@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angular-devkit/architect';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 export interface TslintBuilderOptions {
     tslintConfig?: string;
     tsConfig?: string | string[];

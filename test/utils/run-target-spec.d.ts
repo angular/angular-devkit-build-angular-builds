@@ -7,7 +7,7 @@
  */
 import { BuildEvent, TargetSpecifier } from '@angular-devkit/architect';
 import { logging } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { TestProjectHost } from '../utils/test-project-host';
 export declare const workspaceRoot: string & {
     __PRIVATE_DEVKIT_PATH: void;

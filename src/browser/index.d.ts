@@ -7,7 +7,7 @@
  */
 import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angular-devkit/architect';
 import { Path } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import * as ts from 'typescript';
 import { Budget } from '../angular-cli-files/utilities/bundle-calculator';
 export interface BrowserBuilderOptions {

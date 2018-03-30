@@ -7,7 +7,7 @@
  */
 import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angular-devkit/architect';
 import { Path } from '@angular-devkit/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { BuildWebpackServerSchema } from './schema';
 export declare class ServerBuilder implements Builder<BuildWebpackServerSchema> {
     context: BuilderContext;

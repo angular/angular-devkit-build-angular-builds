@@ -9,7 +9,7 @@
 import { Path, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { Stats } from 'fs';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 export declare class TestProjectHost extends NodeJsSyncHost {
     protected _root: Path;
     private _scopedSyncHost;

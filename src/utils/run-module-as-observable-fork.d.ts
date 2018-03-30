@@ -6,5 +6,5 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuildEvent } from '@angular-devkit/architect';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 export declare function runModuleAsObservableFork(cwd: string, modulePath: string, exportName: string | undefined, args: any[]): Observable<BuildEvent>;
