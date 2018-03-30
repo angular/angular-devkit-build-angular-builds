@@ -1,1 +1,2 @@
-export declare function readTsconfig(tsconfigPath: string): any;
+import * as ts from 'typescript';
+export declare function readTsconfig(tsconfigPath: string): ts.ParsedCommandLine;
