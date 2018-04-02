@@ -15,15 +15,6 @@ export declare function getWebpackStatsConfig(verbose?: boolean): {
     errorDetails: boolean;
     moduleTrace: boolean;
 };
-export interface ExtraEntry {
-    input: string;
-    output?: string;
-    lazy?: boolean;
-    path?: string;
-    entry?: string;
-}
-export declare function lazyChunksFilter(extraEntries: ExtraEntry[]): (string | undefined)[];
-export declare function extraEntryParser(extraEntries: (string | ExtraEntry)[], appRoot: string, defaultEntry: string): ExtraEntry[];
 export interface HashFormat {
     chunk: string;
     extract: string;
@@ -31,9 +22,3 @@ export interface HashFormat {
     script: string;
 }
 export declare function getOutputHashFormat(option: string, length?: number): HashFormat;
-export interface AssetPattern {
-    glob: string;
-    input?: string;
-    output: string;
-    allowOutsideOutDir: boolean;
-}

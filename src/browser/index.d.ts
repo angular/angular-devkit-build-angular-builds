@@ -56,19 +56,18 @@ export interface BrowserBuilderOptions {
         includePaths: string[];
     };
     fileReplacements: {
-        from: string;
-        to: string;
+        src: string;
+        replaceWith: string;
     }[];
 }
 export interface AssetPattern {
     glob: string;
     input: string;
     output: string;
-    allowOutsideOutDir: boolean;
 }
 export interface ExtraEntryPoint {
     input: string;
-    output?: string;
+    bundleName: string;
     lazy: boolean;
 }
 export interface WebpackConfigOptions {

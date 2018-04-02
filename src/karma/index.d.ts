@@ -29,8 +29,8 @@ export interface KarmaBuilderOptions {
         includePaths: string[];
     };
     fileReplacements: {
-        from: string;
-        to: string;
+        src: string;
+        replaceWith: string;
     }[];
 }
 export declare class KarmaBuilder implements Builder<KarmaBuilderOptions> {
