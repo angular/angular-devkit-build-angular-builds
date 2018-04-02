@@ -74,8 +74,8 @@ export interface WebpackConfigOptions {
     root: string;
     projectRoot: string;
     buildOptions: BrowserBuilderOptions;
-    appConfig: BrowserBuilderOptions;
     tsConfig: ts.ParsedCommandLine;
+    tsConfigPath: string;
     supportES2015: boolean;
 }
 export declare class BrowserBuilder implements Builder<BrowserBuilderOptions> {
