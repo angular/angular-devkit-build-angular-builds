@@ -1,3 +1,4 @@
+import { ExtraEntryPoint } from '../../../browser';
 export declare const ngAppResolve: (resolvePath: string) => string;
 export declare function getWebpackStatsConfig(verbose?: boolean): {
     colors: boolean;
@@ -22,3 +23,4 @@ export interface HashFormat {
     script: string;
 }
 export declare function getOutputHashFormat(option: string, length?: number): HashFormat;
+export declare function computeBundleName(entry: ExtraEntryPoint, defaultName: string): string;
