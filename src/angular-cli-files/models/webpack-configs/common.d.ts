@@ -1,15 +1,5 @@
 import { WebpackConfigOptions } from '../build-options';
-/**
- * Enumerate loaders and their dependencies from this file to let the dependency validator
- * know they are used.
- *
- * require('source-map-loader')
- * require('raw-loader')
- * require('url-loader')
- * require('file-loader')
- * require('cache-loader')
- * require('@angular-devkit/build-optimizer')
- */
+export declare const buildOptimizerLoader: string;
 export declare function getCommonConfig(wco: WebpackConfigOptions): {
     mode: string;
     devtool: boolean;
