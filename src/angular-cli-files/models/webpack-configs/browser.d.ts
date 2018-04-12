@@ -17,11 +17,13 @@ export declare function getBrowserConfig(wco: WebpackConfigOptions): {
         runtimeChunk: string;
         splitChunks: {
             chunks: string;
+            maxAsyncRequests: number;
             cacheGroups: {
                 vendors: boolean;
                 vendor: boolean | {
                     name: string;
                     chunks: string;
+                    enforce: boolean;
                     test: (module: any, chunks: {
                         name: string;
                     }[]) => boolean;
