@@ -6,7 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angular-devkit/architect';
+import { Path } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
+import { BrowserBuilderSchema } from '../browser/schema';
 export interface ExtractI18nBuilderOptions {
     browserTarget: string;
     i18nFormat: string;
@@ -18,5 +20,6 @@ export declare class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOpt
     context: BuilderContext;
     constructor(context: BuilderContext);
     run(builderConfig: BuilderConfiguration<ExtractI18nBuilderOptions>): Observable<BuildEvent>;
+    buildWebpackConfig(root: Path, projectRoot: Path, options: BrowserBuilderSchema): any;
 }
 export default ExtractI18nBuilder;

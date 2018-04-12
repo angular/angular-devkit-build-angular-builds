@@ -12,7 +12,7 @@ export declare function getNonAotConfig(wco: WebpackConfigOptions, host: virtual
     };
     plugins: AngularCompilerPlugin[];
 };
-export declare function getAotConfig(wco: WebpackConfigOptions, host: virtualFs.Host<Stats>): {
+export declare function getAotConfig(wco: WebpackConfigOptions, host: virtualFs.Host<Stats>, extract?: boolean): {
     module: {
         rules: {
             test: RegExp;

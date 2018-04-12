@@ -7,36 +7,15 @@
  */
 import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angular-devkit/architect';
 import { Observable } from 'rxjs';
-import { AssetPattern, ExtraEntryPoint } from '../browser';
-export interface KarmaBuilderOptions {
-    main: string;
-    tsConfig: string;
-    karmaConfig: string;
-    watch: boolean;
-    codeCoverage: boolean;
-    codeCoverageExclude: string[];
-    progress: boolean;
-    preserveSymlinks?: boolean;
-    polyfills?: string;
-    poll?: number;
-    port?: number;
-    browsers?: string;
-    sourceMap: boolean;
-    assets: AssetPattern[];
-    scripts: ExtraEntryPoint[];
-    styles: ExtraEntryPoint[];
-    stylePreprocessorOptions: {
-        includePaths: string[];
-    };
-    fileReplacements: {
-        src: string;
-        replaceWith: string;
-    }[];
+import { CurrentFileReplacement } from '../browser/schema';
+import { KarmaBuilderSchema } from './schema';
+export interface KarmaBuilderOptions extends KarmaBuilderSchema {
+    fileReplacements: CurrentFileReplacement[];
 }
 export declare class KarmaBuilder implements Builder<KarmaBuilderOptions> {
     context: BuilderContext;
     constructor(context: BuilderContext);
     run(builderConfig: BuilderConfiguration<KarmaBuilderOptions>): Observable<BuildEvent>;
-    private _buildWebpackConfig(root, projectRoot, options);
+    private _buildWebpackConfig(root, projectRoot, host, options);
 }
 export default KarmaBuilder;
