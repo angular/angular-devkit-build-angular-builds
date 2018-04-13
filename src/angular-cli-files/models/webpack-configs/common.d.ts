@@ -29,6 +29,7 @@ export declare function getCommonConfig(wco: WebpackConfigOptions): {
             test: RegExp;
             loader: string;
             options?: undefined;
+            parser?: undefined;
         } | {
             test: RegExp;
             loader: string;
@@ -36,30 +37,9 @@ export declare function getCommonConfig(wco: WebpackConfigOptions): {
                 name: string;
                 limit: number;
             };
+            parser?: undefined;
         } | {
             test: RegExp;
-            sideEffects: boolean;
-            parser: {
-                system: boolean;
-            };
-            loader?: undefined;
-            options?: undefined;
-        } | {
-            use: ({
-                loader: string;
-                options: {
-                    cacheDirectory: string;
-                    sourceMap?: undefined;
-                };
-            } | {
-                loader: string;
-                options: {
-                    sourceMap: boolean | undefined;
-                    cacheDirectory?: undefined;
-                };
-            })[];
-            test: RegExp;
-            sideEffects: boolean;
             parser: {
                 system: boolean;
             };
@@ -69,6 +49,7 @@ export declare function getCommonConfig(wco: WebpackConfigOptions): {
             test: RegExp;
             loader?: undefined;
             options?: undefined;
+            parser?: undefined;
         } | {
             use: ({
                 loader: string;
@@ -86,6 +67,7 @@ export declare function getCommonConfig(wco: WebpackConfigOptions): {
             test: RegExp;
             loader?: undefined;
             options?: undefined;
+            parser?: undefined;
         })[];
     };
     optimization: {
