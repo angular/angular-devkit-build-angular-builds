@@ -21,7 +21,7 @@ export declare class TestProjectHost extends NodeJsSyncHost {
     private _gitInit();
     private _exec(cmd, args);
     writeMultipleFiles(files: {
-        [path: string]: string;
+        [path: string]: string | ArrayBufferLike | Buffer;
     }): void;
     replaceInFile(path: string, match: RegExp | string, replacement: string): void;
     appendToFile(path: string, str: string): void;
