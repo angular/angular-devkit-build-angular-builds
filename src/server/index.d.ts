@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,14 +7,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angular-devkit/architect';
-import { Path } from '@angular-devkit/core';
+import { Path, virtualFs } from '@angular-devkit/core';
+import { Stats } from 'fs';
 import { Observable } from 'rxjs';
 import { BuildWebpackServerSchema } from './schema';
 export declare class ServerBuilder implements Builder<BuildWebpackServerSchema> {
     context: BuilderContext;
     constructor(context: BuilderContext);
     run(builderConfig: BuilderConfiguration<BuildWebpackServerSchema>): Observable<BuildEvent>;
-    buildWebpackConfig(root: Path, projectRoot: Path, options: BuildWebpackServerSchema): any;
-    private _deleteOutputDir(root, outputPath);
+    buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<Stats>, options: BuildWebpackServerSchema): any;
+    private _deleteOutputDir(root, outputPath, host);
 }
 export default ServerBuilder;
