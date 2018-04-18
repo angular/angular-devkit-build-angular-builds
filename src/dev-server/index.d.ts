@@ -24,6 +24,14 @@ export interface DevServerBuilderOptions {
     watch: boolean;
     hmrWarning: boolean;
     servePathDefaultWarning: boolean;
+    optimization?: boolean;
+    aot?: boolean;
+    sourceMap?: boolean;
+    evalSourceMap?: boolean;
+    vendorChunk?: boolean;
+    commonChunk?: boolean;
+    baseHref?: string;
+    progress?: boolean;
 }
 export declare class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     context: BuilderContext;
