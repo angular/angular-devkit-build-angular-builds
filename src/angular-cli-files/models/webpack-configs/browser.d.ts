@@ -16,9 +16,20 @@ export declare function getBrowserConfig(wco: WebpackConfigOptions): {
     optimization: {
         runtimeChunk: string;
         splitChunks: {
-            chunks: string;
             maxAsyncRequests: number;
             cacheGroups: {
+                default: boolean | {
+                    chunks: string;
+                    minChunks: number;
+                    reuseExistingChunk: boolean;
+                    priority: number;
+                } | undefined;
+                common: boolean | {
+                    name: string;
+                    chunks: string;
+                    minChunks: number;
+                    priority: number;
+                } | undefined;
                 vendors: boolean;
                 vendor: boolean | {
                     name: string;
