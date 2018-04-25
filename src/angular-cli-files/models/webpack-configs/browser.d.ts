@@ -21,13 +21,13 @@ export declare function getBrowserConfig(wco: WebpackConfigOptions): {
                 default: boolean | {
                     chunks: string;
                     minChunks: number;
-                    reuseExistingChunk: boolean;
                     priority: number;
                 } | undefined;
                 common: boolean | {
                     name: string;
                     chunks: string;
                     minChunks: number;
+                    enforce: boolean;
                     priority: number;
                 } | undefined;
                 vendors: boolean;
