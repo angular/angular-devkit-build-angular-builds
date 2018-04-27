@@ -10,21 +10,16 @@ import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angu
 import { Path, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
-import * as ts from 'typescript';
-import { BrowserBuilderSchema } from './schema';
-export interface WebpackConfigOptions {
-    root: string;
-    projectRoot: string;
-    buildOptions: BrowserBuilderSchema;
-    tsConfig: ts.ParsedCommandLine;
-    tsConfigPath: string;
-    supportES2015: boolean;
+import { AssetPatternObject, BrowserBuilderSchema, CurrentFileReplacement } from './schema';
+export interface NormalizedBrowserBuilderSchema extends BrowserBuilderSchema {
+    assets: AssetPatternObject[];
+    fileReplacements: CurrentFileReplacement[];
 }
 export declare class BrowserBuilder implements Builder<BrowserBuilderSchema> {
     context: BuilderContext;
     constructor(context: BuilderContext);
     run(builderConfig: BuilderConfiguration<BrowserBuilderSchema>): Observable<BuildEvent>;
-    buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<fs.Stats>, options: BrowserBuilderSchema): any;
+    buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<fs.Stats>, options: NormalizedBrowserBuilderSchema): any;
     private _deleteOutputDir(root, outputPath, host);
 }
 export default BrowserBuilder;

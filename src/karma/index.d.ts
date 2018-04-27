@@ -7,15 +7,16 @@
  */
 import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angular-devkit/architect';
 import { Observable } from 'rxjs';
-import { CurrentFileReplacement } from '../browser/schema';
+import { AssetPatternObject, CurrentFileReplacement } from '../browser/schema';
 import { KarmaBuilderSchema } from './schema';
-export interface KarmaBuilderOptions extends KarmaBuilderSchema {
+export interface NormalizedKarmaBuilderSchema extends KarmaBuilderSchema {
+    assets: AssetPatternObject[];
     fileReplacements: CurrentFileReplacement[];
 }
-export declare class KarmaBuilder implements Builder<KarmaBuilderOptions> {
+export declare class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     context: BuilderContext;
     constructor(context: BuilderContext);
-    run(builderConfig: BuilderConfiguration<KarmaBuilderOptions>): Observable<BuildEvent>;
+    run(builderConfig: BuilderConfiguration<KarmaBuilderSchema>): Observable<BuildEvent>;
     private _buildWebpackConfig(root, projectRoot, host, options);
 }
 export default KarmaBuilder;

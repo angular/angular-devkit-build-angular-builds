@@ -8,7 +8,7 @@
 import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angular-devkit/architect';
 import { Path } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
-import { BrowserBuilderSchema } from '../browser/schema';
+import { NormalizedBrowserBuilderSchema } from '../browser';
 export interface ExtractI18nBuilderOptions {
     browserTarget: string;
     i18nFormat: string;
@@ -20,6 +20,6 @@ export declare class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOpt
     context: BuilderContext;
     constructor(context: BuilderContext);
     run(builderConfig: BuilderConfiguration<ExtractI18nBuilderOptions>): Observable<BuildEvent>;
-    buildWebpackConfig(root: Path, projectRoot: Path, options: BrowserBuilderSchema): any;
+    buildWebpackConfig(root: Path, projectRoot: Path, options: NormalizedBrowserBuilderSchema): any;
 }
 export default ExtractI18nBuilder;

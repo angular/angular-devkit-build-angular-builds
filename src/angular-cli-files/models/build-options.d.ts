@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { AssetPattern, Budget, ExtraEntryPoint } from '../../browser/schema';
+import { AssetPatternObject, Budget, ExtraEntryPoint } from '../../browser/schema';
 export interface BuildOptions {
     optimization: boolean;
     environment?: string;
@@ -45,7 +45,7 @@ export interface BuildOptions {
     index: string;
     polyfills?: string;
     budgets: Budget[];
-    assets: AssetPattern[];
+    assets: AssetPatternObject[];
     scripts: ExtraEntryPoint[];
     styles: ExtraEntryPoint[];
     stylePreprocessorOptions?: {
