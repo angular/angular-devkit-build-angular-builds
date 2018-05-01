@@ -32,6 +32,7 @@ export interface DevServerBuilderOptions {
     commonChunk?: boolean;
     baseHref?: string;
     progress?: boolean;
+    poll?: number;
 }
 export declare class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     context: BuilderContext;
