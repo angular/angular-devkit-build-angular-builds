@@ -6,10 +6,10 @@
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#b530ced",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#b530ced",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#b530ced",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#b530ced",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#452cd1d",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#452cd1d",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#452cd1d",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#452cd1d",
     "ajv": "~6.4.0",
     "autoprefixer": "^8.4.1",
     "cache-loader": "^1.2.2",
@@ -30,7 +30,6 @@
     "memory-fs": "^0.4.1",
     "mini-css-extract-plugin": "~0.4.0",
     "minimatch": "^3.0.4",
-    "node-sass": "^4.9.0",
     "parse5": "^4.0.0",
     "opn": "^5.1.0",
     "portfinder": "^1.0.13",
@@ -57,6 +56,9 @@
     "webpack-merge": "^4.1.2",
     "webpack-sources": "^1.1.0",
     "webpack-subresource-integrity": "^1.1.0-rc.4"
+  },
+  "optionalDependencies": {
+    "node-sass": "^4.9.0"
   },
   "keywords": [
     "angular",
