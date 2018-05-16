@@ -11,4 +11,5 @@ export declare class IndexHtmlWebpackPlugin {
     private _options;
     constructor(options?: Partial<IndexHtmlWebpackPluginOptions>);
     apply(compiler: Compiler): void;
+    private _generateSriAttributes(content);
 }
