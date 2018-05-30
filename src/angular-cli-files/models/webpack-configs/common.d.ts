@@ -61,6 +61,23 @@ export declare function getCommonConfig(wco: WebpackConfigOptions): {
             loader?: undefined;
             options?: undefined;
             parser?: undefined;
+        } | {
+            test: RegExp;
+            exclude: RegExp;
+            enforce: string;
+            loader?: undefined;
+            options?: undefined;
+            parser?: undefined;
+        } | {
+            use: {
+                loader: string;
+            }[];
+            test: RegExp;
+            exclude: RegExp;
+            enforce: string;
+            loader?: undefined;
+            options?: undefined;
+            parser?: undefined;
         })[];
     };
     optimization: {
