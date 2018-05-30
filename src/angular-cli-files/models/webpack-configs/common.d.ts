@@ -51,19 +51,12 @@ export declare function getCommonConfig(wco: WebpackConfigOptions): {
             options?: undefined;
             parser?: undefined;
         } | {
-            use: ({
-                loader: string;
-                options: {
-                    cacheDirectory: string;
-                    sourceMap?: undefined;
-                };
-            } | {
+            use: {
                 loader: string;
                 options: {
                     sourceMap: boolean | undefined;
-                    cacheDirectory?: undefined;
                 };
-            })[];
+            }[];
             test: RegExp;
             loader?: undefined;
             options?: undefined;
