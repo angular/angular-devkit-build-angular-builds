@@ -21,6 +21,10 @@ export declare function getCommonConfig(wco: WebpackConfigOptions): {
         publicPath: string | undefined;
         filename: string;
     };
+    watch: boolean | undefined;
+    watchOptions: {
+        poll: number | undefined;
+    };
     performance: {
         hints: boolean;
     };

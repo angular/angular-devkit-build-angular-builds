@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angular-devkit/architect';
+import { LoggingCallback } from '@angular-devkit/build-webpack';
 import { Path, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
@@ -22,4 +23,5 @@ export declare class BrowserBuilder implements Builder<BrowserBuilderSchema> {
     buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<fs.Stats>, options: NormalizedBrowserBuilderSchema): any;
     private _deleteOutputDir(root, outputPath, host);
 }
+export declare const getBrowserLoggingCb: (verbose: boolean) => LoggingCallback;
 export default BrowserBuilder;

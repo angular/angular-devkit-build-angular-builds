@@ -5,13 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuildEvent, TargetSpecifier } from '@angular-devkit/architect';
-import { logging } from '@angular-devkit/core';
-import { Observable } from 'rxjs';
-import { TestProjectHost } from '../utils/test-project-host';
-export declare const workspaceRoot: string & {
-    __PRIVATE_DEVKIT_PATH: void;
-};
+import { TestProjectHost } from '@angular-devkit/architect/testing';
 export declare const host: TestProjectHost;
 export declare const outputPath: string & {
     __PRIVATE_DEVKIT_PATH: void;
@@ -40,4 +34,9 @@ export declare const protractorTargetSpec: {
     project: string;
     target: string;
 };
-export declare function runTargetSpec(host: TestProjectHost, targetSpec: TargetSpecifier, overrides?: {}, logger?: logging.Logger): Observable<BuildEvent>;
+export declare enum Timeout {
+    Basic = 30000,
+    Standard = 45000,
+    Complex = 60000,
+    Massive = 120000,
+}
