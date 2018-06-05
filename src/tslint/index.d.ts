@@ -18,9 +18,9 @@ export interface TslintBuilderOptions {
     exclude: string[];
     files: string[];
 }
-export declare class TslintBuilder implements Builder<TslintBuilderOptions> {
+export default class TslintBuilder implements Builder<TslintBuilderOptions> {
     context: BuilderContext;
     constructor(context: BuilderContext);
+    private loadTslint();
     run(builderConfig: BuilderConfiguration<TslintBuilderOptions>): Observable<BuildEvent>;
 }
-export default TslintBuilder;
