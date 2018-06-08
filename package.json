@@ -6,11 +6,11 @@
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#139a4fd",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#139a4fd",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#139a4fd",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#139a4fd",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#139a4fd",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#abc62ed",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#abc62ed",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#abc62ed",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#abc62ed",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#abc62ed",
     "ajv": "~6.4.0",
     "autoprefixer": "^8.4.1",
     "circular-dependency-plugin": "^5.0.2",
@@ -58,13 +58,14 @@
   },
   "keywords": [
     "angular",
+    "Angular CLI",
     "devkit",
     "sdk",
     "Angular DevKit"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/angular/devkit.git"
+    "url": "https://github.com/angular/angular-cli.git"
   },
   "engines": {
     "node": ">= 8.9.0",
@@ -73,7 +74,7 @@
   "author": "Angular Authors",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/angular/devkit/issues"
+    "url": "https://github.com/angular/angular-cli/issues"
   },
-  "homepage": "https://github.com/angular/devkit"
+  "homepage": "https://github.com/angular/angular-cli"
 }
