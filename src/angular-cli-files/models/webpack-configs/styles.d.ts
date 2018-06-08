@@ -15,7 +15,7 @@ export declare function getStylesConfig(wco: WebpackConfigOptions): {
         [key: string]: string[];
     };
     module: {
-        rules: webpack.Rule[];
+        rules: webpack.RuleSetRule[];
     };
     plugins: never[];
 };
