@@ -7,6 +7,6 @@
  */
 export declare class KarmaWebpackFailureCb {
     private callback;
-    constructor(callback: () => void);
+    constructor(callback: (error: string | undefined, errors: string[]) => void);
     apply(compiler: any): void;
 }
