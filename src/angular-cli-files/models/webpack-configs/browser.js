@@ -130,7 +130,7 @@ function getBrowserConfig(wco) {
                 sri: buildOptions.subresourceIntegrity,
             }),
         ]),
-        node: false,
+        node: { crypto: true, stream: true, buffer: true },
     };
 }
 exports.getBrowserConfig = getBrowserConfig;
