@@ -34,9 +34,3 @@ export declare const protractorTargetSpec: {
     project: string;
     target: string;
 };
-export declare enum Timeout {
-    Basic = 30000,
-    Standard = 45000,
-    Complex = 60000,
-    Massive = 120000,
-}
