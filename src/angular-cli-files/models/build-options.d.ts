@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { AssetPatternObject, Budget, ExtraEntryPoint } from '../../browser/schema';
+import { AssetPatternObject, Budget, CurrentFileReplacement, ExtraEntryPoint } from '../../browser/schema';
 export interface BuildOptions {
     optimization: boolean;
     environment?: string;
@@ -54,6 +54,7 @@ export interface BuildOptions {
     };
     lazyModules: string[];
     platform?: 'browser' | 'server';
+    fileReplacements: CurrentFileReplacement[];
 }
 export interface WebpackTestOptions extends BuildOptions {
     codeCoverage?: boolean;

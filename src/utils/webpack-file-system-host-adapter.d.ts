@@ -16,13 +16,13 @@ export declare class WebpackFileSystemHostAdapter implements InputFileSystem {
     private _doHostCall<T>(o, callback);
     stat(path: string, callback: Callback<Stats>): void;
     readdir(path: string, callback: Callback<string[]>): void;
-    readFile(path: string, callback: Callback<string>): void;
+    readFile(path: string, callback: Callback<Buffer>): void;
     readJson(path: string, callback: Callback<JsonObject>): void;
     readlink(path: string, callback: Callback<string>): void;
     statSync(path: string): Stats;
     readdirSync(path: string): string[];
-    readFileSync(path: string): string;
-    readJsonSync(path: string): string;
+    readFileSync(path: string): Buffer;
+    readJsonSync(path: string): {};
     readlinkSync(path: string): string;
     purge(_changes?: string[] | string): void;
 }

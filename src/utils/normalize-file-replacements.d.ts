@@ -11,4 +11,8 @@ import { FileReplacement } from '../browser/schema';
 export declare class MissingFileReplacementException extends BaseException {
     constructor(path: String);
 }
-export declare function addFileReplacements(root: Path, host: virtualFs.AliasHost, fileReplacements: FileReplacement[]): Observable<null>;
+export interface NormalizedFileReplacement {
+    replace: Path;
+    with: Path;
+}
+export declare function normalizeFileReplacements(fileReplacements: FileReplacement[], host: virtualFs.Host, root: Path): Observable<NormalizedFileReplacement[]>;
