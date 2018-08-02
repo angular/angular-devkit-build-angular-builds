@@ -31,6 +31,7 @@ export interface DevServerBuilderOptions {
     optimization?: boolean;
     aot?: boolean;
     sourceMap?: boolean;
+    vendorSourceMap?: boolean;
     evalSourceMap?: boolean;
     vendorChunk?: boolean;
     commonChunk?: boolean;
