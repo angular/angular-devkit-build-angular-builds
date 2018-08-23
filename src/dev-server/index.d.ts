@@ -8,7 +8,7 @@
 /// <reference types="node" />
 import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angular-devkit/architect';
 import { Path, virtualFs } from '@angular-devkit/core';
-import * as fs from 'fs';
+import { Stats } from 'fs';
 import { Observable } from 'rxjs';
 import { BrowserBuilderSchema } from '../browser/schema';
 export interface DevServerBuilderOptions {
@@ -43,7 +43,7 @@ export declare class DevServerBuilder implements Builder<DevServerBuilderOptions
     context: BuilderContext;
     constructor(context: BuilderContext);
     run(builderConfig: BuilderConfiguration<DevServerBuilderOptions>): Observable<BuildEvent>;
-    buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<fs.Stats>, browserOptions: BrowserBuilderSchema): any;
+    buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<Stats>, browserOptions: BrowserBuilderSchema): any;
     private _buildServerConfig;
     private _addLiveReload;
     private _addSslConfig;
