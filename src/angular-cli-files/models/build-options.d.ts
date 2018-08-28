@@ -63,6 +63,7 @@ export interface WebpackTestOptions extends BuildOptions {
 export interface WebpackConfigOptions<T = BuildOptions> {
     root: string;
     projectRoot: string;
+    sourceRoot?: string;
     buildOptions: T;
     tsConfig: ts.ParsedCommandLine;
     tsConfigPath: string;
