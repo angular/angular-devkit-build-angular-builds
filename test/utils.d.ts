@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { TestProjectHost } from '@angular-devkit/architect/testing';
+import { Path } from '@angular-devkit/core';
 export declare const host: TestProjectHost;
-export declare const outputPath: import("../../core/src/virtual-fs/path").Path;
+export declare const outputPath: Path;
 export declare const browserTargetSpec: {
     project: string;
     target: string;
