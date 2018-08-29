@@ -7,16 +7,8 @@
  */
 import { Budget } from '../../browser/schema';
 export interface Compilation {
-    assets: {
-        [name: string]: {
-            size: () => number;
-        };
-    };
-    chunks: {
-        name: string;
-        files: string[];
-        isOnlyInitial: () => boolean;
-    }[];
+    assets: any;
+    chunks: any[];
     warnings: string[];
     errors: string[];
 }
@@ -34,4 +26,4 @@ export declare abstract class Calculator {
 /**
  * Calculate the bytes given a string value.
  */
-export declare function calculateBytes(input: string, baseline?: string, factor?: 1 | -1): number;
+export declare function calculateBytes(val: string, baseline?: string, factor?: ('pos' | 'neg')): number;
