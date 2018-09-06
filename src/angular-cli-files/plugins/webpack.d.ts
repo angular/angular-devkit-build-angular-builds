@@ -10,5 +10,6 @@ export { CleanCssWebpackPlugin, CleanCssWebpackPluginOptions } from './cleancss-
 export { BundleBudgetPlugin, BundleBudgetPluginOptions } from './bundle-budget';
 export { ScriptsWebpackPlugin, ScriptsWebpackPluginOptions } from './scripts-webpack-plugin';
 export { SuppressExtractedTextChunksWebpackPlugin } from './suppress-entry-chunks-webpack-plugin';
+export { RemoveHashPlugin, RemoveHashPluginOptions } from './remove-hash-plugin';
 export { default as PostcssCliResources, PostcssCliResourcesOptions, } from './postcss-cli-resources';
 export declare const RawCssLoader: string;
