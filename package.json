@@ -6,11 +6,11 @@
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#57a32c2",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#57a32c2",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#57a32c2",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#57a32c2",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#57a32c2",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#4c5ed59",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#4c5ed59",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#4c5ed59",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#4c5ed59",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#4c5ed59",
     "ajv": "6.5.3",
     "autoprefixer": "8.4.1",
     "circular-dependency-plugin": "5.0.2",
@@ -69,8 +69,8 @@
     "url": "https://github.com/angular/angular-cli.git"
   },
   "engines": {
-    "node": ">=10.3.0 <11.0.0",
-    "yarn": ">=1.6.0 <2.0.0"
+    "node": ">=10.9.0 <11.0.0",
+    "yarn": ">=1.9.0 <2.0.0"
   },
   "author": "Angular Authors",
   "license": "MIT",
