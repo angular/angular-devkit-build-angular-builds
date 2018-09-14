@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "0.9.0-beta.2",
+  "version": "0.9.0-beta.3",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#c63b4d8",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#c63b4d8",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#c63b4d8",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#c63b4d8",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#c63b4d8",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#b6793bd",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#b6793bd",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#b6793bd",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#b6793bd",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#b6793bd",
     "ajv": "6.5.3",
     "autoprefixer": "8.4.1",
     "circular-dependency-plugin": "5.0.2",
@@ -69,8 +69,8 @@
     "url": "https://github.com/angular/angular-cli.git"
   },
   "engines": {
-    "node": ">=10.9.0 <11.0.0",
-    "yarn": ">=1.9.0 <2.0.0"
+    "node": ">= 8.9.0",
+    "npm": ">= 5.5.1"
   },
   "author": "Angular Authors",
   "license": "MIT",
