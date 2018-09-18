@@ -46,7 +46,6 @@ export declare function getCommonConfig(wco: WebpackConfigOptions): {
             loader: string;
             options: {
                 name: string;
-                limit: number;
             };
             parser?: undefined;
         } | {
