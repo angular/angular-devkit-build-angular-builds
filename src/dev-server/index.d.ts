@@ -38,6 +38,7 @@ export interface DevServerBuilderOptions {
     baseHref?: string;
     progress?: boolean;
     poll?: number;
+    verbose?: boolean;
 }
 export declare class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     context: BuilderContext;
