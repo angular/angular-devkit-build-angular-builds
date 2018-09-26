@@ -7,9 +7,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { JsonObject, virtualFs } from '@angular-devkit/core';
-import { Callback } from '@ngtools/webpack/src/webpack';
+import { Callback, InputFileSystem } from '@ngtools/webpack/src/webpack';
 import { Stats } from 'fs';
-export declare class WebpackFileSystemHostAdapter {
+export declare class WebpackFileSystemHostAdapter implements InputFileSystem {
     protected _host: virtualFs.Host<Stats>;
     protected _syncHost: virtualFs.SyncDelegateHost<Stats> | null;
     constructor(_host: virtualFs.Host<Stats>);
