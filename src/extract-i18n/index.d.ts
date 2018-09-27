@@ -15,6 +15,7 @@ export interface ExtractI18nBuilderOptions {
     i18nLocale: string;
     outputPath?: string;
     outFile?: string;
+    progress?: boolean;
 }
 export declare class ExtractI18nBuilder implements Builder<ExtractI18nBuilderOptions> {
     context: BuilderContext;
