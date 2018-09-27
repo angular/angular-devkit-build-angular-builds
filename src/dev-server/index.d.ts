@@ -36,6 +36,7 @@ export interface DevServerBuilderOptions {
     vendorChunk?: boolean;
     commonChunk?: boolean;
     baseHref?: string;
+    deployUrl?: string;
     progress?: boolean;
     poll?: number;
     verbose?: boolean;
