@@ -25,12 +25,12 @@ export declare function getBrowserConfig(wco: WebpackConfigOptions): {
         splitChunks: {
             maxAsyncRequests: number;
             cacheGroups: {
-                default: boolean | {
+                default: false | {
                     chunks: string;
                     minChunks: number;
                     priority: number;
                 } | undefined;
-                common: boolean | {
+                common: false | {
                     name: string;
                     chunks: string;
                     minChunks: number;
@@ -38,7 +38,7 @@ export declare function getBrowserConfig(wco: WebpackConfigOptions): {
                     priority: number;
                 } | undefined;
                 vendors: boolean;
-                vendor: boolean | {
+                vendor: false | {
                     name: string;
                     chunks: string;
                     enforce: boolean;
