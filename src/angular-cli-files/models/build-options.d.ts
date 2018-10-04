@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { logging } from '@angular-devkit/core';
 import * as ts from 'typescript';
 import { AssetPatternObject, Budget, CurrentFileReplacement, ExtraEntryPoint } from '../../browser/schema';
 export interface BuildOptions {
@@ -63,6 +64,7 @@ export interface WebpackTestOptions extends BuildOptions {
 }
 export interface WebpackConfigOptions<T = BuildOptions> {
     root: string;
+    logger: logging.Logger;
     projectRoot: string;
     sourceRoot?: string;
     buildOptions: T;
