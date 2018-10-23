@@ -1,17 +1,4 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 import { WebpackConfigOptions } from '../build-options';
-/**
-+ * license-webpack-plugin has a peer dependency on webpack-sources, list it in a comment to
-+ * let the dependency validator know it is used.
-+ *
-+ * require('webpack-sources')
-+ */
 export declare function getBrowserConfig(wco: WebpackConfigOptions): {
     devtool: string | boolean;
     resolve: {
@@ -42,7 +29,9 @@ export declare function getBrowserConfig(wco: WebpackConfigOptions): {
                     name: string;
                     chunks: string;
                     enforce: boolean;
-                    test: (module: any, chunks: {
+                    test: (module: {
+                        nameForCondition?: Function | undefined;
+                    }, chunks: {
                         name: string;
                     }[]) => boolean;
                 } | undefined;
