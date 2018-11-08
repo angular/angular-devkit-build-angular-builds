@@ -6,11 +6,11 @@
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#13c057a",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#13c057a",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#13c057a",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#13c057a",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#13c057a",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#8d69589",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#8d69589",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#8d69589",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#8d69589",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#8d69589",
     "ajv": "6.5.3",
     "autoprefixer": "9.1.5",
     "circular-dependency-plugin": "5.0.2",
@@ -54,7 +54,7 @@
     "webpack-subresource-integrity": "1.1.0-rc.6"
   },
   "optionalDependencies": {
-    "node-sass": "4.9.3"
+    "node-sass": "4.10.0"
   },
   "keywords": [
     "angular",
