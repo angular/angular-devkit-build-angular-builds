@@ -57,11 +57,6 @@ export interface BrowserBuilderSchema {
   outputPath: string;
 
   /**
-   * Path where style resources will be placed (Relative to outputPath).
-   */
-  resourcesOutputPath: string;
-
-  /**
    * Build using Ahead of Time compilation.
    */
   aot: boolean;

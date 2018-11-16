@@ -12,7 +12,6 @@ export interface BuildOptions {
     optimization: boolean;
     environment?: string;
     outputPath: string;
-    resourcesOutputPath?: string;
     aot?: boolean;
     sourceMap?: boolean;
     vendorSourceMap?: boolean;
