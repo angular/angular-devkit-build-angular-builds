@@ -32,6 +32,7 @@ export interface DevServerBuilderOptions {
     aot?: boolean;
     sourceMap?: boolean;
     vendorSourceMap?: boolean;
+    /**@deprecated */
     evalSourceMap?: boolean;
     vendorChunk?: boolean;
     commonChunk?: boolean;

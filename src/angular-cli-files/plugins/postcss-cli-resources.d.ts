@@ -3,6 +3,7 @@ import * as webpack from 'webpack';
 export interface PostcssCliResourcesOptions {
     baseHref?: string;
     deployUrl?: string;
+    resourcesOutputPath?: string;
     filename: string;
     loader: webpack.loader.LoaderContext;
 }
