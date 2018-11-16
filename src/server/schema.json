@@ -57,8 +57,7 @@
     "evalSourceMap": {
       "type": "boolean",
       "description": "Output in-file eval sourcemaps.",
-      "default": false,
-      "x-deprecated": true
+      "default": false
     },
     "vendorChunk": {
       "type": "boolean",

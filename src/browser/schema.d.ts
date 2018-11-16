@@ -72,7 +72,6 @@ export interface BrowserBuilderSchema {
   vendorSourceMap?: boolean;
 
   /**
-    @deprecated
    * Output in-file eval sourcemaps.
    */
   evalSourceMap: boolean;
@@ -193,7 +192,6 @@ export interface BrowserBuilderSchema {
   ngswConfigPath?: string;
 
   /**
-   * @deprecated
    * Flag to prevent building an app shell.
    */
   skipAppShell: boolean;
