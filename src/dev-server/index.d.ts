@@ -11,7 +11,7 @@ import { Path, virtualFs } from '@angular-devkit/core';
 import { Stats } from 'fs';
 import { Observable } from 'rxjs';
 import { BrowserBuilderSchema } from '../browser/schema';
-export interface DevServerBuilderOptions {
+export interface DevServerBuilderOptions extends Pick<BrowserBuilderSchema, 'optimization' | 'aot' | 'sourceMap' | 'vendorSourceMap' | 'evalSourceMap' | 'vendorChunk' | 'commonChunk' | 'poll' | 'baseHref' | 'deployUrl' | 'progress' | 'verbose'> {
     browserTarget: string;
     port: number;
     host: string;
@@ -28,19 +28,6 @@ export interface DevServerBuilderOptions {
     watch: boolean;
     hmrWarning: boolean;
     servePathDefaultWarning: boolean;
-    optimization?: boolean;
-    aot?: boolean;
-    sourceMap?: boolean;
-    vendorSourceMap?: boolean;
-    /**@deprecated */
-    evalSourceMap?: boolean;
-    vendorChunk?: boolean;
-    commonChunk?: boolean;
-    baseHref?: string;
-    deployUrl?: string;
-    progress?: boolean;
-    poll?: number;
-    verbose?: boolean;
 }
 export declare class DevServerBuilder implements Builder<DevServerBuilderOptions> {
     context: BuilderContext;

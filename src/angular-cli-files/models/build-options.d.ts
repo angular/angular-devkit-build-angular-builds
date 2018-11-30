@@ -15,6 +15,9 @@ export interface BuildOptions {
     resourcesOutputPath?: string;
     aot?: boolean;
     sourceMap?: boolean;
+    scriptsSourceMap?: boolean;
+    stylesSourceMap?: boolean;
+    hiddenSourceMap?: boolean;
     vendorSourceMap?: boolean;
     evalSourceMap?: boolean;
     vendorChunk?: boolean;
