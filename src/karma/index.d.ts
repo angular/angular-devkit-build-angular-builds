@@ -10,12 +10,7 @@ import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angu
 import { Path, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
-import { AssetPatternObject, CurrentFileReplacement } from '../browser/schema';
-import { KarmaBuilderSchema } from './schema';
-export interface NormalizedKarmaBuilderSchema extends KarmaBuilderSchema {
-    assets: AssetPatternObject[];
-    fileReplacements: CurrentFileReplacement[];
-}
+import { KarmaBuilderSchema, NormalizedKarmaBuilderSchema } from './schema';
 export declare class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     context: BuilderContext;
     constructor(context: BuilderContext);

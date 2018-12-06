@@ -10,7 +10,7 @@ import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angu
 import { Path, virtualFs } from '@angular-devkit/core';
 import { Stats } from 'fs';
 import { Observable } from 'rxjs';
-import { BrowserBuilderSchema } from '../browser/schema';
+import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from '../browser/schema';
 export interface DevServerBuilderOptions extends Pick<BrowserBuilderSchema, 'optimization' | 'aot' | 'sourceMap' | 'vendorSourceMap' | 'evalSourceMap' | 'vendorChunk' | 'commonChunk' | 'poll' | 'baseHref' | 'deployUrl' | 'progress' | 'verbose'> {
     browserTarget: string;
     port: number;
@@ -33,7 +33,7 @@ export declare class DevServerBuilder implements Builder<DevServerBuilderOptions
     context: BuilderContext;
     constructor(context: BuilderContext);
     run(builderConfig: BuilderConfiguration<DevServerBuilderOptions>): Observable<BuildEvent>;
-    buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<Stats>, browserOptions: BrowserBuilderSchema): any;
+    buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<Stats>, browserOptions: NormalizedBrowserBuilderSchema): any;
     private _buildServerConfig;
     private _addLiveReload;
     private _addSslConfig;

@@ -10,12 +10,12 @@ import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angu
 import { Path, virtualFs } from '@angular-devkit/core';
 import { Stats } from 'fs';
 import { Observable } from 'rxjs';
-import { BuildWebpackServerSchema } from './schema';
+import { BuildWebpackServerSchema, NormalizedServerBuilderServerSchema } from './schema';
 export declare class ServerBuilder implements Builder<BuildWebpackServerSchema> {
     context: BuilderContext;
     constructor(context: BuilderContext);
     run(builderConfig: BuilderConfiguration<BuildWebpackServerSchema>): Observable<BuildEvent>;
-    buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<Stats>, options: BuildWebpackServerSchema): any;
+    buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<Stats>, options: NormalizedServerBuilderServerSchema): any;
     private _deleteOutputDir;
 }
 export default ServerBuilder;

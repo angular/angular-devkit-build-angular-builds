@@ -11,12 +11,7 @@ import { LoggingCallback } from '@angular-devkit/build-webpack';
 import { Path, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
-import { NormalizedSourceMaps } from '../utils';
-import { AssetPatternObject, BrowserBuilderSchema, CurrentFileReplacement } from './schema';
-export interface NormalizedBrowserBuilderSchema extends Pick<BrowserBuilderSchema, Exclude<keyof BrowserBuilderSchema, 'sourceMap' | 'vendorSourceMap'>>, NormalizedSourceMaps {
-    assets: AssetPatternObject[];
-    fileReplacements: CurrentFileReplacement[];
-}
+import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from './schema';
 export declare class BrowserBuilder implements Builder<BrowserBuilderSchema> {
     context: BuilderContext;
     constructor(context: BuilderContext);

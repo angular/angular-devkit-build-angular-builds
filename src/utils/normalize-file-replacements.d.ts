@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException, Path, virtualFs } from '@angular-devkit/core';
-import { Observable } from 'rxjs';
 import { FileReplacement } from '../browser/schema';
 export declare class MissingFileReplacementException extends BaseException {
     constructor(path: String);
@@ -15,4 +14,4 @@ export interface NormalizedFileReplacement {
     replace: Path;
     with: Path;
 }
-export declare function normalizeFileReplacements(fileReplacements: FileReplacement[], host: virtualFs.Host, root: Path): Observable<NormalizedFileReplacement[]>;
+export declare function normalizeFileReplacements(fileReplacements: FileReplacement[], host: virtualFs.SyncDelegateHost, root: Path): NormalizedFileReplacement[];

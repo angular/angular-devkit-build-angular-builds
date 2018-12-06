@@ -44,7 +44,7 @@ export interface BrowserBuilderSchema {
   /**
    * Enables optimization of the build output.
    */
-  optimization: boolean;
+  optimization: OptimizationOptions;
 
   /**
    * Replace files with other files in the build.
@@ -237,6 +237,15 @@ export interface BrowserBuilderSchema {
   profile: boolean;
 }
 
+export type OptimizationOptions = boolean | OptimizationObject;
+
+export interface OptimizationObject {
+  /** Enables optimization of the scripts output. */
+  scripts?: boolean;
+  /** Enables optimization of the styles output. */
+  styles?: boolean;
+}
+
 export type SourceMapOptions = boolean | SourceMapObject;
 
 export interface SourceMapObject {
@@ -393,4 +402,20 @@ export enum BudgetType {
   AllScript = 'allScript',
   AnyScript = 'anyScript',
   Bundle = 'bundle',
+}
+
+// TODO: figure out a better way to normalize assets, extra entry points, file replacements,
+// and whatever else needs to be normalized, while keeping type safety.
+// Right now this normalization has to be done in all other builders that make use of the
+// BrowserBuildSchema and BrowserBuilder.buildWebpackConfig.
+// It would really help if it happens during architect.validateBuilderOptions, or similar.
+export interface NormalizedBrowserBuilderSchema extends
+  Pick<
+  BrowserBuilderSchema,
+  Exclude<keyof BrowserBuilderSchema, 'sourceMap' | 'vendorSourceMap' | 'optimization'>
+  > {
+  sourceMap: NormalizedSourceMaps;
+  assets: AssetPatternObject[];
+  fileReplacements: CurrentFileReplacement[];
+  optimization: NormalizedOptimization;
 }

@@ -8,17 +8,17 @@
 import { logging } from '@angular-devkit/core';
 import * as ts from 'typescript';
 import { AssetPatternObject, Budget, CurrentFileReplacement, ExtraEntryPoint } from '../../browser/schema';
+import { NormalizedOptimization, NormalizedSourceMaps } from '../../utils/index';
 export interface BuildOptions {
-    optimization: boolean;
+    optimization: NormalizedOptimization;
     environment?: string;
     outputPath: string;
     resourcesOutputPath?: string;
     aot?: boolean;
-    sourceMap?: boolean;
-    scriptsSourceMap?: boolean;
-    stylesSourceMap?: boolean;
-    hiddenSourceMap?: boolean;
+    sourceMap: NormalizedSourceMaps;
+    /** @deprecated use sourceMap instead */
     vendorSourceMap?: boolean;
+    /** @deprecated  */
     evalSourceMap?: boolean;
     vendorChunk?: boolean;
     commonChunk?: boolean;
