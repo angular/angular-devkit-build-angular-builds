@@ -6,11 +6,11 @@
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#1e97eb1",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#1e97eb1",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#1e97eb1",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#1e97eb1",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#1e97eb1",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#e1c9eec",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#e1c9eec",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#e1c9eec",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#e1c9eec",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#e1c9eec",
     "ajv": "6.6.2",
     "autoprefixer": "9.4.3",
     "circular-dependency-plugin": "5.0.2",
@@ -25,10 +25,10 @@
     "less-loader": "4.1.0",
     "license-webpack-plugin": "2.0.4",
     "loader-utils": "1.1.0",
-    "mini-css-extract-plugin": "0.4.4",
+    "mini-css-extract-plugin": "0.5.0",
     "minimatch": "3.0.4",
     "parse5": "4.0.0",
-    "opn": "5.3.0",
+    "opn": "5.4.0",
     "portfinder": "1.0.17",
     "postcss": "7.0.5",
     "postcss-import": "12.0.0",
@@ -54,7 +54,7 @@
     "webpack-subresource-integrity": "1.1.0-rc.6"
   },
   "optionalDependencies": {
-    "node-sass": "4.10.0"
+    "node-sass": "4.11.0"
   },
   "keywords": [
     "angular",
