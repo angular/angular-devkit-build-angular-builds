@@ -14,7 +14,7 @@ export declare class AppShellBuilder implements Builder<BuildWebpackAppShellSche
     context: BuilderContext;
     constructor(context: BuilderContext);
     run(builderConfig: BuilderConfiguration<BuildWebpackAppShellSchema>): Observable<BuildEvent>;
-    build(targetString: string, overrides: {}): Observable<BuildEvent>;
+    build(targetString: string, overrides: {}): Observable<BuildEvent<any>>;
     getServerModuleBundlePath(options: BuildWebpackAppShellSchema): Observable<Path>;
     getBrowserBuilderConfig(options: BuildWebpackAppShellSchema): Observable<BuilderConfiguration<BrowserBuilderSchema>>;
     renderUniversal(options: BuildWebpackAppShellSchema): Observable<BuildEvent>;
