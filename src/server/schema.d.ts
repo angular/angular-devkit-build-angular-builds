@@ -8,10 +8,7 @@
 
 import {
   BrowserBuilderSchema,
-  CurrentFileReplacement,
   FileReplacement,
-  NormalizedOptimization,
-  NormalizedSourceMaps,
   OptimizationObject,
   SourceMapOptions,
 } from '../browser/schema';
