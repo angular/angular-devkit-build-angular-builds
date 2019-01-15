@@ -47,6 +47,7 @@ export interface BuildOptions {
     statsJson: boolean;
     forkTypeChecker: boolean;
     profile?: boolean;
+    es5BrowserSupport?: boolean;
     main: string;
     index: string;
     polyfills?: string;
