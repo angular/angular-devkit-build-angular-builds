@@ -17,6 +17,7 @@ export declare function getCommonConfig(wco: WebpackConfigOptions): {
         [key: string]: string[];
     };
     output: {
+        futureEmitAssets: boolean;
         path: string;
         publicPath: string | undefined;
         filename: string;
