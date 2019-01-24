@@ -7,8 +7,7 @@
  */
 import { logging } from '@angular-devkit/core';
 import * as ts from 'typescript';
-import { AssetPatternObject, Budget, CurrentFileReplacement, ExtraEntryPoint } from '../../browser/schema';
-import { NormalizedOptimization, NormalizedSourceMaps } from '../../utils/index';
+import { AssetPatternObject, Budget, CurrentFileReplacement, ExtraEntryPoint, NormalizedOptimization, NormalizedSourceMaps } from '../../browser/schema';
 export interface BuildOptions {
     optimization: NormalizedOptimization;
     environment?: string;
