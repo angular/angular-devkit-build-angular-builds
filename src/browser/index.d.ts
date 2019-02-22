@@ -11,7 +11,8 @@ import { LoggingCallback, WebpackBuilder } from '@angular-devkit/build-webpack';
 import { Path, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
-import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from './schema';
+import { NormalizedBrowserBuilderSchema } from '../utils';
+import { Schema as BrowserBuilderSchema } from './schema';
 export declare class BrowserBuilder implements Builder<BrowserBuilderSchema> {
     context: BuilderContext;
     constructor(context: BuilderContext);

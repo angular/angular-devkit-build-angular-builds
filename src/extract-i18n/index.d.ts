@@ -8,7 +8,7 @@
 import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angular-devkit/architect';
 import { Path } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
-import { NormalizedBrowserBuilderSchema } from '../browser/schema';
+import { NormalizedBrowserBuilderSchema } from '../utils';
 export interface ExtractI18nBuilderOptions {
     browserTarget: string;
     i18nFormat: string;

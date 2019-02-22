@@ -7,11 +7,9 @@
  */
 export * from './app-shell';
 export * from './browser';
-export * from './browser/schema';
 export * from './dev-server';
 export * from './extract-i18n';
 export * from './karma';
-export * from './karma/schema';
 export * from './protractor';
 export * from './server';
 export * from './tslint';

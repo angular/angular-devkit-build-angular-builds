@@ -10,7 +10,8 @@ import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angu
 import { Path, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
-import { KarmaBuilderSchema, NormalizedKarmaBuilderSchema } from './schema';
+import { NormalizedKarmaBuilderSchema } from '../utils';
+import { KarmaBuilderSchema } from './schema';
 export declare class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     context: BuilderContext;
     constructor(context: BuilderContext);

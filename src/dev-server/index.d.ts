@@ -10,29 +10,12 @@ import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angu
 import { Path, virtualFs } from '@angular-devkit/core';
 import { Stats } from 'fs';
 import { Observable } from 'rxjs';
-import { BrowserBuilderSchema, NormalizedBrowserBuilderSchema } from '../browser/schema';
-export interface DevServerBuilderOptions extends Pick<BrowserBuilderSchema, 'optimization' | 'aot' | 'sourceMap' | 'vendorSourceMap' | 'evalSourceMap' | 'vendorChunk' | 'commonChunk' | 'poll' | 'baseHref' | 'deployUrl' | 'progress' | 'verbose'> {
-    browserTarget: string;
-    port: number;
-    host: string;
-    proxyConfig?: string;
-    ssl: boolean;
-    sslKey?: string;
-    sslCert?: string;
-    open: boolean;
-    liveReload: boolean;
-    publicHost?: string;
-    servePath?: string;
-    disableHostCheck: boolean;
-    hmr: boolean;
-    watch: boolean;
-    hmrWarning: boolean;
-    servePathDefaultWarning: boolean;
-}
-export declare class DevServerBuilder implements Builder<DevServerBuilderOptions> {
+import { NormalizedBrowserBuilderSchema } from '../utils';
+import { Schema as DevServerBuilderSchema } from './schema';
+export declare class DevServerBuilder implements Builder<DevServerBuilderSchema> {
     context: BuilderContext;
     constructor(context: BuilderContext);
-    run(builderConfig: BuilderConfiguration<DevServerBuilderOptions>): Observable<BuildEvent>;
+    run(builderConfig: BuilderConfiguration<DevServerBuilderSchema>): Observable<BuildEvent>;
     buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<Stats>, browserOptions: NormalizedBrowserBuilderSchema): any;
     private _buildServerConfig;
     private _addLiveReload;

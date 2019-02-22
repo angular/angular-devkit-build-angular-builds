@@ -58,7 +58,7 @@ export declare function getCommonConfig(wco: WebpackConfigOptions): {
             use: {
                 loader: string;
                 options: {
-                    sourceMap: boolean;
+                    sourceMap: boolean | undefined;
                 };
             }[];
             test: RegExp;

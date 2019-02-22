@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ExtraEntryPoint, ExtraEntryPointObject } from '../../../browser/schema';
+import { ExtraEntryPoint, ExtraEntryPointClass } from '../../../browser/schema';
 import { SourceMapDevToolPlugin } from 'webpack';
 export declare const ngAppResolve: (resolvePath: string) => string;
 export interface HashFormat {
@@ -15,7 +15,7 @@ export interface HashFormat {
     script: string;
 }
 export declare function getOutputHashFormat(option: string, length?: number): HashFormat;
-export declare type NormalizedEntryPoint = ExtraEntryPointObject & {
+export declare type NormalizedEntryPoint = ExtraEntryPointClass & {
     bundleName: string;
 };
 export declare function normalizeExtraEntryPoints(extraEntryPoints: ExtraEntryPoint[], defaultBundleName: string): NormalizedEntryPoint[];
