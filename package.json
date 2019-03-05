@@ -6,11 +6,11 @@
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#eca5dc3",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#eca5dc3",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#eca5dc3",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#eca5dc3",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#eca5dc3",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#28b3042",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#28b3042",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#28b3042",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#28b3042",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#28b3042",
     "ajv": "6.10.0",
     "autoprefixer": "9.4.9",
     "circular-dependency-plugin": "5.0.2",
@@ -74,11 +74,5 @@
   "bugs": {
     "url": "https://github.com/angular/angular-cli/issues"
   },
-  "homepage": "https://github.com/angular/angular-cli",
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "node ./bin/devkit-admin hooks/pre-push"
-    }
-  }
+  "homepage": "https://github.com/angular/angular-cli"
 }
