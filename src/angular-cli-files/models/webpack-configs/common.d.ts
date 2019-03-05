@@ -33,11 +33,6 @@ export declare function getCommonConfig(wco: WebpackConfigOptions): {
         rules: ({
             test: RegExp;
             loader: string;
-            options?: undefined;
-            parser?: undefined;
-        } | {
-            test: RegExp;
-            loader: string;
             options: {
                 name: string;
             };
