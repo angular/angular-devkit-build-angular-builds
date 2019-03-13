@@ -15,7 +15,7 @@ export declare class ServerBuilder implements Builder<BuildWebpackServerSchema> 
     context: BuilderContext;
     constructor(context: BuilderContext);
     run(builderConfig: BuilderConfiguration<BuildWebpackServerSchema>): Observable<BuildEvent>;
-    buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<Stats>, options: NormalizedServerBuilderServerSchema): any;
+    buildWebpackConfig(root: Path, projectRoot: Path, _host: virtualFs.Host<Stats>, options: NormalizedServerBuilderServerSchema): any;
     private _deleteOutputDir;
 }
 export default ServerBuilder;

@@ -18,7 +18,7 @@ export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
     outputPath: string;
 };
 export declare function createBrowserLoggingCallback(verbose: boolean, logger: logging.LoggerApi): WebpackLoggingCallback;
-export declare function buildWebpackConfig(root: Path, projectRoot: Path, host: virtualFs.Host<fs.Stats>, options: NormalizedBrowserBuilderSchema, logger: logging.LoggerApi): webpack.Configuration;
+export declare function buildWebpackConfig(root: Path, projectRoot: Path, options: NormalizedBrowserBuilderSchema, logger: logging.LoggerApi): webpack.Configuration;
 export declare function buildBrowserWebpackConfigFromWorkspace(options: BrowserBuilderSchema, projectName: string, workspace: experimental.workspace.Workspace, host: virtualFs.Host<fs.Stats>, logger: logging.LoggerApi): Promise<webpack.Configuration>;
 export declare function buildBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, host: virtualFs.Host<fs.Stats>): Promise<{
     workspace: experimental.workspace.Workspace;
