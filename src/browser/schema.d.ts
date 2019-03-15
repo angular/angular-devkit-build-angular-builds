@@ -125,6 +125,7 @@ export interface Schema {
     preserveSymlinks?: boolean;
     /**
      * Output profile events for Chrome profiler.
+     * @deprecated Use "NG_BUILD_PROFILING" environment variable instead.
      */
     profile?: boolean;
     /**
