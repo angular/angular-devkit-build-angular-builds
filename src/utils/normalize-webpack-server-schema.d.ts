@@ -7,7 +7,7 @@
  */
 import { Path, virtualFs } from '@angular-devkit/core';
 import { OptimizationClass, SourceMapClass } from '../browser/schema';
-import { BuildWebpackServerSchema } from '../server/schema';
+import { Schema as BuildWebpackServerSchema } from '../server/schema';
 import { NormalizedFileReplacement } from './normalize-file-replacements';
 /**
  * A normalized webpack server builder schema.
