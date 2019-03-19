@@ -3,6 +3,7 @@ export declare const buildOptimizerLoader: string;
 export declare function getCommonConfig(wco: WebpackConfigOptions): {
     mode: string;
     devtool: boolean;
+    profile: boolean;
     resolve: {
         extensions: string[];
         symlinks: boolean;
