@@ -1,17 +1,17 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "0.800.0-beta.7+30.0a1d429",
+  "version": "0.800.0-beta.7+32.778c5f5",
   "description": "Angular Webpack Build Facade",
   "experimental": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#0a1d429",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#0a1d429",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#0a1d429",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#0a1d429",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#0a1d429",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#778c5f5",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#778c5f5",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#778c5f5",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#778c5f5",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#778c5f5",
     "ajv": "6.10.0",
     "autoprefixer": "9.5.0",
     "circular-dependency-plugin": "5.0.2",
@@ -34,6 +34,7 @@
     "postcss-loader": "3.0.0",
     "raw-loader": "1.0.0",
     "rxjs": "6.4.0",
+    "sass": "1.17.3",
     "sass-loader": "7.1.0",
     "semver": "5.6.0",
     "source-map-support": "0.5.11",
@@ -51,9 +52,6 @@
     "webpack-merge": "4.2.1",
     "webpack-sources": "1.3.0",
     "webpack-subresource-integrity": "1.1.0-rc.6"
-  },
-  "optionalDependencies": {
-    "node-sass": "4.11.0"
   },
   "keywords": [
     "angular",
