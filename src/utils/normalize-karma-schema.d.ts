@@ -7,7 +7,7 @@
  */
 import { Path, virtualFs } from '@angular-devkit/core';
 import { AssetPatternClass, OptimizationClass, SourceMapClass } from '../browser/schema';
-import { KarmaBuilderSchema } from '../karma/schema';
+import { Schema as KarmaBuilderSchema } from '../karma/schema';
 import { NormalizedFileReplacement } from './normalize-file-replacements';
 /**
  * A normalized webpack server builder schema.

@@ -11,7 +11,7 @@ import { Path, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
 import { NormalizedKarmaBuilderSchema } from '../utils';
-import { KarmaBuilderSchema } from './schema';
+import { Schema as KarmaBuilderSchema } from './schema';
 export declare class KarmaBuilder implements Builder<KarmaBuilderSchema> {
     context: BuilderContext;
     constructor(context: BuilderContext);
