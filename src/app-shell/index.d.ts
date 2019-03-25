@@ -9,7 +9,7 @@ import { BuildEvent, Builder, BuilderConfiguration, BuilderContext } from '@angu
 import { Path } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
-import { BuildWebpackAppShellSchema } from './schema';
+import { Schema as BuildWebpackAppShellSchema } from './schema';
 export declare class AppShellBuilder implements Builder<BuildWebpackAppShellSchema> {
     context: BuilderContext;
     constructor(context: BuilderContext);
