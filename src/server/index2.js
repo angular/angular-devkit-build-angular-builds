@@ -8,12 +8,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const index2_1 = require("@angular-devkit/architect/src/index2");
+const index2_2 = require("@angular-devkit/build-webpack/src/webpack/index2");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
-const index2_2 = require("../../../build_webpack/src/webpack/index2");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const require_project_module_1 = require("../angular-cli-files/utilities/require-project-module");
