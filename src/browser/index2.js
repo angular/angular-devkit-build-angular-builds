@@ -13,6 +13,7 @@ const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
+const analytics_1 = require("../../plugins/webpack/analytics");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const require_project_module_1 = require("../angular-cli-files/utilities/require-project-module");
@@ -40,7 +41,7 @@ function createBrowserLoggingCallback(verbose, logger) {
     };
 }
 exports.createBrowserLoggingCallback = createBrowserLoggingCallback;
-function buildWebpackConfig(root, projectRoot, options, logger) {
+function buildWebpackConfig(root, projectRoot, options, additionalOptions = {}) {
     // Ensure Build Optimizer is only used with AOT.
     if (options.buildOptimizer && !options.aot) {
         throw new Error(`The 'buildOptimizer' option cannot be used without 'aot'.`);
@@ -51,9 +52,12 @@ function buildWebpackConfig(root, projectRoot, options, logger) {
     const projectTs = require_project_module_1.requireProjectModule(core_1.getSystemPath(projectRoot), 'typescript');
     const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
         && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
+    const logger = additionalOptions.logger
+        ? additionalOptions.logger.createChild('webpackConfigOptions')
+        : new core_1.logging.NullLogger();
     wco = {
         root: core_1.getSystemPath(root),
-        logger: logger.createChild('webpackConfigOptions'),
+        logger,
         projectRoot: core_1.getSystemPath(projectRoot),
         buildOptions: options,
         tsConfig,
@@ -67,6 +71,20 @@ function buildWebpackConfig(root, projectRoot, options, logger) {
         webpack_configs_1.getStylesConfig(wco),
         webpack_configs_1.getStatsConfig(wco),
     ];
+    if (additionalOptions.analytics) {
+        // If there's analytics, add our plugin. Otherwise no need to slow down the build.
+        let category = 'build';
+        if (additionalOptions.builderInfo) {
+            // We already vetted that this is a "safe" package, otherwise the analytics would be noop.
+            category = additionalOptions.builderInfo.builderName.split(':')[1];
+        }
+        // The category is the builder name if it's an angular builder.
+        webpackConfigs.push({
+            plugins: [
+                new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, additionalOptions.analytics, category),
+            ],
+        });
+    }
     if (wco.buildOptions.main || wco.buildOptions.polyfills) {
         const typescriptConfigPartial = wco.buildOptions.aot
             ? webpack_configs_1.getAotConfig(wco)
@@ -84,12 +102,12 @@ function buildWebpackConfig(root, projectRoot, options, logger) {
     return webpackConfig;
 }
 exports.buildWebpackConfig = buildWebpackConfig;
-async function buildBrowserWebpackConfigFromWorkspace(options, projectName, workspace, host, logger) {
+async function buildBrowserWebpackConfigFromWorkspace(options, projectName, workspace, host, additionalOptions = {}) {
     // TODO: Use a better interface for workspace access.
     const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
     const sourceRoot = workspace.getProject(projectName).sourceRoot;
     const normalizedOptions = utils_1.normalizeBrowserSchema(host, workspace.root, projectRoot, sourceRoot ? core_1.resolve(workspace.root, core_1.normalize(sourceRoot)) : undefined, options);
-    return buildWebpackConfig(workspace.root, projectRoot, normalizedOptions, logger);
+    return buildWebpackConfig(workspace.root, projectRoot, normalizedOptions, additionalOptions);
 }
 exports.buildBrowserWebpackConfigFromWorkspace = buildBrowserWebpackConfigFromWorkspace;
 async function buildBrowserWebpackConfigFromContext(options, context, host) {
@@ -100,7 +118,11 @@ async function buildBrowserWebpackConfigFromContext(options, context, host) {
     if (!projectName) {
         throw new Error('Must either have a target from the context or a default project.');
     }
-    const config = await buildBrowserWebpackConfigFromWorkspace(options, projectName, workspace, host, context.logger);
+    const config = await buildBrowserWebpackConfigFromWorkspace(options, projectName, workspace, host, {
+        logger: context.logger,
+        analytics: context.analytics,
+        builderInfo: context.builder,
+    });
     return { workspace, config };
 }
 exports.buildBrowserWebpackConfigFromContext = buildBrowserWebpackConfigFromContext;
