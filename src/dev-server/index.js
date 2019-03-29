@@ -76,15 +76,14 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port }) => {
         options.port = port;
         // Resolve public host and client address.
-        let clientAddress = `${options.ssl ? 'https' : 'http'}://0.0.0.0:0`;
+        let clientAddress = url.parse(`${options.ssl ? 'https' : 'http'}://0.0.0.0:0`);
         if (options.publicHost) {
             let publicHost = options.publicHost;
             if (!/^\w+:\/\//.test(publicHost)) {
                 publicHost = `${options.ssl ? 'https' : 'http'}://${publicHost}`;
             }
-            const clientUrl = url.parse(publicHost);
-            options.publicHost = clientUrl.host;
-            clientAddress = url.format(clientUrl);
+            clientAddress = url.parse(publicHost);
+            options.publicHost = clientAddress.host;
         }
         // Resolve serve address.
         const serverAddress = url.format({
@@ -254,7 +253,12 @@ function _addLiveReload(options, browserOptions, webpackConfig, clientAddress, l
     catch (_a) {
         throw new Error('The "webpack-dev-server" package could not be found.');
     }
-    const entryPoints = [`${webpackDevServerPath}?${clientAddress}`];
+    // If a custom path is provided the webpack dev server client drops the sockjs-node segment.
+    // This adds it back so that behavior is consistent when using a custom URL path
+    if (clientAddress.pathname) {
+        clientAddress.pathname = path.posix.join(clientAddress.pathname, 'sockjs-node');
+    }
+    const entryPoints = [`${webpackDevServerPath}?${url.format(clientAddress)}`];
     if (options.hmr) {
         const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
         logger.warn(core_1.tags.oneLine `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.`);
