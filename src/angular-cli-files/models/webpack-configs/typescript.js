@@ -42,7 +42,7 @@ function _createAotPlugin(wco, options, useMain = true, extract = false) {
         }
     }
     const pluginOptions = Object.assign({ mainPath: useMain ? path.join(root, buildOptions.main) : undefined }, i18nFileAndFormat, { locale: buildOptions.i18nLocale, platform: buildOptions.platform === 'server' ? webpack_1.PLATFORM.Server : webpack_1.PLATFORM.Browser, missingTranslation: buildOptions.i18nMissingTranslation, sourceMap: buildOptions.sourceMap.scripts, additionalLazyModules,
-        hostReplacementPaths, nameLazyFiles: buildOptions.namedChunks, forkTypeChecker: buildOptions.forkTypeChecker, contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'), logger: wco.logger, directTemplateLoading: true, importFactories: buildOptions.experimentalImportFactories }, options);
+        hostReplacementPaths, nameLazyFiles: buildOptions.namedChunks, forkTypeChecker: buildOptions.forkTypeChecker, contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'), logger: wco.logger, directTemplateLoading: true }, options);
     return new webpack_1.AngularCompilerPlugin(pluginOptions);
 }
 function getNonAotConfig(wco) {

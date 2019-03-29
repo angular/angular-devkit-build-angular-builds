@@ -45,12 +45,6 @@ export interface Schema {
      */
     evalSourceMap?: boolean;
     /**
-     * **EXPERIMENTAL** Transform import statements for lazy routes to import factories when
-     * using View Engine. Should only be used when switching back and forth between View Engine
-     * and Ivy. See https://angular.io/guide/ivy for usage information.
-     */
-    experimentalImportFactories?: boolean;
-    /**
      * Extract css from global styles into css files instead of js ones.
      */
     extractCss?: boolean;

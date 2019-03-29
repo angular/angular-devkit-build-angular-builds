@@ -283,13 +283,7 @@ function getCommonConfig(wco) {
                 ...extraMinimizers,
             ],
         },
-        plugins: [
-            // Always replace the context for the System.import in angular/core to prevent warnings.
-            // https://github.com/angular/angular/issues/11580
-            // With VE the correct context is added in @ngtools/webpack, but Ivy doesn't need it at all.
-            new webpack_1.ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)/),
-            ...extraPlugins,
-        ],
+        plugins: extraPlugins,
     };
 }
 exports.getCommonConfig = getCommonConfig;
