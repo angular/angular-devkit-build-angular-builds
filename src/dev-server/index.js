@@ -7,8 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const build_webpack_1 = require("@angular-devkit/build-webpack");
+const index2_1 = require("@angular-devkit/architect/src/index2");
+const index2_2 = require("@angular-devkit/build-webpack/src/webpack-dev-server/index2");
 const core_1 = require("@angular-devkit/core");
+const node_1 = require("@angular-devkit/core/node");
 const fs_1 = require("fs");
 const path = require("path");
 const rxjs_1 = require("rxjs");
@@ -19,103 +21,140 @@ const check_port_1 = require("../angular-cli-files/utilities/check-port");
 const browser_1 = require("../browser");
 const utils_1 = require("../utils");
 const opn = require('opn');
-class DevServerBuilder {
-    constructor(context) {
-        this.context = context;
+exports.devServerBuildOverriddenKeys = [
+    'watch',
+    'optimization',
+    'aot',
+    'sourceMap',
+    'vendorSourceMap',
+    'evalSourceMap',
+    'vendorChunk',
+    'commonChunk',
+    'baseHref',
+    'progress',
+    'poll',
+    'verbose',
+    'deployUrl',
+];
+/**
+ * Reusable implementation of the build angular webpack dev server builder.
+ * @param options Dev Server options.
+ * @param context The build context.
+ * @param transforms A map of transforms that can be used to hook into some logic (such as
+ *     transforming webpack configuration before passing it to webpack).
+ */
+function serveWebpackBrowser(options, context, transforms = {}) {
+    const browserTarget = index2_1.targetFromTargetString(options.browserTarget);
+    const root = context.workspaceRoot;
+    let first = true;
+    let opnAddress;
+    const host = new node_1.NodeJsSyncHost();
+    const loggingFn = transforms.logging
+        || browser_1.createBrowserLoggingCallback(!!options.verbose, context.logger);
+    async function setup() {
+        // Get the browser configuration from the target name.
+        const rawBrowserOptions = await context.getTargetOptions(browserTarget);
+        // Override options we need to override, if defined.
+        const overrides = Object.keys(options)
+            .filter(key => options[key] !== undefined && exports.devServerBuildOverriddenKeys.includes(key))
+            .reduce((previous, key) => (Object.assign({}, previous, { [key]: options[key] })), {});
+        const browserName = await context.getBuilderNameForTarget(browserTarget);
+        const browserOptions = await context.validateOptions(Object.assign({}, rawBrowserOptions, overrides), browserName);
+        const webpackConfigResult = await browser_1.buildBrowserWebpackConfigFromContext(browserOptions, context, host);
+        let webpackConfig = webpackConfigResult.config;
+        const workspace = webpackConfigResult.workspace;
+        if (transforms.browserConfig) {
+            webpackConfig = await transforms.browserConfig(workspace, webpackConfig).toPromise();
+        }
+        const port = await check_port_1.checkPort(options.port || 0, options.host || 'localhost', 4200);
+        let webpackDevServerConfig = buildServerConfig(root, options, browserOptions, context.logger);
+        if (transforms.serverConfig) {
+            webpackDevServerConfig = await transforms.serverConfig(workspace, webpackConfig).toPromise();
+        }
+        return { browserOptions, webpackConfig, webpackDevServerConfig, port };
     }
-    run(builderConfig) {
-        const options = builderConfig.options;
-        const root = this.context.workspace.root;
-        const projectRoot = core_1.resolve(root, builderConfig.root);
-        const host = new core_1.virtualFs.AliasHost(this.context.host);
-        const webpackDevServerBuilder = new build_webpack_1.WebpackDevServerBuilder(Object.assign({}, this.context, { host }));
-        let browserOptions;
-        let first = true;
-        let opnAddress;
-        return rxjs_1.from(check_port_1.checkPort(options.port || 0, options.host || 'localhost', 4200)).pipe(operators_1.tap((port) => options.port = port), operators_1.concatMap(() => this._getBrowserOptions(options)), operators_1.tap(opts => browserOptions = utils_1.normalizeBrowserSchema(host, root, core_1.resolve(root, builderConfig.root), builderConfig.sourceRoot, opts.options)), operators_1.concatMap(() => {
-            const webpackConfig = this.buildWebpackConfig(root, projectRoot, host, browserOptions);
-            let webpackDevServerConfig;
-            try {
-                webpackDevServerConfig = this._buildServerConfig(root, options, browserOptions);
+    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port }) => {
+        options.port = port;
+        // Resolve public host and client address.
+        let clientAddress = `${options.ssl ? 'https' : 'http'}://0.0.0.0:0`;
+        if (options.publicHost) {
+            let publicHost = options.publicHost;
+            if (!/^\w+:\/\//.test(publicHost)) {
+                publicHost = `${options.ssl ? 'https' : 'http'}://${publicHost}`;
             }
-            catch (err) {
-                return rxjs_1.throwError(err);
-            }
-            // Resolve public host and client address.
-            let clientAddress = `${options.ssl ? 'https' : 'http'}://0.0.0.0:0`;
-            if (options.publicHost) {
-                let publicHost = options.publicHost;
-                if (!/^\w+:\/\//.test(publicHost)) {
-                    publicHost = `${options.ssl ? 'https' : 'http'}://${publicHost}`;
-                }
-                const clientUrl = url.parse(publicHost);
-                options.publicHost = clientUrl.host;
-                clientAddress = url.format(clientUrl);
-            }
-            // Resolve serve address.
-            const serverAddress = url.format({
-                protocol: options.ssl ? 'https' : 'http',
-                hostname: options.host === '0.0.0.0' ? 'localhost' : options.host,
-                // Port cannot be undefined here since we have a step that sets it back in options above.
-                // tslint:disable-next-line:no-non-null-assertion
-                port: options.port.toString(),
-            });
-            // Add live reload config.
-            if (options.liveReload) {
-                this._addLiveReload(options, browserOptions, webpackConfig, clientAddress);
-            }
-            else if (options.hmr) {
-                this.context.logger.warn('Live reload is disabled. HMR option ignored.');
-            }
-            if (!options.watch) {
-                // There's no option to turn off file watching in webpack-dev-server, but
-                // we can override the file watcher instead.
-                webpackConfig.plugins.unshift({
+            const clientUrl = url.parse(publicHost);
+            options.publicHost = clientUrl.host;
+            clientAddress = url.format(clientUrl);
+        }
+        // Resolve serve address.
+        const serverAddress = url.format({
+            protocol: options.ssl ? 'https' : 'http',
+            hostname: options.host === '0.0.0.0' ? 'localhost' : options.host,
+            // Port cannot be undefined here since we have a step that sets it back in options above.
+            // tslint:disable-next-line:no-non-null-assertion
+            port: options.port.toString(),
+        });
+        // Add live reload config.
+        if (options.liveReload) {
+            _addLiveReload(options, browserOptions, webpackConfig, clientAddress, context.logger);
+        }
+        else if (options.hmr) {
+            context.logger.warn('Live reload is disabled. HMR option ignored.');
+        }
+        if (!options.watch) {
+            // There's no option to turn off file watching in webpack-dev-server, but
+            // we can override the file watcher instead.
+            webpackConfig.plugins = [...(webpackConfig.plugins || []), {
                     // tslint:disable-next-line:no-any
                     apply: (compiler) => {
                         compiler.hooks.afterEnvironment.tap('angular-cli', () => {
                             compiler.watchFileSystem = { watch: () => { } };
                         });
                     },
-                });
-            }
-            if (browserOptions.optimization.scripts || browserOptions.optimization.styles) {
-                this.context.logger.error(core_1.tags.stripIndents `
-            ****************************************************************************************
-            This is a simple server for use in testing or debugging Angular applications locally.
-            It hasn't been reviewed for security issues.
+                }];
+        }
+        const normalizedOptimization = utils_1.normalizeOptimization(browserOptions.optimization);
+        if (normalizedOptimization.scripts || normalizedOptimization.styles) {
+            context.logger.error(core_1.tags.stripIndents `
+          ****************************************************************************************
+          This is a simple server for use in testing or debugging Angular applications locally.
+          It hasn't been reviewed for security issues.
 
-            DON'T USE IT FOR PRODUCTION!
-            ****************************************************************************************
-          `);
-            }
-            this.context.logger.info(core_1.tags.oneLine `
-          **
-          Angular Live Development Server is listening on ${options.host}:${options.port},
-          open your browser on ${serverAddress}${webpackDevServerConfig.publicPath}
-          **
+          DON'T USE IT FOR PRODUCTION!
+          ****************************************************************************************
         `);
-            opnAddress = serverAddress + webpackDevServerConfig.publicPath;
-            webpackConfig.devServer = webpackDevServerConfig;
-            return webpackDevServerBuilder.runWebpackDevServer(webpackConfig, undefined, browser_1.getBrowserLoggingCb(browserOptions.verbose || false));
-        }), operators_1.map(buildEvent => {
-            if (first && options.open) {
-                first = false;
-                opn(opnAddress);
-            }
-            return buildEvent;
-        }));
-    }
-    buildWebpackConfig(root, projectRoot, host, browserOptions) {
-        const browserBuilder = new browser_1.BrowserBuilder(this.context);
-        return browserBuilder.buildWebpackConfig(root, projectRoot, host, browserOptions);
-    }
-    _buildServerConfig(root, options, browserOptions) {
-        const systemRoot = core_1.getSystemPath(root);
-        if (options.host) {
-            // Check that the host is either localhost or prints out a message.
-            if (!/^127\.\d+\.\d+\.\d+/g.test(options.host) && options.host !== 'localhost') {
-                this.context.logger.warn(core_1.tags.stripIndent `
+        }
+        context.logger.info(core_1.tags.oneLine `
+        **
+        Angular Live Development Server is listening on ${options.host}:${options.port},
+        open your browser on ${serverAddress}${webpackDevServerConfig.publicPath}
+        **
+      `);
+        opnAddress = serverAddress + webpackDevServerConfig.publicPath;
+        webpackConfig.devServer = webpackDevServerConfig;
+        return index2_2.runWebpackDevServer(webpackConfig, context, { logging: loggingFn });
+    }), operators_1.map(buildEvent => {
+        if (first && options.open) {
+            first = false;
+            opn(opnAddress);
+        }
+        return Object.assign({}, buildEvent, { baseUrl: opnAddress });
+    }));
+}
+exports.serveWebpackBrowser = serveWebpackBrowser;
+/**
+ * Create a webpack configuration for the dev server.
+ * @param workspaceRoot The root of the workspace. This comes from the context.
+ * @param serverOptions DevServer options, based on the dev server input schema.
+ * @param browserOptions Browser builder options. See the browser builder from this package.
+ * @param logger A generic logger to use for showing warnings.
+ * @returns A webpack dev-server configuration.
+ */
+function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger) {
+    if (serverOptions.host) {
+        // Check that the host is either localhost or prints out a message.
+        if (!/^127\.\d+\.\d+\.\d+/g.test(serverOptions.host) && serverOptions.host !== 'localhost') {
+            logger.warn(core_1.tags.stripIndent `
           WARNING: This is a simple server for use in testing or debugging Angular applications
           locally. It hasn't been reviewed for security issues.
 
@@ -124,199 +163,202 @@ class DevServerBuilder {
           websocket connection issues. You might need to use "--disableHostCheck" if that's the
           case.
         `);
-            }
         }
-        if (options.disableHostCheck) {
-            this.context.logger.warn(core_1.tags.oneLine `
+    }
+    if (serverOptions.disableHostCheck) {
+        logger.warn(core_1.tags.oneLine `
         WARNING: Running a server with --disable-host-check is a security risk.
         See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a
         for more information.
       `);
-        }
-        const servePath = this._buildServePath(options, browserOptions);
-        const { styles, scripts } = browserOptions.optimization;
-        const config = {
-            host: options.host,
-            port: options.port,
-            headers: { 'Access-Control-Allow-Origin': '*' },
-            historyApiFallback: {
-                index: `${servePath}/${path.basename(browserOptions.index)}`,
-                disableDotRule: true,
-                htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
-            },
-            stats: false,
-            compress: styles || scripts,
-            watchOptions: {
-                poll: browserOptions.poll,
-            },
-            https: options.ssl,
-            overlay: {
-                errors: !(styles || scripts),
-                warnings: false,
-            },
-            public: options.publicHost,
-            disableHostCheck: options.disableHostCheck,
-            publicPath: servePath,
-            hot: options.hmr,
-            contentBase: false,
-        };
-        if (options.ssl) {
-            this._addSslConfig(systemRoot, options, config);
-        }
-        if (options.proxyConfig) {
-            this._addProxyConfig(systemRoot, options, config);
-        }
-        return config;
     }
-    _addLiveReload(options, browserOptions, webpackConfig, // tslint:disable-line:no-any
-    clientAddress) {
-        // This allows for live reload of page when changes are made to repo.
-        // https://webpack.js.org/configuration/dev-server/#devserver-inline
-        let webpackDevServerPath;
-        try {
-            webpackDevServerPath = require.resolve('webpack-dev-server/client');
+    const servePath = buildServePath(serverOptions, browserOptions, logger);
+    const { styles, scripts } = utils_1.normalizeOptimization(browserOptions.optimization);
+    const config = {
+        host: serverOptions.host,
+        port: serverOptions.port,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        historyApiFallback: {
+            index: `${servePath}/${path.basename(browserOptions.index)}`,
+            disableDotRule: true,
+            htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
+        },
+        stats: false,
+        compress: styles || scripts,
+        watchOptions: {
+            poll: browserOptions.poll,
+        },
+        https: serverOptions.ssl,
+        overlay: {
+            errors: !(styles || scripts),
+            warnings: false,
+        },
+        public: serverOptions.publicHost,
+        disableHostCheck: serverOptions.disableHostCheck,
+        publicPath: servePath,
+        hot: serverOptions.hmr,
+        contentBase: false,
+    };
+    if (serverOptions.ssl) {
+        _addSslConfig(workspaceRoot, serverOptions, config);
+    }
+    if (serverOptions.proxyConfig) {
+        _addProxyConfig(workspaceRoot, serverOptions, config);
+    }
+    return config;
+}
+exports.buildServerConfig = buildServerConfig;
+/**
+ * Resolve and build a URL _path_ that will be the root of the server. This resolved base href and
+ * deploy URL from the browser options and returns a path from the root.
+ * @param serverOptions The server options that were passed to the server builder.
+ * @param browserOptions The browser options that were passed to the browser builder.
+ * @param logger A generic logger to use for showing warnings.
+ */
+function buildServePath(serverOptions, browserOptions, logger) {
+    let servePath = serverOptions.servePath;
+    if (!servePath && servePath !== '') {
+        const defaultPath = _findDefaultServePath(browserOptions.baseHref, browserOptions.deployUrl);
+        const showWarning = serverOptions.servePathDefaultWarning;
+        if (defaultPath == null && showWarning) {
+            logger.warn(core_1.tags.oneLine `
+        WARNING: --deploy-url and/or --base-href contain unsupported values for ng serve. Default
+        serve path of '/' used. Use --serve-path to override.
+      `);
         }
-        catch (_a) {
-            throw new Error('The "webpack-dev-server" package could not be found.');
-        }
-        const entryPoints = [`${webpackDevServerPath}?${clientAddress}`];
-        if (options.hmr) {
-            const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
-            this.context.logger.warn(core_1.tags.oneLine `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.`);
-            const showWarning = options.hmrWarning;
-            if (showWarning) {
-                this.context.logger.info(core_1.tags.stripIndents `
+        servePath = defaultPath || '';
+    }
+    if (servePath.endsWith('/')) {
+        servePath = servePath.substr(0, servePath.length - 1);
+    }
+    if (!servePath.startsWith('/')) {
+        servePath = `/${servePath}`;
+    }
+    return servePath;
+}
+exports.buildServePath = buildServePath;
+/**
+ * Private method to enhance a webpack config with live reload configuration.
+ * @private
+ */
+function _addLiveReload(options, browserOptions, webpackConfig, clientAddress, logger) {
+    if (webpackConfig.plugins === undefined) {
+        webpackConfig.plugins = [];
+    }
+    // This allows for live reload of page when changes are made to repo.
+    // https://webpack.js.org/configuration/dev-server/#devserver-inline
+    let webpackDevServerPath;
+    try {
+        webpackDevServerPath = require.resolve('webpack-dev-server/client');
+    }
+    catch (_a) {
+        throw new Error('The "webpack-dev-server" package could not be found.');
+    }
+    const entryPoints = [`${webpackDevServerPath}?${clientAddress}`];
+    if (options.hmr) {
+        const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
+        logger.warn(core_1.tags.oneLine `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.`);
+        const showWarning = options.hmrWarning;
+        if (showWarning) {
+            logger.info(core_1.tags.stripIndents `
           The project will still live reload when HMR is enabled,
           but to take advantage of HMR additional application code is required'
           (not included in an Angular CLI project by default).'
           See ${webpackHmrLink}
           for information on working with HMR for Webpack.`);
-                this.context.logger.warn(core_1.tags.oneLine `To disable this warning use "hmrWarning: false" under "serve"
+            logger.warn(core_1.tags.oneLine `To disable this warning use "hmrWarning: false" under "serve"
            options in "angular.json".`);
-            }
-            entryPoints.push('webpack/hot/dev-server');
-            webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
-            if (browserOptions.extractCss) {
-                this.context.logger.warn(core_1.tags.oneLine `NOTICE: (HMR) does not allow for CSS hot reload
+        }
+        entryPoints.push('webpack/hot/dev-server');
+        webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
+        if (browserOptions.extractCss) {
+            logger.warn(core_1.tags.oneLine `NOTICE: (HMR) does not allow for CSS hot reload
                 when used together with '--extract-css'.`);
-            }
-        }
-        if (!webpackConfig.entry.main) {
-            webpackConfig.entry.main = [];
-        }
-        webpackConfig.entry.main.unshift(...entryPoints);
-    }
-    _addSslConfig(root, options, config) {
-        let sslKey = undefined;
-        let sslCert = undefined;
-        if (options.sslKey) {
-            const keyPath = path.resolve(root, options.sslKey);
-            if (fs_1.existsSync(keyPath)) {
-                sslKey = fs_1.readFileSync(keyPath, 'utf-8');
-            }
-        }
-        if (options.sslCert) {
-            const certPath = path.resolve(root, options.sslCert);
-            if (fs_1.existsSync(certPath)) {
-                sslCert = fs_1.readFileSync(certPath, 'utf-8');
-            }
-        }
-        config.https = true;
-        if (sslKey != null && sslCert != null) {
-            config.https = {
-                key: sslKey,
-                cert: sslCert,
-            };
         }
     }
-    _addProxyConfig(root, options, config) {
-        let proxyConfig = {};
-        const proxyPath = path.resolve(root, options.proxyConfig);
-        if (fs_1.existsSync(proxyPath)) {
-            proxyConfig = require(proxyPath);
-        }
-        else {
-            const message = 'Proxy config file ' + proxyPath + ' does not exist.';
-            throw new Error(message);
-        }
-        config.proxy = proxyConfig;
+    if (typeof webpackConfig.entry !== 'object' || Array.isArray(webpackConfig.entry)) {
+        webpackConfig.entry = {};
     }
-    _buildServePath(options, browserOptions) {
-        let servePath = options.servePath;
-        if (!servePath && servePath !== '') {
-            const defaultServePath = this._findDefaultServePath(browserOptions.baseHref, browserOptions.deployUrl);
-            const showWarning = options.servePathDefaultWarning;
-            if (defaultServePath == null && showWarning) {
-                this.context.logger.warn(core_1.tags.oneLine `
-            WARNING: --deploy-url and/or --base-href contain
-            unsupported values for ng serve.  Default serve path of '/' used.
-            Use --serve-path to override.
-          `);
-            }
-            servePath = defaultServePath || '';
-        }
-        if (servePath.endsWith('/')) {
-            servePath = servePath.substr(0, servePath.length - 1);
-        }
-        if (!servePath.startsWith('/')) {
-            servePath = `/${servePath}`;
-        }
-        return servePath;
+    if (!Array.isArray(webpackConfig.entry.main)) {
+        webpackConfig.entry.main = [];
     }
-    _findDefaultServePath(baseHref, deployUrl) {
-        if (!baseHref && !deployUrl) {
-            return '';
+    webpackConfig.entry.main.unshift(...entryPoints);
+}
+/**
+ * Private method to enhance a webpack config with SSL configuration.
+ * @private
+ */
+function _addSslConfig(root, options, config) {
+    let sslKey = undefined;
+    let sslCert = undefined;
+    if (options.sslKey) {
+        const keyPath = path.resolve(root, options.sslKey);
+        if (fs_1.existsSync(keyPath)) {
+            sslKey = fs_1.readFileSync(keyPath, 'utf-8');
         }
-        if (/^(\w+:)?\/\//.test(baseHref || '') || /^(\w+:)?\/\//.test(deployUrl || '')) {
-            // If baseHref or deployUrl is absolute, unsupported by ng serve
-            return null;
-        }
-        // normalize baseHref
-        // for ng serve the starting base is always `/` so a relative
-        // and root relative value are identical
-        const baseHrefParts = (baseHref || '')
-            .split('/')
-            .filter(part => part !== '');
-        if (baseHref && !baseHref.endsWith('/')) {
-            baseHrefParts.pop();
-        }
-        const normalizedBaseHref = baseHrefParts.length === 0 ? '/' : `/${baseHrefParts.join('/')}/`;
-        if (deployUrl && deployUrl[0] === '/') {
-            if (baseHref && baseHref[0] === '/' && normalizedBaseHref !== deployUrl) {
-                // If baseHref and deployUrl are root relative and not equivalent, unsupported by ng serve
-                return null;
-            }
-            return deployUrl;
-        }
-        // Join together baseHref and deployUrl
-        return `${normalizedBaseHref}${deployUrl || ''}`;
     }
-    _getBrowserOptions(options) {
-        const architect = this.context.architect;
-        const [project, target, configuration] = options.browserTarget.split(':');
-        const overridesOptions = [
-            'watch',
-            'optimization',
-            'aot',
-            'sourceMap',
-            'vendorSourceMap',
-            'evalSourceMap',
-            'vendorChunk',
-            'commonChunk',
-            'baseHref',
-            'progress',
-            'poll',
-            'verbose',
-            'deployUrl',
-        ];
-        // remove options that are undefined or not to be overrriden
-        const overrides = Object.keys(options)
-            .filter(key => options[key] !== undefined && overridesOptions.includes(key))
-            .reduce((previous, key) => (Object.assign({}, previous, { [key]: options[key] })), {});
-        const browserTargetSpec = { project, target, configuration, overrides };
-        const builderConfig = architect.getBuilderConfiguration(browserTargetSpec);
-        return architect.getBuilderDescription(builderConfig).pipe(operators_1.concatMap(browserDescription => architect.validateBuilderOptions(builderConfig, browserDescription)));
+    if (options.sslCert) {
+        const certPath = path.resolve(root, options.sslCert);
+        if (fs_1.existsSync(certPath)) {
+            sslCert = fs_1.readFileSync(certPath, 'utf-8');
+        }
+    }
+    config.https = true;
+    if (sslKey != null && sslCert != null) {
+        config.https = {
+            key: sslKey,
+            cert: sslCert,
+        };
     }
 }
-exports.DevServerBuilder = DevServerBuilder;
-exports.default = DevServerBuilder;
+/**
+ * Private method to enhance a webpack config with Proxy configuration.
+ * @private
+ */
+function _addProxyConfig(root, options, config) {
+    let proxyConfig = {};
+    const proxyPath = path.resolve(root, options.proxyConfig);
+    if (fs_1.existsSync(proxyPath)) {
+        proxyConfig = require(proxyPath);
+    }
+    else {
+        const message = 'Proxy config file ' + proxyPath + ' does not exist.';
+        throw new Error(message);
+    }
+    config.proxy = proxyConfig;
+}
+/**
+ * Find the default server path. We don't want to expose baseHref and deployUrl as arguments, only
+ * the browser options where needed. This method should stay private (people who want to resolve
+ * baseHref and deployUrl should use the buildServePath exported function.
+ * @private
+ */
+function _findDefaultServePath(baseHref, deployUrl) {
+    if (!baseHref && !deployUrl) {
+        return '';
+    }
+    if (/^(\w+:)?\/\//.test(baseHref || '') || /^(\w+:)?\/\//.test(deployUrl || '')) {
+        // If baseHref or deployUrl is absolute, unsupported by ng serve
+        return null;
+    }
+    // normalize baseHref
+    // for ng serve the starting base is always `/` so a relative
+    // and root relative value are identical
+    const baseHrefParts = (baseHref || '')
+        .split('/')
+        .filter(part => part !== '');
+    if (baseHref && !baseHref.endsWith('/')) {
+        baseHrefParts.pop();
+    }
+    const normalizedBaseHref = baseHrefParts.length === 0 ? '/' : `/${baseHrefParts.join('/')}/`;
+    if (deployUrl && deployUrl[0] === '/') {
+        if (baseHref && baseHref[0] === '/' && normalizedBaseHref !== deployUrl) {
+            // If baseHref and deployUrl are root relative and not equivalent, unsupported by ng serve
+            return null;
+        }
+        return deployUrl;
+    }
+    // Join together baseHref and deployUrl
+    return `${normalizedBaseHref}${deployUrl || ''}`;
+}
+exports.default = index2_1.createBuilder(serveWebpackBrowser);
