@@ -20,7 +20,7 @@ const webpack = require("webpack");
 const check_port_1 = require("../angular-cli-files/utilities/check-port");
 const browser_1 = require("../browser");
 const utils_1 = require("../utils");
-const opn = require('opn');
+const open = require('open');
 exports.devServerBuildOverriddenKeys = [
     'watch',
     'optimization',
@@ -47,7 +47,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     const browserTarget = index2_1.targetFromTargetString(options.browserTarget);
     const root = context.workspaceRoot;
     let first = true;
-    let opnAddress;
+    let openAddress;
     const host = new node_1.NodeJsSyncHost();
     const loggingFn = transforms.logging
         || browser_1.createBrowserLoggingCallback(!!options.verbose, context.logger);
@@ -129,15 +129,15 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         open your browser on ${serverAddress}${webpackDevServerConfig.publicPath}
         **
       `);
-        opnAddress = serverAddress + webpackDevServerConfig.publicPath;
+        openAddress = serverAddress + webpackDevServerConfig.publicPath;
         webpackConfig.devServer = webpackDevServerConfig;
         return index2_2.runWebpackDevServer(webpackConfig, context, { logging: loggingFn });
     }), operators_1.map(buildEvent => {
         if (first && options.open) {
             first = false;
-            opn(opnAddress);
+            open(openAddress);
         }
-        return Object.assign({}, buildEvent, { baseUrl: opnAddress });
+        return Object.assign({}, buildEvent, { baseUrl: openAddress });
     }));
 }
 exports.serveWebpackBrowser = serveWebpackBrowser;
