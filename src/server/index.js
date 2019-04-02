@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const index2_1 = require("@angular-devkit/architect/src/index2");
-const index2_2 = require("@angular-devkit/build-webpack/src/webpack/index2");
+const webpack_1 = require("@angular-devkit/build-webpack/src/webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const path = require("path");
@@ -45,7 +45,7 @@ exports.default = index2_1.createBuilder((options, context) => {
         }
     }), operators_1.concatMap(({ normalizedOptions, projectRoot }) => {
         const webpackConfig = buildServerWebpackConfig(core_1.normalize(root), projectRoot, host, normalizedOptions, context.logger.createChild('webpack'));
-        return index2_2.runWebpack(webpackConfig, context);
+        return webpack_1.runWebpack(webpackConfig, context);
     }), operators_1.map(output => {
         if (output.success === false) {
             return output;

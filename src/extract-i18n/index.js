@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const index2_1 = require("@angular-devkit/architect/src/index2");
-const index2_2 = require("@angular-devkit/build-webpack/src/webpack/index2");
+const webpack_1 = require("@angular-devkit/build-webpack/src/webpack");
 const path = require("path");
 const webpack = require("webpack");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
@@ -52,6 +52,6 @@ async function execute(options, context) {
         webpack_configs_1.getStylesConfig(wco),
         webpack_configs_1.getStatsConfig(wco),
     ]);
-    return index2_2.runWebpack(config, context).toPromise();
+    return webpack_1.runWebpack(config, context).toPromise();
 }
 exports.default = index2_1.createBuilder(execute);

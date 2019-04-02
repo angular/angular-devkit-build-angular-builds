@@ -8,7 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const index2_1 = require("@angular-devkit/architect/src/index2");
-const index2_2 = require("@angular-devkit/build-webpack/src/webpack-dev-server/index2");
+const webpack_dev_server_1 = require("@angular-devkit/build-webpack/src/webpack-dev-server");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const fs_1 = require("fs");
@@ -131,7 +131,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
       `);
         openAddress = serverAddress + webpackDevServerConfig.publicPath;
         webpackConfig.devServer = webpackDevServerConfig;
-        return index2_2.runWebpackDevServer(webpackConfig, context, { logging: loggingFn });
+        return webpack_dev_server_1.runWebpackDevServer(webpackConfig, context, { logging: loggingFn });
     }), operators_1.map(buildEvent => {
         if (first && options.open) {
             first = false;

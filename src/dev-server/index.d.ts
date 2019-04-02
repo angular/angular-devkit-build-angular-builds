@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect/src/index2';
-import { DevServerBuildOutput } from '@angular-devkit/build-webpack/src/webpack-dev-server/index2';
-import { WebpackLoggingCallback } from '@angular-devkit/build-webpack/src/webpack/index2';
+import { WebpackLoggingCallback } from '@angular-devkit/build-webpack/src/webpack';
+import { DevServerBuildOutput } from '@angular-devkit/build-webpack/src/webpack-dev-server';
 import { experimental, json, logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import * as WebpackDevServer from 'webpack-dev-server';
