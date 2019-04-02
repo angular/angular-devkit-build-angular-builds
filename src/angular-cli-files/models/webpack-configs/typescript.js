@@ -69,3 +69,22 @@ function getAotConfig(wco, extract = false) {
     };
 }
 exports.getAotConfig = getAotConfig;
+function getTypescriptWorkerPlugin(wco, workerTsConfigPath) {
+    const { buildOptions } = wco;
+    const pluginOptions = {
+        skipCodeGeneration: true,
+        tsConfigPath: workerTsConfigPath,
+        mainPath: undefined,
+        platform: webpack_1.PLATFORM.Browser,
+        sourceMap: buildOptions.sourceMap.scripts,
+        forkTypeChecker: buildOptions.forkTypeChecker,
+        contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
+        logger: wco.logger,
+        // Run no transformers.
+        platformTransformers: [],
+        // Don't attempt lazy route discovery.
+        discoverLazyRoutes: false,
+    };
+    return new webpack_1.AngularCompilerPlugin(pluginOptions);
+}
+exports.getTypescriptWorkerPlugin = getTypescriptWorkerPlugin;

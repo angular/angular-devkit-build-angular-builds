@@ -18,3 +18,4 @@ __export(require("./test"));
 __export(require("./typescript"));
 __export(require("./utils"));
 __export(require("./stats"));
+__export(require("./worker"));

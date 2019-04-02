@@ -208,6 +208,10 @@ export interface Schema {
      * Run build when files change.
      */
     watch?: boolean;
+    /**
+     * TypeScript configuration for Web Worker modules.
+     */
+    webWorkerTsConfig?: string;
 }
 export declare type AssetPattern = AssetPatternClass | string;
 export interface AssetPatternClass {

@@ -91,6 +91,9 @@ function buildWebpackConfig(root, projectRoot, options, additionalOptions = {}) 
             : webpack_configs_1.getNonAotConfig(wco);
         webpackConfigs.push(typescriptConfigPartial);
     }
+    if (wco.buildOptions.webWorkerTsConfig) {
+        webpackConfigs.push(webpack_configs_1.getWorkerConfig(wco));
+    }
     const webpackConfig = webpackMerge(webpackConfigs);
     if (options.profile || process.env['NG_BUILD_PROFILING']) {
         const smp = new SpeedMeasurePlugin({
