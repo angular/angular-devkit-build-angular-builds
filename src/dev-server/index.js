@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const index2_1 = require("@angular-devkit/architect/src/index2");
-const webpack_dev_server_1 = require("@angular-devkit/build-webpack/src/webpack-dev-server");
+const architect_1 = require("@angular-devkit/architect");
+const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const fs_1 = require("fs");
@@ -44,7 +44,7 @@ exports.devServerBuildOverriddenKeys = [
  *     transforming webpack configuration before passing it to webpack).
  */
 function serveWebpackBrowser(options, context, transforms = {}) {
-    const browserTarget = index2_1.targetFromTargetString(options.browserTarget);
+    const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
     const root = context.workspaceRoot;
     let first = true;
     let openAddress;
@@ -131,7 +131,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
       `);
         openAddress = serverAddress + webpackDevServerConfig.publicPath;
         webpackConfig.devServer = webpackDevServerConfig;
-        return webpack_dev_server_1.runWebpackDevServer(webpackConfig, context, { logging: loggingFn });
+        return build_webpack_1.runWebpackDevServer(webpackConfig, context, { logging: loggingFn });
     }), operators_1.map(buildEvent => {
         if (first && options.open) {
             first = false;
@@ -365,4 +365,4 @@ function _findDefaultServePath(baseHref, deployUrl) {
     // Join together baseHref and deployUrl
     return `${normalizedBaseHref}${deployUrl || ''}`;
 }
-exports.default = index2_1.createBuilder(serveWebpackBrowser);
+exports.default = architect_1.createBuilder(serveWebpackBrowser);

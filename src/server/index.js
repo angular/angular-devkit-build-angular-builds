@@ -7,8 +7,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const index2_1 = require("@angular-devkit/architect/src/index2");
-const webpack_1 = require("@angular-devkit/build-webpack/src/webpack");
+const architect_1 = require("@angular-devkit/architect");
+const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const path = require("path");
@@ -19,7 +19,7 @@ const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const require_project_module_1 = require("../angular-cli-files/utilities/require-project-module");
 const utils_1 = require("../utils");
 const webpackMerge = require('webpack-merge');
-exports.default = index2_1.createBuilder((options, context) => {
+exports.default = architect_1.createBuilder((options, context) => {
     const host = new core_1.virtualFs.AliasHost(new node_1.NodeJsSyncHost());
     const root = context.workspaceRoot;
     async function setup() {
@@ -45,7 +45,7 @@ exports.default = index2_1.createBuilder((options, context) => {
         }
     }), operators_1.concatMap(({ normalizedOptions, projectRoot }) => {
         const webpackConfig = buildServerWebpackConfig(core_1.normalize(root), projectRoot, host, normalizedOptions, context.logger.createChild('webpack'));
-        return webpack_1.runWebpack(webpackConfig, context);
+        return build_webpack_1.runWebpack(webpackConfig, context);
     }), operators_1.map(output => {
         if (output.success === false) {
             return output;
