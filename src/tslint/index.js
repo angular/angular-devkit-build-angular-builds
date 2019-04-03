@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const architect_1 = require("@angular-devkit/architect");
+const index2_1 = require("@angular-devkit/architect/src/index2");
 const fs_1 = require("fs");
 const glob = require("glob");
 const minimatch_1 = require("minimatch");
@@ -106,7 +106,7 @@ async function _run(options, context) {
         success: options.force || result.errorCount === 0,
     };
 }
-exports.default = architect_1.createBuilder(_run);
+exports.default = index2_1.createBuilder(_run);
 async function _lint(projectTslint, systemRoot, tslintConfigPath, options, program, allPrograms) {
     const Linter = projectTslint.Linter;
     const Configuration = projectTslint.Configuration;

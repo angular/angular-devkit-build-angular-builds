@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const architect_1 = require("@angular-devkit/architect");
+const index2_1 = require("@angular-devkit/architect/src/index2");
 const node_1 = require("@angular-devkit/core/node");
 const path_1 = require("path");
 const rxjs_1 = require("rxjs");
@@ -76,4 +76,4 @@ function runKarma(options, context) {
     })));
 }
 exports.runKarma = runKarma;
-exports.default = architect_1.createBuilder(runKarma);
+exports.default = index2_1.createBuilder(runKarma);

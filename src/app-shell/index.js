@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const architect_1 = require("@angular-devkit/architect");
+const index2_1 = require("@angular-devkit/architect/src/index2");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const fs = require("fs");
@@ -31,7 +31,7 @@ async function _renderUniversal(options, context, browserResult, serverResult) {
         url: options.route,
     });
     fs.writeFileSync(outputIndexPath, html);
-    const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
+    const browserTarget = index2_1.targetFromTargetString(options.browserTarget);
     const rawBrowserOptions = await context.getTargetOptions(browserTarget);
     const browserBuilderName = await context.getBuilderNameForTarget(browserTarget);
     const browserOptions = await context.validateOptions(rawBrowserOptions, browserBuilderName);
@@ -68,8 +68,8 @@ async function _getServerModuleBundlePath(options, context, serverResult) {
     }
 }
 async function _appShellBuilder(options, context) {
-    const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
-    const serverTarget = architect_1.targetFromTargetString(options.serverTarget);
+    const browserTarget = index2_1.targetFromTargetString(options.browserTarget);
+    const serverTarget = index2_1.targetFromTargetString(options.serverTarget);
     // Never run the browser target in watch mode.
     // If service worker is needed, it will be added in _renderUniversal();
     const browserTargetRun = await context.scheduleTarget(browserTarget, {
@@ -101,4 +101,4 @@ async function _appShellBuilder(options, context) {
         ]);
     }
 }
-exports.default = architect_1.createBuilder(_appShellBuilder);
+exports.default = index2_1.createBuilder(_appShellBuilder);

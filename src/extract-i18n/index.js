@@ -7,8 +7,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const architect_1 = require("@angular-devkit/architect");
-const build_webpack_1 = require("@angular-devkit/build-webpack");
+const index2_1 = require("@angular-devkit/architect/src/index2");
+const webpack_1 = require("@angular-devkit/build-webpack/src/webpack");
 const path = require("path");
 const webpack = require("webpack");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
@@ -34,7 +34,7 @@ class InMemoryOutputPlugin {
     }
 }
 async function execute(options, context) {
-    const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
+    const browserTarget = index2_1.targetFromTargetString(options.browserTarget);
     const browserOptions = await context.validateOptions(await context.getTargetOptions(browserTarget), await context.getBuilderNameForTarget(browserTarget));
     // We need to determine the outFile name so that AngularCompiler can retrieve it.
     let outFile = options.outFile || getI18nOutfile(options.i18nFormat);
@@ -52,6 +52,6 @@ async function execute(options, context) {
         webpack_configs_1.getStylesConfig(wco),
         webpack_configs_1.getStatsConfig(wco),
     ]);
-    return build_webpack_1.runWebpack(config, context).toPromise();
+    return webpack_1.runWebpack(config, context).toPromise();
 }
-exports.default = architect_1.createBuilder(execute);
+exports.default = index2_1.createBuilder(execute);

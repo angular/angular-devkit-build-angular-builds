@@ -6,8 +6,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuilderContext, BuilderInfo, BuilderOutput } from '@angular-devkit/architect';
-import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
+import { BuilderContext, BuilderInfo, BuilderOutput } from '@angular-devkit/architect/src/index2';
+import { WebpackLoggingCallback } from '@angular-devkit/build-webpack/src/webpack';
 import { Path, analytics, experimental, json, logging, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs';

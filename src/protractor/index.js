@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const architect_1 = require("@angular-devkit/architect");
+const index2_1 = require("@angular-devkit/architect/src/index2");
 const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
 const url = require("url");
@@ -80,7 +80,7 @@ async function execute(options, context) {
     let baseUrl;
     let server;
     if (options.devServerTarget) {
-        const target = architect_1.targetFromTargetString(options.devServerTarget);
+        const target = index2_1.targetFromTargetString(options.devServerTarget);
         const serverOptions = await context.getTargetOptions(target);
         const overrides = { watch: false };
         if (options.host !== undefined) {
@@ -130,4 +130,4 @@ async function execute(options, context) {
         }
     }
 }
-exports.default = architect_1.createBuilder(execute);
+exports.default = index2_1.createBuilder(execute);
