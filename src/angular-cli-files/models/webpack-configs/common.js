@@ -42,7 +42,7 @@ function getCommonConfig(wco) {
         entryPoints['main'] = [path.resolve(root, buildOptions.main)];
     }
     if (buildOptions.es5BrowserSupport) {
-        entryPoints['polyfills.es5'] = [path.join(__dirname, '..', 'es2015-polyfills.js')];
+        entryPoints['polyfills.es5'] = [path.join(__dirname, '..', 'es5-polyfills.js')];
     }
     if (buildOptions.polyfills) {
         entryPoints['polyfills'] = [path.resolve(root, buildOptions.polyfills)];
@@ -55,7 +55,7 @@ function getCommonConfig(wco) {
         if (buildOptions.es5BrowserSupport) {
             entryPoints['polyfills.es5'] = [
                 ...entryPoints['polyfills.es5'],
-                path.join(__dirname, '..', 'es2015-jit-polyfills.js'),
+                path.join(__dirname, '..', 'es5-jit-polyfills.js'),
             ];
         }
     }
