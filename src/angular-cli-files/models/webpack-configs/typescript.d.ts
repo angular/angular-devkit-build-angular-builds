@@ -18,3 +18,4 @@ export declare function getAotConfig(wco: WebpackConfigOptions, extract?: boolea
     };
     plugins: AngularCompilerPlugin[];
 };
+export declare function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsConfigPath: string): AngularCompilerPlugin;

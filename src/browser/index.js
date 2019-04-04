@@ -7,8 +7,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const index2_1 = require("@angular-devkit/architect/src/index2");
-const index2_2 = require("@angular-devkit/build-webpack/src/webpack/index2");
+const architect_1 = require("@angular-devkit/architect");
+const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const rxjs_1 = require("rxjs");
@@ -91,6 +91,9 @@ function buildWebpackConfig(root, projectRoot, options, additionalOptions = {}) 
             : webpack_configs_1.getNonAotConfig(wco);
         webpackConfigs.push(typescriptConfigPartial);
     }
+    if (wco.buildOptions.webWorkerTsConfig) {
+        webpackConfigs.push(webpack_configs_1.getWorkerConfig(wco));
+    }
     const webpackConfig = webpackMerge(webpackConfigs);
     if (options.profile || process.env['NG_BUILD_PROFILING']) {
         const smp = new SpeedMeasurePlugin({
@@ -156,7 +159,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             throw new Error('Must either have a target from the context or a default project.');
         }
         const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
-        return index2_2.runWebpack(config, context, { logging: loggingFn }).pipe(operators_1.concatMap(buildEvent => {
+        return build_webpack_1.runWebpack(config, context, { logging: loggingFn }).pipe(operators_1.concatMap(buildEvent => {
             if (buildEvent.success && !options.watch && options.serviceWorker) {
                 return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, projectRoot, core_1.resolve(root, core_1.normalize(options.outputPath)), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), () => ({ success: false })));
             }
@@ -167,4 +170,4 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     }));
 }
 exports.buildWebpackBrowser = buildWebpackBrowser;
-exports.default = index2_1.createBuilder(buildWebpackBrowser);
+exports.default = architect_1.createBuilder(buildWebpackBrowser);

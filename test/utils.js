@@ -7,11 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const index2_1 = require("@angular-devkit/architect/src/index2");
+const architect_1 = require("@angular-devkit/architect");
+const node_1 = require("@angular-devkit/architect/node");
 const testing_1 = require("@angular-devkit/architect/testing");
 const core_1 = require("@angular-devkit/core");
-const node_1 = require("../../architect/node");
-const testing_architect_host_1 = require("../../architect/testing/testing-architect-host");
 const devkitRoot = core_1.normalize(global._DevKitRoot); // tslint:disable-line:no-any
 exports.workspaceRoot = core_1.join(devkitRoot, 'tests/angular_devkit/build_angular/hello-world-app/');
 exports.host = new testing_1.TestProjectHost(exports.workspaceRoot);
@@ -26,8 +25,8 @@ async function createArchitect(workspaceRoot) {
     const registry = new core_1.schema.CoreSchemaRegistry();
     registry.addPostTransform(core_1.schema.transforms.addUndefinedDefaults);
     const workspace = await core_1.experimental.workspace.Workspace.fromPath(exports.host, exports.host.root(), registry);
-    const architectHost = new testing_architect_host_1.TestingArchitectHost(workspaceRoot, workspaceRoot, new node_1.WorkspaceNodeModulesArchitectHost(workspace, workspaceRoot));
-    const architect = new index2_1.Architect(architectHost, registry);
+    const architectHost = new testing_1.TestingArchitectHost(workspaceRoot, workspaceRoot, new node_1.WorkspaceNodeModulesArchitectHost(workspace, workspaceRoot));
+    const architect = new architect_1.Architect(architectHost, registry);
     return {
         workspace,
         architectHost,
@@ -102,7 +101,6 @@ exports.lazyModuleImport = {
     'src/app/app.module.ts': `
     import { BrowserModule } from '@angular/platform-browser';
     import { NgModule } from '@angular/core';
-    import { HttpModule } from '@angular/http';
 
     import { AppComponent } from './app.component';
     import { RouterModule } from '@angular/router';
@@ -113,7 +111,6 @@ exports.lazyModuleImport = {
       ],
       imports: [
         BrowserModule,
-        HttpModule,
         RouterModule.forRoot([
           { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' }
         ])
