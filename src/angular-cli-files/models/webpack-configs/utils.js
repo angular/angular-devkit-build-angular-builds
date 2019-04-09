@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const core_1 = require("@angular-devkit/core");
 const webpack_1 = require("webpack");
+const ts = require("typescript");
 exports.ngAppResolve = (resolvePath) => {
     return path.resolve(process.cwd(), resolvePath);
 };
@@ -66,3 +67,11 @@ function getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, hiddenSourceMap 
     });
 }
 exports.getSourceMapDevTool = getSourceMapDevTool;
+/**
+ * Returns an ES version file suffix to differentiate between various builds.
+ */
+function getEsVersionForFileName(scriptTargetOverride, esVersionInFileName = false) {
+    return scriptTargetOverride && esVersionInFileName ?
+        '-' + ts.ScriptTarget[scriptTargetOverride].toLowerCase() : '';
+}
+exports.getEsVersionForFileName = getEsVersionForFileName;

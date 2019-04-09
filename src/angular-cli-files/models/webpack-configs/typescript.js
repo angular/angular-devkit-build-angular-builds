@@ -12,13 +12,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const webpack_1 = require("@ngtools/webpack");
 const common_1 = require("./common");
+function _pluginOptionsOverrides(buildOptions, pluginOptions) {
+    const compilerOptions = Object.assign({}, (pluginOptions.compilerOptions || {}));
+    const hostReplacementPaths = {};
+    if (buildOptions.fileReplacements) {
+        for (const replacement of buildOptions.fileReplacements) {
+            hostReplacementPaths[replacement.replace] = replacement.with;
+        }
+    }
+    if (buildOptions.scriptTargetOverride) {
+        compilerOptions.target = buildOptions.scriptTargetOverride;
+    }
+    if (buildOptions.preserveSymlinks) {
+        compilerOptions.preserveSymlinks = true;
+    }
+    return Object.assign({}, pluginOptions, { hostReplacementPaths,
+        compilerOptions });
+}
 function _createAotPlugin(wco, options, useMain = true, extract = false) {
     const { root, buildOptions } = wco;
-    options.compilerOptions = options.compilerOptions || {};
-    if (wco.buildOptions.preserveSymlinks) {
-        options.compilerOptions.preserveSymlinks = true;
-    }
-    let i18nInFile = buildOptions.i18nFile
+    const i18nInFile = buildOptions.i18nFile
         ? path.resolve(root, buildOptions.i18nFile)
         : undefined;
     const i18nFileAndFormat = extract
@@ -35,14 +48,8 @@ function _createAotPlugin(wco, options, useMain = true, extract = false) {
             additionalLazyModules[lazyModule] = path.resolve(root, lazyModule);
         }
     }
-    const hostReplacementPaths = {};
-    if (buildOptions.fileReplacements) {
-        for (const replacement of buildOptions.fileReplacements) {
-            hostReplacementPaths[replacement.replace] = replacement.with;
-        }
-    }
-    const pluginOptions = Object.assign({ mainPath: useMain ? path.join(root, buildOptions.main) : undefined }, i18nFileAndFormat, { locale: buildOptions.i18nLocale, platform: buildOptions.platform === 'server' ? webpack_1.PLATFORM.Server : webpack_1.PLATFORM.Browser, missingTranslation: buildOptions.i18nMissingTranslation, sourceMap: buildOptions.sourceMap.scripts, additionalLazyModules,
-        hostReplacementPaths, nameLazyFiles: buildOptions.namedChunks, forkTypeChecker: buildOptions.forkTypeChecker, contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'), logger: wco.logger, directTemplateLoading: true, importFactories: buildOptions.experimentalImportFactories }, options);
+    let pluginOptions = Object.assign({ mainPath: useMain ? path.join(root, buildOptions.main) : undefined }, i18nFileAndFormat, { locale: buildOptions.i18nLocale, platform: buildOptions.platform === 'server' ? webpack_1.PLATFORM.Server : webpack_1.PLATFORM.Browser, missingTranslation: buildOptions.i18nMissingTranslation, sourceMap: buildOptions.sourceMap.scripts, additionalLazyModules, nameLazyFiles: buildOptions.namedChunks, forkTypeChecker: buildOptions.forkTypeChecker, contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'), logger: wco.logger, directTemplateLoading: true, importFactories: buildOptions.experimentalImportFactories }, options);
+    pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
     return new webpack_1.AngularCompilerPlugin(pluginOptions);
 }
 function getNonAotConfig(wco) {
@@ -71,7 +78,7 @@ function getAotConfig(wco, extract = false) {
 exports.getAotConfig = getAotConfig;
 function getTypescriptWorkerPlugin(wco, workerTsConfigPath) {
     const { buildOptions } = wco;
-    const pluginOptions = {
+    let pluginOptions = {
         skipCodeGeneration: true,
         tsConfigPath: workerTsConfigPath,
         mainPath: undefined,
@@ -85,6 +92,7 @@ function getTypescriptWorkerPlugin(wco, workerTsConfigPath) {
         // Don't attempt lazy route discovery.
         discoverLazyRoutes: false,
     };
+    pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
     return new webpack_1.AngularCompilerPlugin(pluginOptions);
 }
 exports.getTypescriptWorkerPlugin = getTypescriptWorkerPlugin;

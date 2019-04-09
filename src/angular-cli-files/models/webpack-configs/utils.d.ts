@@ -7,6 +7,7 @@
  */
 import { ExtraEntryPoint, ExtraEntryPointClass } from '../../../browser/schema';
 import { SourceMapDevToolPlugin } from 'webpack';
+import * as ts from 'typescript';
 export declare const ngAppResolve: (resolvePath: string) => string;
 export interface HashFormat {
     chunk: string;
@@ -20,3 +21,7 @@ export declare type NormalizedEntryPoint = ExtraEntryPointClass & {
 };
 export declare function normalizeExtraEntryPoints(extraEntryPoints: ExtraEntryPoint[], defaultBundleName: string): NormalizedEntryPoint[];
 export declare function getSourceMapDevTool(scriptsSourceMap: boolean, stylesSourceMap: boolean, hiddenSourceMap?: boolean, inlineSourceMap?: boolean): SourceMapDevToolPlugin;
+/**
+ * Returns an ES version file suffix to differentiate between various builds.
+ */
+export declare function getEsVersionForFileName(scriptTargetOverride: ts.ScriptTarget | undefined, esVersionInFileName?: boolean): string;

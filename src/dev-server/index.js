@@ -61,7 +61,8 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         const browserName = await context.getBuilderNameForTarget(browserTarget);
         const browserOptions = await context.validateOptions(Object.assign({}, rawBrowserOptions, overrides), browserName);
         const webpackConfigResult = await browser_1.buildBrowserWebpackConfigFromContext(browserOptions, context, host);
-        let webpackConfig = webpackConfigResult.config;
+        // No differential loading for dev-server, hence there is just one config
+        let webpackConfig = webpackConfigResult.config[0];
         const workspace = webpackConfigResult.workspace;
         if (transforms.browserConfig) {
             webpackConfig = await transforms.browserConfig(workspace, webpackConfig).toPromise();

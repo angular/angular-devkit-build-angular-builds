@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7,16 +6,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
+const ts = require("typescript");
 const analytics_1 = require("../../plugins/webpack/analytics");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
-const require_project_module_1 = require("../angular-cli-files/utilities/require-project-module");
 const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
 const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
@@ -49,60 +49,73 @@ function buildWebpackConfig(root, projectRoot, options, additionalOptions = {}) 
     let wco;
     const tsConfigPath = core_1.getSystemPath(core_1.normalize(core_1.resolve(root, core_1.normalize(options.tsConfig))));
     const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
-    const projectTs = require_project_module_1.requireProjectModule(core_1.getSystemPath(projectRoot), 'typescript');
-    const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
-        && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
     const logger = additionalOptions.logger
         ? additionalOptions.logger.createChild('webpackConfigOptions')
         : new core_1.logging.NullLogger();
-    wco = {
-        root: core_1.getSystemPath(root),
-        logger,
-        projectRoot: core_1.getSystemPath(projectRoot),
-        buildOptions: options,
-        tsConfig,
-        tsConfigPath,
-        supportES2015,
-    };
-    wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
-    const webpackConfigs = [
-        webpack_configs_1.getCommonConfig(wco),
-        webpack_configs_1.getBrowserConfig(wco),
-        webpack_configs_1.getStylesConfig(wco),
-        webpack_configs_1.getStatsConfig(wco),
-    ];
-    if (additionalOptions.analytics) {
-        // If there's analytics, add our plugin. Otherwise no need to slow down the build.
-        let category = 'build';
-        if (additionalOptions.builderInfo) {
-            // We already vetted that this is a "safe" package, otherwise the analytics would be noop.
-            category = additionalOptions.builderInfo.builderName.split(':')[1];
+    const scriptTarget = tsConfig.options.target;
+    // todo enabe when differential loading is complete
+    // const differentialLoading = isDifferentialLoadingNeeded(projectRoot, scriptTarget);
+    const differentialLoading = false;
+    const scriptTargets = differentialLoading ? [ts.ScriptTarget.ES5, scriptTarget] : [scriptTarget];
+    // For differential loading, we can have several targets
+    return scriptTargets.map(scriptTarget => {
+        let buildOptions = Object.assign({}, options);
+        if (differentialLoading) {
+            // For differential loading, the builder needs to created the index.html by itself
+            // without using a webpack plugin.
+            buildOptions = Object.assign({}, options, { es5BrowserSupport: undefined, index: '', esVersionInFileName: true, scriptTargetOverride: scriptTarget });
         }
-        // The category is the builder name if it's an angular builder.
-        webpackConfigs.push({
-            plugins: [
-                new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, additionalOptions.analytics, category),
-            ],
-        });
-    }
-    if (wco.buildOptions.main || wco.buildOptions.polyfills) {
-        const typescriptConfigPartial = wco.buildOptions.aot
-            ? webpack_configs_1.getAotConfig(wco)
-            : webpack_configs_1.getNonAotConfig(wco);
-        webpackConfigs.push(typescriptConfigPartial);
-    }
-    if (wco.buildOptions.webWorkerTsConfig) {
-        webpackConfigs.push(webpack_configs_1.getWorkerConfig(wco));
-    }
-    const webpackConfig = webpackMerge(webpackConfigs);
-    if (options.profile || process.env['NG_BUILD_PROFILING']) {
-        const smp = new SpeedMeasurePlugin({
-            outputFormat: 'json',
-            outputTarget: core_1.getSystemPath(core_1.join(root, 'speed-measure-plugin.json')),
-        });
-        return smp.wrap(webpackConfig);
-    }
-    return webpackConfig;
+        const supportES2015 = scriptTarget !== ts.ScriptTarget.ES3 && scriptTarget !== ts.ScriptTarget.ES5;
+        wco = {
+            root: core_1.getSystemPath(root),
+            logger,
+            projectRoot: core_1.getSystemPath(projectRoot),
+            buildOptions: buildOptions,
+            tsConfig,
+            tsConfigPath,
+            supportES2015,
+        };
+        wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
+        const webpackConfigs = [
+            webpack_configs_1.getCommonConfig(wco),
+            webpack_configs_1.getBrowserConfig(wco),
+            webpack_configs_1.getStylesConfig(wco),
+            webpack_configs_1.getStatsConfig(wco),
+        ];
+        if (wco.buildOptions.main || wco.buildOptions.polyfills) {
+            const typescriptConfigPartial = wco.buildOptions.aot
+                ? webpack_configs_1.getAotConfig(wco)
+                : webpack_configs_1.getNonAotConfig(wco);
+            webpackConfigs.push(typescriptConfigPartial);
+        }
+        if (additionalOptions.analytics) {
+            // If there's analytics, add our plugin. Otherwise no need to slow down the build.
+            let category = 'build';
+            if (additionalOptions.builderInfo) {
+                // We already vetted that this is a "safe" package, otherwise the analytics would be noop.
+                category = additionalOptions.builderInfo.builderName.split(':')[1];
+            }
+            // The category is the builder name if it's an angular builder.
+            webpackConfigs.push({
+                plugins: [
+                    new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, additionalOptions.analytics, category),
+                ],
+            });
+        }
+        if (wco.buildOptions.webWorkerTsConfig) {
+            webpackConfigs.push(webpack_configs_1.getWorkerConfig(wco));
+        }
+        const webpackConfig = webpackMerge(webpackConfigs);
+        if (options.profile || process.env['NG_BUILD_PROFILING']) {
+            const esVersionInFileName = webpack_configs_1.getEsVersionForFileName(wco.buildOptions.scriptTargetOverride, wco.buildOptions.esVersionInFileName);
+            const smp = new SpeedMeasurePlugin({
+                outputFormat: 'json',
+                outputTarget: core_1.getSystemPath(core_1.join(root, `speed-measure-plugin${esVersionInFileName}.json`)),
+            });
+            return smp.wrap(webpackConfig);
+        }
+        return webpackConfig;
+    });
 }
 exports.buildWebpackConfig = buildWebpackConfig;
 async function buildBrowserWebpackConfigFromWorkspace(options, projectName, workspace, host, additionalOptions = {}) {
@@ -140,7 +153,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     // subscription before calling buildBrowserWebpackConfigFromContext, which can throw.
     return rxjs_1.of(null).pipe(operators_1.switchMap(() => rxjs_1.from(buildBrowserWebpackConfigFromContext(options, context, host))), operators_1.switchMap(({ workspace, config }) => {
         if (configFn) {
-            return configFn(workspace, config).pipe(operators_1.map(config => ({ workspace, config })));
+            return rxjs_1.combineLatest(config.map(config => configFn(workspace, config))).pipe(operators_1.map(config => ({ workspace, config })));
         }
         else {
             return rxjs_1.of({ workspace, config });
@@ -152,21 +165,29 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         else {
             return rxjs_1.of({ workspace, config });
         }
-    }), operators_1.switchMap(({ workspace, config }) => {
+    }), operators_1.switchMap(({ workspace, config: configs }) => {
         const projectName = context.target
             ? context.target.project : workspace.getDefaultProjectName();
         if (!projectName) {
             throw new Error('Must either have a target from the context or a default project.');
         }
         const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
-        return build_webpack_1.runWebpack(config, context, { logging: loggingFn }).pipe(operators_1.concatMap(buildEvent => {
+        return rxjs_1.combineLatest(configs.map(config => build_webpack_1.runWebpack(config, context, { logging: loggingFn })))
+            .pipe(operators_1.switchMap(buildEvents => {
+            if (buildEvents.length === 2) {
+                // todo implement writing index.html for differential loading in another PR
+            }
+            return rxjs_1.of(buildEvents);
+        }), operators_1.map(buildEvents => ({ success: buildEvents.every(r => r.success) })), operators_1.concatMap(buildEvent => {
             if (buildEvent.success && !options.watch && options.serviceWorker) {
                 return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, projectRoot, core_1.resolve(root, core_1.normalize(options.outputPath)), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), () => ({ success: false })));
             }
             else {
                 return rxjs_1.of(buildEvent);
             }
-        }), operators_1.map(event => (Object.assign({}, event, { outputPath: config.output && config.output.path || '' }))), operators_1.concatMap(output => outputFn ? outputFn(output) : rxjs_1.of(output)));
+        }), operators_1.map(event => (Object.assign({}, event, { 
+            // If we use differential loading, both configs have the same outputs
+            outputPath: core_1.getSystemPath(core_1.join(core_1.normalize(context.workspaceRoot), options.outputPath)) }))), operators_1.concatMap(output => outputFn ? outputFn(output) : rxjs_1.of(output)));
     }));
 }
 exports.buildWebpackBrowser = buildWebpackBrowser;

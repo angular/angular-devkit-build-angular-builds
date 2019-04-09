@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
+const ts = require("typescript");
 const webpack_1 = require("webpack");
 const bundle_budget_1 = require("../../plugins/bundle-budget");
 const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
@@ -38,30 +39,39 @@ function getCommonConfig(wco) {
     // tslint:disable-next-line:no-any
     const extraPlugins = [];
     const entryPoints = {};
+    const targetInFileName = utils_1.getEsVersionForFileName(buildOptions.scriptTargetOverride, buildOptions.esVersionInFileName);
     if (buildOptions.main) {
         entryPoints['main'] = [path.resolve(root, buildOptions.main)];
     }
+    const es5Polyfills = path.join(__dirname, '..', 'es5-polyfills.js');
     if (buildOptions.es5BrowserSupport) {
-        entryPoints['polyfills.es5'] = [path.join(__dirname, '..', 'es5-polyfills.js')];
+        entryPoints['polyfills.es5'] = [es5Polyfills];
+        if (!buildOptions.aot) {
+            entryPoints['polyfills.es5'].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
+        }
+    }
+    if (buildOptions.es5BrowserSupport === undefined
+        && buildOptions.scriptTargetOverride === ts.ScriptTarget.ES5) {
+        entryPoints['polyfills'] = [es5Polyfills];
+        if (!buildOptions.aot) {
+            entryPoints['polyfills'].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
+        }
     }
     if (buildOptions.polyfills) {
-        entryPoints['polyfills'] = [path.resolve(root, buildOptions.polyfills)];
+        entryPoints['polyfills'] = [
+            ...(entryPoints['polyfills'] || []),
+            path.resolve(root, buildOptions.polyfills),
+        ];
     }
     if (!buildOptions.aot) {
         entryPoints['polyfills'] = [
             ...(entryPoints['polyfills'] || []),
             path.join(__dirname, '..', 'jit-polyfills.js'),
         ];
-        if (buildOptions.es5BrowserSupport) {
-            entryPoints['polyfills.es5'] = [
-                ...entryPoints['polyfills.es5'],
-                path.join(__dirname, '..', 'es5-jit-polyfills.js'),
-            ];
-        }
     }
     if (buildOptions.profile || process.env['NG_BUILD_PROFILING']) {
         extraPlugins.push(new webpack_1.debug.ProfilingPlugin({
-            outputPath: path.resolve(root, 'chrome-profiler-events.json'),
+            outputPath: path.resolve(root, `chrome-profiler-events${targetInFileName}.json`),
         }));
     }
     // determine hashing format
@@ -138,7 +148,7 @@ function getCommonConfig(wco) {
         }));
     }
     if (buildOptions.statsJson) {
-        extraPlugins.push(new StatsPlugin('stats.json', 'verbose'));
+        extraPlugins.push(new StatsPlugin(`stats${targetInFileName}.json`, 'verbose'));
     }
     let sourceMapUseRule;
     if ((scriptsSourceMap || stylesSourceMap) && vendorSourceMap) {
@@ -246,7 +256,7 @@ function getCommonConfig(wco) {
             futureEmitAssets: true,
             path: path.resolve(root, buildOptions.outputPath),
             publicPath: buildOptions.deployUrl,
-            filename: `[name]${hashFormat.chunk}.js`,
+            filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
         },
         watch: buildOptions.watch,
         watchOptions: {
