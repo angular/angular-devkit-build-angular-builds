@@ -13,6 +13,9 @@ const WorkerPlugin = require('worker-plugin');
 function getWorkerConfig(wco) {
     const { buildOptions } = wco;
     if (!buildOptions.webWorkerTsConfig) {
+        return {};
+    }
+    if (typeof buildOptions.webWorkerTsConfig != 'string') {
         throw new Error('The `webWorkerTsConfig` must be a string.');
     }
     const workerTsConfigPath = path_1.resolve(wco.root, buildOptions.webWorkerTsConfig);

@@ -19,6 +19,7 @@ async function initialize(options, context) {
         webpack_configs_1.getStylesConfig(wco),
         webpack_configs_1.getNonAotConfig(wco),
         webpack_configs_1.getTestConfig(wco),
+        webpack_configs_1.getWorkerConfig(wco),
     ]);
     // tslint:disable-next-line:no-implicit-dependencies
     const karma = await Promise.resolve().then(() => require('karma'));

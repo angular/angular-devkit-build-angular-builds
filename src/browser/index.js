@@ -81,6 +81,7 @@ function buildWebpackConfig(root, projectRoot, options, additionalOptions = {}) 
             webpack_configs_1.getBrowserConfig(wco),
             webpack_configs_1.getStylesConfig(wco),
             webpack_configs_1.getStatsConfig(wco),
+            webpack_configs_1.getWorkerConfig(wco),
         ];
         if (wco.buildOptions.main || wco.buildOptions.polyfills) {
             const typescriptConfigPartial = wco.buildOptions.aot
@@ -101,9 +102,6 @@ function buildWebpackConfig(root, projectRoot, options, additionalOptions = {}) 
                     new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, additionalOptions.analytics, category),
                 ],
             });
-        }
-        if (wco.buildOptions.webWorkerTsConfig) {
-            webpackConfigs.push(webpack_configs_1.getWorkerConfig(wco));
         }
         const webpackConfig = webpackMerge(webpackConfigs);
         if (options.profile || process.env['NG_BUILD_PROFILING']) {
