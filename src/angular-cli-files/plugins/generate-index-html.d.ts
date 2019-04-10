@@ -6,20 +6,25 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Source } from 'webpack-sources';
-export declare type LoadOutputFileFunctionType = (file: string) => string;
-export interface GenerateIndexHtmlParams {
+export declare type LoadOutputFileFunctionType = (file: string) => Promise<string>;
+export interface GenerateIndexHtmlOptions {
     input: string;
     inputContent: string;
     baseHref?: string;
     deployUrl?: string;
     sri: boolean;
-    unfilteredSortedFiles: CompiledFileInfo[];
-    noModuleFiles: Set<string>;
+    files: FileInfo[];
+    /** Files that should be added using 'nomodule'. */
+    noModuleFiles?: FileInfo[];
+    /** Files that should be added using 'module'. */
+    moduleFiles?: FileInfo[];
     loadOutputFile: LoadOutputFileFunctionType;
+    /** Used to sort the inseration of files in the HTML file */
+    entrypoints: string[];
 }
-export declare type CompiledFileType = 'nomodule' | 'module' | 'none';
-export interface CompiledFileInfo {
-    file: string;
-    type: CompiledFileType;
+export interface FileInfo {
+    fileName: string;
+    name: string;
+    extension: string;
 }
-export declare function generateIndexHtml(params: GenerateIndexHtmlParams): Source;
+export declare function generateIndexHtml(params: GenerateIndexHtmlOptions): Promise<Source>;

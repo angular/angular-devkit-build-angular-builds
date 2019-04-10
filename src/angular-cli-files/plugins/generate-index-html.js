@@ -16,32 +16,25 @@ const parse5 = require('parse5');
  * after processing several configurations in order to build different sets of
  * bundles for differential serving.
  */
-function generateIndexHtml(params) {
-    const loadOutputFile = params.loadOutputFile;
-    // Filter files
-    const existingFiles = new Set();
-    const stylesheets = [];
-    const scripts = [];
-    const fileNames = params.unfilteredSortedFiles.map(f => f.file);
-    const moduleFilesArray = params.unfilteredSortedFiles
-        .filter(f => f.type === 'module')
-        .map(f => f.file);
-    const moduleFiles = new Set(moduleFilesArray);
-    const noModuleFilesArray = params.unfilteredSortedFiles
-        .filter(f => f.type === 'nomodule')
-        .map(f => f.file);
-    noModuleFilesArray.push(...params.noModuleFiles);
-    const noModuleFiles = new Set(noModuleFilesArray);
-    for (const file of fileNames) {
-        if (existingFiles.has(file)) {
-            continue;
-        }
-        existingFiles.add(file);
-        if (file.endsWith('.js')) {
-            scripts.push(file);
-        }
-        else if (file.endsWith('.css')) {
-            stylesheets.push(file);
+async function generateIndexHtml(params) {
+    const { loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints, } = params;
+    const stylesheets = new Set();
+    const scripts = new Set();
+    // Sort files in the order we want to insert them by entrypoint and dedupes duplicates
+    const mergedFiles = [...noModuleFiles, ...moduleFiles, ...files];
+    for (const entrypoint of entrypoints) {
+        for (const { extension, fileName, name } of mergedFiles) {
+            if (name !== entrypoint) {
+                continue;
+            }
+            switch (extension) {
+                case '.js':
+                    scripts.add(fileName);
+                    break;
+                case '.css':
+                    stylesheets.add(fileName);
+                    break;
+            }
         }
     }
     // Find the head and body elements
@@ -55,7 +48,7 @@ function generateIndexHtml(params) {
                 if (htmlChild.tagName === 'head') {
                     headElement = htmlChild;
                 }
-                if (htmlChild.tagName === 'body') {
+                else if (htmlChild.tagName === 'body') {
                     bodyElement = htmlChild;
                 }
             }
@@ -90,14 +83,19 @@ function generateIndexHtml(params) {
         const attrs = [
             { name: 'src', value: (params.deployUrl || '') + script },
         ];
-        if (noModuleFiles.has(script)) {
-            attrs.push({ name: 'nomodule', value: null });
-        }
-        if (moduleFiles.has(script)) {
-            attrs.push({ name: 'type', value: 'module' });
+        // We want to include nomodule or module when a file is not common amongs all
+        // such as runtime.js
+        const scriptPredictor = ({ fileName }) => fileName === script;
+        if (!files.some(scriptPredictor)) {
+            if (noModuleFiles.some(scriptPredictor)) {
+                attrs.push({ name: 'nomodule', value: null });
+            }
+            else if (moduleFiles.some(scriptPredictor)) {
+                attrs.push({ name: 'type', value: 'module' });
+            }
         }
         if (params.sri) {
-            const content = loadOutputFile(script);
+            const content = await loadOutputFile(script);
             attrs.push(..._generateSriAttributes(content));
         }
         const attributes = attrs
@@ -146,7 +144,7 @@ function generateIndexHtml(params) {
             { name: 'href', value: (params.deployUrl || '') + stylesheet },
         ];
         if (params.sri) {
-            const content = loadOutputFile(stylesheet);
+            const content = await loadOutputFile(stylesheet);
             attrs.push(..._generateSriAttributes(content));
         }
         const element = treeAdapter.createElement('link', undefined, attrs);
