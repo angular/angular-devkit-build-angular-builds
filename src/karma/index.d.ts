@@ -7,7 +7,17 @@
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { Observable } from 'rxjs';
+import * as webpack from 'webpack';
 import { Schema as KarmaBuilderOptions } from './schema';
-export declare function runKarma(options: KarmaBuilderOptions, context: BuilderContext): Observable<BuilderOutput>;
+declare type KarmaConfigOptions = import('karma').ConfigOptions & {
+    buildWebpack?: unknown;
+    configFile?: string;
+};
+declare type WebpackConfigurationTransformer = (configuration: webpack.Configuration) => webpack.Configuration;
+export declare function execute(options: KarmaBuilderOptions, context: BuilderContext, transforms?: {
+    webpackConfiguration?: WebpackConfigurationTransformer;
+    karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
+}): Observable<BuilderOutput>;
+export { KarmaBuilderOptions };
 declare const _default: import("@angular-devkit/architect/src/internal").Builder<Record<string, string> & KarmaBuilderOptions>;
 export default _default;
