@@ -58,8 +58,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         const overrides = Object.keys(options)
             .filter(key => options[key] !== undefined && exports.devServerBuildOverriddenKeys.includes(key))
             .reduce((previous, key) => (Object.assign({}, previous, { [key]: options[key] })), {});
-        // In dev server we should not have budgets because of extra libs such as socks-js
-        overrides.budgets = undefined;
         const browserName = await context.getBuilderNameForTarget(browserTarget);
         const browserOptions = await context.validateOptions(Object.assign({}, rawBrowserOptions, overrides), browserName);
         const webpackConfigResult = await browser_1.buildBrowserWebpackConfigFromContext(browserOptions, context, host);

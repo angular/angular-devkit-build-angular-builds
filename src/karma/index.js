@@ -14,7 +14,7 @@ const operators_1 = require("rxjs/operators");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 async function initialize(options, context) {
-    const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(Object.assign({}, options, { outputPath: '', budgets: undefined }), context, wco => [
+    const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(Object.assign({}, options, { outputPath: '' }), context, wco => [
         webpack_configs_1.getCommonConfig(wco),
         webpack_configs_1.getStylesConfig(wco),
         webpack_configs_1.getNonAotConfig(wco),
