@@ -52,6 +52,6 @@ async function execute(options, context) {
         webpack_configs_1.getStylesConfig(wco),
         webpack_configs_1.getStatsConfig(wco),
     ]);
-    return build_webpack_1.runWebpack(config, context).toPromise();
+    return build_webpack_1.runWebpack(config[0], context).toPromise();
 }
 exports.default = architect_1.createBuilder(execute);

@@ -14,10 +14,10 @@ import { WebpackConfigOptions } from '../angular-cli-files/models/build-options'
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { NormalizedBrowserBuilderSchema } from '../utils';
 declare type BrowserWebpackConfigOptions = WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
-export declare function generateWebpackConfig(workspaceRoot: string, projectRoot: string, sourceRoot: string | undefined, options: NormalizedBrowserBuilderSchema, webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[], logger: logging.LoggerApi): Promise<webpack.Configuration>;
-export declare function generateBrowserWebpackConfigFromWorkspace(options: BrowserBuilderSchema, projectName: string, workspace: experimental.workspace.Workspace, host: virtualFs.Host<fs.Stats>, webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[], logger: logging.LoggerApi): Promise<webpack.Configuration>;
+export declare function generateWebpackConfig(workspaceRoot: string, projectRoot: string, sourceRoot: string | undefined, options: NormalizedBrowserBuilderSchema, webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[], logger: logging.LoggerApi): Promise<webpack.Configuration[]>;
+export declare function generateBrowserWebpackConfigFromWorkspace(options: BrowserBuilderSchema, projectName: string, workspace: experimental.workspace.Workspace, host: virtualFs.Host<fs.Stats>, webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[], logger: logging.LoggerApi): Promise<webpack.Configuration[]>;
 export declare function generateBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[], host?: virtualFs.Host<fs.Stats>): Promise<{
     workspace: experimental.workspace.Workspace;
-    config: webpack.Configuration;
+    config: webpack.Configuration[];
 }>;
 export {};

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const path = require("path");
+const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const utils_1 = require("../utils");
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
@@ -15,30 +16,46 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
     const tsConfigPath = path.resolve(workspaceRoot, options.tsConfig);
     const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
     // tslint:disable-next-line:no-implicit-dependencies
-    const projectTs = await Promise.resolve().then(() => require('typescript'));
-    const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
-        && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
-    const wco = {
-        root: workspaceRoot,
-        logger: logger.createChild('webpackConfigOptions'),
-        projectRoot,
-        sourceRoot,
-        buildOptions: options,
-        tsConfig,
-        tsConfigPath,
-        supportES2015,
-    };
-    wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
-    const partials = webpackPartialGenerator(wco);
-    const webpackConfig = webpackMerge(partials);
-    if (options.profile || process.env['NG_BUILD_PROFILING']) {
-        const smp = new SpeedMeasurePlugin({
-            outputFormat: 'json',
-            outputTarget: path.resolve(workspaceRoot, 'speed-measure-plugin.json'),
-        });
-        return smp.wrap(webpackConfig);
+    const ts = await Promise.resolve().then(() => require('typescript'));
+    // todo enabe when differential loading is complete
+    // const differentialLoading = isDifferentialLoadingNeeded(projectRoot, scriptTarget);
+    const differentialLoading = false;
+    const scriptTargets = [tsConfig.options.target];
+    if (differentialLoading) {
+        scriptTargets.unshift(ts.ScriptTarget.ES5);
     }
-    return webpackConfig;
+    // For differential loading, we can have several targets
+    return scriptTargets.map(scriptTarget => {
+        let buildOptions = Object.assign({}, options);
+        if (differentialLoading) {
+            // For differential loading, the builder needs to created the index.html by itself
+            // without using a webpack plugin.
+            buildOptions = Object.assign({}, options, { es5BrowserSupport: undefined, index: '', esVersionInFileName: true, scriptTargetOverride: scriptTarget });
+        }
+        const supportES2015 = scriptTarget !== ts.ScriptTarget.ES3 && scriptTarget !== ts.ScriptTarget.ES5;
+        const wco = {
+            root: workspaceRoot,
+            logger: logger.createChild('webpackConfigOptions'),
+            projectRoot,
+            sourceRoot,
+            buildOptions,
+            tsConfig,
+            tsConfigPath,
+            supportES2015,
+        };
+        wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
+        const partials = webpackPartialGenerator(wco);
+        const webpackConfig = webpackMerge(partials);
+        if (options.profile || process.env['NG_BUILD_PROFILING']) {
+            const esVersionInFileName = webpack_configs_1.getEsVersionForFileName(wco.buildOptions.scriptTargetOverride, wco.buildOptions.esVersionInFileName);
+            const smp = new SpeedMeasurePlugin({
+                outputFormat: 'json',
+                outputTarget: path.resolve(workspaceRoot, `speed-measure-plugin${esVersionInFileName}.json`),
+            });
+            return smp.wrap(webpackConfig);
+        }
+        return webpackConfig;
+    });
 }
 exports.generateWebpackConfig = generateWebpackConfig;
 async function generateBrowserWebpackConfigFromWorkspace(options, projectName, workspace, host, webpackPartialGenerator, logger) {
