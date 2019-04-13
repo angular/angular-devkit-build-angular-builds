@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const path = require("path");
-const generate_index_html_1 = require("./generate-index-html");
+const augment_index_html_1 = require("../utilities/index-file/augment-index-html");
 function readFile(filename, compilation) {
     return new Promise((resolve, reject) => {
         compilation.inputFileSystem.readFile(filename, (err, data) => {
@@ -56,7 +56,7 @@ class IndexHtmlWebpackPlugin {
                 const entryFiles = (entrypoint && entrypoint.getFiles() || [])
                     .map((f) => ({
                     name: entryName,
-                    fileName: f,
+                    file: f,
                     extension: path.extname(f),
                 }));
                 if (this._options.noModuleEntrypoints.includes(entryName)) {
@@ -67,7 +67,7 @@ class IndexHtmlWebpackPlugin {
                 }
             }
             const loadOutputFile = (name) => compilation.assets[name].source();
-            const indexSource = await generate_index_html_1.generateIndexHtml({
+            const indexSource = await augment_index_html_1.augmentIndexHtml({
                 input: this._options.input,
                 inputContent,
                 baseHref: this._options.baseHref,

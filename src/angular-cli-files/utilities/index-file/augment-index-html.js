@@ -16,23 +16,23 @@ const parse5 = require('parse5');
  * after processing several configurations in order to build different sets of
  * bundles for differential serving.
  */
-async function generateIndexHtml(params) {
+async function augmentIndexHtml(params) {
     const { loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints, } = params;
     const stylesheets = new Set();
     const scripts = new Set();
     // Sort files in the order we want to insert them by entrypoint and dedupes duplicates
     const mergedFiles = [...noModuleFiles, ...moduleFiles, ...files];
     for (const entrypoint of entrypoints) {
-        for (const { extension, fileName, name } of mergedFiles) {
+        for (const { extension, file, name } of mergedFiles) {
             if (name !== entrypoint) {
                 continue;
             }
             switch (extension) {
                 case '.js':
-                    scripts.add(fileName);
+                    scripts.add(file);
                     break;
                 case '.css':
-                    stylesheets.add(fileName);
+                    stylesheets.add(file);
                     break;
             }
         }
@@ -85,12 +85,17 @@ async function generateIndexHtml(params) {
         ];
         // We want to include nomodule or module when a file is not common amongs all
         // such as runtime.js
-        const scriptPredictor = ({ fileName }) => fileName === script;
+        const scriptPredictor = ({ file }) => file === script;
         if (!files.some(scriptPredictor)) {
-            if (noModuleFiles.some(scriptPredictor)) {
+            // in some cases for differential loading file with the same name is avialable in both
+            // nomodule and module such as scripts.js
+            // we shall not add these attributes if that's the case
+            const isNoModuleType = noModuleFiles.some(scriptPredictor);
+            const isModuleType = moduleFiles.some(scriptPredictor);
+            if (isNoModuleType && !isModuleType) {
                 attrs.push({ name: 'nomodule', value: null });
             }
-            else if (moduleFiles.some(scriptPredictor)) {
+            else if (isModuleType && !isNoModuleType) {
                 attrs.push({ name: 'type', value: 'module' });
             }
         }
@@ -153,7 +158,7 @@ async function generateIndexHtml(params) {
     indexSource.insert(styleInsertionPoint, parse5.serialize(styleElements, { treeAdapter }));
     return indexSource;
 }
-exports.generateIndexHtml = generateIndexHtml;
+exports.augmentIndexHtml = augmentIndexHtml;
 function _generateSriAttributes(content) {
     const algo = 'sha384';
     const hash = crypto_1.createHash(algo)

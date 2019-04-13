@@ -16,6 +16,7 @@ const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const analytics_1 = require("../../plugins/webpack/analytics");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
+const write_index_html_1 = require("../angular-cli-files/utilities/index-file/write-index-html");
 const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
 const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
@@ -92,7 +93,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         }
     }), operators_1.switchMap(({ workspace, config }) => {
         if (options.deleteOutputPath) {
-            return utils_1.deleteOutputDir(core_1.normalize(context.workspaceRoot), core_1.normalize(options.outputPath), host).pipe(operators_1.map(() => ({ workspace, config })));
+            return utils_1.deleteOutputDir(root, core_1.normalize(options.outputPath), host).pipe(operators_1.map(() => ({ workspace, config })));
         }
         else {
             return rxjs_1.of({ workspace, config });
@@ -104,13 +105,32 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             throw new Error('Must either have a target from the context or a default project.');
         }
         const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
-        return rxjs_1.combineLatest(configs.map(config => build_webpack_1.runWebpack(config, context, { logging: loggingFn })))
+        // We use zip because when having multiple builds we want to wait
+        // for all builds to finish before processeding
+        return rxjs_1.zip(...configs.map(config => build_webpack_1.runWebpack(config, context, { logging: loggingFn })))
             .pipe(operators_1.switchMap(buildEvents => {
-            if (buildEvents.length === 2) {
-                // todo implement writing index.html for differential loading in another PR
+            const success = buildEvents.every(r => r.success);
+            if (success && buildEvents.length === 2 && options.index) {
+                const { emittedFiles: ES5BuildFiles = [] } = buildEvents[0];
+                const { emittedFiles: ES2015BuildFiles = [] } = buildEvents[1];
+                return write_index_html_1.writeIndexHtml({
+                    host,
+                    outputPath: core_1.join(root, options.outputPath),
+                    indexPath: core_1.join(root, options.index),
+                    ES5BuildFiles,
+                    ES2015BuildFiles,
+                    baseHref: options.baseHref,
+                    deployUrl: options.deployUrl,
+                    sri: options.subresourceIntegrity,
+                    scripts: options.scripts,
+                    styles: options.styles,
+                })
+                    .pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(() => rxjs_1.of({ success: false })));
             }
-            return rxjs_1.of(buildEvents);
-        }), operators_1.map(buildEvents => ({ success: buildEvents.every(r => r.success) })), operators_1.concatMap(buildEvent => {
+            else {
+                return rxjs_1.of({ success });
+            }
+        }), operators_1.concatMap(buildEvent => {
             if (buildEvent.success && !options.watch && options.serviceWorker) {
                 return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, projectRoot, core_1.resolve(root, core_1.normalize(options.outputPath)), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), () => ({ success: false })));
             }

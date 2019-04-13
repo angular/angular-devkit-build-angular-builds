@@ -7,7 +7,7 @@
  */
 import { Source } from 'webpack-sources';
 export declare type LoadOutputFileFunctionType = (file: string) => Promise<string>;
-export interface GenerateIndexHtmlOptions {
+export interface AugmentIndexHtmlOptions {
     input: string;
     inputContent: string;
     baseHref?: string;
@@ -23,8 +23,8 @@ export interface GenerateIndexHtmlOptions {
     entrypoints: string[];
 }
 export interface FileInfo {
-    fileName: string;
+    file: string;
     name: string;
     extension: string;
 }
-export declare function generateIndexHtml(params: GenerateIndexHtmlOptions): Promise<Source>;
+export declare function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<Source>;
