@@ -40,7 +40,7 @@ function addKarmaFiles(files, newFiles, prepend = false) {
         // Remove globs that do not match any files, otherwise Karma will show a warning for these.
         .filter(file => glob.sync(file.pattern, { nodir: true }).length != 0)
         // Fill in pattern properties with defaults.
-        .map(file => (Object.assign({}, defaults, file)));
+        .map(file => ({ ...defaults, ...file }));
     // It's important to not replace the array, because
     // karma already has a reference to the existing array.
     if (prepend) {
@@ -265,7 +265,7 @@ function fallbackMiddleware() {
     return function (req, res, next) {
         if (webpackMiddleware) {
             const webpackUrl = '/_karma_webpack_' + req.url;
-            const webpackReq = Object.assign({}, req, { url: webpackUrl });
+            const webpackReq = { ...req, url: webpackUrl };
             webpackMiddleware(webpackReq, res, next);
         }
         else {

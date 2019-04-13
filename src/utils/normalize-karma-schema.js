@@ -17,6 +17,12 @@ function normalizeKarmaSchema(host, root, projectRoot, sourceRoot, options) {
     const normalizedSourceMapOptions = normalize_source_maps_1.normalizeSourceMaps(options.sourceMap || false);
     normalizedSourceMapOptions.vendor =
         normalizedSourceMapOptions.vendor || options.vendorSourceMap || false;
-    return Object.assign({}, options, { fileReplacements: normalize_file_replacements_1.normalizeFileReplacements(options.fileReplacements || [], syncHost, root), assets: normalize_asset_patterns_1.normalizeAssetPatterns(options.assets || [], syncHost, root, projectRoot, sourceRoot), sourceMap: normalizedSourceMapOptions, optimization: normalize_optimization_1.normalizeOptimization(undefined) });
+    return {
+        ...options,
+        fileReplacements: normalize_file_replacements_1.normalizeFileReplacements(options.fileReplacements || [], syncHost, root),
+        assets: normalize_asset_patterns_1.normalizeAssetPatterns(options.assets || [], syncHost, root, projectRoot, sourceRoot),
+        sourceMap: normalizedSourceMapOptions,
+        optimization: normalize_optimization_1.normalizeOptimization(undefined),
+    };
 }
 exports.normalizeKarmaSchema = normalizeKarmaSchema;

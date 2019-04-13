@@ -196,11 +196,15 @@ function getCommonConfig(wco) {
         }));
     }
     if (scriptsOptimization) {
-        const terserOptions = Object.assign({ ecma: wco.supportES2015 ? 6 : 5, warnings: !!buildOptions.verbose, safari10: true, output: {
+        const terserOptions = {
+            ecma: wco.supportES2015 ? 6 : 5,
+            warnings: !!buildOptions.verbose,
+            safari10: true,
+            output: {
                 ascii_only: true,
                 comments: false,
                 webkit: true,
-            }, 
+            },
             // On server, we don't want to compress anything. We still set the ngDevMode = false for it
             // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
             compress: (buildOptions.platform == 'server' ? {
@@ -217,7 +221,10 @@ function getCommonConfig(wco) {
                     ngDevMode: false,
                     ngI18nClosureMode: false,
                 },
-            }) }, (buildOptions.platform == 'server' ? { mangle: false } : {}));
+            }),
+            // We also want to avoid mangling on server.
+            ...(buildOptions.platform == 'server' ? { mangle: false } : {}),
+        };
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,
             parallel: true,
@@ -280,8 +287,16 @@ function getCommonConfig(wco) {
                     test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
                     parser: { system: true },
                 },
-                Object.assign({ test: /\.js$/ }, buildOptimizerUseRule),
-                Object.assign({ test: /\.js$/, exclude: /(ngfactory|ngstyle).js$/, enforce: 'pre' }, sourceMapUseRule),
+                {
+                    test: /\.js$/,
+                    ...buildOptimizerUseRule,
+                },
+                {
+                    test: /\.js$/,
+                    exclude: /(ngfactory|ngstyle).js$/,
+                    enforce: 'pre',
+                    ...sourceMapUseRule,
+                },
             ],
         },
         optimization: {

@@ -119,7 +119,7 @@ async function execute(options, context) {
         }
     }
     try {
-        return await runProtractor(context.workspaceRoot, Object.assign({}, options, { baseUrl }));
+        return await runProtractor(context.workspaceRoot, { ...options, baseUrl });
     }
     catch (_a) {
         return { success: false };

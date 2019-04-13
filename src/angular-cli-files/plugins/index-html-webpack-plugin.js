@@ -34,7 +34,14 @@ function readFile(filename, compilation) {
 }
 class IndexHtmlWebpackPlugin {
     constructor(options) {
-        this._options = Object.assign({ input: 'index.html', output: 'index.html', entrypoints: ['polyfills', 'main'], noModuleEntrypoints: [], sri: false }, options);
+        this._options = {
+            input: 'index.html',
+            output: 'index.html',
+            entrypoints: ['polyfills', 'main'],
+            noModuleEntrypoints: [],
+            sri: false,
+            ...options,
+        };
     }
     apply(compiler) {
         compiler.hooks.emit.tapPromise('index-html-webpack-plugin', async (compilation) => {

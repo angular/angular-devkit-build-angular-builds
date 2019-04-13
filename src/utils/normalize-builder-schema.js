@@ -16,10 +16,23 @@ function normalizeBrowserSchema(host, root, projectRoot, sourceRoot, options) {
     const syncHost = new core_1.virtualFs.SyncDelegateHost(host);
     const normalizedSourceMapOptions = normalize_source_maps_1.normalizeSourceMaps(options.sourceMap || false);
     normalizedSourceMapOptions.vendor = normalizedSourceMapOptions.vendor || options.vendorSourceMap;
-    return Object.assign({}, options, { assets: normalize_asset_patterns_1.normalizeAssetPatterns(options.assets || [], syncHost, root, projectRoot, sourceRoot), fileReplacements: normalize_file_replacements_1.normalizeFileReplacements(options.fileReplacements || [], syncHost, root), optimization: normalize_optimization_1.normalizeOptimization(options.optimization), sourceMap: normalizedSourceMapOptions, statsJson: options.statsJson || false, forkTypeChecker: options.forkTypeChecker || false, budgets: options.budgets || [], scripts: options.scripts || [], styles: options.styles || [], stylePreprocessorOptions: {
+    return {
+        ...options,
+        assets: normalize_asset_patterns_1.normalizeAssetPatterns(options.assets || [], syncHost, root, projectRoot, sourceRoot),
+        fileReplacements: normalize_file_replacements_1.normalizeFileReplacements(options.fileReplacements || [], syncHost, root),
+        optimization: normalize_optimization_1.normalizeOptimization(options.optimization),
+        sourceMap: normalizedSourceMapOptions,
+        statsJson: options.statsJson || false,
+        forkTypeChecker: options.forkTypeChecker || false,
+        budgets: options.budgets || [],
+        scripts: options.scripts || [],
+        styles: options.styles || [],
+        stylePreprocessorOptions: {
             includePaths: options.stylePreprocessorOptions
                 && options.stylePreprocessorOptions.includePaths
                 || [],
-        }, lazyModules: options.lazyModules || [] });
+        },
+        lazyModules: options.lazyModules || [],
+    };
 }
 exports.normalizeBrowserSchema = normalizeBrowserSchema;

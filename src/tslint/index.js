@@ -144,7 +144,10 @@ async function _lint(projectTslint, systemRoot, tslintConfigPath, options, progr
             lintedFiles.push(file);
         }
     }
-    return Object.assign({}, linter.getResult(), { fileNames: lintedFiles });
+    return {
+        ...linter.getResult(),
+        fileNames: lintedFiles,
+    };
 }
 function getFilesToLint(root, options, linter, program) {
     const ignore = options.exclude;

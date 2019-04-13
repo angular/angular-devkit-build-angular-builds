@@ -50,7 +50,10 @@ exports.default = architect_1.createBuilder((options, context) => {
         if (output.success === false) {
             return output;
         }
-        return Object.assign({}, output, { outputPath: path.resolve(root, options.outputPath) });
+        return {
+            ...output,
+            outputPath: path.resolve(root, options.outputPath),
+        };
     }));
 });
 function buildServerWebpackConfig(root, projectRoot, _host, options, logger) {
@@ -62,12 +65,21 @@ function buildServerWebpackConfig(root, projectRoot, _host, options, logger) {
     const projectTs = require_project_module_1.requireProjectModule(core_1.getSystemPath(projectRoot), 'typescript');
     const supportES2015 = tsConfig.options.target !== projectTs.ScriptTarget.ES3
         && tsConfig.options.target !== projectTs.ScriptTarget.ES5;
-    const buildOptions = Object.assign({}, options);
+    const buildOptions = {
+        ...options,
+    };
     wco = {
         root: core_1.getSystemPath(root),
         projectRoot: core_1.getSystemPath(projectRoot),
         // TODO: use only this.options, it contains all flags and configs items already.
-        buildOptions: Object.assign({}, buildOptions, { buildOptimizer: false, aot: true, platform: 'server', scripts: [], styles: [] }),
+        buildOptions: {
+            ...buildOptions,
+            buildOptimizer: false,
+            aot: true,
+            platform: 'server',
+            scripts: [],
+            styles: [],
+        },
         tsConfig,
         tsConfigPath,
         supportES2015,

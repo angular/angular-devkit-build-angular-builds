@@ -42,10 +42,22 @@ async function execute(options, context) {
         // AngularCompilerPlugin doesn't support genDir so we have to adjust outFile instead.
         outFile = path.join(options.outputPath, outFile);
     }
-    const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(Object.assign({}, browserOptions, { optimization: {
+    const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext({
+        ...browserOptions,
+        optimization: {
             scripts: false,
             styles: false,
-        }, i18nLocale: options.i18nLocale, i18nFormat: options.i18nFormat, i18nFile: outFile, aot: true, progress: options.progress, assets: [], scripts: [], styles: [], deleteOutputPath: false }), context, wco => [
+        },
+        i18nLocale: options.i18nLocale,
+        i18nFormat: options.i18nFormat,
+        i18nFile: outFile,
+        aot: true,
+        progress: options.progress,
+        assets: [],
+        scripts: [],
+        styles: [],
+        deleteOutputPath: false,
+    }, context, wco => [
         { plugins: [new InMemoryOutputPlugin()] },
         webpack_configs_1.getCommonConfig(wco),
         webpack_configs_1.getAotConfig(wco, true),

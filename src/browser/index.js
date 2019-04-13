@@ -117,9 +117,11 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             else {
                 return rxjs_1.of(buildEvent);
             }
-        }), operators_1.map(event => (Object.assign({}, event, { 
+        }), operators_1.map(event => ({
+            ...event,
             // If we use differential loading, both configs have the same outputs
-            outputPath: path.resolve(context.workspaceRoot, options.outputPath) }))), operators_1.concatMap(output => outputFn ? outputFn(output) : rxjs_1.of(output)));
+            outputPath: path.resolve(context.workspaceRoot, options.outputPath),
+        })), operators_1.concatMap(output => outputFn ? outputFn(output) : rxjs_1.of(output)));
     }));
 }
 exports.buildWebpackBrowser = buildWebpackBrowser;

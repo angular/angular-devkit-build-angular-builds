@@ -11,7 +11,11 @@ function hook(compiler, action) {
 }
 class CleanCssWebpackPlugin {
     constructor(options) {
-        this._options = Object.assign({ sourceMap: false, test: (file) => file.endsWith('.css') }, options);
+        this._options = {
+            sourceMap: false,
+            test: (file) => file.endsWith('.css'),
+            ...options,
+        };
     }
     apply(compiler) {
         hook(compiler, (compilation, chunks) => {

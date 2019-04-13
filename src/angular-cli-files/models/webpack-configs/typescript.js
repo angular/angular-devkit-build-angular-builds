@@ -13,7 +13,9 @@ const path = require("path");
 const webpack_1 = require("@ngtools/webpack");
 const common_1 = require("./common");
 function _pluginOptionsOverrides(buildOptions, pluginOptions) {
-    const compilerOptions = Object.assign({}, (pluginOptions.compilerOptions || {}));
+    const compilerOptions = {
+        ...(pluginOptions.compilerOptions || {})
+    };
     const hostReplacementPaths = {};
     if (buildOptions.fileReplacements) {
         for (const replacement of buildOptions.fileReplacements) {
@@ -26,8 +28,11 @@ function _pluginOptionsOverrides(buildOptions, pluginOptions) {
     if (buildOptions.preserveSymlinks) {
         compilerOptions.preserveSymlinks = true;
     }
-    return Object.assign({}, pluginOptions, { hostReplacementPaths,
-        compilerOptions });
+    return {
+        ...pluginOptions,
+        hostReplacementPaths,
+        compilerOptions
+    };
 }
 function _createAotPlugin(wco, options, useMain = true, extract = false) {
     const { root, buildOptions } = wco;
@@ -48,7 +53,22 @@ function _createAotPlugin(wco, options, useMain = true, extract = false) {
             additionalLazyModules[lazyModule] = path.resolve(root, lazyModule);
         }
     }
-    let pluginOptions = Object.assign({ mainPath: useMain ? path.join(root, buildOptions.main) : undefined }, i18nFileAndFormat, { locale: buildOptions.i18nLocale, platform: buildOptions.platform === 'server' ? webpack_1.PLATFORM.Server : webpack_1.PLATFORM.Browser, missingTranslation: buildOptions.i18nMissingTranslation, sourceMap: buildOptions.sourceMap.scripts, additionalLazyModules, nameLazyFiles: buildOptions.namedChunks, forkTypeChecker: buildOptions.forkTypeChecker, contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'), logger: wco.logger, directTemplateLoading: true, importFactories: buildOptions.experimentalImportFactories }, options);
+    let pluginOptions = {
+        mainPath: useMain ? path.join(root, buildOptions.main) : undefined,
+        ...i18nFileAndFormat,
+        locale: buildOptions.i18nLocale,
+        platform: buildOptions.platform === 'server' ? webpack_1.PLATFORM.Server : webpack_1.PLATFORM.Browser,
+        missingTranslation: buildOptions.i18nMissingTranslation,
+        sourceMap: buildOptions.sourceMap.scripts,
+        additionalLazyModules,
+        nameLazyFiles: buildOptions.namedChunks,
+        forkTypeChecker: buildOptions.forkTypeChecker,
+        contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
+        logger: wco.logger,
+        directTemplateLoading: true,
+        importFactories: buildOptions.experimentalImportFactories,
+        ...options,
+    };
     pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
     return new webpack_1.AngularCompilerPlugin(pluginOptions);
 }

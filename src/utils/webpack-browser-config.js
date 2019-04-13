@@ -26,11 +26,17 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
     }
     // For differential loading, we can have several targets
     return scriptTargets.map(scriptTarget => {
-        let buildOptions = Object.assign({}, options);
+        let buildOptions = { ...options };
         if (differentialLoading) {
             // For differential loading, the builder needs to created the index.html by itself
             // without using a webpack plugin.
-            buildOptions = Object.assign({}, options, { es5BrowserSupport: undefined, index: '', esVersionInFileName: true, scriptTargetOverride: scriptTarget });
+            buildOptions = {
+                ...options,
+                es5BrowserSupport: undefined,
+                index: '',
+                esVersionInFileName: true,
+                scriptTargetOverride: scriptTarget,
+            };
         }
         const supportES2015 = scriptTarget !== ts.ScriptTarget.ES3 && scriptTarget !== ts.ScriptTarget.ES5;
         const wco = {

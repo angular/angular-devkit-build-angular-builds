@@ -46,7 +46,7 @@ function normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName) {
             else {
                 bundleName = defaultBundleName;
             }
-            normalizedEntry = Object.assign({}, entry, { bundleName });
+            normalizedEntry = { ...entry, bundleName };
         }
         return normalizedEntry;
     });

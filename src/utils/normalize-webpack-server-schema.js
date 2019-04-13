@@ -17,6 +17,11 @@ function normalizeWebpackServerSchema(host, root, projectRoot, sourceRoot, optio
     normalizedSourceMapOptions.vendor =
         normalizedSourceMapOptions.vendor || options.vendorSourceMap || false;
     const optimization = options.hasOwnProperty('optimization') && options.optimization || {};
-    return Object.assign({}, options, { fileReplacements: normalize_file_replacements_1.normalizeFileReplacements(options.fileReplacements || [], syncHost, root), optimization: normalize_optimization_1.normalizeOptimization(optimization), sourceMap: normalizedSourceMapOptions });
+    return {
+        ...options,
+        fileReplacements: normalize_file_replacements_1.normalizeFileReplacements(options.fileReplacements || [], syncHost, root),
+        optimization: normalize_optimization_1.normalizeOptimization(optimization),
+        sourceMap: normalizedSourceMapOptions,
+    };
 }
 exports.normalizeWebpackServerSchema = normalizeWebpackServerSchema;
