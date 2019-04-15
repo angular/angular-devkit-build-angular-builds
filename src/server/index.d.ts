@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,17 +6,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
-import { Observable } from 'rxjs';
-import * as webpack from 'webpack';
-import { ExecutionTransformer } from '../transforms';
-import { Schema as BuildWebpackServerOptions } from './schema';
+import { BuilderOutput } from '@angular-devkit/architect';
+import { Path, json, logging, virtualFs } from '@angular-devkit/core';
+import { Stats } from 'fs';
+import { NormalizedWebpackServerBuilderSchema } from '../utils';
+import { Schema as BuildWebpackServerSchema } from './schema';
 export declare type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
     outputPath?: string;
 };
-export declare function execute(options: BuildWebpackServerOptions, context: BuilderContext, transforms?: {
-    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
-}): Observable<ServerBuilderOutput>;
-declare const _default: import("@angular-devkit/architect/src/internal").Builder<json.JsonObject & BuildWebpackServerOptions>;
+declare const _default: import("@angular-devkit/architect/src/internal").Builder<json.JsonObject & BuildWebpackServerSchema>;
 export default _default;
+export declare function buildServerWebpackConfig(root: Path, projectRoot: Path, _host: virtualFs.Host<Stats>, options: NormalizedWebpackServerBuilderSchema, logger: logging.Logger): any;

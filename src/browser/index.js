@@ -40,7 +40,7 @@ function createBrowserLoggingCallback(verbose, logger) {
     };
 }
 exports.createBrowserLoggingCallback = createBrowserLoggingCallback;
-async function buildBrowserWebpackConfigFromContext(options, context, host = new node_1.NodeJsSyncHost()) {
+async function buildBrowserWebpackConfigFromContext(options, context, host) {
     return webpack_browser_config_1.generateBrowserWebpackConfigFromContext(options, context, wco => [
         webpack_configs_1.getCommonConfig(wco),
         webpack_configs_1.getBrowserConfig(wco),
@@ -75,26 +75,30 @@ function getCompilerConfig(wco) {
     }
     return {};
 }
-async function initialize(options, context, host, webpackConfigurationTransform) {
-    const { config, workspace } = await buildBrowserWebpackConfigFromContext(options, context, host);
-    let transformedConfig;
-    if (webpackConfigurationTransform) {
-        transformedConfig = [];
-        for (const c of config) {
-            transformedConfig.push(await webpackConfigurationTransform(c));
-        }
-    }
-    if (options.deleteOutputPath) {
-        await utils_1.deleteOutputDir(core_1.normalize(context.workspaceRoot), core_1.normalize(options.outputPath), host).toPromise();
-    }
-    return { config: transformedConfig || config, workspace };
-}
 function buildWebpackBrowser(options, context, transforms = {}) {
     const host = new node_1.NodeJsSyncHost();
     const root = core_1.normalize(context.workspaceRoot);
+    const configFn = transforms.config;
+    const outputFn = transforms.output;
     const loggingFn = transforms.logging
         || createBrowserLoggingCallback(!!options.verbose, context.logger);
-    return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(operators_1.switchMap(({ workspace, config: configs }) => {
+    // This makes a host observable into a cold one. This is because we want to wait until
+    // subscription before calling buildBrowserWebpackConfigFromContext, which can throw.
+    return rxjs_1.of(null).pipe(operators_1.switchMap(() => rxjs_1.from(buildBrowserWebpackConfigFromContext(options, context, host))), operators_1.switchMap(({ workspace, config }) => {
+        if (configFn) {
+            return rxjs_1.combineLatest(config.map(config => configFn(workspace, config))).pipe(operators_1.map(config => ({ workspace, config })));
+        }
+        else {
+            return rxjs_1.of({ workspace, config });
+        }
+    }), operators_1.switchMap(({ workspace, config }) => {
+        if (options.deleteOutputPath) {
+            return utils_1.deleteOutputDir(root, core_1.normalize(options.outputPath), host).pipe(operators_1.map(() => ({ workspace, config })));
+        }
+        else {
+            return rxjs_1.of({ workspace, config });
+        }
+    }), operators_1.switchMap(({ workspace, config: configs }) => {
         const projectName = context.target
             ? context.target.project : workspace.getDefaultProjectName();
         if (!projectName) {
@@ -137,7 +141,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             ...event,
             // If we use differential loading, both configs have the same outputs
             outputPath: path.resolve(context.workspaceRoot, options.outputPath),
-        })));
+        })), operators_1.concatMap(output => outputFn ? outputFn(output) : rxjs_1.of(output)));
     }));
 }
 exports.buildWebpackBrowser = buildWebpackBrowser;

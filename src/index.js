@@ -10,6 +10,12 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
+// TODO: remove this commented AJV require.
+// We don't actually require AJV, but there is a bug with NPM and peer dependencies that is
+// whose workaround is to depend on AJV.
+// See https://github.com/angular/angular-cli/issues/9691#issuecomment-367322703 for details.
+// We need to add a require here to satisfy the dependency checker.
+// require('ajv');
 __export(require("./app-shell"));
 __export(require("./browser"));
 var schema_1 = require("./browser/schema");
@@ -19,6 +25,5 @@ __export(require("./dev-server"));
 __export(require("./extract-i18n"));
 __export(require("./karma"));
 __export(require("./protractor"));
-var server_1 = require("./server");
-exports.executeServerBuilder = server_1.execute;
+__export(require("./server"));
 __export(require("./tslint"));

@@ -8,14 +8,14 @@
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
-import { ExecutionTransformer } from '../transforms';
 import { Schema as KarmaBuilderOptions } from './schema';
 declare type KarmaConfigOptions = import('karma').ConfigOptions & {
     buildWebpack?: unknown;
     configFile?: string;
 };
+declare type WebpackConfigurationTransformer = (configuration: webpack.Configuration) => webpack.Configuration;
 export declare function execute(options: KarmaBuilderOptions, context: BuilderContext, transforms?: {
-    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
+    webpackConfiguration?: WebpackConfigurationTransformer;
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
 }): Observable<BuilderOutput>;
 export { KarmaBuilderOptions };

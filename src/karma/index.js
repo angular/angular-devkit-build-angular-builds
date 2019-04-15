@@ -13,7 +13,7 @@ const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
-async function initialize(options, context, webpackConfigurationTransformer) {
+async function initialize(options, context) {
     const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(
     // only two properties are missing:
     // * `outputPath` which is fixed for tests
@@ -27,13 +27,10 @@ async function initialize(options, context, webpackConfigurationTransformer) {
     ]);
     // tslint:disable-next-line:no-implicit-dependencies
     const karma = await Promise.resolve().then(() => require('karma'));
-    return [
-        karma,
-        webpackConfigurationTransformer ? await webpackConfigurationTransformer(config[0]) : config[0],
-    ];
+    return [karma, config[0]];
 }
 function execute(options, context, transforms = {}) {
-    return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.switchMap(([karma, webpackConfig]) => new rxjs_1.Observable(subscriber => {
+    return rxjs_1.from(initialize(options, context)).pipe(operators_1.switchMap(([karma, webpackConfig]) => new rxjs_1.Observable(subscriber => {
         const karmaOptions = {};
         if (options.watch !== undefined) {
             karmaOptions.singleRun = !options.watch;
@@ -55,7 +52,9 @@ function execute(options, context, transforms = {}) {
         karmaOptions.configFile = path_1.resolve(context.workspaceRoot, options.karmaConfig);
         karmaOptions.buildWebpack = {
             options,
-            webpackConfig,
+            webpackConfig: transforms.webpackConfiguration
+                ? transforms.webpackConfiguration(webpackConfig)
+                : webpackConfig,
             // Pass onto Karma to emit BuildEvents.
             successCb: () => subscriber.next({ success: true }),
             failureCb: () => subscriber.next({ success: false }),
