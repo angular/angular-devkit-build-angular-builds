@@ -6,9 +6,10 @@ const path = require("path");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const utils_1 = require("../utils");
+const differential_loading_1 = require("./differential-loading");
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const webpackMerge = require('webpack-merge');
-async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, options, webpackPartialGenerator, logger) {
+async function generateWebpackConfig(context, workspaceRoot, projectRoot, sourceRoot, options, webpackPartialGenerator, logger) {
     // Ensure Build Optimizer is only used with AOT.
     if (options.buildOptimizer && !options.aot) {
         throw new Error(`The 'buildOptimizer' option cannot be used without 'aot'.`);
@@ -19,13 +20,10 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
     const ts = await Promise.resolve().then(() => require('typescript'));
     // At the moment, only the browser builder supports differential loading
     // However this config generation is used by multiple builders such as dev-server
-    // const builderInfo = additionalOptions.builderInfo;
-    // const differentialLoading =
-    //   builderInfo
-    //   && builderInfo.builderName === 'browser'
-    //   && isDifferentialLoadingNeeded(projectRoot, scriptTarget);
-    const differentialLoading = false;
-    const scriptTargets = [tsConfig.options.target];
+    const scriptTarget = tsConfig.options.target;
+    const differentialLoading = context.builder.builderName === 'browser'
+        && differential_loading_1.isDifferentialLoadingNeeded(projectRoot, scriptTarget);
+    const scriptTargets = [scriptTarget];
     if (differentialLoading) {
         scriptTargets.unshift(ts.ScriptTarget.ES5);
     }
@@ -69,7 +67,7 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
     });
 }
 exports.generateWebpackConfig = generateWebpackConfig;
-async function generateBrowserWebpackConfigFromWorkspace(options, projectName, workspace, host, webpackPartialGenerator, logger) {
+async function generateBrowserWebpackConfigFromWorkspace(options, context, projectName, workspace, host, webpackPartialGenerator, logger) {
     // TODO: Use a better interface for workspace access.
     const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
     const projectSourceRoot = workspace.getProject(projectName).sourceRoot;
@@ -77,7 +75,7 @@ async function generateBrowserWebpackConfigFromWorkspace(options, projectName, w
         ? core_1.resolve(workspace.root, core_1.normalize(projectSourceRoot))
         : undefined;
     const normalizedOptions = utils_1.normalizeBrowserSchema(host, workspace.root, projectRoot, sourceRoot, options);
-    return generateWebpackConfig(core_1.getSystemPath(workspace.root), core_1.getSystemPath(projectRoot), sourceRoot && core_1.getSystemPath(sourceRoot), normalizedOptions, webpackPartialGenerator, logger);
+    return generateWebpackConfig(context, core_1.getSystemPath(workspace.root), core_1.getSystemPath(projectRoot), sourceRoot && core_1.getSystemPath(sourceRoot), normalizedOptions, webpackPartialGenerator, logger);
 }
 exports.generateBrowserWebpackConfigFromWorkspace = generateBrowserWebpackConfigFromWorkspace;
 async function generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost()) {
@@ -88,7 +86,7 @@ async function generateBrowserWebpackConfigFromContext(options, context, webpack
     if (!projectName) {
         throw new Error('Must either have a target from the context or a default project.');
     }
-    const config = await generateBrowserWebpackConfigFromWorkspace(options, projectName, workspace, host, webpackPartialGenerator, context.logger);
+    const config = await generateBrowserWebpackConfigFromWorkspace(options, context, projectName, workspace, host, webpackPartialGenerator, context.logger);
     return { workspace, config };
 }
 exports.generateBrowserWebpackConfigFromContext = generateBrowserWebpackConfigFromContext;

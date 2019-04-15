@@ -21,7 +21,7 @@ async function augmentIndexHtml(params) {
     const stylesheets = new Set();
     const scripts = new Set();
     // Sort files in the order we want to insert them by entrypoint and dedupes duplicates
-    const mergedFiles = [...noModuleFiles, ...moduleFiles, ...files];
+    const mergedFiles = [...moduleFiles, ...noModuleFiles, ...files];
     for (const entrypoint of entrypoints) {
         for (const { extension, file, name } of mergedFiles) {
             if (name !== entrypoint) {

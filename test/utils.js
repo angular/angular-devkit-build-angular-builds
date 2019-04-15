@@ -24,8 +24,9 @@ exports.protractorTargetSpec = { project: 'app-e2e', target: 'e2e' };
 async function createArchitect(workspaceRoot) {
     const registry = new core_1.schema.CoreSchemaRegistry();
     registry.addPostTransform(core_1.schema.transforms.addUndefinedDefaults);
+    const workspaceSysPath = core_1.getSystemPath(workspaceRoot);
     const workspace = await core_1.experimental.workspace.Workspace.fromPath(exports.host, exports.host.root(), registry);
-    const architectHost = new testing_1.TestingArchitectHost(workspaceRoot, workspaceRoot, new node_1.WorkspaceNodeModulesArchitectHost(workspace, workspaceRoot));
+    const architectHost = new testing_1.TestingArchitectHost(workspaceSysPath, workspaceSysPath, new node_1.WorkspaceNodeModulesArchitectHost(workspace, workspaceSysPath));
     const architect = new architect_1.Architect(architectHost, registry);
     return {
         workspace,

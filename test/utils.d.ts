@@ -35,7 +35,7 @@ export declare const protractorTargetSpec: {
     project: string;
     target: string;
 };
-export declare function createArchitect(workspaceRoot: string): Promise<{
+export declare function createArchitect(workspaceRoot: Path): Promise<{
     workspace: experimental.workspace.Workspace;
     architectHost: TestingArchitectHost;
     architect: Architect;
