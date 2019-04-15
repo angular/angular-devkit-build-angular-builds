@@ -10,22 +10,20 @@ import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { experimental, json, logging, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
-import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
+import { ExecutionTransformer } from '../transforms';
 import { Schema as BrowserBuilderSchema } from './schema';
 export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
     outputPath: string;
 };
 export declare function createBrowserLoggingCallback(verbose: boolean, logger: logging.LoggerApi): WebpackLoggingCallback;
-export declare function buildBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, host: virtualFs.Host<fs.Stats>): Promise<{
+export declare function buildBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, host?: virtualFs.Host<fs.Stats>): Promise<{
     workspace: experimental.workspace.Workspace;
     config: webpack.Configuration[];
 }>;
-export declare type BrowserConfigTransformFn = (workspace: experimental.workspace.Workspace, config: webpack.Configuration) => Observable<webpack.Configuration>;
 export declare function buildWebpackBrowser(options: BrowserBuilderSchema, context: BuilderContext, transforms?: {
-    config?: BrowserConfigTransformFn;
-    output?: (output: BrowserBuilderOutput) => Observable<BuilderOutput>;
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
     logging?: WebpackLoggingCallback;
-}): Observable<BuilderOutput>;
+}): import("rxjs").Observable<BrowserBuilderOutput>;
 declare const _default: import("@angular-devkit/architect/src/internal").Builder<json.JsonObject & BrowserBuilderSchema>;
 export default _default;

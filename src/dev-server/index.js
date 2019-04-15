@@ -68,14 +68,10 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         const webpackConfigResult = await browser_1.buildBrowserWebpackConfigFromContext(browserOptions, context, host);
         // No differential loading for dev-server, hence there is just one config
         let webpackConfig = webpackConfigResult.config[0];
-        const workspace = webpackConfigResult.workspace;
-        if (transforms.browserConfig) {
-            webpackConfig = await transforms.browserConfig(workspace, webpackConfig).toPromise();
-        }
         const port = await check_port_1.checkPort(options.port || 0, options.host || 'localhost', 4200);
-        let webpackDevServerConfig = buildServerConfig(root, options, browserOptions, context.logger);
-        if (transforms.serverConfig) {
-            webpackDevServerConfig = await transforms.serverConfig(workspace, webpackConfig).toPromise();
+        const webpackDevServerConfig = webpackConfig.devServer = buildServerConfig(root, options, browserOptions, context.logger);
+        if (transforms.webpackConfiguration) {
+            webpackConfig = await transforms.webpackConfiguration(webpackConfig);
         }
         return { browserOptions, webpackConfig, webpackDevServerConfig, port };
     }
@@ -136,7 +132,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         **
       `);
         openAddress = serverAddress + webpackDevServerConfig.publicPath;
-        webpackConfig.devServer = webpackDevServerConfig;
         return build_webpack_1.runWebpackDevServer(webpackConfig, context, { logging: loggingFn });
     }), operators_1.map(buildEvent => {
         if (first && options.open) {
