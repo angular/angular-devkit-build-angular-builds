@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import { Schema as KarmaBuilderOptions } from './schema';
-declare type KarmaConfigOptions = import('karma').ConfigOptions & {
+export declare type KarmaConfigOptions = import('karma').ConfigOptions & {
     buildWebpack?: unknown;
     configFile?: string;
 };

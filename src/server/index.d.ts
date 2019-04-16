@@ -10,12 +10,13 @@ import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
-import { Schema as BuildWebpackServerOptions } from './schema';
+import { Schema as ServerBuilderOptions } from './schema';
 export declare type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
     outputPath?: string;
 };
-export declare function execute(options: BuildWebpackServerOptions, context: BuilderContext, transforms?: {
+export { ServerBuilderOptions };
+export declare function execute(options: ServerBuilderOptions, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
 }): Observable<ServerBuilderOutput>;
-declare const _default: import("@angular-devkit/architect/src/internal").Builder<json.JsonObject & BuildWebpackServerOptions>;
+declare const _default: import("@angular-devkit/architect/src/internal").Builder<json.JsonObject & ServerBuilderOptions>;
 export default _default;
