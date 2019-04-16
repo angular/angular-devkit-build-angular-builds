@@ -9,9 +9,10 @@ import { BuilderContext } from '@angular-devkit/architect';
 import { DevServerBuildOutput, WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { experimental, json, logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
+import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
-import { BrowserConfigTransformFn } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
+import { ExecutionTransformer } from '../transforms';
 import { Schema } from './schema';
 export declare type DevServerBuilderSchema = Schema & json.JsonObject;
 export declare const devServerBuildOverriddenKeys: (keyof DevServerBuilderSchema)[];
@@ -27,8 +28,7 @@ export declare type ServerConfigTransformFn = (workspace: experimental.workspace
  *     transforming webpack configuration before passing it to webpack).
  */
 export declare function serveWebpackBrowser(options: DevServerBuilderSchema, context: BuilderContext, transforms?: {
-    browserConfig?: BrowserConfigTransformFn;
-    serverConfig?: ServerConfigTransformFn;
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
     logging?: WebpackLoggingCallback;
 }): Observable<DevServerBuilderOutput>;
 /**
