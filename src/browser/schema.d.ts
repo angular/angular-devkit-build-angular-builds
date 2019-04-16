@@ -37,6 +37,8 @@ export interface Schema {
     deployUrl?: string;
     /**
      * Enables conditionally loaded ES2015 polyfills.
+     * @deprecated This will be determined from the list of supported browsers specified in the
+     * 'browserslist' file.
      */
     es5BrowserSupport?: boolean;
     /**

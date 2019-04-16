@@ -12,6 +12,7 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./default-progress"));
 __export(require("./delete-output-dir"));
+__export(require("./differential-loading"));
 __export(require("./run-module-as-observable-fork"));
 __export(require("./normalize-file-replacements"));
 __export(require("./normalize-asset-patterns"));
