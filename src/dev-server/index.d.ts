@@ -14,8 +14,8 @@ import * as WebpackDevServer from 'webpack-dev-server';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { Schema } from './schema';
-export declare type DevServerBuilderOptions = Schema & json.JsonObject;
-export declare const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[];
+export declare type DevServerBuilderSchema = Schema & json.JsonObject;
+export declare const devServerBuildOverriddenKeys: (keyof DevServerBuilderSchema)[];
 export declare type DevServerBuilderOutput = DevServerBuildOutput & {
     baseUrl: string;
 };
@@ -27,7 +27,7 @@ export declare type ServerConfigTransformFn = (workspace: experimental.workspace
  * @param transforms A map of transforms that can be used to hook into some logic (such as
  *     transforming webpack configuration before passing it to webpack).
  */
-export declare function serveWebpackBrowser(options: DevServerBuilderOptions, context: BuilderContext, transforms?: {
+export declare function serveWebpackBrowser(options: DevServerBuilderSchema, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
     logging?: WebpackLoggingCallback;
 }): Observable<DevServerBuilderOutput>;
@@ -39,7 +39,7 @@ export declare function serveWebpackBrowser(options: DevServerBuilderOptions, co
  * @param logger A generic logger to use for showing warnings.
  * @returns A webpack dev-server configuration.
  */
-export declare function buildServerConfig(workspaceRoot: string, serverOptions: DevServerBuilderOptions, browserOptions: BrowserBuilderSchema, logger: logging.LoggerApi): WebpackDevServer.Configuration;
+export declare function buildServerConfig(workspaceRoot: string, serverOptions: DevServerBuilderSchema, browserOptions: BrowserBuilderSchema, logger: logging.LoggerApi): WebpackDevServer.Configuration;
 /**
  * Resolve and build a URL _path_ that will be the root of the server. This resolved base href and
  * deploy URL from the browser options and returns a path from the root.
@@ -47,6 +47,6 @@ export declare function buildServerConfig(workspaceRoot: string, serverOptions: 
  * @param browserOptions The browser options that were passed to the browser builder.
  * @param logger A generic logger to use for showing warnings.
  */
-export declare function buildServePath(serverOptions: DevServerBuilderOptions, browserOptions: BrowserBuilderSchema, logger: logging.LoggerApi): string;
-declare const _default: import("@angular-devkit/architect/src/internal").Builder<DevServerBuilderOptions>;
+export declare function buildServePath(serverOptions: DevServerBuilderSchema, browserOptions: BrowserBuilderSchema, logger: logging.LoggerApi): string;
+declare const _default: import("@angular-devkit/architect/src/internal").Builder<DevServerBuilderSchema>;
 export default _default;
