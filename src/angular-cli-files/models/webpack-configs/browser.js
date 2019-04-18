@@ -35,7 +35,7 @@ function getBrowserConfig(wco) {
             entrypoints: package_chunk_sort_1.generateEntryPoints(buildOptions),
             deployUrl: buildOptions.deployUrl,
             sri: buildOptions.subresourceIntegrity,
-            noModuleEntrypoints: ['polyfills.es5'],
+            noModuleEntrypoints: ['polyfills-es5'],
         }));
     }
     if (buildOptions.subresourceIntegrity) {
@@ -94,7 +94,7 @@ function getBrowserConfig(wco) {
                         test: (module, chunks) => {
                             const moduleName = module.nameForCondition ? module.nameForCondition() : '';
                             return /[\\/]node_modules[\\/]/.test(moduleName)
-                                && !chunks.some(({ name }) => name === 'polyfills' || name === 'polyfills.es5'
+                                && !chunks.some(({ name }) => name === 'polyfills' || name === 'polyfills-es5'
                                     || globalStylesBundleNames.includes(name));
                         },
                     },
