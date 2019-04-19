@@ -169,7 +169,7 @@
     },
     "deleteOutputPath": {
       "type": "boolean",
-      "description": "Delete the output path before building.",
+      "description": "delete-output-path",
       "default": true
     },
     "preserveSymlinks": {

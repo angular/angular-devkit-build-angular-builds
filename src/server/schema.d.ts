@@ -9,7 +9,7 @@ export interface Schema {
      */
     commonChunk?: boolean;
     /**
-     * Delete the output path before building.
+     * delete-output-path
      */
     deleteOutputPath?: boolean;
     /**
