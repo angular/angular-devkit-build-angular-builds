@@ -22,7 +22,7 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
     // However this config generation is used by multiple builders such as dev-server
     const scriptTarget = tsConfig.options.target;
     const differentialLoading = context.builder.builderName === 'browser'
-        && differential_loading_1.isDifferentialLoadingNeeded(projectRoot, scriptTarget);
+        && differential_loading_1.isDifferentialLoadingNeeded(projectRoot, scriptTarget) && !options.watch;
     const scriptTargets = [scriptTarget];
     if (differentialLoading) {
         scriptTargets.unshift(ts.ScriptTarget.ES5);

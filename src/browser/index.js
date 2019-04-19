@@ -101,10 +101,18 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             throw new Error('Must either have a target from the context or a default project.');
         }
         const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
-        // We use zip because when having multiple builds we want to wait
-        // for all builds to finish before processeding
-        return rxjs_1.zip(...configs.map(config => build_webpack_1.runWebpack(config, context, { logging: loggingFn })))
-            .pipe(operators_1.switchMap(buildEvents => {
+        return rxjs_1.from(configs).pipe(
+        // the concurrency parameter (3rd parameter of mergeScan) is deliberately
+        // set to 1 to make sure the build steps are executed in sequence.
+        operators_1.mergeScan((lastResult, config) => {
+            // Make sure to only run the 2nd build step, if 1st one succeeded
+            if (lastResult.success) {
+                return build_webpack_1.runWebpack(config, context, { logging: loggingFn });
+            }
+            else {
+                return rxjs_1.of();
+            }
+        }, { success: true }, 1), operators_1.bufferCount(configs.length), operators_1.switchMap(buildEvents => {
             const success = buildEvents.every(r => r.success);
             if (success && buildEvents.length === 2 && options.index) {
                 const { emittedFiles: ES5BuildFiles = [] } = buildEvents[0];
