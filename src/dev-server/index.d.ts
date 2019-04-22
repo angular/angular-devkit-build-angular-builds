@@ -7,7 +7,7 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { DevServerBuildOutput, WebpackLoggingCallback } from '@angular-devkit/build-webpack';
-import { experimental, json, logging } from '@angular-devkit/core';
+import { json, logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
@@ -19,7 +19,6 @@ export declare const devServerBuildOverriddenKeys: (keyof DevServerBuilderOption
 export declare type DevServerBuilderOutput = DevServerBuildOutput & {
     baseUrl: string;
 };
-export declare type ServerConfigTransformFn = (workspace: experimental.workspace.Workspace, config: WebpackDevServer.Configuration) => Observable<WebpackDevServer.Configuration>;
 /**
  * Reusable implementation of the build angular webpack dev server builder.
  * @param options Dev Server options.
