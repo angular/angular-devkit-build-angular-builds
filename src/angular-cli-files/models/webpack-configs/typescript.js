@@ -66,7 +66,6 @@ function _createAotPlugin(wco, options, useMain = true, extract = false) {
         contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
         logger: wco.logger,
         directTemplateLoading: true,
-        importFactories: buildOptions.experimentalImportFactories,
         ...options,
     };
     pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
