@@ -14,9 +14,11 @@ const node_1 = require("@angular-devkit/core/node");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
+const ts = require("typescript");
 const analytics_1 = require("../../plugins/webpack/analytics");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const write_index_html_1 = require("../angular-cli-files/utilities/index-file/write-index-html");
+const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
 const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
@@ -101,6 +103,17 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             throw new Error('Must either have a target from the context or a default project.');
         }
         const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
+        const tsConfigPath = path.resolve(workspace.root, options.tsConfig);
+        const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
+        if (utils_1.isEs5SupportNeeded(projectRoot) &&
+            tsConfig.options.target !== ts.ScriptTarget.ES5 &&
+            tsConfig.options.target !== ts.ScriptTarget.ES2015) {
+            context.logger.warn(core_1.tags.stripIndent `
+          WARNING: Using differential loading with targets ES5 and ES2016 or higher may
+          cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
+          referenced with script[type="module"] but they may not support ES2016+ syntax.
+        `);
+        }
         return rxjs_1.from(configs).pipe(
         // the concurrency parameter (3rd parameter of mergeScan) is deliberately
         // set to 1 to make sure the build steps are executed in sequence.
