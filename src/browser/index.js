@@ -103,7 +103,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             throw new Error('Must either have a target from the context or a default project.');
         }
         const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
-        const tsConfigPath = path.resolve(workspace.root, options.tsConfig);
+        const tsConfigPath = path.resolve(core_1.getSystemPath(workspace.root), options.tsConfig);
         const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
         if (utils_1.isEs5SupportNeeded(projectRoot) &&
             tsConfig.options.target !== ts.ScriptTarget.ES5 &&
