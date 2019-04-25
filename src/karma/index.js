@@ -12,6 +12,7 @@ const path_1 = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
+const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 async function initialize(options, context, webpackConfigurationTransformer) {
     const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(
@@ -33,6 +34,8 @@ async function initialize(options, context, webpackConfigurationTransformer) {
     ];
 }
 function execute(options, context, transforms = {}) {
+    // Check Angular version.
+    version_1.Version.assertCompatibleAngularVersion(context.workspaceRoot);
     return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.switchMap(([karma, webpackConfig]) => new rxjs_1.Observable(subscriber => {
         const karmaOptions = {};
         if (options.watch !== undefined) {

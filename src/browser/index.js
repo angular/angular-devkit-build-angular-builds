@@ -22,6 +22,7 @@ const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
 const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
+const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 function createBrowserLoggingCallback(verbose, logger) {
     return (stats, config) => {
@@ -94,6 +95,8 @@ async function initialize(options, context, host, webpackConfigurationTransform)
 function buildWebpackBrowser(options, context, transforms = {}) {
     const host = new node_1.NodeJsSyncHost();
     const root = core_1.normalize(context.workspaceRoot);
+    // Check Angular version.
+    version_1.Version.assertCompatibleAngularVersion(context.workspaceRoot);
     const loggingFn = transforms.logging
         || createBrowserLoggingCallback(!!options.verbose, context.logger);
     return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(operators_1.switchMap(({ workspace, config: configs }) => {

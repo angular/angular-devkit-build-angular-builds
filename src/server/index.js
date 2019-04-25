@@ -16,10 +16,13 @@ const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const utils_1 = require("../utils");
+const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 function execute(options, context, transforms = {}) {
     const host = new node_1.NodeJsSyncHost();
     const root = context.workspaceRoot;
+    // Check Angular version.
+    version_1.Version.assertCompatibleAngularVersion(context.workspaceRoot);
     return rxjs_1.from(buildServerWebpackConfig(options, context)).pipe(operators_1.concatMap(async (v) => transforms.webpackConfiguration ? transforms.webpackConfiguration(v) : v), operators_1.concatMap(v => {
         if (options.deleteOutputPath) {
             return utils_1.deleteOutputDir(core_1.normalize(root), core_1.normalize(options.outputPath), host).pipe(operators_1.map(() => v));

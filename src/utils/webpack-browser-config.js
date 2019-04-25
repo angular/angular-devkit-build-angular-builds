@@ -55,6 +55,15 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
         wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
         const partials = webpackPartialGenerator(wco);
         const webpackConfig = webpackMerge(partials);
+        if (supportES2015) {
+            if (!webpackConfig.resolve) {
+                webpackConfig.resolve = {};
+            }
+            if (!webpackConfig.resolve.alias) {
+                webpackConfig.resolve.alias = {};
+            }
+            webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
+        }
         if (options.profile || process.env['NG_BUILD_PROFILING']) {
             const esVersionInFileName = webpack_configs_1.getEsVersionForFileName(wco.buildOptions.scriptTargetOverride, wco.buildOptions.esVersionInFileName);
             const smp = new SpeedMeasurePlugin({

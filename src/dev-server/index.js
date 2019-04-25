@@ -20,6 +20,7 @@ const webpack = require("webpack");
 const check_port_1 = require("../angular-cli-files/utilities/check-port");
 const browser_1 = require("../browser");
 const utils_1 = require("../utils");
+const version_1 = require("../utils/version");
 const open = require('open');
 exports.devServerBuildOverriddenKeys = [
     'watch',
@@ -44,6 +45,8 @@ exports.devServerBuildOverriddenKeys = [
  *     transforming webpack configuration before passing it to webpack).
  */
 function serveWebpackBrowser(options, context, transforms = {}) {
+    // Check Angular version.
+    version_1.Version.assertCompatibleAngularVersion(context.workspaceRoot);
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
     const root = context.workspaceRoot;
     let first = true;

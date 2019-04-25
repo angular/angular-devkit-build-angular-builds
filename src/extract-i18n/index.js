@@ -12,6 +12,7 @@ const build_webpack_1 = require("@angular-devkit/build-webpack");
 const path = require("path");
 const webpack = require("webpack");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
+const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 function getI18nOutfile(format) {
     switch (format) {
@@ -34,6 +35,8 @@ class InMemoryOutputPlugin {
     }
 }
 async function execute(options, context) {
+    // Check Angular version.
+    version_1.Version.assertCompatibleAngularVersion(context.workspaceRoot);
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
     const browserOptions = await context.validateOptions(await context.getTargetOptions(browserTarget), await context.getBuilderNameForTarget(browserTarget));
     // We need to determine the outFile name so that AngularCompiler can retrieve it.
