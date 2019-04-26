@@ -231,18 +231,13 @@ function getCommonConfig(wco) {
                 comments: false,
                 webkit: true,
             },
-            // On server, we don't want to compress anything. We still set the ngDevMode = false for it
-            // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
-            compress: (buildOptions.platform == 'server' ? {
-                global_defs: angularGlobalDefinitions,
-            } : {
-                pure_getters: buildOptions.buildOptimizer,
+            compress: {
                 // PURE comments work best with 3 passes.
                 // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
-                passes: buildOptions.buildOptimizer ? 3 : 1,
+                passes: 3,
                 global_defs: angularGlobalDefinitions,
-            }),
-            // We also want to avoid mangling on server.
+            },
+            // We want to avoid mangling on server.
             ...(buildOptions.platform == 'server' ? { mangle: false } : {}),
         };
         extraMinimizers.push(new TerserPlugin({
