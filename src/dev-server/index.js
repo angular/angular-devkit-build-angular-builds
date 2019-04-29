@@ -196,6 +196,8 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
             errors: !(styles || scripts),
             warnings: false,
         },
+        // inline is always false, because we add live reloading scripts in _addLiveReload when needed
+        inline: false,
         public: serverOptions.publicHost,
         disableHostCheck: serverOptions.disableHostCheck,
         publicPath: servePath,
