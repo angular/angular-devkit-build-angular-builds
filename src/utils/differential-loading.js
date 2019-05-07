@@ -9,9 +9,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const browserslist = require("browserslist");
 const caniuse = require("caniuse-api");
-const ts = require("typescript");
-function isDifferentialLoadingNeeded(projectRoot, target = ts.ScriptTarget.ES5) {
-    const supportES2015 = target !== ts.ScriptTarget.ES3 && target !== ts.ScriptTarget.ES5;
+const typescript_1 = require("typescript");
+function isDifferentialLoadingNeeded(projectRoot, target = typescript_1.ScriptTarget.ES5) {
+    const supportES2015 = target !== typescript_1.ScriptTarget.ES3 && target !== typescript_1.ScriptTarget.ES5;
     return supportES2015 && isEs5SupportNeeded(projectRoot);
 }
 exports.isDifferentialLoadingNeeded = isDifferentialLoadingNeeded;

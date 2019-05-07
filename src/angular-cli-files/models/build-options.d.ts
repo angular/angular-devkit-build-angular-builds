@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging } from '@angular-devkit/core';
-import * as ts from 'typescript';
+import { ParsedCommandLine, ScriptTarget } from 'typescript';
 import { AssetPatternClass, Budget, ExtraEntryPoint, OptimizationClass, SourceMapClass } from '../../browser/schema';
 import { NormalizedFileReplacement } from '../../utils/normalize-file-replacements';
 export interface BuildOptions {
@@ -66,7 +66,7 @@ export interface BuildOptions {
     /** @deprecated use only for compatibility in 8.x; will be removed in 9.0 */
     rebaseRootRelativeCssUrls?: boolean;
     esVersionInFileName?: boolean;
-    scriptTargetOverride?: ts.ScriptTarget;
+    scriptTargetOverride?: ScriptTarget;
 }
 export interface WebpackTestOptions extends BuildOptions {
     codeCoverage?: boolean;
@@ -78,7 +78,7 @@ export interface WebpackConfigOptions<T = BuildOptions> {
     projectRoot: string;
     sourceRoot?: string;
     buildOptions: T;
-    tsConfig: ts.ParsedCommandLine;
+    tsConfig: ParsedCommandLine;
     tsConfigPath: string;
     supportES2015: boolean;
 }

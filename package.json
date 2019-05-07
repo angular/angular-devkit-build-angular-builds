@@ -1,17 +1,17 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "0.800.0-beta.18+46.d133260",
+  "version": "0.800.0-beta.18+49.22e401b",
   "description": "Angular Webpack Build Facade",
   "experimental": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#d133260",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#d133260",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#d133260",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#d133260",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#d133260",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#22e401b",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#22e401b",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#22e401b",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#22e401b",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#22e401b",
     "ajv": "6.10.0",
     "autoprefixer": "9.5.1",
     "browserslist": "4.5.6",
@@ -58,7 +58,7 @@
     "worker-plugin": "3.1.0"
   },
   "peerDependencies": {
-    "typescript": ">=3.4 < 3.5"
+    "typescript": ">=3.1 < 3.5"
   },
   "keywords": [
     "angular",

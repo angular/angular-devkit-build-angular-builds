@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const core_1 = require("@angular-devkit/core");
 const webpack_1 = require("webpack");
-const ts = require("typescript");
+const typescript_1 = require("typescript");
 exports.ngAppResolve = (resolvePath) => {
     return path.resolve(process.cwd(), resolvePath);
 };
@@ -72,6 +72,10 @@ exports.getSourceMapDevTool = getSourceMapDevTool;
  */
 function getEsVersionForFileName(scriptTargetOverride, esVersionInFileName = false) {
     return scriptTargetOverride && esVersionInFileName ?
-        '-' + ts.ScriptTarget[scriptTargetOverride].toLowerCase() : '';
+        '-' + typescript_1.ScriptTarget[scriptTargetOverride].toLowerCase() : '';
 }
 exports.getEsVersionForFileName = getEsVersionForFileName;
+function isPolyfillsEntry(name) {
+    return name === 'polyfills' || name === 'polyfills-es5';
+}
+exports.isPolyfillsEntry = isPolyfillsEntry;
