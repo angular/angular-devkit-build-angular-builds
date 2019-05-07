@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const core_1 = require("@angular-devkit/core");
 const webpack_1 = require("webpack");
-const typescript_1 = require("typescript");
+const ts = require("typescript");
 exports.ngAppResolve = (resolvePath) => {
     return path.resolve(process.cwd(), resolvePath);
 };
@@ -72,6 +72,6 @@ exports.getSourceMapDevTool = getSourceMapDevTool;
  */
 function getEsVersionForFileName(scriptTargetOverride, esVersionInFileName = false) {
     return scriptTargetOverride && esVersionInFileName ?
-        '-' + typescript_1.ScriptTarget[scriptTargetOverride].toLowerCase() : '';
+        '-' + ts.ScriptTarget[scriptTargetOverride].toLowerCase() : '';
 }
 exports.getEsVersionForFileName = getEsVersionForFileName;
