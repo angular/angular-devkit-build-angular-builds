@@ -10,11 +10,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
-const ts = require("typescript");
+const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
 const differential_loading_1 = require("../../../utils/differential-loading");
 const bundle_budget_1 = require("../../plugins/bundle-budget");
 const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
+const named_chunks_plugin_1 = require("../../plugins/named-chunks-plugin");
 const scripts_webpack_plugin_1 = require("../../plugins/scripts-webpack-plugin");
 const find_up_1 = require("../../utilities/find-up");
 const require_project_module_1 = require("../../utilities/require-project-module");
@@ -48,7 +49,7 @@ function getCommonConfig(wco) {
     const es5JitPolyfills = path.join(__dirname, '..', 'es5-jit-polyfills.js');
     if (targetInFileName) {
         // For differential loading we don't need to have 2 polyfill bundles
-        if (buildOptions.scriptTargetOverride === ts.ScriptTarget.ES2015) {
+        if (buildOptions.scriptTargetOverride === typescript_1.ScriptTarget.ES2015) {
             entryPoints['polyfills'] = [path.join(__dirname, '..', 'safari-nomodule.js')];
         }
         else {
@@ -161,6 +162,9 @@ function getCommonConfig(wco) {
     if (buildOptions.statsJson) {
         extraPlugins.push(new StatsPlugin(`stats${targetInFileName}.json`, 'verbose'));
     }
+    if (buildOptions.namedChunks) {
+        extraPlugins.push(new named_chunks_plugin_1.NamedLazyChunksPlugin());
+    }
     let sourceMapUseRule;
     if ((scriptsSourceMap || stylesSourceMap) && vendorSourceMap) {
         sourceMapUseRule = {
@@ -253,7 +257,7 @@ function getCommonConfig(wco) {
         }));
     }
     if (wco.tsConfig.options.target !== undefined &&
-        wco.tsConfig.options.target >= ts.ScriptTarget.ES2017) {
+        wco.tsConfig.options.target >= typescript_1.ScriptTarget.ES2017) {
         wco.logger.warn(core_1.tags.stripIndent `
       WARNING: Zone.js does not support native async/await in ES2017.
       These blocks are not intercepted by zone.js and will not triggering change detection.

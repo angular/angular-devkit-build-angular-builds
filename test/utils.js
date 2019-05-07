@@ -98,7 +98,7 @@ exports.lazyModuleFiles = {
     export class LazyModule { }
   `,
 };
-exports.lazyModuleImport = {
+exports.lazyModuleStringImport = {
     'src/app/app.module.ts': `
     import { BrowserModule } from '@angular/platform-browser';
     import { NgModule } from '@angular/core';
@@ -121,4 +121,7 @@ exports.lazyModuleImport = {
     })
     export class AppModule { }
   `,
+};
+exports.lazyModuleFnImport = {
+    'src/app/app.module.ts': exports.lazyModuleStringImport['src/app/app.module.ts'].replace(`loadChildren: './lazy/lazy.module#LazyModule'`, `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`),
 };

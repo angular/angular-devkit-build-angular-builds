@@ -14,7 +14,7 @@ const node_1 = require("@angular-devkit/core/node");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
-const ts = require("typescript");
+const typescript_1 = require("typescript");
 const analytics_1 = require("../../plugins/webpack/analytics");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const write_index_html_1 = require("../angular-cli-files/utilities/index-file/write-index-html");
@@ -109,8 +109,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         const tsConfigPath = path.resolve(core_1.getSystemPath(workspace.root), options.tsConfig);
         const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
         if (utils_1.isEs5SupportNeeded(projectRoot) &&
-            tsConfig.options.target !== ts.ScriptTarget.ES5 &&
-            tsConfig.options.target !== ts.ScriptTarget.ES2015) {
+            tsConfig.options.target !== typescript_1.ScriptTarget.ES5 &&
+            tsConfig.options.target !== typescript_1.ScriptTarget.ES2015) {
             context.logger.warn(core_1.tags.stripIndent `
           WARNING: Using differential loading with targets ES5 and ES2016 or higher may
           cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
