@@ -86,17 +86,8 @@ async function execute(options, context) {
         if (options.host !== undefined) {
             overrides.host = options.host;
         }
-        else if (typeof serverOptions.host === 'string') {
-            options.host = serverOptions.host;
-        }
-        else {
-            options.host = overrides.host = 'localhost';
-        }
         if (options.port !== undefined) {
             overrides.port = options.port;
-        }
-        else if (typeof serverOptions.port === 'number') {
-            options.port = serverOptions.port;
         }
         server = await context.scheduleTarget(target, overrides);
         let result;
