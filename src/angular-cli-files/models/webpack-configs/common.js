@@ -15,6 +15,7 @@ const webpack_1 = require("webpack");
 const differential_loading_1 = require("../../../utils/differential-loading");
 const bundle_budget_1 = require("../../plugins/bundle-budget");
 const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
+const named_chunks_plugin_1 = require("../../plugins/named-chunks-plugin");
 const scripts_webpack_plugin_1 = require("../../plugins/scripts-webpack-plugin");
 const find_up_1 = require("../../utilities/find-up");
 const require_project_module_1 = require("../../utilities/require-project-module");
@@ -160,6 +161,9 @@ function getCommonConfig(wco) {
     }
     if (buildOptions.statsJson) {
         extraPlugins.push(new StatsPlugin(`stats${targetInFileName}.json`, 'verbose'));
+    }
+    if (buildOptions.namedChunks) {
+        extraPlugins.push(new named_chunks_plugin_1.NamedLazyChunksPlugin());
     }
     let sourceMapUseRule;
     if ((scriptsSourceMap || stylesSourceMap) && vendorSourceMap) {

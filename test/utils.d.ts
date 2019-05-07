@@ -49,6 +49,9 @@ export declare function browserBuild(architect: Architect, host: virtualFs.Host,
 export declare const lazyModuleFiles: {
     [path: string]: string;
 };
-export declare const lazyModuleImport: {
+export declare const lazyModuleStringImport: {
+    [path: string]: string;
+};
+export declare const lazyModuleFnImport: {
     [path: string]: string;
 };
