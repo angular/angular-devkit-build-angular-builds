@@ -69,13 +69,7 @@ async function execute(options, context) {
     `);
     }
     if (options.webdriverUpdate) {
-        try {
-            await updateWebdriver();
-        }
-        catch (error) {
-            context.reportStatus('Error: ' + error);
-            return { success: false };
-        }
+        await updateWebdriver();
     }
     let baseUrl;
     let server;
@@ -99,14 +93,8 @@ async function execute(options, context) {
             options.port = serverOptions.port;
         }
         server = await context.scheduleTarget(target, overrides);
-        let result;
-        try {
-            result = await server.result;
-        }
-        catch (error) {
-            context.reportStatus('Error: ' + error);
-        }
-        if (!result || !result.success) {
+        const result = await server.result;
+        if (!result.success) {
             return { success: false };
         }
         if (typeof serverOptions.publicHost === 'string') {
@@ -118,6 +106,9 @@ async function execute(options, context) {
             }
             const clientUrl = url.parse(publicHost);
             baseUrl = url.format(clientUrl);
+        }
+        else if (typeof result.baseUrl === 'string') {
+            baseUrl = result.baseUrl;
         }
         else if (typeof result.port === 'number') {
             baseUrl = url.format({
