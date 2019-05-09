@@ -180,16 +180,10 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
         host: serverOptions.host,
         port: serverOptions.port,
         headers: { 'Access-Control-Allow-Origin': '*' },
-        historyApiFallback: !!browserOptions.index && {
+        historyApiFallback: {
             index: `${servePath}/${path.basename(browserOptions.index)}`,
             disableDotRule: true,
             htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
-            rewrites: [
-                {
-                    from: new RegExp(`^(?!${servePath})/.*`),
-                    to: context => url.format(context.parsedUrl),
-                },
-            ],
         },
         stats: false,
         compress: styles || scripts,
