@@ -119,6 +119,9 @@ async function execute(options, context) {
             const clientUrl = url.parse(publicHost);
             baseUrl = url.format(clientUrl);
         }
+        else if (typeof result.baseUrl === 'string') {
+            baseUrl = result.baseUrl;
+        }
         else if (typeof result.port === 'number') {
             baseUrl = url.format({
                 protocol: serverOptions.ssl ? 'https' : 'http',
