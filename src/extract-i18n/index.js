@@ -12,6 +12,7 @@ const build_webpack_1 = require("@angular-devkit/build-webpack");
 const path = require("path");
 const webpack = require("webpack");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
+const stats_1 = require("../angular-cli-files/utilities/stats");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 function getI18nOutfile(format) {
@@ -67,6 +68,15 @@ async function execute(options, context) {
         webpack_configs_1.getStylesConfig(wco),
         webpack_configs_1.getStatsConfig(wco),
     ]);
-    return build_webpack_1.runWebpack(config[0], context).toPromise();
+    const logging = (stats, config) => {
+        const json = stats.toJson({ errors: true, warnings: true });
+        if (stats.hasWarnings()) {
+            context.logger.warn(stats_1.statsWarningsToString(json, config.stats));
+        }
+        if (stats.hasErrors()) {
+            context.logger.error(stats_1.statsErrorsToString(json, config.stats));
+        }
+    };
+    return build_webpack_1.runWebpack(config[0], context, { logging }).toPromise();
 }
 exports.default = architect_1.createBuilder(execute);
