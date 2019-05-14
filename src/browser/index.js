@@ -130,34 +130,20 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             }
         }, { success: true }, 1), operators_1.bufferCount(configs.length), operators_1.switchMap(buildEvents => {
             const success = buildEvents.every(r => r.success);
-            if (success && options.index) {
-                let noModuleFiles;
-                let moduleFiles;
-                let files;
-                const [ES5Result, ES2015Result] = buildEvents;
-                if (buildEvents.length === 2) {
-                    noModuleFiles = ES5Result.emittedFiles;
-                    moduleFiles = ES2015Result.emittedFiles || [];
-                    files = moduleFiles.filter(x => x.extension === '.css');
-                }
-                else {
-                    const { emittedFiles = [] } = ES5Result;
-                    files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
-                    noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
-                }
+            if (success && buildEvents.length === 2 && options.index) {
+                const { emittedFiles: ES5BuildFiles = [] } = buildEvents[0];
+                const { emittedFiles: ES2015BuildFiles = [] } = buildEvents[1];
                 return write_index_html_1.writeIndexHtml({
                     host,
                     outputPath: core_1.join(root, options.outputPath),
                     indexPath: core_1.join(root, options.index),
-                    files,
-                    noModuleFiles,
-                    moduleFiles,
+                    ES5BuildFiles,
+                    ES2015BuildFiles,
                     baseHref: options.baseHref,
                     deployUrl: options.deployUrl,
                     sri: options.subresourceIntegrity,
                     scripts: options.scripts,
                     styles: options.styles,
-                    postTransform: transforms.indexHtml,
                 })
                     .pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(() => rxjs_1.of({ success: false })));
             }

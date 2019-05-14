@@ -36,6 +36,7 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
             buildOptions = {
                 ...options,
                 es5BrowserSupport: undefined,
+                index: '',
                 esVersionInFileName: true,
                 scriptTargetOverride: scriptTarget,
             };

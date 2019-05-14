@@ -8,9 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const path = require("path");
-const webpack_sources_1 = require("webpack-sources");
 const augment_index_html_1 = require("../utilities/index-file/augment-index-html");
-const strip_bom_1 = require("../utilities/strip-bom");
 function readFile(filename, compilation) {
     return new Promise((resolve, reject) => {
         compilation.inputFileSystem.readFile(filename, (err, data) => {
@@ -18,7 +16,19 @@ function readFile(filename, compilation) {
                 reject(err);
                 return;
             }
-            resolve(strip_bom_1.stripBom(data.toString()));
+            let content;
+            if (data.length >= 3 && data[0] === 0xEF && data[1] === 0xBB && data[2] === 0xBF) {
+                // Strip UTF-8 BOM
+                content = data.toString('utf8', 3);
+            }
+            else if (data.length >= 2 && data[0] === 0xFF && data[1] === 0xFE) {
+                // Strip UTF-16 LE BOM
+                content = data.toString('utf16le', 2);
+            }
+            else {
+                content = data.toString();
+            }
+            resolve(content);
         });
     });
 }
@@ -57,7 +67,7 @@ class IndexHtmlWebpackPlugin {
                 }
             }
             const loadOutputFile = (name) => compilation.assets[name].source();
-            let indexSource = await augment_index_html_1.augmentIndexHtml({
+            const indexSource = await augment_index_html_1.augmentIndexHtml({
                 input: this._options.input,
                 inputContent,
                 baseHref: this._options.baseHref,
@@ -68,11 +78,8 @@ class IndexHtmlWebpackPlugin {
                 loadOutputFile,
                 entrypoints: this._options.entrypoints,
             });
-            if (this._options.postTransform) {
-                indexSource = await this._options.postTransform(indexSource);
-            }
             // Add to compilation assets
-            compilation.assets[this._options.output] = new webpack_sources_1.RawSource(indexSource);
+            compilation.assets[this._options.output] = indexSource;
         });
     }
 }

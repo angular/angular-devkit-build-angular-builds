@@ -1,5 +1,4 @@
 import { Compiler } from 'webpack';
-import { IndexHtmlTransform } from '../utilities/index-file/write-index-html';
 export interface IndexHtmlWebpackPluginOptions {
     input: string;
     output: string;
@@ -8,7 +7,6 @@ export interface IndexHtmlWebpackPluginOptions {
     deployUrl?: string;
     sri: boolean;
     noModuleEntrypoints: string[];
-    postTransform?: IndexHtmlTransform;
 }
 export declare class IndexHtmlWebpackPlugin {
     private _options;

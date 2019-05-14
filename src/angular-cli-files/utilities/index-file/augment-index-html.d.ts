@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Source } from 'webpack-sources';
 export declare type LoadOutputFileFunctionType = (file: string) => Promise<string>;
 export interface AugmentIndexHtmlOptions {
     input: string;
@@ -26,4 +27,4 @@ export interface FileInfo {
     name: string;
     extension: string;
 }
-export declare function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<string>;
+export declare function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<Source>;
