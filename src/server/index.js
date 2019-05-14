@@ -51,7 +51,6 @@ function getCompilerConfig(wco) {
 async function buildServerWebpackConfig(options, context) {
     const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext({
         ...options,
-        index: '',
         buildOptimizer: false,
         aot: true,
         platform: 'server',

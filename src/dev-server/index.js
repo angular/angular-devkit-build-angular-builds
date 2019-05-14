@@ -17,7 +17,9 @@ const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const url = require("url");
 const webpack = require("webpack");
+const index_html_webpack_plugin_1 = require("../angular-cli-files/plugins/index-html-webpack-plugin");
 const check_port_1 = require("../angular-cli-files/utilities/check-port");
+const package_chunk_sort_1 = require("../angular-cli-files/utilities/package-chunk-sort");
 const browser_1 = require("../browser");
 const utils_1 = require("../utils");
 const version_1 = require("../utils/version");
@@ -96,17 +98,31 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         else if (options.hmr) {
             context.logger.warn('Live reload is disabled. HMR option ignored.');
         }
+        webpackConfig.plugins = [...(webpackConfig.plugins || [])];
         if (!options.watch) {
             // There's no option to turn off file watching in webpack-dev-server, but
             // we can override the file watcher instead.
-            webpackConfig.plugins = [...(webpackConfig.plugins || []), {
-                    // tslint:disable-next-line:no-any
-                    apply: (compiler) => {
-                        compiler.hooks.afterEnvironment.tap('angular-cli', () => {
-                            compiler.watchFileSystem = { watch: () => { } };
-                        });
-                    },
-                }];
+            webpackConfig.plugins.push({
+                // tslint:disable-next-line:no-any
+                apply: (compiler) => {
+                    compiler.hooks.afterEnvironment.tap('angular-cli', () => {
+                        compiler.watchFileSystem = { watch: () => { } };
+                    });
+                },
+            });
+        }
+        if (browserOptions.index) {
+            const { scripts = [], styles = [], index, baseHref } = browserOptions;
+            webpackConfig.plugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({
+                input: path.resolve(root, index),
+                output: path.basename(index),
+                baseHref,
+                entrypoints: package_chunk_sort_1.generateEntryPoints({ scripts, styles }),
+                deployUrl: browserOptions.deployUrl,
+                sri: browserOptions.subresourceIntegrity,
+                noModuleEntrypoints: ['polyfills-es5'],
+                postTransform: transforms.indexHtml,
+            }));
         }
         const normalizedOptimization = utils_1.normalizeOptimization(browserOptions.optimization);
         if (normalizedOptimization.scripts || normalizedOptimization.styles) {

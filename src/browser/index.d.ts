@@ -11,6 +11,7 @@ import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { experimental, json, logging, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as webpack from 'webpack';
+import { IndexHtmlTransform } from '../angular-cli-files/utilities/index-file/write-index-html';
 import { ExecutionTransformer } from '../transforms';
 import { Schema as BrowserBuilderSchema } from './schema';
 export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
@@ -24,6 +25,7 @@ export declare function buildBrowserWebpackConfigFromContext(options: BrowserBui
 export declare function buildWebpackBrowser(options: BrowserBuilderSchema, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
     logging?: WebpackLoggingCallback;
+    indexHtml?: IndexHtmlTransform;
 }): import("rxjs").Observable<BrowserBuilderOutput>;
 declare const _default: import("@angular-devkit/architect/src/internal").Builder<json.JsonObject & BrowserBuilderSchema>;
 export default _default;
