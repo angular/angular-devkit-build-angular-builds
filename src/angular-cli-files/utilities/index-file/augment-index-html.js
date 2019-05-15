@@ -156,7 +156,7 @@ async function augmentIndexHtml(params) {
         treeAdapter.appendChild(styleElements, element);
     }
     indexSource.insert(styleInsertionPoint, parse5.serialize(styleElements, { treeAdapter }));
-    return indexSource;
+    return indexSource.source();
 }
 exports.augmentIndexHtml = augmentIndexHtml;
 function _generateSriAttributes(content) {
