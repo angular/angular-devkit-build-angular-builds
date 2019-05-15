@@ -12,18 +12,17 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
+const webpack_sources_1 = require("webpack-sources");
 const differential_loading_1 = require("../../../utils/differential-loading");
 const bundle_budget_1 = require("../../plugins/bundle-budget");
 const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
 const named_chunks_plugin_1 = require("../../plugins/named-chunks-plugin");
 const scripts_webpack_plugin_1 = require("../../plugins/scripts-webpack-plugin");
 const find_up_1 = require("../../utilities/find-up");
-const require_project_module_1 = require("../../utilities/require-project-module");
 const utils_1 = require("./utils");
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const StatsPlugin = require('stats-webpack-plugin');
 // tslint:disable-next-line:no-any
 const g = typeof global !== 'undefined' ? global : {};
 exports.buildOptimizerLoader = g['_DevKitIsLocal']
@@ -160,7 +159,14 @@ function getCommonConfig(wco) {
         }));
     }
     if (buildOptions.statsJson) {
-        extraPlugins.push(new StatsPlugin(`stats${targetInFileName}.json`, 'verbose'));
+        extraPlugins.push(new class {
+            apply(compiler) {
+                compiler.hooks.emit.tap('angular-cli-stats', compilation => {
+                    const data = JSON.stringify(compilation.getStats().toJson('verbose'));
+                    compilation.assets[`stats${targetInFileName}.json`] = new webpack_sources_1.RawSource(data);
+                });
+            }
+        });
     }
     if (buildOptions.namedChunks) {
         extraPlugins.push(new named_chunks_plugin_1.NamedLazyChunksPlugin());
@@ -192,13 +198,13 @@ function getCommonConfig(wco) {
     const loaderNodeModules = find_up_1.findAllNodeModules(__dirname, projectRoot);
     loaderNodeModules.unshift('node_modules');
     // Load rxjs path aliases.
-    // https://github.com/ReactiveX/rxjs/blob/master/doc/lettable-operators.md#build-and-treeshaking
+    // https://github.com/ReactiveX/rxjs/blob/master/doc/pipeable-operators.md#build-and-treeshaking
     let alias = {};
     try {
         const rxjsPathMappingImport = wco.supportES2015
             ? 'rxjs/_esm2015/path-mapping'
             : 'rxjs/_esm5/path-mapping';
-        const rxPaths = require_project_module_1.requireProjectModule(projectRoot, rxjsPathMappingImport);
+        const rxPaths = require(require.resolve(rxjsPathMappingImport, { paths: [projectRoot] }));
         alias = rxPaths(nodeModules);
     }
     catch (_a) { }
@@ -298,6 +304,8 @@ function getCommonConfig(wco) {
             hints: false,
         },
         module: {
+            // Show an error for missing exports instead of a warning.
+            strictExportPresence: true,
             rules: [
                 {
                     test: /\.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)$/,

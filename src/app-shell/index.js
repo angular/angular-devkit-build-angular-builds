@@ -12,15 +12,18 @@ const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const fs = require("fs");
 const path = require("path");
-const require_project_module_1 = require("../angular-cli-files/utilities/require-project-module");
 const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
 async function _renderUniversal(options, context, browserResult, serverResult) {
     const browserIndexOutputPath = path.join(browserResult.outputPath || '', 'index.html');
     const indexHtml = fs.readFileSync(browserIndexOutputPath, 'utf8');
     const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult);
     const root = context.workspaceRoot;
-    require_project_module_1.requireProjectModule(root, 'zone.js/dist/zone-node');
-    const renderModuleFactory = require_project_module_1.requireProjectModule(root, '@angular/platform-server').renderModuleFactory;
+    // Initialize zone.js
+    const zonePackage = require.resolve('zone.js', { paths: [root] });
+    await Promise.resolve().then(() => require(zonePackage));
+    // Load platform server module renderer
+    const platformServerPackage = require.resolve('@angular/platform-server', { paths: [root] });
+    const renderModuleFactory = await Promise.resolve().then(() => require(platformServerPackage)).then((m) => m.renderModuleFactory);
     const AppServerModuleNgFactory = require(serverBundlePath).AppServerModuleNgFactory;
     const outputIndexPath = options.outputIndexPath
         ? path.join(root, options.outputIndexPath)
