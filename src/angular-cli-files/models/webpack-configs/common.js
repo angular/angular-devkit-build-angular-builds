@@ -12,6 +12,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
+const webpack_sources_1 = require("webpack-sources");
 const differential_loading_1 = require("../../../utils/differential-loading");
 const bundle_budget_1 = require("../../plugins/bundle-budget");
 const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
@@ -23,7 +24,6 @@ const utils_1 = require("./utils");
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const StatsPlugin = require('stats-webpack-plugin');
 // tslint:disable-next-line:no-any
 const g = typeof global !== 'undefined' ? global : {};
 exports.buildOptimizerLoader = g['_DevKitIsLocal']
@@ -160,7 +160,14 @@ function getCommonConfig(wco) {
         }));
     }
     if (buildOptions.statsJson) {
-        extraPlugins.push(new StatsPlugin(`stats${targetInFileName}.json`, 'verbose'));
+        extraPlugins.push(new class {
+            apply(compiler) {
+                compiler.hooks.emit.tap('angular-cli-stats', compilation => {
+                    const data = JSON.stringify(compilation.getStats().toJson('verbose'));
+                    compilation.assets[`stats${targetInFileName}.json`] = new webpack_sources_1.RawSource(data);
+                });
+            }
+        });
     }
     if (buildOptions.namedChunks) {
         extraPlugins.push(new named_chunks_plugin_1.NamedLazyChunksPlugin());
