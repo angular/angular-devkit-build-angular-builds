@@ -304,8 +304,6 @@ function getCommonConfig(wco) {
             hints: false,
         },
         module: {
-            // Show an error for missing exports instead of a warning.
-            strictExportPresence: true,
             rules: [
                 {
                     test: /\.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)$/,
