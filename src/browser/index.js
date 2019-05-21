@@ -135,7 +135,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 const { emittedFiles: ES2015BuildFiles = [] } = buildEvents[1];
                 return write_index_html_1.writeIndexHtml({
                     host,
-                    outputPath: core_1.join(root, options.outputPath),
+                    outputPath: core_1.resolve(root, core_1.normalize(options.outputPath)),
                     indexPath: core_1.join(root, options.index),
                     ES5BuildFiles,
                     ES2015BuildFiles,
