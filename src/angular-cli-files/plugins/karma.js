@@ -17,7 +17,6 @@ const karma_webpack_failure_cb_1 = require("./karma-webpack-failure-cb");
 const stats_1 = require("../utilities/stats");
 const stats_2 = require("../models/webpack-configs/stats");
 const node_1 = require("@angular-devkit/core/node");
-const index_1 = require("../../utils/index");
 /**
  * Enumerate needed (but not require/imported) dependencies from this file
  *  to let the dependency validator know they are used.
@@ -67,7 +66,7 @@ const init = (config, emitter, customFileHandlers) => {
         config.reporters.unshift('coverage-istanbul');
     }
     // Add a reporter that fixes sourcemap urls.
-    if (index_1.normalizeSourceMaps(options.sourceMap).scripts) {
+    if (options.sourceMap.scripts) {
         config.reporters.unshift('@angular-devkit/build-angular--sourcemap-reporter');
         // Code taken from https://github.com/tschaub/karma-source-map-support.
         // We can't use it directly because we need to add it conditionally in this file, and karma
