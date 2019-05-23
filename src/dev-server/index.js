@@ -147,7 +147,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 first = false;
                 context.logger.info(core_1.tags.oneLine `
               **
-              Angular Live Development Server is listening on ${options.host}:${options.port},
+              Angular Live Development Server is listening on ${options.host}:${buildEvent.port},
               open your browser on ${serverAddress}
               **
             `);
