@@ -29,6 +29,7 @@ class BundleCalculator extends Calculator {
         const size = this.compilation.chunks
             .filter(chunk => chunk.name === this.budget.name)
             .reduce((files, chunk) => [...files, ...chunk.files], [])
+            .filter((file) => !file.endsWith('.map'))
             .map((file) => this.compilation.assets[file].size())
             .reduce((total, size) => total + size, 0);
         return [{ size, label: this.budget.name }];
