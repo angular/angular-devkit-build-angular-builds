@@ -72,7 +72,9 @@ export interface Schema {
      */
     proxyConfig?: string;
     /**
-     * Specify the URL that the browser client will use.
+     * The URL that the browser client (or live-reload client, if enabled) should use to connect
+     * to the development server. Use for a complex dev server setup, such as one with reverse
+     * proxies.
      */
     publicHost?: string;
     /**
