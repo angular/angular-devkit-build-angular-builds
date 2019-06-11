@@ -9,13 +9,9 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 Object.defineProperty(exports, "__esModule", { value: true });
-const path = require("path");
 const core_1 = require("@angular-devkit/core");
 const webpack_1 = require("webpack");
 const typescript_1 = require("typescript");
-exports.ngAppResolve = (resolvePath) => {
-    return path.resolve(process.cwd(), resolvePath);
-};
 function getOutputHashFormat(option, length = 20) {
     /* tslint:disable:max-line-length */
     const hashFormats = {
