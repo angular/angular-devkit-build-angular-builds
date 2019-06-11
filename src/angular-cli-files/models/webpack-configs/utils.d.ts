@@ -8,7 +8,6 @@
 import { ExtraEntryPoint, ExtraEntryPointClass } from '../../../browser/schema';
 import { SourceMapDevToolPlugin } from 'webpack';
 import { ScriptTarget } from 'typescript';
-export declare const ngAppResolve: (resolvePath: string) => string;
 export interface HashFormat {
     chunk: string;
     extract: string;

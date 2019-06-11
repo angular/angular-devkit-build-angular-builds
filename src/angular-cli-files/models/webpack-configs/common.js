@@ -12,7 +12,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
-const differential_loading_1 = require("../../../utils/differential-loading");
+const build_browser_features_1 = require("../../../utils/build-browser-features");
 const bundle_budget_1 = require("../../plugins/bundle-budget");
 const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
 const named_chunks_plugin_1 = require("../../plugins/named-chunks-plugin");
@@ -31,7 +31,7 @@ exports.buildOptimizerLoader = g['_DevKitIsLocal']
     : '@angular-devkit/build-optimizer/webpack-loader';
 // tslint:disable-next-line:no-big-function
 function getCommonConfig(wco) {
-    const { root, projectRoot, buildOptions } = wco;
+    const { root, projectRoot, buildOptions, tsConfig } = wco;
     const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
     const { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap, } = buildOptions.sourceMap;
     const nodeModules = find_up_1.findUp('node_modules', projectRoot);
@@ -46,27 +46,31 @@ function getCommonConfig(wco) {
         entryPoints['main'] = [path.resolve(root, buildOptions.main)];
     }
     if (wco.buildOptions.platform !== 'server') {
-        const es5Polyfills = path.join(__dirname, '..', 'es5-polyfills.js');
-        const es5JitPolyfills = path.join(__dirname, '..', 'es5-jit-polyfills.js');
-        if (targetInFileName) {
-            // For differential loading we don't need to have 2 polyfill bundles
-            if (buildOptions.scriptTargetOverride === typescript_1.ScriptTarget.ES2015) {
-                entryPoints['polyfills'] = [path.join(__dirname, '..', 'safari-nomodule.js')];
-            }
-            else {
-                entryPoints['polyfills'] = [es5Polyfills];
-                if (!buildOptions.aot) {
-                    entryPoints['polyfills'].push(es5JitPolyfills);
+        const buildBrowserFeatures = new build_browser_features_1.BuildBrowserFeatures(projectRoot, tsConfig.options.target || typescript_1.ScriptTarget.ES5);
+        if ((buildOptions.scriptTargetOverride || tsConfig.options.target) === typescript_1.ScriptTarget.ES5) {
+            if (buildOptions.es5BrowserSupport ||
+                (buildOptions.es5BrowserSupport === undefined &&
+                    buildBrowserFeatures.isEs5SupportNeeded())) {
+                // The nomodule polyfill needs to be inject prior to any script and be
+                // outside of webpack compilation because otherwise webpack will cause the
+                // script to be wrapped in window["webpackJsonp"] which causes this to fail.
+                if (buildBrowserFeatures.isNoModulePolyfillNeeded()) {
+                    const noModuleScript = {
+                        bundleName: 'polyfills-nomodule-es5',
+                        input: path.join(__dirname, '..', 'safari-nomodule.js'),
+                    };
+                    buildOptions.scripts = buildOptions.scripts
+                        ? [...buildOptions.scripts, noModuleScript]
+                        : [noModuleScript];
                 }
-            }
-        }
-        else {
-            // For NON differential loading we want to have 2 polyfill bundles
-            if (buildOptions.es5BrowserSupport
-                || (buildOptions.es5BrowserSupport === undefined && differential_loading_1.isEs5SupportNeeded(projectRoot))) {
-                entryPoints['polyfills-es5'] = [es5Polyfills];
+                // For differential loading we don't need to generate a seperate polyfill file
+                // because they will be loaded exclusivly based on module and nomodule
+                const polyfillsChunkName = buildBrowserFeatures.isDifferentialLoadingNeeded()
+                    ? 'polyfills'
+                    : 'polyfills-es5';
+                entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
                 if (!buildOptions.aot) {
-                    entryPoints['polyfills-es5'].push(es5JitPolyfills);
+                    entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
                 }
             }
         }

@@ -108,9 +108,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
         const tsConfigPath = path.resolve(core_1.getSystemPath(workspace.root), options.tsConfig);
         const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
-        if (utils_1.isEs5SupportNeeded(projectRoot) &&
-            tsConfig.options.target !== typescript_1.ScriptTarget.ES5 &&
-            tsConfig.options.target !== typescript_1.ScriptTarget.ES2015) {
+        const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
+        const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(core_1.getSystemPath(projectRoot), target);
+        if (target > typescript_1.ScriptTarget.ES2015 && buildBrowserFeatures.isDifferentialLoadingNeeded()) {
             context.logger.warn(core_1.tags.stripIndent `
           WARNING: Using differential loading with targets ES5 and ES2016 or higher may
           cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
