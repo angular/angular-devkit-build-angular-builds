@@ -9,7 +9,7 @@ export declare function getNonAotConfig(wco: WebpackConfigOptions): {
     };
     plugins: AngularCompilerPlugin[];
 };
-export declare function getAotConfig(wco: WebpackConfigOptions, extract?: boolean): {
+export declare function getAotConfig(wco: WebpackConfigOptions, i18nExtract?: boolean): {
     module: {
         rules: {
             test: RegExp;

@@ -34,12 +34,12 @@ function _pluginOptionsOverrides(buildOptions, pluginOptions) {
         compilerOptions
     };
 }
-function _createAotPlugin(wco, options, useMain = true, extract = false) {
+function _createAotPlugin(wco, options, i18nExtract = false) {
     const { root, buildOptions } = wco;
     const i18nInFile = buildOptions.i18nFile
         ? path.resolve(root, buildOptions.i18nFile)
         : undefined;
-    const i18nFileAndFormat = extract
+    const i18nFileAndFormat = i18nExtract
         ? {
             i18nOutFile: buildOptions.i18nFile,
             i18nOutFormat: buildOptions.i18nFormat,
@@ -54,7 +54,7 @@ function _createAotPlugin(wco, options, useMain = true, extract = false) {
         }
     }
     let pluginOptions = {
-        mainPath: useMain ? path.join(root, buildOptions.main) : undefined,
+        mainPath: path.join(root, buildOptions.main),
         ...i18nFileAndFormat,
         locale: buildOptions.i18nLocale,
         platform: buildOptions.platform === 'server' ? webpack_1.PLATFORM.Server : webpack_1.PLATFORM.Browser,
@@ -79,7 +79,7 @@ function getNonAotConfig(wco) {
     };
 }
 exports.getNonAotConfig = getNonAotConfig;
-function getAotConfig(wco, extract = false) {
+function getAotConfig(wco, i18nExtract = false) {
     const { tsConfigPath, buildOptions } = wco;
     const loaders = [webpack_1.NgToolsLoader];
     if (buildOptions.buildOptimizer) {
@@ -91,7 +91,7 @@ function getAotConfig(wco, extract = false) {
     const test = /(?:\.ngfactory\.js|\.ngstyle\.js|\.tsx?)$/;
     return {
         module: { rules: [{ test, use: loaders }] },
-        plugins: [_createAotPlugin(wco, { tsConfigPath }, true, extract)]
+        plugins: [_createAotPlugin(wco, { tsConfigPath }, i18nExtract)]
     };
 }
 exports.getAotConfig = getAotConfig;

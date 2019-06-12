@@ -52,6 +52,7 @@ async function execute(options, context) {
             scripts: false,
             styles: false,
         },
+        buildOptimizer: false,
         i18nLocale: options.i18nLocale,
         i18nFormat: options.i18nFormat,
         i18nFile: outFile,
