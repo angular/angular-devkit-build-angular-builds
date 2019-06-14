@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging } from '@angular-devkit/core';
-import { ParsedCommandLine, ScriptTarget } from 'typescript';
+import { ParsedConfiguration } from '@angular/compiler-cli';
+import { ScriptTarget } from 'typescript';
 import { AssetPatternClass, Budget, ExtraEntryPoint, OptimizationClass, SourceMapClass } from '../../browser/schema';
 import { NormalizedFileReplacement } from '../../utils/normalize-file-replacements';
 export interface BuildOptions {
@@ -78,7 +79,7 @@ export interface WebpackConfigOptions<T = BuildOptions> {
     projectRoot: string;
     sourceRoot?: string;
     buildOptions: T;
-    tsConfig: ParsedCommandLine;
+    tsConfig: ParsedConfiguration;
     tsConfigPath: string;
     supportES2015: boolean;
 }
