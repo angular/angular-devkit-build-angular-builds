@@ -42,17 +42,16 @@ function statsToString(json, statsConfig) {
     const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
     if (unchangedChunkNumber > 0) {
         return '\n' + rs(core_1.tags.stripIndents `
-      Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)} - Time: ${w('' + json.time)}ms
+      Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)}
       ${unchangedChunkNumber} unchanged chunks
       ${changedChunksStats.join('\n')}
+      Time: ${w('' + json.time)}ms
       `);
     }
     else {
         return '\n' + rs(core_1.tags.stripIndents `
-      Date: ${w(new Date().toISOString())}
-      Hash: ${w(json.hash)}
-      Time: ${w('' + json.time)}ms
       ${changedChunksStats.join('\n')}
+      Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)} - Time: ${w('' + json.time)}ms
       `);
     }
 }
