@@ -12,6 +12,7 @@ const build_webpack_1 = require("@angular-devkit/build-webpack");
 const path = require("path");
 const webpack = require("webpack");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
+const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const stats_1 = require("../angular-cli-files/utilities/stats");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
@@ -40,6 +41,13 @@ async function execute(options, context) {
     version_1.Version.assertCompatibleAngularVersion(context.workspaceRoot);
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
     const browserOptions = await context.validateOptions(await context.getTargetOptions(browserTarget), await context.getBuilderNameForTarget(browserTarget));
+    // FIXME: i18n is not yet implemented in Ivy
+    // We should display a warning and exit gracefully.
+    const { options: compilerOptions } = read_tsconfig_1.readTsconfig(browserOptions.tsConfig, context.workspaceRoot);
+    if (compilerOptions.enableIvy) {
+        context.logger.warn('We are sorry but i18n is not yet implemented in Ivy.');
+        return { success: true };
+    }
     // We need to determine the outFile name so that AngularCompiler can retrieve it.
     let outFile = options.outFile || getI18nOutfile(options.i18nFormat);
     if (options.outputPath) {

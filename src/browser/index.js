@@ -106,8 +106,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             throw new Error('Must either have a target from the context or a default project.');
         }
         const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
-        const tsConfigPath = path.resolve(core_1.getSystemPath(workspace.root), options.tsConfig);
-        const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
+        const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
         const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
         const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(core_1.getSystemPath(projectRoot), target);
         if (target > typescript_1.ScriptTarget.ES2015 && buildBrowserFeatures.isDifferentialLoadingNeeded()) {
