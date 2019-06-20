@@ -32,25 +32,17 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
     // For differential loading, we can have several targets
     return scriptTargets.map(scriptTarget => {
         let buildOptions = { ...options };
-        const supportES2015 = scriptTarget !== ts.ScriptTarget.ES3 && scriptTarget !== ts.ScriptTarget.ES5;
         if (differentialLoading) {
+            // For differential loading, the builder needs to created the index.html by itself
+            // without using a webpack plugin.
             buildOptions = {
                 ...options,
-                ...(
-                // FIXME: we do create better webpack config composition to achieve the below
-                // When DL is enabled and supportES2015 is true it means that we are on the second build
-                // This also means that we don't need to include styles and assets multiple times
-                supportES2015
-                    ? {}
-                    : {
-                        styles: options.extractCss ? [] : options.styles,
-                        assets: [],
-                    }),
                 es5BrowserSupport: undefined,
                 esVersionInFileName: true,
                 scriptTargetOverride: scriptTarget,
             };
         }
+        const supportES2015 = scriptTarget !== ts.ScriptTarget.ES3 && scriptTarget !== ts.ScriptTarget.ES5;
         const wco = {
             root: workspaceRoot,
             logger: logger.createChild('webpackConfigOptions'),
