@@ -96,7 +96,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     const host = new node_1.NodeJsSyncHost();
     const root = core_1.normalize(context.workspaceRoot);
     // Check Angular version.
-    version_1.Version.assertCompatibleAngularVersion(context.workspaceRoot);
+    version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     const loggingFn = transforms.logging
         || createBrowserLoggingCallback(!!options.verbose, context.logger);
     return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(operators_1.switchMap(({ workspace, config: configs }) => {
@@ -158,14 +158,14 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     styles: options.styles,
                     postTransform: transforms.indexHtml,
                 })
-                    .pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(() => rxjs_1.of({ success: false })));
+                    .pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(error => rxjs_1.of({ success: false, error: mapErrorToMessage(error) })));
             }
             else {
                 return rxjs_1.of({ success });
             }
         }), operators_1.concatMap(buildEvent => {
             if (buildEvent.success && !options.watch && options.serviceWorker) {
-                return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, projectRoot, core_1.resolve(root, core_1.normalize(options.outputPath)), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), () => ({ success: false })));
+                return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, projectRoot, core_1.resolve(root, core_1.normalize(options.outputPath)), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), error => ({ success: false, error: mapErrorToMessage(error) })));
             }
             else {
                 return rxjs_1.of(buildEvent);
@@ -178,4 +178,13 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     }));
 }
 exports.buildWebpackBrowser = buildWebpackBrowser;
+function mapErrorToMessage(error) {
+    if (error instanceof Error) {
+        return error.message;
+    }
+    if (typeof error === 'string') {
+        return error;
+    }
+    return undefined;
+}
 exports.default = architect_1.createBuilder(buildWebpackBrowser);

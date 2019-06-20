@@ -48,7 +48,7 @@ exports.devServerBuildOverriddenKeys = [
  */
 function serveWebpackBrowser(options, context, transforms = {}) {
     // Check Angular version.
-    version_1.Version.assertCompatibleAngularVersion(context.workspaceRoot);
+    version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
     const root = context.workspaceRoot;
     let first = true;

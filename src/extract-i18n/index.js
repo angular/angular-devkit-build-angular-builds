@@ -38,7 +38,7 @@ class InMemoryOutputPlugin {
 }
 async function execute(options, context) {
     // Check Angular version.
-    version_1.Version.assertCompatibleAngularVersion(context.workspaceRoot);
+    version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
     const browserOptions = await context.validateOptions(await context.getTargetOptions(browserTarget), await context.getBuilderNameForTarget(browserTarget));
     // FIXME: i18n is not yet implemented in Ivy

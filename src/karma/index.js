@@ -35,7 +35,7 @@ async function initialize(options, context, webpackConfigurationTransformer) {
 }
 function execute(options, context, transforms = {}) {
     // Check Angular version.
-    version_1.Version.assertCompatibleAngularVersion(context.workspaceRoot);
+    version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.switchMap(([karma, webpackConfig]) => new rxjs_1.Observable(subscriber => {
         const karmaOptions = {};
         if (options.watch !== undefined) {
