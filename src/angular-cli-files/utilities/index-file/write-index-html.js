@@ -21,7 +21,7 @@ function writeIndexHtml({ host, outputPath, indexPath, ES5BuildFiles, ES2015Buil
         deployUrl,
         sri,
         entrypoints: package_chunk_sort_1.generateEntryPoints({ scripts, styles }),
-        files: filterAndMapBuildFiles(ES5BuildFiles, '.css'),
+        files: filterAndMapBuildFiles(ES2015BuildFiles, '.css'),
         noModuleFiles: filterAndMapBuildFiles(ES5BuildFiles, '.js'),
         moduleFiles: filterAndMapBuildFiles(ES2015BuildFiles, '.js'),
         loadOutputFile: async (filePath) => {

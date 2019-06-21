@@ -81,7 +81,7 @@ function execute(options, context, transforms = {}) {
                 return karmaStart.then(() => karmaServerWithStop.stop());
             }
         };
-    })));
+    })), operators_1.defaultIfEmpty({ success: false }));
 }
 exports.execute = execute;
 exports.default = architect_1.createBuilder(execute);

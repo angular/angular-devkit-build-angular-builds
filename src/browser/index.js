@@ -144,14 +144,14 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     scripts: options.scripts,
                     styles: options.styles,
                 })
-                    .pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(() => rxjs_1.of({ success: false })));
+                    .pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(error => rxjs_1.of({ success: false, error: mapErrorToMessage(error) })));
             }
             else {
                 return rxjs_1.of({ success });
             }
         }), operators_1.concatMap(buildEvent => {
             if (buildEvent.success && !options.watch && options.serviceWorker) {
-                return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, projectRoot, core_1.resolve(root, core_1.normalize(options.outputPath)), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), () => ({ success: false })));
+                return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, projectRoot, core_1.resolve(root, core_1.normalize(options.outputPath)), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), error => ({ success: false, error: mapErrorToMessage(error) })));
             }
             else {
                 return rxjs_1.of(buildEvent);
@@ -164,4 +164,13 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     }));
 }
 exports.buildWebpackBrowser = buildWebpackBrowser;
+function mapErrorToMessage(error) {
+    if (error instanceof Error) {
+        return error.message;
+    }
+    if (typeof error === 'string') {
+        return error;
+    }
+    return undefined;
+}
 exports.default = architect_1.createBuilder(buildWebpackBrowser);
