@@ -61,7 +61,9 @@ function getAnalyticsConfig(wco, context) {
         let category = 'build';
         if (context.builder) {
             // We already vetted that this is a "safe" package, otherwise the analytics would be noop.
-            category = context.builder.builderName.split(':')[1];
+            category = context.builder.builderName.split(':')[1]
+                || context.builder.builderName
+                || 'build';
         }
         // The category is the builder name if it's an angular builder.
         return {
