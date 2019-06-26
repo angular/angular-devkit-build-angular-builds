@@ -29,6 +29,7 @@ class IndexHtmlWebpackPlugin {
             output: 'index.html',
             entrypoints: ['polyfills', 'main'],
             noModuleEntrypoints: [],
+            moduleEntrypoints: [],
             sri: false,
             ...options,
         };
@@ -37,20 +38,22 @@ class IndexHtmlWebpackPlugin {
         compiler.hooks.emit.tapPromise('index-html-webpack-plugin', async (compilation) => {
             // Get input html file
             const inputContent = await readFile(this._options.input, compilation);
-            compilation
-                .fileDependencies.add(this._options.input);
+            compilation.fileDependencies.add(this._options.input);
             // Get all files for selected entrypoints
             const files = [];
             const noModuleFiles = [];
+            const moduleFiles = [];
             for (const [entryName, entrypoint] of compilation.entrypoints) {
-                const entryFiles = (entrypoint && entrypoint.getFiles() || [])
-                    .map((f) => ({
+                const entryFiles = ((entrypoint && entrypoint.getFiles()) || []).map((f) => ({
                     name: entryName,
                     file: f,
                     extension: path.extname(f),
                 }));
                 if (this._options.noModuleEntrypoints.includes(entryName)) {
                     noModuleFiles.push(...entryFiles);
+                }
+                else if (this._options.moduleEntrypoints.includes(entryName)) {
+                    moduleFiles.push(...entryFiles);
                 }
                 else {
                     files.push(...entryFiles);
@@ -66,6 +69,7 @@ class IndexHtmlWebpackPlugin {
                 files,
                 noModuleFiles,
                 loadOutputFile,
+                moduleFiles,
                 entrypoints: this._options.entrypoints,
             });
             if (this._options.postTransform) {

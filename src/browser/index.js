@@ -67,9 +67,7 @@ function getAnalyticsConfig(wco, context) {
         }
         // The category is the builder name if it's an angular builder.
         return {
-            plugins: [
-                new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category),
-            ],
+            plugins: [new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category)],
         };
     }
     return {};
@@ -99,11 +97,11 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     const root = core_1.normalize(context.workspaceRoot);
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
-    const loggingFn = transforms.logging
-        || createBrowserLoggingCallback(!!options.verbose, context.logger);
+    const loggingFn = transforms.logging || createBrowserLoggingCallback(!!options.verbose, context.logger);
     return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(operators_1.switchMap(({ workspace, config: configs }) => {
         const projectName = context.target
-            ? context.target.project : workspace.getDefaultProjectName();
+            ? context.target.project
+            : workspace.getDefaultProjectName();
         if (!projectName) {
             throw new Error('Must either have a target from the context or a default project.');
         }
@@ -111,7 +109,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
         const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
         const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(core_1.getSystemPath(projectRoot), target);
-        if (target > typescript_1.ScriptTarget.ES2015 && buildBrowserFeatures.isDifferentialLoadingNeeded()) {
+        const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded();
+        if (target > typescript_1.ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
             context.logger.warn(core_1.tags.stripIndent `
           WARNING: Using differential loading with targets ES5 and ES2016 or higher may
           cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
@@ -135,14 +134,20 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 let noModuleFiles;
                 let moduleFiles;
                 let files;
-                const [ES5Result, ES2015Result] = buildEvents;
+                const [firstBuild, secondBuild] = buildEvents;
                 if (buildEvents.length === 2) {
-                    noModuleFiles = ES5Result.emittedFiles;
-                    moduleFiles = ES2015Result.emittedFiles || [];
+                    noModuleFiles = firstBuild.emittedFiles;
+                    moduleFiles = secondBuild.emittedFiles || [];
+                    files = moduleFiles.filter(x => x.extension === '.css');
+                }
+                else if (options.watch && isDifferentialLoadingNeeded) {
+                    // differential loading is not enabled in watch mode
+                    // but we still want to use module type tags
+                    moduleFiles = firstBuild.emittedFiles || [];
                     files = moduleFiles.filter(x => x.extension === '.css');
                 }
                 else {
-                    const { emittedFiles = [] } = ES5Result;
+                    const { emittedFiles = [] } = firstBuild;
                     files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
                     noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
                 }
@@ -159,8 +164,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     scripts: options.scripts,
                     styles: options.styles,
                     postTransform: transforms.indexHtml,
-                })
-                    .pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(error => rxjs_1.of({ success: false, error: mapErrorToMessage(error) })));
+                }).pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(error => rxjs_1.of({ success: false, error: mapErrorToMessage(error) })));
             }
             else {
                 return rxjs_1.of({ success });

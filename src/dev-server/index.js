@@ -15,11 +15,13 @@ const fs_1 = require("fs");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
+const ts = require("typescript");
 const url = require("url");
 const webpack = require("webpack");
 const index_html_webpack_plugin_1 = require("../angular-cli-files/plugins/index-html-webpack-plugin");
 const check_port_1 = require("../angular-cli-files/utilities/check-port");
 const package_chunk_sort_1 = require("../angular-cli-files/utilities/package-chunk-sort");
+const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const browser_1 = require("../browser");
 const utils_1 = require("../utils");
 const version_1 = require("../utils/version");
@@ -53,8 +55,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     const root = context.workspaceRoot;
     let first = true;
     const host = new node_1.NodeJsSyncHost();
-    const loggingFn = transforms.logging
-        || browser_1.createBrowserLoggingCallback(!!options.verbose, context.logger);
+    const loggingFn = transforms.logging || browser_1.createBrowserLoggingCallback(!!options.verbose, context.logger);
     async function setup() {
         // Get the browser configuration from the target name.
         const rawBrowserOptions = await context.getTargetOptions(browserTarget);
@@ -73,13 +74,19 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         // No differential loading for dev-server, hence there is just one config
         let webpackConfig = webpackConfigResult.config[0];
         const port = await check_port_1.checkPort(options.port || 0, options.host || 'localhost', 4200);
-        const webpackDevServerConfig = webpackConfig.devServer = buildServerConfig(root, options, browserOptions, context.logger);
+        const webpackDevServerConfig = (webpackConfig.devServer = buildServerConfig(root, options, browserOptions, context.logger));
         if (transforms.webpackConfiguration) {
             webpackConfig = await transforms.webpackConfiguration(webpackConfig);
         }
-        return { browserOptions, webpackConfig, webpackDevServerConfig, port };
+        return {
+            browserOptions,
+            webpackConfig,
+            webpackDevServerConfig,
+            port,
+            workspace: webpackConfigResult.workspace,
+        };
     }
-    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port }) => {
+    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, workspace }) => {
         options.port = port;
         // Resolve public host and client address.
         let clientAddress = url.parse(`${options.ssl ? 'https' : 'http'}://0.0.0.0:0`);
@@ -112,12 +119,27 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             });
         }
         if (browserOptions.index) {
-            const { scripts = [], styles = [], index, baseHref } = browserOptions;
+            const { scripts = [], styles = [], index, baseHref, tsConfig } = browserOptions;
+            const projectName = context.target
+                ? context.target.project
+                : workspace.getDefaultProjectName();
+            if (!projectName) {
+                throw new Error('Must either have a target from the context or a default project.');
+            }
+            const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
+            const { options: compilerOptions } = read_tsconfig_1.readTsconfig(tsConfig, context.workspaceRoot);
+            const target = compilerOptions.target || ts.ScriptTarget.ES5;
+            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(core_1.getSystemPath(projectRoot), target);
+            const entrypoints = package_chunk_sort_1.generateEntryPoints({ scripts, styles });
+            const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded()
+                ? entrypoints
+                : [];
             webpackConfig.plugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({
                 input: path.resolve(root, index),
                 output: path.basename(index),
                 baseHref,
-                entrypoints: package_chunk_sort_1.generateEntryPoints({ scripts, styles }),
+                moduleEntrypoints,
+                entrypoints,
                 deployUrl: browserOptions.deployUrl,
                 sri: browserOptions.subresourceIntegrity,
                 noModuleEntrypoints: ['polyfills-es5'],
@@ -196,17 +218,18 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
         host: serverOptions.host,
         port: serverOptions.port,
         headers: { 'Access-Control-Allow-Origin': '*' },
-        historyApiFallback: !!browserOptions.index && {
-            index: `${servePath}/${path.basename(browserOptions.index)}`,
-            disableDotRule: true,
-            htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
-            rewrites: [
-                {
-                    from: new RegExp(`^(?!${servePath})/.*`),
-                    to: context => url.format(context.parsedUrl),
-                },
-            ],
-        },
+        historyApiFallback: !!browserOptions.index &&
+            {
+                index: `${servePath}/${path.basename(browserOptions.index)}`,
+                disableDotRule: true,
+                htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
+                rewrites: [
+                    {
+                        from: new RegExp(`^(?!${servePath})/.*`),
+                        to: context => url.format(context.parsedUrl),
+                    },
+                ],
+            },
         stats: false,
         compress: styles || scripts,
         watchOptions: {
@@ -375,9 +398,7 @@ function _findDefaultServePath(baseHref, deployUrl) {
     // normalize baseHref
     // for ng serve the starting base is always `/` so a relative
     // and root relative value are identical
-    const baseHrefParts = (baseHref || '')
-        .split('/')
-        .filter(part => part !== '');
+    const baseHrefParts = (baseHref || '').split('/').filter(part => part !== '');
     if (baseHref && !baseHref.endsWith('/')) {
         baseHrefParts.pop();
     }

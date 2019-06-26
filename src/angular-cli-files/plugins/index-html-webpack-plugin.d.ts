@@ -8,6 +8,7 @@ export interface IndexHtmlWebpackPluginOptions {
     deployUrl?: string;
     sri: boolean;
     noModuleEntrypoints: string[];
+    moduleEntrypoints: string[];
     postTransform?: IndexHtmlTransform;
 }
 export declare class IndexHtmlWebpackPlugin {
