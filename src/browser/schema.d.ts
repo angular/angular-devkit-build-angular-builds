@@ -28,6 +28,10 @@ export interface Schema {
      */
     commonChunk?: boolean;
     /**
+     * Define the crossorigin attribute setting of elements that provide CORS support.
+     */
+    crossOrigin?: CrossOrigin;
+    /**
      * Delete the output path before building.
      */
     deleteOutputPath?: boolean;
@@ -276,6 +280,14 @@ export declare enum Type {
     AnyScript = "anyScript",
     Bundle = "bundle",
     Initial = "initial"
+}
+/**
+ * Define the crossorigin attribute setting of elements that provide CORS support.
+ */
+export declare enum CrossOrigin {
+    Anonymous = "anonymous",
+    None = "none",
+    UseCredentials = "use-credentials"
 }
 export interface FileReplacement {
     replace?: string;

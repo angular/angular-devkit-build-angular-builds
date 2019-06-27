@@ -6,12 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export declare type LoadOutputFileFunctionType = (file: string) => Promise<string>;
+export declare type CrossOriginValue = 'none' | 'anonymous' | 'use-credentials';
 export interface AugmentIndexHtmlOptions {
     input: string;
     inputContent: string;
     baseHref?: string;
     deployUrl?: string;
     sri: boolean;
+    /** crossorigin attribute setting of elements that provide CORS support */
+    crossOrigin?: CrossOriginValue;
     files: FileInfo[];
     /** Files that should be added using 'nomodule'. */
     noModuleFiles?: FileInfo[];

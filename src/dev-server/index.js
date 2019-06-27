@@ -144,6 +144,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 sri: browserOptions.subresourceIntegrity,
                 noModuleEntrypoints: ['polyfills-es5'],
                 postTransform: transforms.indexHtml,
+                crossOrigin: browserOptions.crossOrigin,
             }));
         }
         const normalizedOptimization = utils_1.normalizeOptimization(browserOptions.optimization);

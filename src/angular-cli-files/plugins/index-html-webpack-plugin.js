@@ -66,6 +66,7 @@ class IndexHtmlWebpackPlugin {
                 baseHref: this._options.baseHref,
                 deployUrl: this._options.deployUrl,
                 sri: this._options.sri,
+                crossOrigin: this._options.crossOrigin,
                 files,
                 noModuleFiles,
                 loadOutputFile,

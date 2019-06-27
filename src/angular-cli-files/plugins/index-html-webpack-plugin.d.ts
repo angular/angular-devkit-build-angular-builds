@@ -1,4 +1,5 @@
 import { Compiler } from 'webpack';
+import { CrossOriginValue } from '../utilities/index-file/augment-index-html';
 import { IndexHtmlTransform } from '../utilities/index-file/write-index-html';
 export interface IndexHtmlWebpackPluginOptions {
     input: string;
@@ -10,6 +11,7 @@ export interface IndexHtmlWebpackPluginOptions {
     noModuleEntrypoints: string[];
     moduleEntrypoints: string[];
     postTransform?: IndexHtmlTransform;
+    crossOrigin?: CrossOriginValue;
 }
 export declare class IndexHtmlWebpackPlugin {
     private _options;

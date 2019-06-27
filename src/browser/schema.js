@@ -15,6 +15,15 @@ var Type;
     Type["Initial"] = "initial";
 })(Type = exports.Type || (exports.Type = {}));
 /**
+ * Define the crossorigin attribute setting of elements that provide CORS support.
+ */
+var CrossOrigin;
+(function (CrossOrigin) {
+    CrossOrigin["Anonymous"] = "anonymous";
+    CrossOrigin["None"] = "none";
+    CrossOrigin["UseCredentials"] = "use-credentials";
+})(CrossOrigin = exports.CrossOrigin || (exports.CrossOrigin = {}));
+/**
  * Define the output filename cache-busting hashing mode.
  */
 var OutputHashing;

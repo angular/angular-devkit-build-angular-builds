@@ -17,7 +17,11 @@ const parse5 = require('parse5');
  * bundles for differential serving.
  */
 async function augmentIndexHtml(params) {
-    const { loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints, } = params;
+    const { loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints } = params;
+    let { crossOrigin = 'none' } = params;
+    if (params.sri && crossOrigin === 'none') {
+        crossOrigin = 'anonymous';
+    }
     const stylesheets = new Set();
     const scripts = new Set();
     // Sort files in the order we want to insert them by entrypoint and dedupes duplicates
@@ -83,6 +87,9 @@ async function augmentIndexHtml(params) {
         const attrs = [
             { name: 'src', value: (params.deployUrl || '') + script },
         ];
+        if (crossOrigin !== 'none') {
+            attrs.push({ name: 'crossorigin', value: crossOrigin });
+        }
         // We want to include nomodule or module when a file is not common amongs all
         // such as runtime.js
         const scriptPredictor = ({ file }) => file === script;
@@ -104,7 +111,7 @@ async function augmentIndexHtml(params) {
             attrs.push(..._generateSriAttributes(content));
         }
         const attributes = attrs
-            .map(attr => attr.value === null ? attr.name : `${attr.name}="${attr.value}"`)
+            .map(attr => (attr.value === null ? attr.name : `${attr.name}="${attr.value}"`))
             .join(' ');
         scriptElements += `<script ${attributes}></script>`;
     }
@@ -148,6 +155,9 @@ async function augmentIndexHtml(params) {
             { name: 'rel', value: 'stylesheet' },
             { name: 'href', value: (params.deployUrl || '') + stylesheet },
         ];
+        if (crossOrigin !== 'none') {
+            attrs.push({ name: 'crossorigin', value: crossOrigin });
+        }
         if (params.sri) {
             const content = await loadOutputFile(stylesheet);
             attrs.push(..._generateSriAttributes(content));
@@ -164,8 +174,5 @@ function _generateSriAttributes(content) {
     const hash = crypto_1.createHash(algo)
         .update(content, 'utf8')
         .digest('base64');
-    return [
-        { name: 'integrity', value: `${algo}-${hash}` },
-        { name: 'crossorigin', value: 'anonymous' },
-    ];
+    return [{ name: 'integrity', value: `${algo}-${hash}` }];
 }
