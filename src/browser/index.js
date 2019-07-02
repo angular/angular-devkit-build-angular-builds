@@ -135,8 +135,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 let files;
                 const [firstBuild, secondBuild] = buildEvents;
                 if (buildEvents.length === 2) {
-                    noModuleFiles = firstBuild.emittedFiles;
-                    moduleFiles = secondBuild.emittedFiles || [];
+                    moduleFiles = firstBuild.emittedFiles || [];
+                    noModuleFiles = secondBuild.emittedFiles;
                     files = moduleFiles.filter(x => x.extension === '.css');
                 }
                 else if (options.watch && isDifferentialLoadingNeeded) {

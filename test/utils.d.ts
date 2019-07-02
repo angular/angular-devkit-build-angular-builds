@@ -8,6 +8,7 @@
 import { Architect, BuilderOutput, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
 import { Path, experimental, json, virtualFs } from '@angular-devkit/core';
+export declare const ivyEnabled: boolean;
 export declare const workspaceRoot: Path;
 export declare const host: TestProjectHost;
 export declare const outputPath: Path;
@@ -43,7 +44,7 @@ export declare function createArchitect(workspaceRoot: Path): Promise<{
 export declare function browserBuild(architect: Architect, host: virtualFs.Host, target: Target, overrides?: json.JsonObject, scheduleOptions?: ScheduleOptions): Promise<{
     output: BuilderOutput;
     files: {
-        [file: string]: string;
+        [file: string]: Promise<string>;
     };
 }>;
 export declare const lazyModuleFiles: {

@@ -27,7 +27,7 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
         && buildBrowserFeatures.isDifferentialLoadingNeeded();
     const scriptTargets = [scriptTarget];
     if (differentialLoading) {
-        scriptTargets.unshift(ts.ScriptTarget.ES5);
+        scriptTargets.push(ts.ScriptTarget.ES5);
     }
     // For differential loading, we can have several targets
     return scriptTargets.map(scriptTarget => {
