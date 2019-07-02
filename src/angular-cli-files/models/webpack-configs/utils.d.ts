@@ -15,9 +15,8 @@ export interface HashFormat {
     script: string;
 }
 export declare function getOutputHashFormat(option: string, length?: number): HashFormat;
-export declare type NormalizedEntryPoint = ExtraEntryPointClass & {
-    bundleName: string;
-};
+declare type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+export declare type NormalizedEntryPoint = Required<Omit<ExtraEntryPointClass, 'lazy'>>;
 export declare function normalizeExtraEntryPoints(extraEntryPoints: ExtraEntryPoint[], defaultBundleName: string): NormalizedEntryPoint[];
 export declare function getSourceMapDevTool(scriptsSourceMap: boolean, stylesSourceMap: boolean, hiddenSourceMap?: boolean, inlineSourceMap?: boolean): SourceMapDevToolPlugin;
 /**
@@ -25,3 +24,4 @@ export declare function getSourceMapDevTool(scriptsSourceMap: boolean, stylesSou
  */
 export declare function getEsVersionForFileName(scriptTargetOverride: ScriptTarget | undefined, esVersionInFileName?: boolean): string;
 export declare function isPolyfillsEntry(name: string): boolean;
+export {};

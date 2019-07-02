@@ -48,8 +48,7 @@ function getCommonConfig(wco) {
         const buildBrowserFeatures = new build_browser_features_1.BuildBrowserFeatures(projectRoot, tsConfig.options.target || typescript_1.ScriptTarget.ES5);
         if ((buildOptions.scriptTargetOverride || tsConfig.options.target) === typescript_1.ScriptTarget.ES5) {
             if (buildOptions.es5BrowserSupport ||
-                (buildOptions.es5BrowserSupport === undefined &&
-                    buildBrowserFeatures.isEs5SupportNeeded())) {
+                (buildOptions.es5BrowserSupport === undefined && buildBrowserFeatures.isEs5SupportNeeded())) {
                 // The nomodule polyfill needs to be inject prior to any script and be
                 // outside of webpack compilation because otherwise webpack will cause the
                 // script to be wrapped in window["webpackJsonp"] which causes this to fail.
@@ -95,15 +94,14 @@ function getCommonConfig(wco) {
     const hashFormat = utils_1.getOutputHashFormat(buildOptions.outputHashing || 'none');
     // process global scripts
     if (buildOptions.scripts.length > 0) {
-        const globalScriptsByBundleName = utils_1.normalizeExtraEntryPoints(buildOptions.scripts, 'scripts')
-            .reduce((prev, curr) => {
+        const globalScriptsByBundleName = utils_1.normalizeExtraEntryPoints(buildOptions.scripts, 'scripts').reduce((prev, curr) => {
             const bundleName = curr.bundleName;
             const resolvedPath = path.resolve(root, curr.input);
-            const existingEntry = prev.find((el) => el.bundleName === bundleName);
+            const existingEntry = prev.find(el => el.bundleName === bundleName);
             if (existingEntry) {
-                if (existingEntry.lazy && !curr.lazy) {
+                if (existingEntry.inject && !curr.inject) {
                     // All entries have to be lazy for the bundle to be lazy.
-                    throw new Error(`The ${curr.bundleName} bundle is mixing lazy and non-lazy scripts.`);
+                    throw new Error(`The ${curr.bundleName} bundle is mixing injected and non-injected scripts.`);
                 }
                 existingEntry.paths.push(resolvedPath);
             }
@@ -111,15 +109,15 @@ function getCommonConfig(wco) {
                 prev.push({
                     bundleName,
                     paths: [resolvedPath],
-                    lazy: curr.lazy || false,
+                    inject: curr.inject,
                 });
             }
             return prev;
         }, []);
         // Add a new asset for each entry.
-        globalScriptsByBundleName.forEach((script) => {
+        globalScriptsByBundleName.forEach(script => {
             // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
-            const hash = script.lazy ? '' : hashFormat.script;
+            const hash = script.inject ? hashFormat.script : '';
             const bundleName = script.bundleName;
             extraPlugins.push(new scripts_webpack_plugin_1.ScriptsWebpackPlugin({
                 name: bundleName,
@@ -165,14 +163,14 @@ function getCommonConfig(wco) {
         }));
     }
     if (buildOptions.statsJson) {
-        extraPlugins.push(new class {
+        extraPlugins.push(new (class {
             apply(compiler) {
                 compiler.hooks.emit.tap('angular-cli-stats', compilation => {
                     const data = JSON.stringify(compilation.getStats().toJson('verbose'));
                     compilation.assets[`stats${targetInFileName}.json`] = new webpack_sources_1.RawSource(data);
                 });
             }
-        });
+        })());
     }
     if (buildOptions.namedChunks) {
         extraPlugins.push(new named_chunks_plugin_1.NamedLazyChunksPlugin());
@@ -219,7 +217,7 @@ function getCommonConfig(wco) {
         extraMinimizers.push(new cleancss_webpack_plugin_1.CleanCssWebpackPlugin({
             sourceMap: stylesSourceMap,
             // component styles retain their original file name
-            test: (file) => /\.(?:css|scss|sass|less|styl)$/.test(file),
+            test: file => /\.(?:css|scss|sass|less|styl)$/.test(file),
         }));
     }
     if (scriptsOptimization) {
@@ -249,15 +247,17 @@ function getCommonConfig(wco) {
             },
             // On server, we don't want to compress anything. We still set the ngDevMode = false for it
             // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
-            compress: (buildOptions.platform == 'server' ? {
-                global_defs: angularGlobalDefinitions,
-            } : {
-                pure_getters: buildOptions.buildOptimizer,
-                // PURE comments work best with 3 passes.
-                // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
-                passes: buildOptions.buildOptimizer ? 3 : 1,
-                global_defs: angularGlobalDefinitions,
-            }),
+            compress: buildOptions.platform == 'server'
+                ? {
+                    global_defs: angularGlobalDefinitions,
+                }
+                : {
+                    pure_getters: buildOptions.buildOptimizer,
+                    // PURE comments work best with 3 passes.
+                    // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
+                    passes: buildOptions.buildOptimizer ? 3 : 1,
+                    global_defs: angularGlobalDefinitions,
+                },
             // We also want to avoid mangling on server.
             ...(buildOptions.platform == 'server' ? { mangle: false } : {}),
         };
@@ -277,18 +277,13 @@ function getCommonConfig(wco) {
     `);
     }
     return {
-        mode: scriptsOptimization || stylesOptimization
-            ? 'production'
-            : 'development',
+        mode: scriptsOptimization || stylesOptimization ? 'production' : 'development',
         devtool: false,
         profile: buildOptions.statsJson,
         resolve: {
             extensions: ['.ts', '.tsx', '.mjs', '.js'],
             symlinks: !buildOptions.preserveSymlinks,
-            modules: [
-                wco.tsConfig.options.baseUrl || projectRoot,
-                'node_modules',
-            ],
+            modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
             alias,
         },
         resolveLoader: {

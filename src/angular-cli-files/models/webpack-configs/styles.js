@@ -26,6 +26,7 @@ const postcssImports = require('postcss-import');
  * require('node-sass')
  * require('sass-loader')
  */
+// tslint:disable-next-line:no-big-function
 function getStylesConfig(wco) {
     const { root, buildOptions } = wco;
     const entryPoints = {};
@@ -37,7 +38,7 @@ function getStylesConfig(wco) {
     const postcssPluginCreator = function (loader) {
         return [
             postcssImports({
-                resolve: (url) => url.startsWith('~') ? url.substr(1) : url,
+                resolve: (url) => (url.startsWith('~') ? url.substr(1) : url),
                 load: (filename) => {
                     return new Promise((resolve, reject) => {
                         loader.fs.readFile(filename, (err, data) => {
@@ -65,9 +66,9 @@ function getStylesConfig(wco) {
     // use includePaths from appConfig
     const includePaths = [];
     let lessPathOptions = {};
-    if (buildOptions.stylePreprocessorOptions
-        && buildOptions.stylePreprocessorOptions.includePaths
-        && buildOptions.stylePreprocessorOptions.includePaths.length > 0) {
+    if (buildOptions.stylePreprocessorOptions &&
+        buildOptions.stylePreprocessorOptions.includePaths &&
+        buildOptions.stylePreprocessorOptions.includePaths.length > 0) {
         buildOptions.stylePreprocessorOptions.includePaths.forEach((includePath) => includePaths.push(path.resolve(root, includePath)));
         lessPathOptions = {
             paths: includePaths,
@@ -85,8 +86,8 @@ function getStylesConfig(wco) {
             else {
                 entryPoints[style.bundleName] = [resolvedPath];
             }
-            // Add lazy styles to the list.
-            if (style.lazy) {
+            // Add non injected styles to the list.
+            if (!style.inject) {
                 chunkNames.push(style.bundleName);
             }
             // Add global css paths.
@@ -116,7 +117,8 @@ function getStylesConfig(wco) {
         { test: /\.css$/, use: [] },
         {
             test: /\.scss$|\.sass$/,
-            use: [{
+            use: [
+                {
                     loader: 'sass-loader',
                     options: {
                         implementation: sassImplementation,
@@ -126,28 +128,33 @@ function getStylesConfig(wco) {
                         precision: 8,
                         includePaths,
                     },
-                }],
+                },
+            ],
         },
         {
             test: /\.less$/,
-            use: [{
+            use: [
+                {
                     loader: 'less-loader',
                     options: {
                         sourceMap: cssSourceMap,
                         javascriptEnabled: true,
                         ...lessPathOptions,
                     },
-                }],
+                },
+            ],
         },
         {
             test: /\.styl$/,
-            use: [{
+            use: [
+                {
                     loader: 'stylus-loader',
                     options: {
                         sourceMap: cssSourceMap,
                         paths: includePaths,
                     },
-                }],
+                },
+            ],
         },
     ];
     // load component css as raw strings
@@ -181,10 +188,9 @@ function getStylesConfig(wco) {
                         options: {
                             ident: buildOptions.extractCss ? 'extracted' : 'embedded',
                             plugins: postcssPluginCreator,
-                            sourceMap: cssSourceMap
-                                && !buildOptions.extractCss
-                                && !buildOptions.sourceMap.hidden
-                                ? 'inline' : cssSourceMap,
+                            sourceMap: cssSourceMap && !buildOptions.extractCss && !buildOptions.sourceMap.hidden
+                                ? 'inline'
+                                : cssSourceMap,
                         },
                     },
                     ...use,

@@ -17,8 +17,18 @@ function getOutputHashFormat(option, length = 20) {
     const hashFormats = {
         none: { chunk: '', extract: '', file: '', script: '' },
         media: { chunk: '', extract: '', file: `.[hash:${length}]`, script: '' },
-        bundles: { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: '', script: `.[hash:${length}]` },
-        all: { chunk: `.[chunkhash:${length}]`, extract: `.[contenthash:${length}]`, file: `.[hash:${length}]`, script: `.[hash:${length}]` },
+        bundles: {
+            chunk: `.[chunkhash:${length}]`,
+            extract: `.[contenthash:${length}]`,
+            file: '',
+            script: `.[hash:${length}]`,
+        },
+        all: {
+            chunk: `.[chunkhash:${length}]`,
+            extract: `.[contenthash:${length}]`,
+            file: `.[hash:${length}]`,
+            script: `.[hash:${length}]`,
+        },
     };
     /* tslint:enable:max-line-length */
     return hashFormats[option] || hashFormats['none'];
@@ -28,21 +38,23 @@ function normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName) {
     return extraEntryPoints.map(entry => {
         let normalizedEntry;
         if (typeof entry === 'string') {
-            normalizedEntry = { input: entry, lazy: false, bundleName: defaultBundleName };
+            normalizedEntry = { input: entry, inject: true, bundleName: defaultBundleName };
         }
         else {
+            const { lazy, inject = true, ...newEntry } = entry;
+            const injectNormalized = entry.lazy !== undefined ? !entry.lazy : inject;
             let bundleName;
             if (entry.bundleName) {
                 bundleName = entry.bundleName;
             }
-            else if (entry.lazy) {
+            else if (!injectNormalized) {
                 // Lazy entry points use the file name as bundle name.
                 bundleName = core_1.basename(core_1.normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')));
             }
             else {
                 bundleName = defaultBundleName;
             }
-            normalizedEntry = { ...entry, bundleName };
+            normalizedEntry = { ...newEntry, inject: injectNormalized, bundleName };
         }
         return normalizedEntry;
     });
@@ -67,8 +79,9 @@ exports.getSourceMapDevTool = getSourceMapDevTool;
  * Returns an ES version file suffix to differentiate between various builds.
  */
 function getEsVersionForFileName(scriptTargetOverride, esVersionInFileName = false) {
-    return scriptTargetOverride && esVersionInFileName ?
-        '-' + typescript_1.ScriptTarget[scriptTargetOverride].toLowerCase() : '';
+    return scriptTargetOverride && esVersionInFileName
+        ? '-' + typescript_1.ScriptTarget[scriptTargetOverride].toLowerCase()
+        : '';
 }
 exports.getEsVersionForFileName = getEsVersionForFileName;
 function isPolyfillsEntry(name) {

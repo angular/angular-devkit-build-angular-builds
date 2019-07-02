@@ -134,6 +134,10 @@ export interface ExtraEntryPointClass {
      */
     bundleName?: string;
     /**
+     * If the bundle will be referenced in the HTML file.
+     */
+    inject?: boolean;
+    /**
      * The file to include.
      */
     input: string;

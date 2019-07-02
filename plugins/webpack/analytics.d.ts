@@ -29,6 +29,7 @@ export declare function countOccurrences(source: string, match: string, wordBrea
 declare class AnalyticsBuildStats {
     errors: string[];
     numberOfNgOnInit: number;
+    numberOfComponents: number;
     initialChunkSize: number;
     totalChunkCount: number;
     totalChunkSize: number;
@@ -55,6 +56,7 @@ export declare class NgBuildAnalyticsPlugin {
     protected _reportBuildMetrics(stats: Stats): void;
     protected _reportRebuildMetrics(stats: Stats): void;
     protected _checkTsNormalModule(module: NormalModule): void;
+    protected _checkNgFactoryNormalModule(module: NormalModule): void;
     protected _collectErrors(stats: Stats): void;
     protected _collectBundleStats(json: any): void;
     /************************************************************************************************
