@@ -1,5 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7,17 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
 const architect_1 = require("@angular-devkit/architect");
 const node_1 = require("@angular-devkit/architect/node");
 const testing_1 = require("@angular-devkit/architect/testing");
 const core_1 = require("@angular-devkit/core");
-exports.ivyEnabled = process.argv.includes('--ivy');
-if (exports.ivyEnabled) {
-    // tslint:disable-next-line:no-console
-    console.warn('********* IVY Enabled ***********');
-}
 const devkitRoot = core_1.normalize(global._DevKitRoot); // tslint:disable-line:no-any
-exports.workspaceRoot = core_1.join(devkitRoot, `tests/angular_devkit/build_angular/hello-world-app${exports.ivyEnabled ? '-ivy' : ''}/`);
+exports.workspaceRoot = core_1.join(devkitRoot, 'tests/angular_devkit/build_angular/hello-world-app/');
 exports.host = new testing_1.TestProjectHost(exports.workspaceRoot);
 exports.outputPath = core_1.normalize('dist');
 exports.browserTargetSpec = { project: 'app', target: 'build' };
