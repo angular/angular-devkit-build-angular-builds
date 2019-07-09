@@ -27,11 +27,11 @@ function writeIndexHtml({ host, outputPath, indexPath, files = [], noModuleFiles
         moduleFiles: filterAndMapBuildFiles(moduleFiles, '.js'),
         loadOutputFile: async (filePath) => {
             return host
-                .read(core_1.join(outputPath, filePath))
+                .read(core_1.join(core_1.dirname(outputPath), filePath))
                 .pipe(operators_1.map(data => core_1.virtualFs.fileBufferToString(data)))
                 .toPromise();
         },
-    })), operators_1.switchMap(content => (postTransform ? postTransform(content) : rxjs_1.of(content))), operators_1.map(content => core_1.virtualFs.stringToFileBuffer(content)), operators_1.switchMap(content => host.write(core_1.join(outputPath, core_1.basename(indexPath)), content)));
+    })), operators_1.switchMap(content => (postTransform ? postTransform(content) : rxjs_1.of(content))), operators_1.map(content => core_1.virtualFs.stringToFileBuffer(content)), operators_1.switchMap(content => host.write(outputPath, content)));
 }
 exports.writeIndexHtml = writeIndexHtml;
 function filterAndMapBuildFiles(files, extensionFilter) {

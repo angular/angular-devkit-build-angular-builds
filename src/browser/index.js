@@ -152,8 +152,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 }
                 return write_index_html_1.writeIndexHtml({
                     host,
-                    outputPath: core_1.resolve(root, core_1.normalize(options.outputPath)),
-                    indexPath: core_1.join(root, options.index),
+                    outputPath: core_1.resolve(root, core_1.join(core_1.normalize(options.outputPath), webpack_browser_config_1.getIndexOutputFile(options))),
+                    indexPath: core_1.join(root, webpack_browser_config_1.getIndexInputFile(options)),
                     files,
                     noModuleFiles,
                     moduleFiles,

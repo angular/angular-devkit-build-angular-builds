@@ -108,3 +108,21 @@ async function generateBrowserWebpackConfigFromContext(options, context, webpack
     return { workspace, config };
 }
 exports.generateBrowserWebpackConfigFromContext = generateBrowserWebpackConfigFromContext;
+function getIndexOutputFile(options) {
+    if (typeof options.index === 'string') {
+        return path.basename(options.index);
+    }
+    else {
+        return options.index.output || 'index.html';
+    }
+}
+exports.getIndexOutputFile = getIndexOutputFile;
+function getIndexInputFile(options) {
+    if (typeof options.index === 'string') {
+        return options.index;
+    }
+    else {
+        return options.index.input;
+    }
+}
+exports.getIndexInputFile = getIndexInputFile;
