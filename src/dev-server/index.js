@@ -132,7 +132,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(core_1.getSystemPath(projectRoot), target);
             const entrypoints = package_chunk_sort_1.generateEntryPoints({ scripts, styles });
             const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded()
-                ? entrypoints
+                ? package_chunk_sort_1.generateEntryPoints({ scripts: [], styles })
                 : [];
             webpackConfig.plugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({
                 input: path.resolve(root, index),
