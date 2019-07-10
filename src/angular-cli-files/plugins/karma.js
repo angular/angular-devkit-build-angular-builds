@@ -125,7 +125,6 @@ const init = (config, emitter, customFileHandlers) => {
     // Files need to be served from a custom path for Karma.
     webpackConfig.output.path = '/_karma_webpack_/';
     webpackConfig.output.publicPath = '/_karma_webpack_/';
-    webpackConfig.output.devtoolModuleFilenameTemplate = '[namespace]/[resource-path]?[loaders]';
     let compiler;
     try {
         compiler = webpack(webpackConfig);

@@ -9,9 +9,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
+const build_optimizer_1 = require("@angular-devkit/build-optimizer");
 const path = require("path");
 const webpack_1 = require("@ngtools/webpack");
-const common_1 = require("./common");
 function _pluginOptionsOverrides(buildOptions, pluginOptions) {
     const compilerOptions = {
         ...(pluginOptions.compilerOptions || {})
@@ -84,7 +84,7 @@ function getAotConfig(wco, i18nExtract = false) {
     const loaders = [webpack_1.NgToolsLoader];
     if (buildOptions.buildOptimizer) {
         loaders.unshift({
-            loader: common_1.buildOptimizerLoader,
+            loader: build_optimizer_1.buildOptimizerLoaderPath,
             options: { sourceMap: buildOptions.sourceMap.scripts }
         });
     }

@@ -7,6 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+const build_optimizer_1 = require("@angular-devkit/build-optimizer");
 const core_1 = require("@angular-devkit/core");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
@@ -25,9 +26,6 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 // tslint:disable-next-line:no-any
 const g = typeof global !== 'undefined' ? global : {};
-exports.buildOptimizerLoader = g['_DevKitIsLocal']
-    ? require.resolve('@angular-devkit/build-optimizer/src/build-optimizer/webpack-loader')
-    : '@angular-devkit/build-optimizer/webpack-loader';
 // tslint:disable-next-line:no-big-function
 function getCommonConfig(wco) {
     const { root, projectRoot, buildOptions, tsConfig } = wco;
@@ -187,10 +185,11 @@ function getCommonConfig(wco) {
     }
     let buildOptimizerUseRule;
     if (buildOptions.buildOptimizer) {
+        extraPlugins.push(new build_optimizer_1.BuildOptimizerWebpackPlugin());
         buildOptimizerUseRule = {
             use: [
                 {
-                    loader: exports.buildOptimizerLoader,
+                    loader: build_optimizer_1.buildOptimizerLoaderPath,
                     options: { sourceMap: scriptsSourceMap },
                 },
             ],
