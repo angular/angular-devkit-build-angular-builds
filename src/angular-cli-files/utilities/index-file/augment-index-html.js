@@ -100,11 +100,17 @@ async function augmentIndexHtml(params) {
             const isNoModuleType = noModuleFiles.some(scriptPredictor);
             const isModuleType = moduleFiles.some(scriptPredictor);
             if (isNoModuleType && !isModuleType) {
-                attrs.push({ name: 'nomodule', value: null });
+                attrs.push({ name: 'nomodule', value: null }, { name: 'defer', value: null });
             }
             else if (isModuleType && !isNoModuleType) {
                 attrs.push({ name: 'type', value: 'module' });
             }
+            else {
+                attrs.push({ name: 'defer', value: null });
+            }
+        }
+        else {
+            attrs.push({ name: 'defer', value: null });
         }
         if (params.sri) {
             const content = await loadOutputFile(script);
