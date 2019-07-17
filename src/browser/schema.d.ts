@@ -83,9 +83,9 @@ export interface Schema {
      */
     i18nMissingTranslation?: string;
     /**
-     * Configures the generation of the application's HTML index.
+     * The name of the index HTML file.
      */
-    index: IndexUnion;
+    index: string;
     /**
      * List of additional NgModule files that will be lazy loaded. Lazy router modules will be
      * discovered automatically.
@@ -294,21 +294,6 @@ export interface FileReplacement {
     replaceWith?: string;
     src?: string;
     with?: string;
-}
-/**
- * Configures the generation of the application's HTML index.
- */
-export declare type IndexUnion = IndexObject | string;
-export interface IndexObject {
-    /**
-     * The path of a file to use for the application's generated HTML index.
-     */
-    input: string;
-    /**
-     * The output path of the application's generated HTML index file. The full provided path
-     * will be used and will be considered relative to the application's configured output path.
-     */
-    output?: string;
 }
 /**
  * Enables optimization of the build output.

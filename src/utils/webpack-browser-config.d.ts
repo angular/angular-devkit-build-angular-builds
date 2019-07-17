@@ -20,6 +20,4 @@ export declare function generateBrowserWebpackConfigFromContext(options: Browser
     workspace: experimental.workspace.Workspace;
     config: webpack.Configuration[];
 }>;
-export declare function getIndexOutputFile(options: BrowserBuilderSchema): string;
-export declare function getIndexInputFile(options: BrowserBuilderSchema): string;
 export {};

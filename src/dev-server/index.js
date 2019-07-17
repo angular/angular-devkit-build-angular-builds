@@ -25,7 +25,6 @@ const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const browser_1 = require("../browser");
 const utils_1 = require("../utils");
 const version_1 = require("../utils/version");
-const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const open = require('open');
 exports.devServerBuildOverriddenKeys = [
     'watch',
@@ -120,7 +119,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             });
         }
         if (browserOptions.index) {
-            const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
+            const { scripts = [], styles = [], index, baseHref, tsConfig } = browserOptions;
             const projectName = context.target
                 ? context.target.project
                 : workspace.getDefaultProjectName();
@@ -136,8 +135,8 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 ? package_chunk_sort_1.generateEntryPoints({ scripts: [], styles })
                 : [];
             webpackConfig.plugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({
-                input: path.resolve(root, webpack_browser_config_1.getIndexInputFile(browserOptions)),
-                output: webpack_browser_config_1.getIndexOutputFile(browserOptions),
+                input: path.resolve(root, index),
+                output: path.basename(index),
                 baseHref,
                 moduleEntrypoints,
                 entrypoints,
@@ -222,7 +221,7 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
         headers: { 'Access-Control-Allow-Origin': '*' },
         historyApiFallback: !!browserOptions.index &&
             {
-                index: `${servePath}/${webpack_browser_config_1.getIndexOutputFile(browserOptions)}`,
+                index: `${servePath}/${path.basename(browserOptions.index)}`,
                 disableDotRule: true,
                 htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
                 rewrites: [
