@@ -134,14 +134,16 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 let moduleFiles;
                 let files;
                 const [firstBuild, secondBuild] = buildEvents;
-                if (isDifferentialLoadingNeeded) {
-                    const scriptsEntryPointName = webpack_configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts')
-                        .map(x => x.bundleName);
+                if (buildEvents.length === 2) {
                     moduleFiles = firstBuild.emittedFiles || [];
-                    files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
-                    if (buildEvents.length === 2) {
-                        noModuleFiles = secondBuild.emittedFiles;
-                    }
+                    noModuleFiles = secondBuild.emittedFiles;
+                    files = moduleFiles.filter(x => x.extension === '.css');
+                }
+                else if (options.watch && isDifferentialLoadingNeeded) {
+                    // differential loading is not enabled in watch mode
+                    // but we still want to use module type tags
+                    moduleFiles = firstBuild.emittedFiles || [];
+                    files = moduleFiles.filter(x => x.extension === '.css');
                 }
                 else {
                     const { emittedFiles = [] } = firstBuild;
