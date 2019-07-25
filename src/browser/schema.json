@@ -482,7 +482,6 @@
             "allScript",
             "any",
             "anyScript",
-            "anyComponentStyle",
             "bundle",
             "initial"
           ]

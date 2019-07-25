@@ -13,6 +13,7 @@ const core_1 = require("@angular-devkit/core");
 const webpack_1 = require("webpack");
 const typescript_1 = require("typescript");
 function getOutputHashFormat(option, length = 20) {
+    /* tslint:disable:max-line-length */
     const hashFormats = {
         none: { chunk: '', extract: '', file: '', script: '' },
         media: { chunk: '', extract: '', file: `.[hash:${length}]`, script: '' },
@@ -29,6 +30,7 @@ function getOutputHashFormat(option, length = 20) {
             script: `.[hash:${length}]`,
         },
     };
+    /* tslint:enable:max-line-length */
     return hashFormats[option] || hashFormats['none'];
 }
 exports.getOutputHashFormat = getOutputHashFormat;
@@ -69,7 +71,7 @@ function getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, hiddenSourceMap 
     return new webpack_1.SourceMapDevToolPlugin({
         filename: inlineSourceMap ? undefined : '[file].map',
         include,
-        moduleFilenameTemplate: '[resource-path]',
+        moduleFilenameTemplate: '[namespace]/[resource-path]',
         append: hiddenSourceMap ? false : undefined,
     });
 }
