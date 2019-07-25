@@ -277,6 +277,7 @@ export declare enum Type {
     All = "all",
     AllScript = "allScript",
     Any = "any",
+    AnyComponentStyle = "anyComponentStyle",
     AnyScript = "anyScript",
     Bundle = "bundle",
     Initial = "initial"
