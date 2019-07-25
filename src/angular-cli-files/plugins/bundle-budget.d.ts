@@ -17,5 +17,4 @@ export declare class BundleBudgetPlugin {
     private checkMinimum;
     private checkMaximum;
     private calculate;
-    private runChecks;
 }

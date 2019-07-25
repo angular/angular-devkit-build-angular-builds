@@ -10,7 +10,6 @@ var Type;
     Type["All"] = "all";
     Type["AllScript"] = "allScript";
     Type["Any"] = "any";
-    Type["AnyComponentStyle"] = "anyComponentStyle";
     Type["AnyScript"] = "anyScript";
     Type["Bundle"] = "bundle";
     Type["Initial"] = "initial";
