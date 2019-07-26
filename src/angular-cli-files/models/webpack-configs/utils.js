@@ -71,7 +71,7 @@ function getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, hiddenSourceMap 
     return new webpack_1.SourceMapDevToolPlugin({
         filename: inlineSourceMap ? undefined : '[file].map',
         include,
-        moduleFilenameTemplate: '[namespace]/[resource-path]',
+        moduleFilenameTemplate: '[resource-path]',
         append: hiddenSourceMap ? false : undefined,
     });
 }

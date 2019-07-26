@@ -322,6 +322,14 @@ function getCommonConfig(wco) {
                     parser: { system: true },
                 },
                 {
+                    test: /[\/\\]hot[\/\\]emitter.js$/,
+                    parser: { node: { events: true } },
+                },
+                {
+                    test: /[\/\\]webpack-dev-server[\/\\]client[\/\\]utils[\/\\]createSocketUrl.js$/,
+                    parser: { node: { querystring: true } },
+                },
+                {
                     test: /\.js$/,
                     ...buildOptimizerUseRule,
                 },
