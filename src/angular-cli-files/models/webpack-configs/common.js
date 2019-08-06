@@ -224,16 +224,20 @@ function getCommonConfig(wco) {
             ngDevMode: false,
             ngI18nClosureMode: false,
         };
-        try {
-            // Try to load known global definitions from @angular/compiler-cli.
-            // tslint:disable-next-line:no-implicit-dependencies
-            const GLOBAL_DEFS_FOR_TERSER = require('@angular/compiler-cli').GLOBAL_DEFS_FOR_TERSER;
-            if (GLOBAL_DEFS_FOR_TERSER) {
-                angularGlobalDefinitions = GLOBAL_DEFS_FOR_TERSER;
-            }
+        // Try to load known global definitions from @angular/compiler-cli.
+        const GLOBAL_DEFS_FOR_TERSER = require('@angular/compiler-cli').GLOBAL_DEFS_FOR_TERSER;
+        if (GLOBAL_DEFS_FOR_TERSER) {
+            angularGlobalDefinitions = GLOBAL_DEFS_FOR_TERSER;
         }
-        catch (_b) {
-            // Do nothing, the default above will be used instead.
+        if (buildOptions.aot) {
+            // Also try to load AOT-only global definitions.
+            const GLOBAL_DEFS_FOR_TERSER_WITH_AOT = require('@angular/compiler-cli').GLOBAL_DEFS_FOR_TERSER_WITH_AOT;
+            if (GLOBAL_DEFS_FOR_TERSER_WITH_AOT) {
+                angularGlobalDefinitions = {
+                    ...angularGlobalDefinitions,
+                    ...GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
+                };
+            }
         }
         const terserOptions = {
             ecma: wco.supportES2015 ? 6 : 5,
