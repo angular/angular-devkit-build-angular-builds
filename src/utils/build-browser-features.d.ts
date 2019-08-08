@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
+export declare const fullDifferential: boolean;
 export declare class BuildBrowserFeatures {
     private projectRoot;
     private scriptTarget;

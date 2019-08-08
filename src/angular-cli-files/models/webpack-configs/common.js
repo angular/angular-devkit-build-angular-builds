@@ -14,13 +14,13 @@ const path = require("path");
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
 const webpack_sources_1 = require("webpack-sources");
-const build_browser_features_1 = require("../../../utils/build-browser-features");
+const utils_1 = require("../../../utils");
 const bundle_budget_1 = require("../../plugins/bundle-budget");
 const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
 const named_chunks_plugin_1 = require("../../plugins/named-chunks-plugin");
 const scripts_webpack_plugin_1 = require("../../plugins/scripts-webpack-plugin");
 const find_up_1 = require("../../utilities/find-up");
-const utils_1 = require("./utils");
+const utils_2 = require("./utils");
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -38,12 +38,14 @@ function getCommonConfig(wco) {
     // tslint:disable-next-line:no-any
     const extraPlugins = [];
     const entryPoints = {};
-    const targetInFileName = utils_1.getEsVersionForFileName(buildOptions.scriptTargetOverride, buildOptions.esVersionInFileName);
+    const targetInFileName = utils_2.getEsVersionForFileName(utils_1.fullDifferential ? buildOptions.scriptTargetOverride : tsConfig.options.target, buildOptions.esVersionInFileName);
     if (buildOptions.main) {
         entryPoints['main'] = [path.resolve(root, buildOptions.main)];
     }
+    let differentialLoadingNeeded = false;
     if (wco.buildOptions.platform !== 'server') {
-        const buildBrowserFeatures = new build_browser_features_1.BuildBrowserFeatures(projectRoot, tsConfig.options.target || typescript_1.ScriptTarget.ES5);
+        const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, tsConfig.options.target || typescript_1.ScriptTarget.ES5);
+        differentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded();
         if ((buildOptions.scriptTargetOverride || tsConfig.options.target) === typescript_1.ScriptTarget.ES5) {
             if (buildOptions.es5BrowserSupport ||
                 (buildOptions.es5BrowserSupport === undefined && buildBrowserFeatures.isEs5SupportNeeded())) {
@@ -59,14 +61,25 @@ function getCommonConfig(wco) {
                         ? [...buildOptions.scripts, noModuleScript]
                         : [noModuleScript];
                 }
-                // For differential loading we don't need to generate a seperate polyfill file
+                // For full build differential loading we don't need to generate a seperate polyfill file
                 // because they will be loaded exclusivly based on module and nomodule
-                const polyfillsChunkName = buildBrowserFeatures.isDifferentialLoadingNeeded()
-                    ? 'polyfills'
-                    : 'polyfills-es5';
+                const polyfillsChunkName = utils_1.fullDifferential && differentialLoadingNeeded ? 'polyfills' : 'polyfills-es5';
                 entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
+                if (!utils_1.fullDifferential && differentialLoadingNeeded) {
+                    // Add zone.js legacy support to the es5 polyfills
+                    // This is a noop execution-wise if zone-evergreen is not used.
+                    entryPoints[polyfillsChunkName].push('zone.js/dist/zone-legacy');
+                }
                 if (!buildOptions.aot) {
+                    // If not performing a full differential build the JIT polyfills need to be added to ES5
+                    if (!utils_1.fullDifferential && differentialLoadingNeeded) {
+                        entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'jit-polyfills.js'));
+                    }
                     entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
+                }
+                // If not performing a full differential build the polyfills need to be added to ES5 bundle
+                if (!utils_1.fullDifferential && buildOptions.polyfills) {
+                    entryPoints[polyfillsChunkName].push(path.resolve(root, buildOptions.polyfills));
                 }
             }
         }
@@ -89,10 +102,10 @@ function getCommonConfig(wco) {
         }));
     }
     // determine hashing format
-    const hashFormat = utils_1.getOutputHashFormat(buildOptions.outputHashing || 'none');
+    const hashFormat = utils_2.getOutputHashFormat(buildOptions.outputHashing || 'none');
     // process global scripts
     if (buildOptions.scripts.length > 0) {
-        const globalScriptsByBundleName = utils_1.normalizeExtraEntryPoints(buildOptions.scripts, 'scripts').reduce((prev, curr) => {
+        const globalScriptsByBundleName = utils_2.normalizeExtraEntryPoints(buildOptions.scripts, 'scripts').reduce((prev, curr) => {
             const bundleName = curr.bundleName;
             const resolvedPath = path.resolve(root, curr.input);
             const existingEntry = prev.find(el => el.bundleName === bundleName);
@@ -240,11 +253,16 @@ function getCommonConfig(wco) {
             }
         }
         const terserOptions = {
-            ecma: wco.supportES2015 ? 6 : 5,
+            // Use 5 if using bundle downleveling to ensure script bundles do not use ES2015+ features
+            // Script bundles are shared for differential loading
+            // Bundle processing will use the ES2015+ optimizations on the ES2015 bundles
+            ecma: wco.supportES2015 &&
+                (!differentialLoadingNeeded || (differentialLoadingNeeded && utils_1.fullDifferential))
+                ? 6
+                : 5,
             warnings: !!buildOptions.verbose,
             safari10: true,
             output: {
-                ascii_only: true,
                 comments: false,
                 webkit: true,
             },
@@ -262,7 +280,9 @@ function getCommonConfig(wco) {
                     global_defs: angularGlobalDefinitions,
                 },
             // We also want to avoid mangling on server.
-            ...(buildOptions.platform == 'server' ? { mangle: false } : {}),
+            // Name mangling is handled within the browser builder
+            mangle: buildOptions.platform !== 'server' &&
+                (!differentialLoadingNeeded || (differentialLoadingNeeded && utils_1.fullDifferential)),
         };
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,

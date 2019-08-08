@@ -100,7 +100,10 @@ async function augmentIndexHtml(params) {
             const isNoModuleType = noModuleFiles.some(scriptPredictor);
             const isModuleType = moduleFiles.some(scriptPredictor);
             if (isNoModuleType && !isModuleType) {
-                attrs.push({ name: 'nomodule', value: null }, { name: 'defer', value: null });
+                attrs.push({ name: 'nomodule', value: null });
+                if (!script.startsWith('polyfills-nomodule-es5')) {
+                    attrs.push({ name: 'defer', value: null });
+                }
             }
             else if (isModuleType && !isNoModuleType) {
                 attrs.push({ name: 'type', value: 'module' });

@@ -11,10 +11,12 @@ const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
+const fs = require("fs");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const typescript_1 = require("typescript");
+const workerFarm = require("worker-farm");
 const analytics_1 = require("../../plugins/webpack/analytics");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const write_index_html_1 = require("../angular-cli-files/utilities/index-file/write-index-html");
@@ -91,13 +93,16 @@ async function initialize(options, context, host, webpackConfigurationTransform)
     }
     return { config: transformedConfig || config, workspace };
 }
+// tslint:disable-next-line: no-big-function
 function buildWebpackBrowser(options, context, transforms = {}) {
     const host = new node_1.NodeJsSyncHost();
     const root = core_1.normalize(context.workspaceRoot);
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     const loggingFn = transforms.logging || createBrowserLoggingCallback(!!options.verbose, context.logger);
-    return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(operators_1.switchMap(({ workspace, config: configs }) => {
+    return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
+    // tslint:disable-next-line: no-big-function
+    operators_1.switchMap(({ workspace, config: configs }) => {
         const projectName = context.target
             ? context.target.project
             : workspace.getDefaultProjectName();
@@ -127,45 +132,158 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             else {
                 return rxjs_1.of();
             }
-        }, { success: true }, 1), operators_1.bufferCount(configs.length), operators_1.switchMap(buildEvents => {
+        }, { success: true }, 1), operators_1.bufferCount(configs.length), operators_1.switchMap(async (buildEvents) => {
+            configs.length = 0;
             const success = buildEvents.every(r => r.success);
-            if (success && options.index) {
+            if (success) {
                 let noModuleFiles;
                 let moduleFiles;
                 let files;
+                const scriptsEntryPointName = webpack_configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map(x => x.bundleName);
                 const [firstBuild, secondBuild] = buildEvents;
-                if (isDifferentialLoadingNeeded) {
-                    const scriptsEntryPointName = webpack_configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts')
-                        .map(x => x.bundleName);
+                if (isDifferentialLoadingNeeded && (utils_1.fullDifferential || options.watch)) {
                     moduleFiles = firstBuild.emittedFiles || [];
                     files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
                     if (buildEvents.length === 2) {
                         noModuleFiles = secondBuild.emittedFiles;
                     }
                 }
+                else if (isDifferentialLoadingNeeded && !utils_1.fullDifferential) {
+                    const { emittedFiles = [] } = firstBuild;
+                    moduleFiles = [];
+                    noModuleFiles = [];
+                    // Common options for all bundle process actions
+                    const sourceMapOptions = utils_1.normalizeSourceMaps(options.sourceMap || false);
+                    const actionOptions = {
+                        optimize: utils_1.normalizeOptimization(options.optimization).scripts,
+                        sourceMaps: sourceMapOptions.scripts,
+                        hiddenSourceMaps: sourceMapOptions.hidden,
+                    };
+                    const actions = [];
+                    const seen = new Set();
+                    for (const file of emittedFiles) {
+                        // Scripts and non-javascript files are not processed
+                        if (file.extension !== '.js' ||
+                            (file.name && scriptsEntryPointName.includes(file.name))) {
+                            if (files === undefined) {
+                                files = [];
+                            }
+                            files.push(file);
+                            continue;
+                        }
+                        // Ignore already processed files; emittedFiles can contain duplicates
+                        if (seen.has(file.file)) {
+                            continue;
+                        }
+                        seen.add(file.file);
+                        // All files at this point except ES5 polyfills are module scripts
+                        const es5Polyfills = file.file.startsWith('polyfills-es5');
+                        if (!es5Polyfills && !file.file.startsWith('polyfills-nomodule-es5')) {
+                            moduleFiles.push(file);
+                        }
+                        // If not optimizing then ES2015 polyfills do not need processing
+                        // Unlike other module scripts, it is never downleveled
+                        if (!actionOptions.optimize && file.file.startsWith('polyfills-es2015')) {
+                            continue;
+                        }
+                        // Retrieve the content/map for the file
+                        // NOTE: Additional future optimizations will read directly from memory
+                        let filename = path.resolve(core_1.getSystemPath(root), options.outputPath, file.file);
+                        const code = fs.readFileSync(filename, 'utf8');
+                        let map;
+                        if (actionOptions.sourceMaps) {
+                            try {
+                                map = fs.readFileSync(filename + '.map', 'utf8');
+                                if (es5Polyfills) {
+                                    fs.unlinkSync(filename + '.map');
+                                }
+                            }
+                            catch (_a) { }
+                        }
+                        if (es5Polyfills) {
+                            fs.unlinkSync(filename);
+                            filename = filename.replace('-es2015', '');
+                        }
+                        // ES2015 polyfills are only optimized; optimization check was performed above
+                        if (file.file.startsWith('polyfills-es2015')) {
+                            actions.push({
+                                ...actionOptions,
+                                filename,
+                                code,
+                                map,
+                                optimizeOnly: true,
+                            });
+                            continue;
+                        }
+                        // Record the bundle processing action
+                        // The runtime chunk gets special processing for lazy loaded files
+                        actions.push({
+                            ...actionOptions,
+                            filename,
+                            code,
+                            map,
+                            runtime: file.file.startsWith('runtime'),
+                        });
+                        // Add the newly created ES5 bundles to the index as nomodule scripts
+                        const newFilename = es5Polyfills
+                            ? file.file.replace('-es2015', '')
+                            : file.file.replace('es2015', 'es5');
+                        noModuleFiles.push({ ...file, file: newFilename });
+                    }
+                    // Execute the bundle processing actions
+                    context.logger.info('Generating ES5 bundles for differential loading...');
+                    await new Promise((resolve, reject) => {
+                        const workerFile = require.resolve('../utils/process-bundle');
+                        const workers = workerFarm({
+                            maxRetries: 1,
+                        }, path.extname(workerFile) !== '.ts'
+                            ? workerFile
+                            : require.resolve('../utils/process-bundle-bootstrap'), ['process']);
+                        let completed = 0;
+                        const workCallback = (error) => {
+                            if (error) {
+                                workerFarm.end(workers);
+                                reject(error);
+                            }
+                            else if (++completed === actions.length) {
+                                workerFarm.end(workers);
+                                resolve();
+                            }
+                        };
+                        actions.forEach(action => workers['process'](action, workCallback));
+                    });
+                    context.logger.info('ES5 bundle generation complete.');
+                }
                 else {
                     const { emittedFiles = [] } = firstBuild;
                     files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
                     noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
                 }
-                return write_index_html_1.writeIndexHtml({
-                    host,
-                    outputPath: core_1.resolve(root, core_1.join(core_1.normalize(options.outputPath), webpack_browser_config_1.getIndexOutputFile(options))),
-                    indexPath: core_1.join(root, webpack_browser_config_1.getIndexInputFile(options)),
-                    files,
-                    noModuleFiles,
-                    moduleFiles,
-                    baseHref: options.baseHref,
-                    deployUrl: options.deployUrl,
-                    sri: options.subresourceIntegrity,
-                    scripts: options.scripts,
-                    styles: options.styles,
-                    postTransform: transforms.indexHtml,
-                    crossOrigin: options.crossOrigin,
-                }).pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(error => rxjs_1.of({ success: false, error: mapErrorToMessage(error) })));
+                if (options.index) {
+                    return write_index_html_1.writeIndexHtml({
+                        host,
+                        outputPath: core_1.resolve(root, core_1.join(core_1.normalize(options.outputPath), webpack_browser_config_1.getIndexOutputFile(options))),
+                        indexPath: core_1.join(root, webpack_browser_config_1.getIndexInputFile(options)),
+                        files,
+                        noModuleFiles,
+                        moduleFiles,
+                        baseHref: options.baseHref,
+                        deployUrl: options.deployUrl,
+                        sri: options.subresourceIntegrity,
+                        scripts: options.scripts,
+                        styles: options.styles,
+                        postTransform: transforms.indexHtml,
+                        crossOrigin: options.crossOrigin,
+                    })
+                        .pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(error => rxjs_1.of({ success: false, error: mapErrorToMessage(error) })))
+                        .toPromise();
+                }
+                else {
+                    return { success };
+                }
             }
             else {
-                return rxjs_1.of({ success });
+                return { success };
             }
         }), operators_1.concatMap(buildEvent => {
             if (buildEvent.success && !options.watch && options.serviceWorker) {

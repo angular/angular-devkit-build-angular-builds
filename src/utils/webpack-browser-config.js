@@ -26,14 +26,14 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
         && !options.watch
         && buildBrowserFeatures.isDifferentialLoadingNeeded();
     const scriptTargets = [scriptTarget];
-    if (differentialLoading) {
+    if (differentialLoading && utils_1.fullDifferential) {
         scriptTargets.push(ts.ScriptTarget.ES5);
     }
     // For differential loading, we can have several targets
     return scriptTargets.map(scriptTarget => {
         let buildOptions = { ...options };
         const supportES2015 = scriptTarget !== ts.ScriptTarget.ES3 && scriptTarget !== ts.ScriptTarget.ES5;
-        if (differentialLoading) {
+        if (differentialLoading && utils_1.fullDifferential) {
             buildOptions = {
                 ...options,
                 ...(
@@ -50,6 +50,9 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
                 esVersionInFileName: true,
                 scriptTargetOverride: scriptTarget,
             };
+        }
+        else if (differentialLoading && !utils_1.fullDifferential) {
+            buildOptions = { ...options, esVersionInFileName: true, scriptTargetOverride: ts.ScriptTarget.ES5, es5BrowserSupport: undefined };
         }
         const wco = {
             root: workspaceRoot,
@@ -74,7 +77,7 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
             webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
         }
         if (options.profile || process.env['NG_BUILD_PROFILING']) {
-            const esVersionInFileName = webpack_configs_1.getEsVersionForFileName(wco.buildOptions.scriptTargetOverride, wco.buildOptions.esVersionInFileName);
+            const esVersionInFileName = webpack_configs_1.getEsVersionForFileName(utils_1.fullDifferential ? buildOptions.scriptTargetOverride : tsConfig.options.target, wco.buildOptions.esVersionInFileName);
             const smp = new SpeedMeasurePlugin({
                 outputFormat: 'json',
                 outputTarget: path.resolve(workspaceRoot, `speed-measure-plugin${esVersionInFileName}.json`),
