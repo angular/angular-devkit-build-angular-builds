@@ -12,10 +12,6 @@ const node_1 = require("@angular-devkit/architect/node");
 const testing_1 = require("@angular-devkit/architect/testing");
 const core_1 = require("@angular-devkit/core");
 exports.ivyEnabled = process.argv.includes('--ivy');
-if (exports.ivyEnabled) {
-    // tslint:disable-next-line:no-console
-    console.warn('********* IVY Enabled ***********');
-}
 const devkitRoot = core_1.normalize(global._DevKitRoot); // tslint:disable-line:no-any
 exports.workspaceRoot = core_1.join(devkitRoot, `tests/angular_devkit/build_angular/hello-world-app${exports.ivyEnabled ? '-ivy' : ''}/`);
 exports.host = new testing_1.TestProjectHost(exports.workspaceRoot);
