@@ -220,18 +220,17 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
         host: serverOptions.host,
         port: serverOptions.port,
         headers: { 'Access-Control-Allow-Origin': '*' },
-        historyApiFallback: !!browserOptions.index &&
-            {
-                index: `${servePath}/${webpack_browser_config_1.getIndexOutputFile(browserOptions)}`,
-                disableDotRule: true,
-                htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
-                rewrites: [
-                    {
-                        from: new RegExp(`^(?!${servePath})/.*`),
-                        to: context => url.format(context.parsedUrl),
-                    },
-                ],
-            },
+        historyApiFallback: !!browserOptions.index && {
+            index: `${servePath}/${webpack_browser_config_1.getIndexOutputFile(browserOptions)}`,
+            disableDotRule: true,
+            htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
+            rewrites: [
+                {
+                    from: new RegExp(`^(?!${servePath})/.*`),
+                    to: context => url.format(context.parsedUrl),
+                },
+            ],
+        },
         stats: false,
         compress: styles || scripts,
         watchOptions: {

@@ -8,7 +8,6 @@
 import { analytics } from '@angular-devkit/core';
 import { Compiler, Module, Stats, compilation } from 'webpack';
 import { Source } from 'webpack-sources';
-import Compilation = compilation.Compilation;
 declare const NormalModule: any;
 interface NormalModule extends Module {
     _source?: Source | null;
@@ -67,7 +66,7 @@ export declare class NgBuildAnalyticsPlugin {
      * @private
      */
     protected _succeedModule(mod: Module): void;
-    protected _compilation(compiler: Compiler, compilation: Compilation): void;
+    protected _compilation(compiler: Compiler, compilation: compilation.Compilation): void;
     protected _done(stats: Stats): void;
     apply(compiler: Compiler): void;
 }
