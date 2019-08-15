@@ -27,7 +27,7 @@ const utils_1 = require("../utils");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const open = require('open');
-const devServerBuildOverriddenKeys = [
+exports.devServerBuildOverriddenKeys = [
     'watch',
     'optimization',
     'aot',
@@ -62,7 +62,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         const rawBrowserOptions = await context.getTargetOptions(browserTarget);
         // Override options we need to override, if defined.
         const overrides = Object.keys(options)
-            .filter(key => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
+            .filter(key => options[key] !== undefined && exports.devServerBuildOverriddenKeys.includes(key))
             .reduce((previous, key) => ({
             ...previous,
             [key]: options[key],

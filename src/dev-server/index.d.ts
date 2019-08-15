@@ -16,6 +16,7 @@ import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { Schema } from './schema';
 export declare type DevServerBuilderOptions = Schema & json.JsonObject;
+export declare const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[];
 export declare type DevServerBuilderOutput = DevServerBuildOutput & {
     baseUrl: string;
 };
