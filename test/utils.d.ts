@@ -7,7 +7,7 @@
  */
 import { Architect, BuilderOutput, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
-import { Path, experimental, json, virtualFs } from '@angular-devkit/core';
+import { Path, json, virtualFs, workspaces } from '@angular-devkit/core';
 export declare const ivyEnabled: boolean;
 export declare const workspaceRoot: Path;
 export declare const host: TestProjectHost;
@@ -37,7 +37,7 @@ export declare const protractorTargetSpec: {
     target: string;
 };
 export declare function createArchitect(workspaceRoot: Path): Promise<{
-    workspace: experimental.workspace.Workspace;
+    workspace: workspaces.WorkspaceDefinition;
     architectHost: TestingArchitectHost;
     architect: Architect;
 }>;

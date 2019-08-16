@@ -26,7 +26,7 @@ async function createArchitect(workspaceRoot) {
     const registry = new core_1.schema.CoreSchemaRegistry();
     registry.addPostTransform(core_1.schema.transforms.addUndefinedDefaults);
     const workspaceSysPath = core_1.getSystemPath(workspaceRoot);
-    const workspace = await core_1.experimental.workspace.Workspace.fromPath(exports.host, exports.host.root(), registry);
+    const { workspace } = await core_1.workspaces.readWorkspace(workspaceSysPath, core_1.workspaces.createWorkspaceHost(exports.host));
     const architectHost = new testing_1.TestingArchitectHost(workspaceSysPath, workspaceSysPath, new node_1.WorkspaceNodeModulesArchitectHost(workspace, workspaceSysPath));
     const architect = new architect_1.Architect(architectHost, registry);
     return {
