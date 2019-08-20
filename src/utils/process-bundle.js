@@ -12,11 +12,15 @@ const path = require("path");
 const source_map_1 = require("source-map");
 const terser_1 = require("terser");
 const { transformAsync } = require('@babel/core');
+const cacache = require('cacache');
 function process(options, callback) {
     processWorker(options).then(() => callback(null, {}), error => callback(error));
 }
 exports.process = process;
 async function processWorker(options) {
+    if (!options.cacheKeys) {
+        options.cacheKeys = [];
+    }
     // If no downlevelling required than just mangle code and return
     if (options.optimizeOnly) {
         return mangleOriginal(options);
@@ -108,7 +112,9 @@ async function processWorker(options) {
         code = result.code;
         map = result.map;
         // Mangle original code
-        mangleOriginal(options);
+        if (!options.ignoreOriginal) {
+            await mangleOriginal(options);
+        }
     }
     else if (map) {
         map = JSON.stringify(map);
@@ -117,11 +123,17 @@ async function processWorker(options) {
         if (!options.hiddenSourceMaps) {
             code += `\n//# sourceMappingURL=${path.basename(newFilePath)}.map`;
         }
+        if (options.cachePath && options.cacheKeys[3 /* DownlevelMap */]) {
+            await cacache.put(options.cachePath, options.cacheKeys[3 /* DownlevelMap */], map);
+        }
         fs.writeFileSync(newFilePath + '.map', map);
+    }
+    if (options.cachePath && options.cacheKeys[2 /* DownlevelCode */]) {
+        await cacache.put(options.cachePath, options.cacheKeys[2 /* DownlevelCode */], code);
     }
     fs.writeFileSync(newFilePath, code);
 }
-function mangleOriginal(options) {
+async function mangleOriginal(options) {
     const resultOriginal = terser_1.minify(options.code, {
         compress: false,
         ecma: 6,
@@ -140,8 +152,14 @@ function mangleOriginal(options) {
     if (resultOriginal.error) {
         throw resultOriginal.error;
     }
+    if (options.cachePath && options.cacheKeys && options.cacheKeys[0 /* OriginalCode */]) {
+        await cacache.put(options.cachePath, options.cacheKeys[0 /* OriginalCode */], resultOriginal.code);
+    }
     fs.writeFileSync(options.filename, resultOriginal.code);
     if (resultOriginal.map) {
+        if (options.cachePath && options.cacheKeys && options.cacheKeys[1 /* OriginalMap */]) {
+            await cacache.put(options.cachePath, options.cacheKeys[1 /* OriginalMap */], resultOriginal.map);
+        }
         fs.writeFileSync(options.filename + '.map', resultOriginal.map);
     }
 }

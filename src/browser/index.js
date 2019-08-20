@@ -11,6 +11,8 @@ const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
+const crypto_1 = require("crypto");
+const findCacheDirectory = require("find-cache-dir");
 const fs = require("fs");
 const path = require("path");
 const rxjs_1 = require("rxjs");
@@ -26,6 +28,9 @@ const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
+const cacache = require('cacache');
+const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
+const packageVersion = require('../../package.json').version;
 function createBrowserLoggingCallback(verbose, logger) {
     return (stats, config) => {
         // config.stats contains our own stats settings, added during buildWebpackConfig().
@@ -132,7 +137,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             else {
                 return rxjs_1.of();
             }
-        }, { success: true }, 1), operators_1.bufferCount(configs.length), operators_1.switchMap(async (buildEvents) => {
+        }, { success: true }, 1), operators_1.bufferCount(configs.length), 
+        // tslint:disable-next-line: no-big-function
+        operators_1.switchMap(async (buildEvents) => {
             configs.length = 0;
             const success = buildEvents.every(r => r.success);
             if (success) {
@@ -158,6 +165,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         optimize: utils_1.normalizeOptimization(options.optimization).scripts,
                         sourceMaps: sourceMapOptions.scripts,
                         hiddenSourceMaps: sourceMapOptions.hidden,
+                        vendorSourceMaps: sourceMapOptions.vendor,
                     };
                     const actions = [];
                     const seen = new Set();
@@ -223,6 +231,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             code,
                             map,
                             runtime: file.file.startsWith('runtime'),
+                            ignoreOriginal: es5Polyfills,
                         });
                         // Add the newly created ES5 bundles to the index as nomodule scripts
                         const newFilename = es5Polyfills
@@ -232,26 +241,118 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     }
                     // Execute the bundle processing actions
                     context.logger.info('Generating ES5 bundles for differential loading...');
-                    await new Promise((resolve, reject) => {
-                        const workerFile = require.resolve('../utils/process-bundle');
-                        const workers = workerFarm({
-                            maxRetries: 1,
-                        }, path.extname(workerFile) !== '.ts'
-                            ? workerFile
-                            : require.resolve('../utils/process-bundle-bootstrap'), ['process']);
-                        let completed = 0;
-                        const workCallback = (error) => {
-                            if (error) {
-                                workerFarm.end(workers);
-                                reject(error);
+                    const processActions = [];
+                    const cacheActions = [];
+                    for (const action of actions) {
+                        // Create base cache key with elements:
+                        // * package version - different build-angular versions cause different final outputs
+                        // * code length/hash - ensure cached version matches the same input code
+                        const codeHash = crypto_1.createHash('sha1')
+                            .update(action.code)
+                            .digest('hex');
+                        const baseCacheKey = `${packageVersion}|${action.code.length}|${codeHash}`;
+                        // Postfix added to sourcemap cache keys when vendor sourcemaps are present
+                        // Allows non-destructive caching of both variants
+                        const SourceMapVendorPostfix = !!action.sourceMaps && action.vendorSourceMaps ? '|vendor' : '';
+                        // Determine cache entries required based on build settings
+                        const cacheKeys = [];
+                        // If optimizing and the original is not ignored, add original as required
+                        if ((action.optimize || action.optimizeOnly) && !action.ignoreOriginal) {
+                            cacheKeys[0 /* OriginalCode */] = baseCacheKey + '|orig';
+                            // If sourcemaps are enabled, add original sourcemap as required
+                            if (action.sourceMaps) {
+                                cacheKeys[1 /* OriginalMap */] =
+                                    baseCacheKey + SourceMapVendorPostfix + '|orig-map';
                             }
-                            else if (++completed === actions.length) {
-                                workerFarm.end(workers);
-                                resolve();
+                        }
+                        // If not only optimizing, add downlevel as required
+                        if (!action.optimizeOnly) {
+                            cacheKeys[2 /* DownlevelCode */] = baseCacheKey + '|dl';
+                            // If sourcemaps are enabled, add downlevel sourcemap as required
+                            if (action.sourceMaps) {
+                                cacheKeys[3 /* DownlevelMap */] =
+                                    baseCacheKey + SourceMapVendorPostfix + '|dl-map';
                             }
-                        };
-                        actions.forEach(action => workers['process'](action, workCallback));
-                    });
+                        }
+                        // Attempt to get required cache entries
+                        const cacheEntries = [];
+                        for (const key of cacheKeys) {
+                            if (key) {
+                                cacheEntries.push(await cacache.get.info(cacheDownlevelPath, key));
+                            }
+                            else {
+                                cacheEntries.push(null);
+                            }
+                        }
+                        // Check if required cache entries are present
+                        let cached = cacheKeys.length > 0;
+                        for (let i = 0; i < cacheKeys.length; ++i) {
+                            if (cacheKeys[i] && !cacheEntries[i]) {
+                                cached = false;
+                                break;
+                            }
+                        }
+                        // If all required cached entries are present, use the cached entries
+                        // Otherwise process the files
+                        if (cached) {
+                            if (cacheEntries[0 /* OriginalCode */]) {
+                                cacheActions.push({
+                                    src: cacheEntries[0 /* OriginalCode */].path,
+                                    dest: action.filename,
+                                });
+                            }
+                            if (cacheEntries[1 /* OriginalMap */]) {
+                                cacheActions.push({
+                                    src: cacheEntries[1 /* OriginalMap */].path,
+                                    dest: action.filename + '.map',
+                                });
+                            }
+                            if (cacheEntries[2 /* DownlevelCode */]) {
+                                cacheActions.push({
+                                    src: cacheEntries[2 /* DownlevelCode */].path,
+                                    dest: action.filename.replace('es2015', 'es5'),
+                                });
+                            }
+                            if (cacheEntries[3 /* DownlevelMap */]) {
+                                cacheActions.push({
+                                    src: cacheEntries[3 /* DownlevelMap */].path,
+                                    dest: action.filename.replace('es2015', 'es5') + '.map',
+                                });
+                            }
+                        }
+                        else {
+                            processActions.push({
+                                ...action,
+                                cacheKeys,
+                                cachePath: cacheDownlevelPath || undefined,
+                            });
+                        }
+                    }
+                    for (const action of cacheActions) {
+                        fs.copyFileSync(action.src, action.dest, fs.constants.COPYFILE_FICLONE);
+                    }
+                    if (processActions.length > 0) {
+                        await new Promise((resolve, reject) => {
+                            const workerFile = require.resolve('../utils/process-bundle');
+                            const workers = workerFarm({
+                                maxRetries: 1,
+                            }, path.extname(workerFile) !== '.ts'
+                                ? workerFile
+                                : require.resolve('../utils/process-bundle-bootstrap'), ['process']);
+                            let completed = 0;
+                            const workCallback = (error) => {
+                                if (error) {
+                                    workerFarm.end(workers);
+                                    reject(error);
+                                }
+                                else if (++completed === processActions.length) {
+                                    workerFarm.end(workers);
+                                    resolve();
+                                }
+                            };
+                            processActions.forEach(action => workers['process'](action, workCallback));
+                        });
+                    }
                     context.logger.info('ES5 bundle generation complete.');
                 }
                 else {
