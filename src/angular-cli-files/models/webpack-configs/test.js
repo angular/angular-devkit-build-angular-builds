@@ -37,7 +37,7 @@ function getTestConfig(wco) {
             });
         }
         extraRules.push({
-            test: /\.(js|ts)$/,
+            test: /\.(jsx?|tsx?)$/,
             loader: 'istanbul-instrumenter-loader',
             options: { esModules: true },
             enforce: 'post',
