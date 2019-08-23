@@ -33,6 +33,10 @@ function normalizeBrowserSchema(host, root, projectRoot, sourceRoot, options) {
                 || [],
         },
         lazyModules: options.lazyModules || [],
+        // Using just `--poll` will result in a value of 0 which is very likely not the intention
+        // A value of 0 is falsy and will disable polling rather then enable
+        // 500 ms is a sensible default in this case
+        poll: options.poll === 0 ? 500 : options.poll,
     };
 }
 exports.normalizeBrowserSchema = normalizeBrowserSchema;
