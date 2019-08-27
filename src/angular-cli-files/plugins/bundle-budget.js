@@ -30,21 +30,17 @@ class BundleBudgetPlugin {
         });
     }
     checkMinimum(threshold, size, messages) {
-        if (threshold) {
-            if (threshold > size.size) {
-                const sizeDifference = stats_1.formatSize(threshold - size.size);
-                messages.push(`budgets, minimum exceeded for ${size.label}. `
-                    + `Budget ${stats_1.formatSize(threshold)} was not reached by ${sizeDifference}.`);
-            }
+        if (threshold && threshold > size.size) {
+            const sizeDifference = stats_1.formatSize(threshold - size.size);
+            messages.push(`budgets, minimum exceeded for ${size.label}. `
+                + `Budget ${stats_1.formatSize(threshold)} was not reached by ${sizeDifference}.`);
         }
     }
     checkMaximum(threshold, size, messages) {
-        if (threshold) {
-            if (threshold < size.size) {
-                const sizeDifference = stats_1.formatSize(size.size - threshold);
-                messages.push(`budgets, maximum exceeded for ${size.label}. `
-                    + `Budget ${stats_1.formatSize(threshold)} was exceeded by ${sizeDifference}.`);
-            }
+        if (threshold && threshold < size.size) {
+            const sizeDifference = stats_1.formatSize(size.size - threshold);
+            messages.push(`budgets, maximum exceeded for ${size.label}. `
+                + `Budget ${stats_1.formatSize(threshold)} was exceeded by ${sizeDifference}.`);
         }
     }
     calculate(budget) {
