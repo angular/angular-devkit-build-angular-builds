@@ -170,6 +170,10 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     const actions = [];
                     const seen = new Set();
                     for (const file of emittedFiles) {
+                        // Assets are not processed nor injected into the index
+                        if (file.asset) {
+                            continue;
+                        }
                         // Scripts and non-javascript files are not processed
                         if (file.extension !== '.js' ||
                             (file.name && scriptsEntryPointName.includes(file.name))) {
