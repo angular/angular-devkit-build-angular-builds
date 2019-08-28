@@ -1,19 +1,19 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "0.900.0-next.0+22.a6fbee6",
+  "version": "0.900.0-next.0+28.0f18e35",
   "description": "Angular Webpack Build Facade",
   "experimental": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#a6fbee686",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#a6fbee686",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#a6fbee686",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#a6fbee686",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#0f18e3537",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#0f18e3537",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#0f18e3537",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#0f18e3537",
     "@babel/core": "7.5.5",
     "@babel/preset-env": "7.5.5",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#a6fbee686",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#0f18e3537",
     "ajv": "6.10.2",
     "autoprefixer": "9.6.1",
     "browserslist": "4.6.6",
@@ -61,7 +61,7 @@
     "webpack-sources": "1.4.3",
     "webpack-subresource-integrity": "1.1.0-rc.6",
     "worker-farm": "1.7.0",
-    "worker-plugin": "3.1.0"
+    "worker-plugin": "3.2.0"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^8.0.0-beta.0 || ^8.1.0-beta.0 || ^8.2.0-beta.0 || ^8.3.0-beta.0 || ^8.4.0-beta.0 || >=9.0.0-beta < 9",
