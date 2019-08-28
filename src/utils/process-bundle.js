@@ -152,14 +152,17 @@ async function mangleOriginal(options) {
     if (resultOriginal.error) {
         throw resultOriginal.error;
     }
-    if (options.cachePath && options.cacheKeys && options.cacheKeys[0 /* OriginalCode */]) {
-        await cacache.put(options.cachePath, options.cacheKeys[0 /* OriginalCode */], resultOriginal.code);
-    }
-    fs.writeFileSync(options.filename, resultOriginal.code);
     if (resultOriginal.map) {
+        if (!options.hiddenSourceMaps) {
+            resultOriginal.code += `\n//# sourceMappingURL=${path.basename(options.filename)}.map`;
+        }
         if (options.cachePath && options.cacheKeys && options.cacheKeys[1 /* OriginalMap */]) {
             await cacache.put(options.cachePath, options.cacheKeys[1 /* OriginalMap */], resultOriginal.map);
         }
         fs.writeFileSync(options.filename + '.map', resultOriginal.map);
     }
+    if (options.cachePath && options.cacheKeys && options.cacheKeys[0 /* OriginalCode */]) {
+        await cacache.put(options.cachePath, options.cacheKeys[0 /* OriginalCode */], resultOriginal.code);
+    }
+    fs.writeFileSync(options.filename, resultOriginal.code);
 }
