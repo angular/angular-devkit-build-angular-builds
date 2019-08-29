@@ -93,11 +93,10 @@ async function processWorker(options) {
         // estree -> terser is already supported; need babel -> estree/terser
         // Mangle downlevel code
         const result = terser_1.minify(code, {
-            compress: false,
+            compress: true,
             ecma: 5,
             mangle: !mangle_options_1.manglingDisabled,
             safari10: true,
-            toplevel: true,
             output: {
                 ascii_only: true,
                 webkit: true,

@@ -4,7 +4,6 @@
 export interface Schema {
     /**
      * Base URL for protractor to connect to.
-     * @deprecated Use "baseUrl" in the Protractor config file instead.
      */
     baseUrl?: string;
     /**
