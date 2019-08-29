@@ -25,7 +25,7 @@ function getTestConfig(wco) {
     if (buildOptions.codeCoverage) {
         const codeCoverageExclude = buildOptions.codeCoverageExclude;
         const exclude = [
-            /\.(e2e|spec)\.ts$/,
+            /\.(e2e|spec)\.tsx?$/,
             /node_modules/,
         ];
         if (codeCoverageExclude) {
