@@ -11,6 +11,7 @@ const fs = require("fs");
 const path = require("path");
 const source_map_1 = require("source-map");
 const terser_1 = require("terser");
+const mangle_options_1 = require("./mangle-options");
 const { transformAsync } = require('@babel/core');
 const cacache = require('cacache');
 function process(options, callback) {
@@ -92,11 +93,10 @@ async function processWorker(options) {
         // estree -> terser is already supported; need babel -> estree/terser
         // Mangle downlevel code
         const result = terser_1.minify(code, {
-            compress: false,
+            compress: true,
             ecma: 5,
-            mangle: true,
+            mangle: !mangle_options_1.manglingDisabled,
             safari10: true,
-            toplevel: true,
             output: {
                 ascii_only: true,
                 webkit: true,
@@ -137,7 +137,7 @@ async function mangleOriginal(options) {
     const resultOriginal = terser_1.minify(options.code, {
         compress: false,
         ecma: 6,
-        mangle: true,
+        mangle: !mangle_options_1.manglingDisabled,
         safari10: true,
         output: {
             ascii_only: true,
