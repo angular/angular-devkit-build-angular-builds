@@ -12,32 +12,39 @@ const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const fs = require("fs");
 const path = require("path");
+const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
 async function _renderUniversal(options, context, browserResult, serverResult) {
     const browserIndexOutputPath = path.join(browserResult.outputPath || '', 'index.html');
     const indexHtml = fs.readFileSync(browserIndexOutputPath, 'utf8');
     const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult);
     const root = context.workspaceRoot;
+    // Get browser target options.
+    const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
+    const rawBrowserOptions = await context.getTargetOptions(browserTarget);
+    const browserBuilderName = await context.getBuilderNameForTarget(browserTarget);
+    const browserOptions = await context.validateOptions(rawBrowserOptions, browserBuilderName);
+    // Determine if browser app was compiled using Ivy.
+    const { options: compilerOptions } = read_tsconfig_1.readTsconfig(browserOptions.tsConfig, context.workspaceRoot);
+    const ivy = compilerOptions.enableIvy;
     // Initialize zone.js
     const zonePackage = require.resolve('zone.js', { paths: [root] });
     await Promise.resolve().then(() => require(zonePackage));
     // Load platform server module renderer
     const platformServerPackage = require.resolve('@angular/platform-server', { paths: [root] });
-    const renderModuleFactory = await Promise.resolve().then(() => require(platformServerPackage)).then((m) => m.renderModuleFactory);
-    const AppServerModuleNgFactory = require(serverBundlePath).AppServerModuleNgFactory;
+    const renderOpts = {
+        document: indexHtml,
+        url: options.route,
+    };
+    // Render app to HTML using Ivy or VE
+    const html = await Promise.resolve().then(() => require(platformServerPackage)).then((m) => ivy
+        ? m.renderModule(require(serverBundlePath).AppServerModule, renderOpts)
+        : m.renderModuleFactory(require(serverBundlePath).AppServerModuleNgFactory, renderOpts));
+    // Overwrite the client index file.
     const outputIndexPath = options.outputIndexPath
         ? path.join(root, options.outputIndexPath)
         : browserIndexOutputPath;
-    // Render to HTML and overwrite the client index file.
-    const html = await renderModuleFactory(AppServerModuleNgFactory, {
-        document: indexHtml,
-        url: options.route,
-    });
     fs.writeFileSync(outputIndexPath, html);
-    const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
-    const rawBrowserOptions = await context.getTargetOptions(browserTarget);
-    const browserBuilderName = await context.getBuilderNameForTarget(browserTarget);
-    const browserOptions = await context.validateOptions(rawBrowserOptions, browserBuilderName);
     if (browserOptions.serviceWorker) {
         const host = new node_1.NodeJsSyncHost();
         // Create workspace.
@@ -98,10 +105,7 @@ async function _appShellBuilder(options, context) {
     }
     finally {
         // Just be good citizens and stop those jobs.
-        await Promise.all([
-            browserTargetRun.stop(),
-            serverTargetRun.stop(),
-        ]);
+        await Promise.all([browserTargetRun.stop(), serverTargetRun.stop()]);
     }
 }
 exports.default = architect_1.createBuilder(_appShellBuilder);
