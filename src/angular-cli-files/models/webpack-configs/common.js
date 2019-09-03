@@ -272,6 +272,7 @@ function getCommonConfig(wco) {
             compress: buildOptions.platform == 'server'
                 ? {
                     global_defs: angularGlobalDefinitions,
+                    keep_fnames: true,
                 }
                 : {
                     pure_getters: buildOptions.buildOptimizer,
