@@ -99,18 +99,12 @@ function getStylesConfig(wco) {
         }
     }
     let sassImplementation;
-    let fiber;
     try {
         // tslint:disable-next-line:no-implicit-dependencies
         sassImplementation = require('node-sass');
     }
     catch (_a) {
         sassImplementation = require('sass');
-        try {
-            // tslint:disable-next-line:no-implicit-dependencies
-            fiber = require('fibers');
-        }
-        catch (_b) { }
     }
     // set base rules to derive final rules from
     const baseRules = [
@@ -122,11 +116,12 @@ function getStylesConfig(wco) {
                     loader: 'sass-loader',
                     options: {
                         implementation: sassImplementation,
-                        fiber,
                         sourceMap: cssSourceMap,
-                        // bootstrap-sass requires a minimum precision of 8
-                        precision: 8,
-                        includePaths,
+                        sassOptions: {
+                            // bootstrap-sass requires a minimum precision of 8
+                            precision: 8,
+                            includePaths,
+                        },
                     },
                 },
             ],
