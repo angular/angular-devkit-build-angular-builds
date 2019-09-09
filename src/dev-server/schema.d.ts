@@ -3,6 +3,10 @@
  */
 export interface Schema {
     /**
+     * Whitelist of hosts that are allowed to access the dev server.
+     */
+    allowedHosts?: string[];
+    /**
      * Build using Ahead of Time compilation.
      */
     aot?: boolean;
