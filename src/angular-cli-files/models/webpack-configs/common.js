@@ -291,6 +291,7 @@ function getCommonConfig(wco) {
             sourceMap: scriptsSourceMap,
             parallel: true,
             cache: true,
+            extractComments: false,
             terserOptions,
         }));
     }
