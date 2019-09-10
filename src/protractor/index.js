@@ -118,6 +118,11 @@ async function execute(options, context) {
             });
         }
     }
+    // Like the baseUrl in protractor config file when using the API we need to add
+    // a trailing slash when provide to the baseUrl.
+    if (baseUrl && !baseUrl.endsWith('/')) {
+        baseUrl += '/';
+    }
     try {
         return await runProtractor(context.workspaceRoot, { ...options, baseUrl });
     }
