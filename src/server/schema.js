@@ -4,7 +4,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Available on server platform only. Which external dependencies to bundle into the module.
- * By default, all of node_modules will be kept as requires.
+ * By default, all of node_modules will be bundled.
  */
 var BundleDependencies;
 (function (BundleDependencies) {

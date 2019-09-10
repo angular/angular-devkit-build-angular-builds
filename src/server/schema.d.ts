@@ -1,7 +1,7 @@
 export interface Schema {
     /**
      * Available on server platform only. Which external dependencies to bundle into the module.
-     * By default, all of node_modules will be kept as requires.
+     * By default, all of node_modules will be bundled.
      */
     bundleDependencies?: BundleDependencies;
     /**
@@ -131,7 +131,7 @@ export interface Schema {
 }
 /**
  * Available on server platform only. Which external dependencies to bundle into the module.
- * By default, all of node_modules will be kept as requires.
+ * By default, all of node_modules will be bundled.
  */
 export declare enum BundleDependencies {
     All = "all",
