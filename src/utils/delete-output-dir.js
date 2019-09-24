@@ -18,6 +18,6 @@ function deleteOutputDir(root, outputPath, host) {
     if (resolvedOutputPath === root) {
         throw new Error('Output path MUST not be project root directory!');
     }
-    return host.exists(resolvedOutputPath).pipe(operators_1.concatMap(exists => exists ? host.delete(resolvedOutputPath) : rxjs_1.EMPTY), operators_1.last(null, null));
+    return host.exists(resolvedOutputPath).pipe(operators_1.concatMap(exists => exists ? host.delete(resolvedOutputPath) : rxjs_1.EMPTY), operators_1.last(null, null), operators_1.map(() => undefined));
 }
 exports.deleteOutputDir = deleteOutputDir;
