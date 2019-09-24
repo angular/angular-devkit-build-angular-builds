@@ -84,10 +84,10 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             webpackConfig,
             webpackDevServerConfig,
             port,
-            workspace: webpackConfigResult.workspace,
+            projectRoot: webpackConfigResult.projectRoot,
         };
     }
-    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, workspace }) => {
+    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, projectRoot }) => {
         options.port = port;
         // Resolve public host and client address.
         let clientAddress = url.parse(`${options.ssl ? 'https' : 'http'}://0.0.0.0:0`);
@@ -121,16 +121,9 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         }
         if (browserOptions.index) {
             const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
-            const projectName = context.target
-                ? context.target.project
-                : workspace.getDefaultProjectName();
-            if (!projectName) {
-                throw new Error('Must either have a target from the context or a default project.');
-            }
-            const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
             const { options: compilerOptions } = read_tsconfig_1.readTsconfig(tsConfig, context.workspaceRoot);
             const target = compilerOptions.target || ts.ScriptTarget.ES5;
-            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(core_1.getSystemPath(projectRoot), target);
+            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, target);
             const entrypoints = package_chunk_sort_1.generateEntryPoints({ scripts, styles });
             const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded()
                 ? package_chunk_sort_1.generateEntryPoints({ scripts: [], styles })

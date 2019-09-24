@@ -18,7 +18,7 @@ const find_tests_1 = require("../angular-cli-files/utilities/find-tests");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 async function initialize(options, context, webpackConfigurationTransformer) {
-    const { config, workspace } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(
+    const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(
     // only two properties are missing:
     // * `outputPath` which is fixed for tests
     // * `budgets` which might be incorrect due to extra dev libs
@@ -32,7 +32,6 @@ async function initialize(options, context, webpackConfigurationTransformer) {
     // tslint:disable-next-line:no-implicit-dependencies
     const karma = await Promise.resolve().then(() => require('karma'));
     return [
-        workspace,
         karma,
         webpackConfigurationTransformer ? await webpackConfigurationTransformer(config[0]) : config[0],
     ];
@@ -40,7 +39,7 @@ async function initialize(options, context, webpackConfigurationTransformer) {
 function execute(options, context, transforms = {}) {
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
-    return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.switchMap(([workspace, karma, webpackConfig]) => new rxjs_1.Observable(subscriber => {
+    return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.switchMap(([karma, webpackConfig]) => new rxjs_1.Observable(subscriber => {
         const karmaOptions = {};
         if (options.watch !== undefined) {
             karmaOptions.singleRun = !options.watch;
@@ -63,8 +62,8 @@ function execute(options, context, transforms = {}) {
             webpackConfig.module &&
             options.include &&
             options.include.length > 0) {
-            const mainFilePath = core_1.getSystemPath(core_1.join(workspace.root, options.main));
-            const files = find_tests_1.findTests(options.include, path_1.dirname(mainFilePath), core_1.getSystemPath(workspace.root));
+            const mainFilePath = core_1.getSystemPath(core_1.join(core_1.normalize(context.workspaceRoot), options.main));
+            const files = find_tests_1.findTests(options.include, path_1.dirname(mainFilePath), context.workspaceRoot);
             // early exit, no reason to start karma
             if (!files.length) {
                 subscriber.error(`Specified patterns: "${options.include.join(', ')}" did not match any spec files`);

@@ -85,7 +85,7 @@ function getCompilerConfig(wco) {
     return {};
 }
 async function initialize(options, context, host, webpackConfigurationTransform) {
-    const { config, workspace } = await buildBrowserWebpackConfigFromContext(options, context, host);
+    const { config, projectRoot, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(options, context, host);
     let transformedConfig;
     if (webpackConfigurationTransform) {
         transformedConfig = [];
@@ -96,7 +96,7 @@ async function initialize(options, context, host, webpackConfigurationTransform)
     if (options.deleteOutputPath) {
         await utils_1.deleteOutputDir(core_1.normalize(context.workspaceRoot), core_1.normalize(options.outputPath), host).toPromise();
     }
-    return { config: transformedConfig || config, workspace };
+    return { config: transformedConfig || config, projectRoot, projectSourceRoot };
 }
 // tslint:disable-next-line: no-big-function
 function buildWebpackBrowser(options, context, transforms = {}) {
@@ -107,17 +107,10 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     const loggingFn = transforms.logging || createBrowserLoggingCallback(!!options.verbose, context.logger);
     return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
     // tslint:disable-next-line: no-big-function
-    operators_1.switchMap(({ workspace, config: configs }) => {
-        const projectName = context.target
-            ? context.target.project
-            : workspace.getDefaultProjectName();
-        if (!projectName) {
-            throw new Error('Must either have a target from the context or a default project.');
-        }
-        const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
+    operators_1.switchMap(({ config: configs, projectRoot }) => {
         const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
         const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
-        const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(core_1.getSystemPath(projectRoot), target);
+        const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, target);
         const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded();
         if (target > typescript_1.ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
             context.logger.warn(core_1.tags.stripIndent `
@@ -414,7 +407,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             }
         }), operators_1.concatMap(buildEvent => {
             if (buildEvent.success && !options.watch && options.serviceWorker) {
-                return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, projectRoot, core_1.resolve(root, core_1.normalize(options.outputPath)), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), error => ({ success: false, error: mapErrorToMessage(error) })));
+                return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.resolve(root, core_1.normalize(options.outputPath)), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), error => ({ success: false, error: mapErrorToMessage(error) })));
             }
             else {
                 return rxjs_1.of(buildEvent);

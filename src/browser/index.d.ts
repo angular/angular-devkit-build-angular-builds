@@ -8,7 +8,7 @@
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
-import { experimental, json, logging, virtualFs } from '@angular-devkit/core';
+import { json, logging, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
@@ -20,8 +20,9 @@ export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
 };
 export declare function createBrowserLoggingCallback(verbose: boolean, logger: logging.LoggerApi): WebpackLoggingCallback;
 export declare function buildBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, host?: virtualFs.Host<fs.Stats>): Promise<{
-    workspace: experimental.workspace.Workspace;
     config: webpack.Configuration[];
+    projectRoot: string;
+    projectSourceRoot?: string;
 }>;
 export declare function buildWebpackBrowser(options: BrowserBuilderSchema, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;

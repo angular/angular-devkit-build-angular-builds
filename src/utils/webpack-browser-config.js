@@ -22,9 +22,9 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
     // However this config generation is used by multiple builders such as dev-server
     const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES5;
     const buildBrowserFeatures = new build_browser_features_1.BuildBrowserFeatures(projectRoot, scriptTarget);
-    const differentialLoading = context.builder.builderName === 'browser'
-        && !options.watch
-        && buildBrowserFeatures.isDifferentialLoadingNeeded();
+    const differentialLoading = context.builder.builderName === 'browser' &&
+        !options.watch &&
+        buildBrowserFeatures.isDifferentialLoadingNeeded();
     const scriptTargets = [scriptTarget];
     if (differentialLoading && utils_1.fullDifferential) {
         scriptTargets.push(ts.ScriptTarget.ES5);
@@ -36,11 +36,10 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
         if (differentialLoading && utils_1.fullDifferential) {
             buildOptions = {
                 ...options,
-                ...(
-                // FIXME: we do create better webpack config composition to achieve the below
+                ... // FIXME: we do create better webpack config composition to achieve the below
                 // When DL is enabled and supportES2015 is true it means that we are on the second build
                 // This also means that we don't need to include styles and assets multiple times
-                supportES2015
+                (supportES2015
                     ? {}
                     : {
                         styles: options.extractCss ? [] : options.styles,
@@ -52,7 +51,12 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
             };
         }
         else if (differentialLoading && !utils_1.fullDifferential) {
-            buildOptions = { ...options, esVersionInFileName: true, scriptTargetOverride: ts.ScriptTarget.ES5, es5BrowserSupport: undefined };
+            buildOptions = {
+                ...options,
+                esVersionInFileName: true,
+                scriptTargetOverride: ts.ScriptTarget.ES5,
+                es5BrowserSupport: undefined,
+            };
         }
         const wco = {
             root: workspaceRoot,
@@ -88,27 +92,25 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
     });
 }
 exports.generateWebpackConfig = generateWebpackConfig;
-async function generateBrowserWebpackConfigFromWorkspace(options, context, projectName, workspace, host, webpackPartialGenerator, logger) {
-    // TODO: Use a better interface for workspace access.
-    const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
-    const projectSourceRoot = workspace.getProject(projectName).sourceRoot;
-    const sourceRoot = projectSourceRoot
-        ? core_1.resolve(workspace.root, core_1.normalize(projectSourceRoot))
-        : undefined;
-    const normalizedOptions = utils_1.normalizeBrowserSchema(host, workspace.root, projectRoot, sourceRoot, options);
-    return generateWebpackConfig(context, core_1.getSystemPath(workspace.root), core_1.getSystemPath(projectRoot), sourceRoot && core_1.getSystemPath(sourceRoot), normalizedOptions, webpackPartialGenerator, logger);
-}
-exports.generateBrowserWebpackConfigFromWorkspace = generateBrowserWebpackConfigFromWorkspace;
 async function generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost()) {
-    const registry = new core_1.schema.CoreSchemaRegistry();
-    registry.addPostTransform(core_1.schema.transforms.addUndefinedDefaults);
-    const workspace = await core_1.experimental.workspace.Workspace.fromPath(host, core_1.normalize(context.workspaceRoot), registry);
-    const projectName = context.target ? context.target.project : workspace.getDefaultProjectName();
+    const projectName = context.target && context.target.project;
     if (!projectName) {
-        throw new Error('Must either have a target from the context or a default project.');
+        throw new Error('The builder requires a target.');
     }
-    const config = await generateBrowserWebpackConfigFromWorkspace(options, context, projectName, workspace, host, webpackPartialGenerator, context.logger);
-    return { workspace, config };
+    const workspaceRoot = core_1.normalize(context.workspaceRoot);
+    const projectMetadata = await context.getProjectMetadata(projectName);
+    const projectRoot = core_1.resolve(workspaceRoot, core_1.normalize(projectMetadata.root || ''));
+    const projectSourceRoot = projectMetadata.sourceRoot;
+    const sourceRoot = projectSourceRoot
+        ? core_1.resolve(workspaceRoot, core_1.normalize(projectSourceRoot))
+        : undefined;
+    const normalizedOptions = utils_1.normalizeBrowserSchema(host, workspaceRoot, projectRoot, sourceRoot, options);
+    const config = await generateWebpackConfig(context, core_1.getSystemPath(workspaceRoot), core_1.getSystemPath(projectRoot), sourceRoot && core_1.getSystemPath(sourceRoot), normalizedOptions, webpackPartialGenerator, context.logger);
+    return {
+        config,
+        projectRoot: core_1.getSystemPath(projectRoot),
+        projectSourceRoot: sourceRoot && core_1.getSystemPath(sourceRoot),
+    };
 }
 exports.generateBrowserWebpackConfigFromContext = generateBrowserWebpackConfigFromContext;
 function getIndexOutputFile(options) {

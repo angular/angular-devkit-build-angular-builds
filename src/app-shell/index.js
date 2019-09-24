@@ -53,15 +53,12 @@ async function _renderUniversal(options, context, browserResult, serverResult) {
     fs.writeFileSync(outputIndexPath, html);
     if (browserOptions.serviceWorker) {
         const host = new node_1.NodeJsSyncHost();
-        // Create workspace.
-        const registry = new core_1.schema.CoreSchemaRegistry();
-        registry.addPostTransform(core_1.schema.transforms.addUndefinedDefaults);
-        const workspace = await core_1.experimental.workspace.Workspace.fromPath(host, core_1.normalize(context.workspaceRoot), registry);
-        const projectName = context.target ? context.target.project : workspace.getDefaultProjectName();
+        const projectName = context.target && context.target.project;
         if (!projectName) {
-            throw new Error('Must either have a target from the context or a default project.');
+            throw new Error('The builder requires a target.');
         }
-        const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
+        const projectMetadata = await context.getProjectMetadata(projectName);
+        const projectRoot = core_1.resolve(core_1.normalize(context.workspaceRoot), core_1.normalize(projectMetadata.root || ''));
         await service_worker_1.augmentAppWithServiceWorker(host, core_1.normalize(root), projectRoot, core_1.join(core_1.normalize(root), browserOptions.outputPath), browserOptions.baseHref || '/', browserOptions.ngswConfigPath);
     }
     return browserResult;
