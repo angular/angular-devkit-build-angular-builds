@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 const core_1 = require("@angular-devkit/core");
+const path = require("path");
 const { bold, green, red, reset, white, yellow } = core_1.terminal;
 function formatSize(size) {
     if (size <= 0) {
@@ -20,24 +21,33 @@ function formatSize(size) {
     return `${+(size / Math.pow(1024, index)).toPrecision(3)} ${abbreviations[index]}`;
 }
 exports.formatSize = formatSize;
+function generateBundleStats(info, colors) {
+    const g = (x) => (colors ? bold(green(x)) : x);
+    const y = (x) => (colors ? bold(yellow(x)) : x);
+    const size = typeof info.size === 'number' ? ` ${formatSize(info.size)}` : '';
+    const files = info.files.map(f => path.basename(f)).join(', ');
+    const names = info.names ? ` (${info.names.join(', ')})` : '';
+    const initial = y(info.entry ? '[entry]' : info.initial ? '[initial]' : '');
+    const flags = ['rendered', 'recorded']
+        .map(f => (f && info[f] ? g(` [${f}]`) : ''))
+        .join('');
+    return `chunk {${y(info.id.toString())}} ${g(files)}${names}${size} ${initial}${flags}`;
+}
+exports.generateBundleStats = generateBundleStats;
+function generateBuildStats(hash, time, colors) {
+    const w = (x) => colors ? bold(white(x)) : x;
+    return `Date: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
+}
+exports.generateBuildStats = generateBuildStats;
 function statsToString(json, statsConfig) {
     const colors = statsConfig.colors;
     const rs = (x) => colors ? reset(x) : x;
     const w = (x) => colors ? bold(white(x)) : x;
-    const g = (x) => colors ? bold(green(x)) : x;
-    const y = (x) => colors ? bold(yellow(x)) : x;
     const changedChunksStats = json.chunks
         .filter((chunk) => chunk.rendered)
         .map((chunk) => {
         const asset = json.assets.filter((x) => x.name == chunk.files[0])[0];
-        const size = asset ? ` ${formatSize(asset.size)}` : '';
-        const files = chunk.files.join(', ');
-        const names = chunk.names ? ` (${chunk.names.join(', ')})` : '';
-        const initial = y(chunk.entry ? '[entry]' : chunk.initial ? '[initial]' : '');
-        const flags = ['rendered', 'recorded']
-            .map(f => f && chunk[f] ? g(` [${f}]`) : '')
-            .join('');
-        return `chunk {${y(chunk.id)}} ${g(files)}${names}${size} ${initial}${flags}`;
+        return generateBundleStats({ ...chunk, size: asset && asset.size }, colors);
     });
     const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
     if (unchangedChunkNumber > 0) {
