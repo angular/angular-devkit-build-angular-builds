@@ -36,5 +36,4 @@ export declare const enum CacheKey {
     DownlevelCode = 2,
     DownlevelMap = 3
 }
-export declare function process(options: ProcessBundleOptions, callback: (error: Error | null, result?: ProcessBundleResult) => void): void;
-export declare function processAsync(options: ProcessBundleOptions): Promise<ProcessBundleResult>;
+export declare function process(options: ProcessBundleOptions): Promise<ProcessBundleResult>;
