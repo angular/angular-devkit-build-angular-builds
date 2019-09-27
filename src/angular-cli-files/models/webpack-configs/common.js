@@ -378,8 +378,6 @@ function getCommonConfig(wco) {
                 },
                 {
                     test: /\.js$/,
-                    // Factory files are processed by BO in the rules added in typescript.ts.
-                    exclude: /(ngfactory|ngstyle)\.js$/,
                     ...buildOptimizerUseRule,
                 },
                 {
