@@ -18,7 +18,6 @@ const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const typescript_1 = require("typescript");
-const workerFarm = require("worker-farm");
 const analytics_1 = require("../../plugins/webpack/analytics");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const write_index_html_1 = require("../angular-cli-files/utilities/index-file/write-index-html");
@@ -29,6 +28,7 @@ const utils_1 = require("../utils");
 const mangle_options_1 = require("../utils/mangle-options");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
+const action_executor_1 = require("./action-executor");
 const cacache = require('cacache');
 const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
 const packageVersion = require('../../package.json').version;
@@ -313,20 +313,18 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                         // Attempt to get required cache entries
                         const cacheEntries = [];
+                        let cached = cacheKeys.length > 0;
                         for (const key of cacheKeys) {
                             if (key) {
-                                cacheEntries.push(await cacache.get.info(cacheDownlevelPath, key));
+                                const entry = await cacache.get.info(cacheDownlevelPath, key);
+                                if (!entry) {
+                                    cached = false;
+                                    break;
+                                }
+                                cacheEntries.push(entry);
                             }
                             else {
                                 cacheEntries.push(null);
-                            }
-                        }
-                        // Check if required cache entries are present
-                        let cached = cacheKeys.length > 0;
-                        for (let i = 0; i < cacheKeys.length; ++i) {
-                            if (cacheKeys[i] && !cacheEntries[i]) {
-                                cached = false;
-                                break;
                             }
                         }
                         // If all required cached entries are present, use the cached entries
@@ -443,28 +441,17 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                     }
                     if (processActions.length > 0) {
-                        await new Promise((resolve, reject) => {
-                            const workerFile = require.resolve('../utils/process-bundle');
-                            const workers = workerFarm({
-                                maxRetries: 1,
-                            }, path.extname(workerFile) !== '.ts'
-                                ? workerFile
-                                : require.resolve('../utils/process-bundle-bootstrap'), ['process']);
-                            let completed = 0;
-                            const workCallback = (error, result) => {
-                                if (error) {
-                                    workerFarm.end(workers);
-                                    reject(error);
-                                    return;
-                                }
-                                processResults.push(result);
-                                if (++completed === processActions.length) {
-                                    workerFarm.end(workers);
-                                    resolve();
-                                }
-                            };
-                            processActions.forEach(action => workers['process'](action, workCallback));
-                        });
+                        const workerFile = require.resolve('../utils/process-bundle');
+                        const executor = new action_executor_1.ActionExecutor(path.extname(workerFile) !== '.ts'
+                            ? workerFile
+                            : require.resolve('../utils/process-bundle-bootstrap'), 'process');
+                        try {
+                            const results = await executor.executeAll(processActions.map(a => ({ ...a, size: a.code.length })));
+                            results.forEach(result => processResults.push(result));
+                        }
+                        finally {
+                            executor.stop();
+                        }
                     }
                     // Runtime must be processed after all other files
                     if (processRuntimeAction) {
@@ -472,7 +459,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             ...processRuntimeAction,
                             runtimeData: processResults,
                         };
-                        processResults.push(await Promise.resolve().then(() => require('../utils/process-bundle')).then(m => m.processAsync(runtimeOptions)));
+                        processResults.push(await Promise.resolve().then(() => require('../utils/process-bundle')).then(m => m.process(runtimeOptions)));
                     }
                     context.logger.info('ES5 bundle generation complete.');
                     function generateBundleInfoStats(id, bundle, chunk) {

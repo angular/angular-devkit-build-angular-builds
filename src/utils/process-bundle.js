@@ -15,11 +15,7 @@ const terser_1 = require("terser");
 const mangle_options_1 = require("./mangle-options");
 const { transformAsync } = require('@babel/core');
 const cacache = require('cacache');
-function process(options, callback) {
-    processAsync(options).then(result => callback(null, result), error => callback(error));
-}
-exports.process = process;
-async function processAsync(options) {
+async function process(options) {
     if (!options.cacheKeys) {
         options.cacheKeys = [];
     }
@@ -174,7 +170,7 @@ async function processAsync(options) {
     }
     return result;
 }
-exports.processAsync = processAsync;
+exports.process = process;
 async function mangleOriginal(options) {
     const resultOriginal = terser_1.minify(options.code, {
         compress: false,
