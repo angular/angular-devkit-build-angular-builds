@@ -523,6 +523,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         styles: options.styles,
                         postTransform: transforms.indexHtml,
                         crossOrigin: options.crossOrigin,
+                        lang: options.i18nLocale,
                     })
                         .pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(error => rxjs_1.of({ success: false, error: mapErrorToMessage(error) })))
                         .toPromise();

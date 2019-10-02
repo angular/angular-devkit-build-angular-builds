@@ -12,6 +12,7 @@ export interface IndexHtmlWebpackPluginOptions {
     moduleEntrypoints: string[];
     postTransform?: IndexHtmlTransform;
     crossOrigin?: CrossOriginValue;
+    lang?: string;
 }
 export declare class IndexHtmlWebpackPlugin {
     private _options;

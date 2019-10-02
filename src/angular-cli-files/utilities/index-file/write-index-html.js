@@ -13,7 +13,7 @@ const operators_1 = require("rxjs/operators");
 const package_chunk_sort_1 = require("../package-chunk-sort");
 const strip_bom_1 = require("../strip-bom");
 const augment_index_html_1 = require("./augment-index-html");
-function writeIndexHtml({ host, outputPath, indexPath, files = [], noModuleFiles = [], moduleFiles = [], baseHref, deployUrl, sri = false, scripts = [], styles = [], postTransform, crossOrigin, }) {
+function writeIndexHtml({ host, outputPath, indexPath, files = [], noModuleFiles = [], moduleFiles = [], baseHref, deployUrl, sri = false, scripts = [], styles = [], postTransform, crossOrigin, lang, }) {
     return host.read(indexPath).pipe(operators_1.map(content => strip_bom_1.stripBom(core_1.virtualFs.fileBufferToString(content))), operators_1.switchMap(content => augment_index_html_1.augmentIndexHtml({
         input: core_1.getSystemPath(outputPath),
         inputContent: content,
@@ -31,6 +31,7 @@ function writeIndexHtml({ host, outputPath, indexPath, files = [], noModuleFiles
                 .pipe(operators_1.map(data => core_1.virtualFs.fileBufferToString(data)))
                 .toPromise();
         },
+        lang: lang,
     })), operators_1.switchMap(content => (postTransform ? postTransform(content) : rxjs_1.of(content))), operators_1.map(content => core_1.virtualFs.stringToFileBuffer(content)), operators_1.switchMap(content => host.write(outputPath, content)));
 }
 exports.writeIndexHtml = writeIndexHtml;

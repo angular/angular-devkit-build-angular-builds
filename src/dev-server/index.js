@@ -139,6 +139,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 noModuleEntrypoints: ['polyfills-es5'],
                 postTransform: transforms.indexHtml,
                 crossOrigin: browserOptions.crossOrigin,
+                lang: browserOptions.i18nLocale,
             }));
         }
         const normalizedOptimization = utils_1.normalizeOptimization(browserOptions.optimization);

@@ -72,6 +72,7 @@ class IndexHtmlWebpackPlugin {
                 loadOutputFile,
                 moduleFiles,
                 entrypoints: this._options.entrypoints,
+                lang: this._options.lang,
             });
             if (this._options.postTransform) {
                 indexSource = await this._options.postTransform(indexSource);

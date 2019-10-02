@@ -23,6 +23,8 @@ export interface AugmentIndexHtmlOptions {
     loadOutputFile: LoadOutputFileFunctionType;
     /** Used to sort the inseration of files in the HTML file */
     entrypoints: string[];
+    /** Used to set the document default locale */
+    lang?: string;
 }
 export interface FileInfo {
     file: string;
