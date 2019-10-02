@@ -54,6 +54,7 @@ exports.countOccurrences = countOccurrences;
  */
 class AnalyticsBuildStats {
     constructor() {
+        this.isIvy = false;
         this.errors = [];
         this.numberOfNgOnInit = 0;
         this.numberOfComponents = 0;
@@ -106,6 +107,7 @@ class NgBuildAnalyticsPlugin {
             // Adding commas before and after so the regex are easier to define filters.
             dimensions[core_1.analytics.NgCliAnalyticsDimensions.BuildErrors] = `,${this._stats.errors.join()},`;
         }
+        dimensions[core_1.analytics.NgCliAnalyticsDimensions.NgIvyEnabled] = this._stats.isIvy;
         return dimensions;
     }
     _reportBuildMetrics(stats) {
@@ -129,7 +131,14 @@ class NgBuildAnalyticsPlugin {
             // This does not include View Engine AOT compilation, we use the ngfactory for it.
             this._stats.numberOfComponents += countOccurrences(module._source.source(), ' Component({');
             // For Ivy we just count ngComponentDef.
-            this._stats.numberOfComponents += countOccurrences(module._source.source(), 'ngComponentDef', true);
+            const numIvyComponents = countOccurrences(module._source.source(), 'ngComponentDef', true);
+            this._stats.numberOfComponents += numIvyComponents;
+            // Check whether this is an Ivy app so that it can reported as part of analytics.
+            if (!this._stats.isIvy) {
+                if (numIvyComponents > 0 || module._source.source().includes('ngModuleDef')) {
+                    this._stats.isIvy = true;
+                }
+            }
         }
     }
     _checkNgFactoryNormalModule(module) {
