@@ -274,6 +274,7 @@ function getCommonConfig(wco) {
                 }
                 : {
                     ecma: terserEcma,
+                    pure_getters: buildOptions.buildOptimizer,
                     // PURE comments work best with 3 passes.
                     // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
                     passes: buildOptions.buildOptimizer ? 3 : 1,
