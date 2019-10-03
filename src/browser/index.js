@@ -25,6 +25,7 @@ const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
 const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
+const i18n_options_1 = require("../utils/i18n-options");
 const mangle_options_1 = require("../utils/mangle-options");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
@@ -87,6 +88,10 @@ function getCompilerConfig(wco) {
 }
 async function initialize(options, context, host, webpackConfigurationTransform) {
     const { config, projectRoot, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(options, context, host);
+    // target is verified in the above call
+    // tslint:disable-next-line: no-non-null-assertion
+    const metadata = await context.getProjectMetadata(context.target);
+    const i18n = i18n_options_1.createI18nOptions(metadata);
     let transformedConfig;
     if (webpackConfigurationTransform) {
         transformedConfig = [];
@@ -97,7 +102,7 @@ async function initialize(options, context, host, webpackConfigurationTransform)
     if (options.deleteOutputPath) {
         await utils_1.deleteOutputDir(core_1.normalize(context.workspaceRoot), core_1.normalize(options.outputPath), host).toPromise();
     }
-    return { config: transformedConfig || config, projectRoot, projectSourceRoot };
+    return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
 }
 // tslint:disable-next-line: no-big-function
 function buildWebpackBrowser(options, context, transforms = {}) {
@@ -107,7 +112,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
     // tslint:disable-next-line: no-big-function
-    operators_1.switchMap(({ config: configs, projectRoot }) => {
+    operators_1.switchMap(({ config: configs, projectRoot, i18n }) => {
         const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
         const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
         const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, target);
@@ -397,14 +402,12 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             processRuntimeAction = {
                                 ...action,
                                 cacheKeys,
-                                cachePath: cacheDownlevelPath || undefined,
                             };
                         }
                         else {
                             processActions.push({
                                 ...action,
                                 cacheKeys,
-                                cachePath: cacheDownlevelPath || undefined,
                             });
                         }
                     }
@@ -437,7 +440,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         const workerFile = require.resolve('../utils/process-bundle');
                         const executor = new action_executor_1.ActionExecutor(path.extname(workerFile) !== '.ts'
                             ? workerFile
-                            : require.resolve('../utils/process-bundle-bootstrap'), 'process');
+                            : require.resolve('../utils/process-bundle-bootstrap'), 'process', { cachePath: cacheDownlevelPath, i18n });
                         try {
                             const results = await executor.executeAll(processActions.map(a => ({ ...a, size: a.code.length })));
                             results.forEach(result => processResults.push(result));

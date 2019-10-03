@@ -5,7 +5,7 @@ export declare class ActionExecutor<Input extends {
     private largeWorker;
     private smallWorker;
     private smallThreshold;
-    constructor(actionFile: string, actionName: string);
+    constructor(actionFile: string, actionName: string, setupOptions?: unknown);
     execute(options: Input): Promise<Output>;
     executeAll(options: Input[]): Promise<Output[]>;
     stop(): void;

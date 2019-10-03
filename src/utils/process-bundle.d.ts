@@ -11,7 +11,6 @@ export interface ProcessBundleOptions {
     optimizeOnly?: boolean;
     ignoreOriginal?: boolean;
     cacheKeys?: (string | null)[];
-    cachePath?: string;
     integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
     runtimeData?: ProcessBundleResult[];
 }
@@ -36,4 +35,7 @@ export declare const enum CacheKey {
     DownlevelCode = 2,
     DownlevelMap = 3
 }
+export declare function setup(options: {
+    cachePath: string;
+}): void;
 export declare function process(options: ProcessBundleOptions): Promise<ProcessBundleResult>;
