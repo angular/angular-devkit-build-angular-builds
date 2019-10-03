@@ -71,7 +71,7 @@ async function execute(options, context) {
     if (options.webdriverUpdate) {
         await updateWebdriver();
     }
-    let baseUrl;
+    let baseUrl = options.baseUrl;
     let server;
     if (options.devServerTarget) {
         const target = architect_1.targetFromTargetString(options.devServerTarget);
