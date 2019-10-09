@@ -48,11 +48,6 @@ function _createAotPlugin(wco, options, i18nExtract = false) {
         i18nInFile: i18nInFile,
         i18nInFormat: buildOptions.i18nFormat,
     };
-    const compilerOptions = options.compilerOptions || {};
-    if (i18nExtract) {
-        // Extraction of i18n is still using the legacy VE pipeline
-        compilerOptions.enableIvy = false;
-    }
     const additionalLazyModules = {};
     if (buildOptions.lazyModules) {
         for (const lazyModule of buildOptions.lazyModules) {
@@ -73,7 +68,6 @@ function _createAotPlugin(wco, options, i18nExtract = false) {
         logger: wco.logger,
         directTemplateLoading: true,
         ...options,
-        compilerOptions,
     };
     pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
     return new webpack_1.AngularCompilerPlugin(pluginOptions);
