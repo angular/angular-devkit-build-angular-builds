@@ -9,37 +9,88 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const jest_worker_1 = require("jest-worker");
 const os = require("os");
-class ActionExecutor {
-    constructor(actionFile, actionName) {
-        this.actionName = actionName;
-        this.smallThreshold = 32 * 1024;
+const path = require("path");
+const action_cache_1 = require("./action-cache");
+let workerFile = require.resolve('../utils/process-bundle');
+workerFile =
+    path.extname(workerFile) === '.ts'
+        ? require.resolve('../utils/process-bundle-bootstrap')
+        : workerFile;
+class BundleActionExecutor {
+    constructor(workerOptions, integrityAlgorithm, sizeThreshold = 32 * 1024) {
+        this.workerOptions = workerOptions;
+        this.sizeThreshold = sizeThreshold;
+        this.cache = new action_cache_1.BundleActionCache(integrityAlgorithm);
+    }
+    static executeMethod(worker, method, input) {
+        return worker[method](input);
+    }
+    ensureLarge() {
+        if (this.largeWorker) {
+            return this.largeWorker;
+        }
         // larger files are processed in a separate process to limit memory usage in the main process
-        this.largeWorker = new jest_worker_1.default(actionFile, {
-            exposedMethods: [actionName],
-        });
+        return (this.largeWorker = new jest_worker_1.default(workerFile, {
+            exposedMethods: ['process'],
+            setupArgs: [this.workerOptions],
+        }));
+    }
+    ensureSmall() {
+        if (this.smallWorker) {
+            return this.smallWorker;
+        }
         // small files are processed in a limited number of threads to improve speed
         // The limited number also prevents a large increase in memory usage for an otherwise short operation
-        this.smallWorker = new jest_worker_1.default(actionFile, {
-            exposedMethods: [actionName],
+        return (this.smallWorker = new jest_worker_1.default(workerFile, {
+            exposedMethods: ['process'],
+            setupArgs: [this.workerOptions],
             numWorkers: os.cpus().length < 2 ? 1 : 2,
             // Will automatically fallback to processes if not supported
             enableWorkerThreads: true,
-        });
+        }));
     }
-    execute(options) {
-        if (options.size > this.smallThreshold) {
-            return this.largeWorker[this.actionName](options);
+    executeAction(method, action) {
+        // code.length is not an exact byte count but close enough for this
+        if (action.code.length > this.sizeThreshold) {
+            return BundleActionExecutor.executeMethod(this.ensureLarge(), method, action);
         }
         else {
-            return this.smallWorker[this.actionName](options);
+            return BundleActionExecutor.executeMethod(this.ensureSmall(), method, action);
         }
     }
-    executeAll(options) {
-        return Promise.all(options.map(o => this.execute(o)));
+    async process(action) {
+        const cacheKeys = this.cache.generateCacheKeys(action);
+        action.cacheKeys = cacheKeys;
+        // Try to get cached data, if it fails fallback to processing
+        try {
+            const cachedResult = await this.cache.getCachedBundleResult(action);
+            if (cachedResult) {
+                return cachedResult;
+            }
+        }
+        catch (_a) { }
+        return this.executeAction('process', action);
+    }
+    async *processAll(actions) {
+        const executions = new Map();
+        for (const action of actions) {
+            const execution = this.process(action);
+            executions.set(execution, execution.then(result => {
+                executions.delete(execution);
+                return result;
+            }));
+        }
+        while (executions.size > 0) {
+            yield Promise.race(executions.values());
+        }
     }
     stop() {
-        this.largeWorker.end();
-        this.smallWorker.end();
+        if (this.largeWorker) {
+            this.largeWorker.end();
+        }
+        if (this.smallWorker) {
+            this.smallWorker.end();
+        }
     }
 }
-exports.ActionExecutor = ActionExecutor;
+exports.BundleActionExecutor = BundleActionExecutor;
