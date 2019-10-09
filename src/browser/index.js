@@ -25,6 +25,7 @@ const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
 const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
+const copy_assets_1 = require("../utils/copy-assets");
 const i18n_options_1 = require("../utils/i18n-options");
 const mangle_options_1 = require("../utils/mangle-options");
 const version_1 = require("../utils/version");
@@ -108,11 +109,12 @@ async function initialize(options, context, host, webpackConfigurationTransform)
 function buildWebpackBrowser(options, context, transforms = {}) {
     const host = new node_1.NodeJsSyncHost();
     const root = core_1.normalize(context.workspaceRoot);
+    const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
     // tslint:disable-next-line: no-big-function
-    operators_1.switchMap(({ config: configs, projectRoot, i18n }) => {
+    operators_1.switchMap(({ config: configs, projectRoot, projectSourceRoot, i18n }) => {
         const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
         const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
         const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, target);
@@ -219,7 +221,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                         // Retrieve the content/map for the file
                         // NOTE: Additional future optimizations will read directly from memory
-                        let filename = path.resolve(core_1.getSystemPath(root), options.outputPath, file.file);
+                        let filename = path.join(baseOutputPath, file.file);
                         const code = fs.readFileSync(filename, 'utf8');
                         let map;
                         if (actionOptions.sourceMaps) {
@@ -458,6 +460,16 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         processResults.push(await Promise.resolve().then(() => require('../utils/process-bundle')).then(m => m.process(runtimeOptions)));
                     }
                     context.logger.info('ES5 bundle generation complete.');
+                    // Copy assets
+                    if (options.assets) {
+                        try {
+                            await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), [baseOutputPath], context.workspaceRoot);
+                        }
+                        catch (err) {
+                            context.logger.error('Unable to copy assets: ' + err.message);
+                            return { success: false };
+                        }
+                    }
                     function generateBundleInfoStats(id, bundle, chunk) {
                         return stats_1.generateBundleStats({
                             id,
@@ -514,7 +526,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 if (options.index) {
                     return write_index_html_1.writeIndexHtml({
                         host,
-                        outputPath: core_1.resolve(root, core_1.join(core_1.normalize(options.outputPath), webpack_browser_config_1.getIndexOutputFile(options))),
+                        outputPath: core_1.join(core_1.normalize(baseOutputPath), webpack_browser_config_1.getIndexOutputFile(options)),
                         indexPath: core_1.join(root, webpack_browser_config_1.getIndexInputFile(options)),
                         files,
                         noModuleFiles,
@@ -540,7 +552,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             }
         }), operators_1.concatMap(buildEvent => {
             if (buildEvent.success && !options.watch && options.serviceWorker) {
-                return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.resolve(root, core_1.normalize(options.outputPath)), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), error => ({ success: false, error: mapErrorToMessage(error) })));
+                return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(baseOutputPath), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), error => ({ success: false, error: mapErrorToMessage(error) })));
             }
             else {
                 return rxjs_1.of(buildEvent);
@@ -548,7 +560,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         }), operators_1.map(event => ({
             ...event,
             // If we use differential loading, both configs have the same outputs
-            outputPath: path.resolve(context.workspaceRoot, options.outputPath),
+            outputPath: baseOutputPath,
         })));
     }));
 }

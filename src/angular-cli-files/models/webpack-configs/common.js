@@ -141,7 +141,8 @@ function getCommonConfig(wco) {
         });
     }
     // process asset entries
-    if (buildOptions.assets) {
+    if (buildOptions.assets &&
+        (utils_1.fullDifferential || buildOptions.watch || !differentialLoadingNeeded)) {
         const copyWebpackPluginPatterns = buildOptions.assets.map((asset) => {
             // Resolve input paths relative to workspace root and add slash at the end.
             asset.input = path.resolve(root, asset.input).replace(/\\/g, '/');
