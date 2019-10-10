@@ -41,13 +41,12 @@ export declare function createArchitect(workspaceRoot: Path): Promise<{
     architectHost: TestingArchitectHost;
     architect: Architect;
 }>;
-export interface BrowserBuildOutput {
+export declare function browserBuild(architect: Architect, host: virtualFs.Host, target: Target, overrides?: json.JsonObject, scheduleOptions?: ScheduleOptions): Promise<{
     output: BuilderOutput;
     files: {
         [file: string]: Promise<string>;
     };
-}
-export declare function browserBuild(architect: Architect, host: virtualFs.Host, target: Target, overrides?: json.JsonObject, scheduleOptions?: ScheduleOptions): Promise<BrowserBuildOutput>;
+}>;
 export declare const lazyModuleFiles: {
     [path: string]: string;
 };

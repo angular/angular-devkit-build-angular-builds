@@ -8,7 +8,7 @@
 import { logging } from '@angular-devkit/core';
 import { ParsedConfiguration } from '@angular/compiler-cli';
 import { ScriptTarget } from 'typescript';
-import { AssetPatternClass, Budget, ExtraEntryPoint, I18NMissingTranslation, Localize, OptimizationClass, SourceMapClass } from '../../browser/schema';
+import { AssetPatternClass, Budget, ExtraEntryPoint, OptimizationClass, SourceMapClass } from '../../browser/schema';
 import { NormalizedFileReplacement } from '../../utils/normalize-file-replacements';
 export interface BuildOptions {
     optimization: OptimizationClass;
@@ -17,9 +17,9 @@ export interface BuildOptions {
     resourcesOutputPath?: string;
     aot?: boolean;
     sourceMap: SourceMapClass;
-    /** @deprecated since version 8. use sourceMap instead. */
+    /** @deprecated use sourceMap instead */
     vendorSourceMap?: boolean;
-    /** @deprecated since version 8 */
+    /** @deprecated  */
     evalSourceMap?: boolean;
     vendorChunk?: boolean;
     commonChunk?: boolean;
@@ -27,19 +27,16 @@ export interface BuildOptions {
     deployUrl?: string;
     verbose?: boolean;
     progress?: boolean;
-    /** @deprecated since version 9. Use 'locales' object in the project metadata instead.*/
     i18nFile?: string;
-    /** @deprecated since version 9. No longer needed as the format will be determined automatically.*/
     i18nFormat?: string;
-    /** @deprecated since version 9. Use 'localize' instead.*/
     i18nLocale?: string;
-    localize?: Localize;
-    i18nMissingTranslation?: I18NMissingTranslation;
+    i18nMissingTranslation?: string;
     extractCss?: boolean;
     bundleDependencies?: 'none' | 'all';
     watch?: boolean;
     outputHashing?: string;
     poll?: number;
+    app?: string;
     deleteOutputPath?: boolean;
     preserveSymlinks?: boolean;
     extractLicenses?: boolean;
@@ -49,12 +46,10 @@ export interface BuildOptions {
     subresourceIntegrity?: boolean;
     serviceWorker?: boolean;
     webWorkerTsConfig?: string;
-    /** @deprecated since version 8 **/
     skipAppShell?: boolean;
     statsJson: boolean;
     forkTypeChecker: boolean;
     profile?: boolean;
-    /** @deprecated since version 8 **/
     es5BrowserSupport?: boolean;
     main: string;
     polyfills?: string;
@@ -73,7 +68,6 @@ export interface BuildOptions {
     rebaseRootRelativeCssUrls?: boolean;
     esVersionInFileName?: boolean;
     scriptTargetOverride?: ScriptTarget;
-    experimentalRollupPass?: boolean;
 }
 export interface WebpackTestOptions extends BuildOptions {
     codeCoverage?: boolean;

@@ -8,24 +8,10 @@
       "type": "string",
       "description": "Target to extract from."
     },
-    "format": {
-      "type": "string",
-      "description": "Output format for the generated file.",
-      "default": "xlf",
-      "enum": [
-        "xmb",
-        "xlf",
-        "xlif",
-        "xliff",
-        "xlf2",
-        "xliff2"
-      ]
-    },
     "i18nFormat": {
       "type": "string",
       "description": "Output format for the generated file.",
       "default": "xlf",
-      "x-deprecated": "Use 'format' option instead.",
       "enum": [
         "xmb",
         "xlf",
@@ -37,8 +23,7 @@
     },
     "i18nLocale": {
       "type": "string",
-      "description": "Specifies the source language of the application.",
-      "x-deprecated": "Use 'i18n' project level sub-option 'sourceLocale' instead."
+      "description": "Specifies the source language of the application."
     },
     "progress": {
       "type": "boolean",

@@ -13,10 +13,8 @@ const path = require("path");
 const webpack = require("webpack");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const stats_1 = require("../angular-cli-files/utilities/stats");
-const i18n_options_1 = require("../utils/i18n-options");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
-const schema_1 = require("./schema");
 function getI18nOutfile(format) {
     switch (format) {
         case 'xmb':
@@ -42,23 +40,12 @@ async function execute(options, context) {
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
     const browserOptions = await context.validateOptions(await context.getTargetOptions(browserTarget), await context.getBuilderNameForTarget(browserTarget));
-    if (options.i18nFormat !== schema_1.Format.Xlf) {
-        options.format = options.i18nFormat;
-    }
     // We need to determine the outFile name so that AngularCompiler can retrieve it.
-    let outFile = options.outFile || getI18nOutfile(options.format);
+    let outFile = options.outFile || getI18nOutfile(options.i18nFormat);
     if (options.outputPath) {
         // AngularCompilerPlugin doesn't support genDir so we have to adjust outFile instead.
         outFile = path.join(options.outputPath, outFile);
     }
-    const projectName = context.target && context.target.project;
-    if (!projectName) {
-        throw new Error('The builder requires a target.');
-    }
-    // target is verified in the above call
-    // tslint:disable-next-line: no-non-null-assertion
-    const metadata = await context.getProjectMetadata(context.target);
-    const i18n = i18n_options_1.createI18nOptions(metadata);
     const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext({
         ...browserOptions,
         optimization: {
@@ -66,8 +53,8 @@ async function execute(options, context) {
             styles: false,
         },
         buildOptimizer: false,
-        i18nLocale: options.i18nLocale || i18n.sourceLocale,
-        i18nFormat: options.format,
+        i18nLocale: options.i18nLocale,
+        i18nFormat: options.i18nFormat,
         i18nFile: outFile,
         aot: true,
         progress: options.progress,

@@ -20,7 +20,6 @@ const bundle_budget_1 = require("../../plugins/bundle-budget");
 const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
 const named_chunks_plugin_1 = require("../../plugins/named-chunks-plugin");
 const scripts_webpack_plugin_1 = require("../../plugins/scripts-webpack-plugin");
-const webpack_2 = require("../../plugins/webpack");
 const find_up_1 = require("../../utilities/find-up");
 const utils_2 = require("./utils");
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
@@ -39,50 +38,10 @@ function getCommonConfig(wco) {
     }
     // tslint:disable-next-line:no-any
     const extraPlugins = [];
-    const extraRules = [];
     const entryPoints = {};
     const targetInFileName = utils_2.getEsVersionForFileName(utils_1.fullDifferential ? buildOptions.scriptTargetOverride : tsConfig.options.target, buildOptions.esVersionInFileName);
     if (buildOptions.main) {
-        const mainPath = path.resolve(root, buildOptions.main);
-        entryPoints['main'] = [mainPath];
-        if (buildOptions.experimentalRollupPass) {
-            // NOTE: the following are known problems with experimentalRollupPass
-            // - vendorChunk, commonChunk, namedChunks: these won't work, because by the time webpack
-            // sees the chunks, the context of where they came from is lost.
-            // - webWorkerTsConfig: workers must be imported via a root relative path (e.g.
-            // `app/search/search.worker`) instead of a relative path (`/search.worker`) because
-            // of the same reason as above.
-            // - loadChildren string syntax: doesn't work because rollup cannot follow the imports.
-            // Rollup options, except entry module, which is automatically inferred.
-            const rollupOptions = {};
-            // Add rollup plugins/rules.
-            extraRules.push({
-                test: mainPath,
-                // Ensure rollup loader executes after other loaders.
-                enforce: 'post',
-                use: [{
-                        loader: webpack_2.WebpackRollupLoader,
-                        options: rollupOptions,
-                    }],
-            });
-            // Rollup bundles will include the dynamic System.import that was inside Angular and webpack
-            // will emit warnings because it can't resolve it. We just ignore it.
-            // TODO: maybe use https://webpack.js.org/configuration/stats/#statswarningsfilter instead.
-            // Ignore all "Critical dependency: the request of a dependency is an expression" warnings.
-            extraPlugins.push(new webpack_1.ContextReplacementPlugin(/./));
-            // Ignore "System.import() is deprecated" warnings for the main file and js files.
-            // Might still get them if @angular/core gets split into a lazy module.
-            extraRules.push({
-                test: mainPath,
-                enforce: 'post',
-                parser: { system: true },
-            });
-            extraRules.push({
-                test: /\.js$/,
-                enforce: 'post',
-                parser: { system: true },
-            });
-        }
+        entryPoints['main'] = [path.resolve(root, buildOptions.main)];
     }
     let differentialLoadingNeeded = false;
     if (wco.buildOptions.platform !== 'server') {
@@ -431,7 +390,6 @@ function getCommonConfig(wco) {
                     enforce: 'pre',
                     ...sourceMapUseRule,
                 },
-                ...extraRules,
             ],
         },
         optimization: {

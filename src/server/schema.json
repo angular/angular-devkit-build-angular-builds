@@ -142,41 +142,19 @@
     },
     "i18nFile": {
       "type": "string",
-      "description": "Localization file to use for i18n.",
-      "x-deprecated": "Use 'locales' object in the project metadata instead."
+      "description": "Localization file to use for i18n."
     },
     "i18nFormat": {
       "type": "string",
-      "description": "Format of the localization file specified with --i18n-file.",
-      "x-deprecated": "No longer needed as the format will be determined automatically."
+      "description": "Format of the localization file specified with --i18n-file."
     },
     "i18nLocale": {
       "type": "string",
-      "description": "Locale to use for i18n.",
-      "x-deprecated": "Use 'localize' instead."
+      "description": "Locale to use for i18n."
     },
     "i18nMissingTranslation": {
       "type": "string",
-      "description": "How to handle missing translations for i18n.",
-      "enum": ["warning", "error", "ignore"],
-      "default": "warning"
-    },
-    "localize": {
-      "oneOf": [
-        {
-          "type": "boolean",
-          "description": "Translate all locales."
-        },
-        {
-          "type": "array",
-          "description": "List of locales ID's to translate.",
-          "minItems": 1,
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z]{2}(-[a-zA-Z]{2,})?$"
-          }
-        }
-      ]
+      "description": "How to handle missing translations for i18n."
     },
     "outputHashing": {
       "type": "string",

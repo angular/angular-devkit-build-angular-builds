@@ -13,4 +13,3 @@ export { RemoveHashPlugin, RemoveHashPluginOptions } from './remove-hash-plugin'
 export { NamedLazyChunksPlugin as NamedChunksPlugin } from './named-chunks-plugin';
 export { default as PostcssCliResources, PostcssCliResourcesOptions, } from './postcss-cli-resources';
 export declare const RawCssLoader: string;
-export declare const WebpackRollupLoader: string;

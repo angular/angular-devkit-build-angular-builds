@@ -9,15 +9,9 @@ export interface Schema {
     /**
      * Output format for the generated file.
      */
-    format?: Format;
-    /**
-     * Output format for the generated file.
-     * @deprecated Use 'format' option instead.
-     */
-    i18nFormat?: Format;
+    i18nFormat?: I18NFormat;
     /**
      * Specifies the source language of the application.
-     * @deprecated Use 'i18n' project level sub-option 'sourceLocale' instead.
      */
     i18nLocale?: string;
     /**
@@ -35,11 +29,8 @@ export interface Schema {
 }
 /**
  * Output format for the generated file.
- *
- * Output format for the generated file.
- * @deprecated Use 'format' option instead.
  */
-export declare enum Format {
+export declare enum I18NFormat {
     Xlf = "xlf",
     Xlf2 = "xlf2",
     Xlif = "xlif",
