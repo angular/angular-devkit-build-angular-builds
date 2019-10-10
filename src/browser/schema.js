@@ -25,6 +25,15 @@ var CrossOrigin;
     CrossOrigin["UseCredentials"] = "use-credentials";
 })(CrossOrigin = exports.CrossOrigin || (exports.CrossOrigin = {}));
 /**
+ * How to handle missing translations for i18n.
+ */
+var I18NMissingTranslation;
+(function (I18NMissingTranslation) {
+    I18NMissingTranslation["Error"] = "error";
+    I18NMissingTranslation["Ignore"] = "ignore";
+    I18NMissingTranslation["Warning"] = "warning";
+})(I18NMissingTranslation = exports.I18NMissingTranslation || (exports.I18NMissingTranslation = {}));
+/**
  * Define the output filename cache-busting hashing mode.
  */
 var OutputHashing;

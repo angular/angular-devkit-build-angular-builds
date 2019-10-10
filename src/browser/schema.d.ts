@@ -68,20 +68,23 @@ export interface Schema {
     forkTypeChecker?: boolean;
     /**
      * Localization file to use for i18n.
+     * @deprecated Use 'locales' object in the project metadata instead.
      */
     i18nFile?: string;
     /**
      * Format of the localization file specified with --i18n-file.
+     * @deprecated No longer needed as the format will be determined automatically.
      */
     i18nFormat?: string;
     /**
      * Locale to use for i18n.
+     * @deprecated Use 'localize' instead.
      */
     i18nLocale?: string;
     /**
      * How to handle missing translations for i18n.
      */
-    i18nMissingTranslation?: string;
+    i18nMissingTranslation?: I18NMissingTranslation;
     /**
      * Configures the generation of the application's HTML index.
      */
@@ -93,6 +96,7 @@ export interface Schema {
      * 'import()' syntax instead.
      */
     lazyModules?: string[];
+    localize?: Localize;
     /**
      * The full path for the main entry point to the app, relative to the current workspace.
      */
@@ -299,6 +303,14 @@ export interface FileReplacement {
     with?: string;
 }
 /**
+ * How to handle missing translations for i18n.
+ */
+export declare enum I18NMissingTranslation {
+    Error = "error",
+    Ignore = "ignore",
+    Warning = "warning"
+}
+/**
  * Configures the generation of the application's HTML index.
  */
 export declare type IndexUnion = IndexObject | string;
@@ -313,6 +325,7 @@ export interface IndexObject {
      */
     output?: string;
 }
+export declare type Localize = string[] | boolean;
 /**
  * Enables optimization of the build output.
  */
