@@ -73,6 +73,7 @@ export interface BuildOptions {
     rebaseRootRelativeCssUrls?: boolean;
     esVersionInFileName?: boolean;
     scriptTargetOverride?: ScriptTarget;
+    experimentalRollupPass?: boolean;
 }
 export interface WebpackTestOptions extends BuildOptions {
     codeCoverage?: boolean;

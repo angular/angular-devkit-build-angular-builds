@@ -51,6 +51,10 @@ export interface Schema {
      */
     evalSourceMap?: boolean;
     /**
+     * Concatenate modules with Rollup before bundling them with Webpack.
+     */
+    experimentalRollupPass?: boolean;
+    /**
      * Extract css from global styles into css files instead of js ones.
      */
     extractCss?: boolean;
