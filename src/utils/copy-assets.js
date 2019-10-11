@@ -21,8 +21,10 @@ async function copyAssets(entries, basePaths, root, changed) {
         const files = await globAsync(entry.glob, {
             cwd,
             dot: true,
+            nodir: true,
             ignore: entry.ignore ? defaultIgnore.concat(entry.ignore) : defaultIgnore,
         });
+        const directoryExists = new Set();
         for (const file of files) {
             const src = path.join(cwd, file);
             if (changed && !changed.has(src)) {
@@ -32,9 +34,11 @@ async function copyAssets(entries, basePaths, root, changed) {
             for (const base of basePaths) {
                 const dest = path.join(base, entry.output, filePath);
                 const dir = path.dirname(dest);
-                if (!fs.existsSync(dir)) {
-                    // tslint:disable-next-line: no-any
-                    fs.mkdirSync(dir, { recursive: true });
+                if (!directoryExists.has(dir)) {
+                    if (!fs.existsSync(dir)) {
+                        fs.mkdirSync(dir, { recursive: true });
+                    }
+                    directoryExists.add(dir);
                 }
                 copy_file_1.copyFile(src, dest);
             }
