@@ -29,9 +29,7 @@ const i18n_options_1 = require("../utils/i18n-options");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const action_executor_1 = require("./action-executor");
-const cacache = require('cacache');
 const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
-const packageVersion = require('../../package.json').version;
 function createBrowserLoggingCallback(verbose, logger) {
     return (stats, config) => {
         // config.stats contains our own stats settings, added during buildWebpackConfig().
