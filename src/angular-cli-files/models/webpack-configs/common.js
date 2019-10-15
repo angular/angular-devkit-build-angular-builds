@@ -39,7 +39,7 @@ function getCommonConfig(wco) {
     const extraPlugins = [];
     const extraRules = [];
     const entryPoints = {};
-    const targetInFileName = utils_2.getEsVersionForFileName(tsConfig.options.target, buildOptions.esVersionInFileName);
+    const targetInFileName = utils_2.getEsVersionForFileName(utils_1.fullDifferential ? buildOptions.scriptTargetOverride : tsConfig.options.target, buildOptions.esVersionInFileName);
     if (buildOptions.main) {
         const mainPath = path.resolve(root, buildOptions.main);
         entryPoints['main'] = [mainPath];
@@ -82,10 +82,11 @@ function getCommonConfig(wco) {
             });
         }
     }
-    const differentialLoadingMode = !!wco.differentialLoadingMode;
+    let differentialLoadingNeeded = false;
     if (wco.buildOptions.platform !== 'server') {
-        if (differentialLoadingMode || tsConfig.options.target === typescript_1.ScriptTarget.ES5) {
-            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, tsConfig.options.target || typescript_1.ScriptTarget.ES5);
+        const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, tsConfig.options.target || typescript_1.ScriptTarget.ES5);
+        differentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded();
+        if ((buildOptions.scriptTargetOverride || tsConfig.options.target) === typescript_1.ScriptTarget.ES5) {
             if (buildOptions.es5BrowserSupport ||
                 (buildOptions.es5BrowserSupport === undefined && buildBrowserFeatures.isEs5SupportNeeded())) {
                 // The nomodule polyfill needs to be inject prior to any script and be
@@ -100,21 +101,24 @@ function getCommonConfig(wco) {
                         ? [...buildOptions.scripts, noModuleScript]
                         : [noModuleScript];
                 }
-                const polyfillsChunkName = 'polyfills-es5';
+                // For full build differential loading we don't need to generate a seperate polyfill file
+                // because they will be loaded exclusivly based on module and nomodule
+                const polyfillsChunkName = utils_1.fullDifferential && differentialLoadingNeeded ? 'polyfills' : 'polyfills-es5';
                 entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
-                if (differentialLoadingMode) {
+                if (!utils_1.fullDifferential && differentialLoadingNeeded) {
                     // Add zone.js legacy support to the es5 polyfills
                     // This is a noop execution-wise if zone-evergreen is not used.
                     entryPoints[polyfillsChunkName].push('zone.js/dist/zone-legacy');
                 }
                 if (!buildOptions.aot) {
-                    if (differentialLoadingMode) {
+                    // If not performing a full differential build the JIT polyfills need to be added to ES5
+                    if (!utils_1.fullDifferential && differentialLoadingNeeded) {
                         entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'jit-polyfills.js'));
                     }
                     entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
                 }
                 // If not performing a full differential build the polyfills need to be added to ES5 bundle
-                if (buildOptions.polyfills) {
+                if (!utils_1.fullDifferential && buildOptions.polyfills) {
                     entryPoints[polyfillsChunkName].push(path.resolve(root, buildOptions.polyfills));
                 }
             }
@@ -319,7 +323,7 @@ function getCommonConfig(wco) {
             // Name mangling is handled within the browser builder
             mangle: !mangle_options_1.manglingDisabled &&
                 buildOptions.platform !== 'server' &&
-                !differentialLoadingMode,
+                (!differentialLoadingNeeded || (differentialLoadingNeeded && utils_1.fullDifferential)),
         };
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,

@@ -73,7 +73,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         const browserOptions = await context.validateOptions({ ...rawBrowserOptions, ...overrides }, browserName);
         const webpackConfigResult = await browser_1.buildBrowserWebpackConfigFromContext(browserOptions, context, host);
         // No differential loading for dev-server, hence there is just one config
-        let webpackConfig = webpackConfigResult.config;
+        let webpackConfig = webpackConfigResult.config[0];
         const port = await check_port_1.checkPort(options.port || 0, options.host || 'localhost', 4200);
         const webpackDevServerConfig = (webpackConfig.devServer = buildServerConfig(root, options, browserOptions, context.logger));
         if (transforms.webpackConfiguration) {

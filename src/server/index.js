@@ -61,5 +61,5 @@ async function buildServerWebpackConfig(options, context) {
         webpack_configs_1.getStatsConfig(wco),
         getCompilerConfig(wco),
     ]);
-    return config;
+    return config[0];
 }

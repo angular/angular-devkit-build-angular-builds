@@ -20,7 +20,7 @@ export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
 };
 export declare function createBrowserLoggingCallback(verbose: boolean, logger: logging.LoggerApi): WebpackLoggingCallback;
 export declare function buildBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, host?: virtualFs.Host<fs.Stats>): Promise<{
-    config: webpack.Configuration;
+    config: webpack.Configuration[];
     projectRoot: string;
     projectSourceRoot?: string;
 }>;

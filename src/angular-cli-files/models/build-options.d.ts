@@ -7,6 +7,7 @@
  */
 import { logging } from '@angular-devkit/core';
 import { ParsedConfiguration } from '@angular/compiler-cli';
+import { ScriptTarget } from 'typescript';
 import { AssetPatternClass, Budget, ExtraEntryPoint, I18NMissingTranslation, Localize, OptimizationClass, SourceMapClass } from '../../browser/schema';
 import { NormalizedFileReplacement } from '../../utils/normalize-file-replacements';
 export interface BuildOptions {
@@ -71,6 +72,7 @@ export interface BuildOptions {
     /** @deprecated use only for compatibility in 8.x; will be removed in 9.0 */
     rebaseRootRelativeCssUrls?: boolean;
     esVersionInFileName?: boolean;
+    scriptTargetOverride?: ScriptTarget;
     experimentalRollupPass?: boolean;
 }
 export interface WebpackTestOptions extends BuildOptions {
@@ -86,5 +88,4 @@ export interface WebpackConfigOptions<T = BuildOptions> {
     tsConfig: ParsedConfiguration;
     tsConfigPath: string;
     supportES2015: boolean;
-    differentialLoadingMode?: boolean;
 }

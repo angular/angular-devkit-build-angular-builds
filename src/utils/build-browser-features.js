@@ -10,6 +10,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const browserslist = require("browserslist");
 const caniuse_lite_1 = require("caniuse-lite");
 const ts = require("typescript");
+const fullDifferentialEnv = process.env['NG_BUILD_DIFFERENTIAL_FULL'];
+exports.fullDifferential = fullDifferentialEnv !== undefined &&
+    fullDifferentialEnv !== '0' &&
+    fullDifferentialEnv.toLowerCase() !== 'false';
 class BuildBrowserFeatures {
     constructor(projectRoot, scriptTarget) {
         this.projectRoot = projectRoot;

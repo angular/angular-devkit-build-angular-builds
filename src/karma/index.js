@@ -33,7 +33,7 @@ async function initialize(options, context, webpackConfigurationTransformer) {
     const karma = await Promise.resolve().then(() => require('karma'));
     return [
         karma,
-        webpackConfigurationTransformer ? await webpackConfigurationTransformer(config) : config,
+        webpackConfigurationTransformer ? await webpackConfigurationTransformer(config[0]) : config[0],
     ];
 }
 function execute(options, context, transforms = {}) {
