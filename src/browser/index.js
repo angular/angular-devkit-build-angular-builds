@@ -91,10 +91,7 @@ async function initialize(options, context, host, webpackConfigurationTransform)
     const i18n = i18n_options_1.createI18nOptions(metadata);
     let transformedConfig;
     if (webpackConfigurationTransform) {
-        transformedConfig = [];
-        for (const c of config) {
-            transformedConfig.push(await webpackConfigurationTransform(c));
-        }
+        transformedConfig = await webpackConfigurationTransform(config);
     }
     if (options.deleteOutputPath) {
         await utils_1.deleteOutputDir(core_1.normalize(context.workspaceRoot), core_1.normalize(options.outputPath), host).toPromise();
@@ -110,7 +107,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
     // tslint:disable-next-line: no-big-function
-    operators_1.switchMap(({ config: configs, projectRoot, projectSourceRoot, i18n }) => {
+    operators_1.switchMap(({ config, projectRoot, projectSourceRoot, i18n }) => {
         const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
         const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
         const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, target);
@@ -122,33 +119,20 @@ function buildWebpackBrowser(options, context, transforms = {}) {
           referenced with script[type="module"] but they may not support ES2016+ syntax.
         `);
         }
-        const useBundleDownleveling = isDifferentialLoadingNeeded && !(utils_1.fullDifferential || options.watch);
+        const useBundleDownleveling = isDifferentialLoadingNeeded && !options.watch;
         const startTime = Date.now();
-        return rxjs_1.from(configs).pipe(
-        // the concurrency parameter (3rd parameter of mergeScan) is deliberately
-        // set to 1 to make sure the build steps are executed in sequence.
-        operators_1.mergeScan((lastResult, config) => {
-            // Make sure to only run the 2nd build step, if 1st one succeeded
-            if (lastResult.success) {
-                return build_webpack_1.runWebpack(config, context, {
-                    logging: transforms.logging ||
-                        (useBundleDownleveling
-                            ? () => { }
-                            : createBrowserLoggingCallback(!!options.verbose, context.logger)),
-                });
-            }
-            else {
-                return rxjs_1.of();
-            }
-        }, { success: true }, 1), operators_1.bufferCount(configs.length), 
+        return build_webpack_1.runWebpack(config, context, {
+            logging: transforms.logging ||
+                (useBundleDownleveling
+                    ? () => { }
+                    : createBrowserLoggingCallback(!!options.verbose, context.logger)),
+        }).pipe(
         // tslint:disable-next-line: no-big-function
-        operators_1.switchMap(async (buildEvents) => {
-            configs.length = 0;
-            const success = buildEvents.every(r => r.success);
+        operators_1.concatMap(async (buildEvent) => {
+            const { webpackStats, success, emittedFiles = [] } = buildEvent;
             if (!success && useBundleDownleveling) {
                 // If using bundle downleveling then there is only one build
                 // If it fails show any diagnostic messages and bail
-                const webpackStats = buildEvents[0].webpackStats;
                 if (webpackStats && webpackStats.warnings.length > 0) {
                     context.logger.warn(stats_1.statsWarningsToString(webpackStats, { colors: true }));
                 }
@@ -162,16 +146,11 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 let moduleFiles;
                 let files;
                 const scriptsEntryPointName = webpack_configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map(x => x.bundleName);
-                const [firstBuild, secondBuild] = buildEvents;
-                if (isDifferentialLoadingNeeded && (utils_1.fullDifferential || options.watch)) {
-                    moduleFiles = firstBuild.emittedFiles || [];
+                if (isDifferentialLoadingNeeded && options.watch) {
+                    moduleFiles = emittedFiles;
                     files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
-                    if (buildEvents.length === 2) {
-                        noModuleFiles = secondBuild.emittedFiles;
-                    }
                 }
-                else if (isDifferentialLoadingNeeded && !utils_1.fullDifferential) {
-                    const { emittedFiles = [], webpackStats } = firstBuild;
+                else if (isDifferentialLoadingNeeded) {
                     moduleFiles = [];
                     noModuleFiles = [];
                     // Common options for all bundle process actions
@@ -350,7 +329,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     }
                 }
                 else {
-                    const { emittedFiles = [] } = firstBuild;
                     files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
                     noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
                 }

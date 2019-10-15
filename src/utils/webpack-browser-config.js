@@ -35,73 +35,49 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
     const differentialLoading = context.builder.builderName === 'browser' &&
         !options.watch &&
         buildBrowserFeatures.isDifferentialLoadingNeeded();
-    const scriptTargets = [scriptTarget];
-    if (differentialLoading && utils_1.fullDifferential) {
-        scriptTargets.push(ts.ScriptTarget.ES5);
-    }
-    // For differential loading, we can have several targets
-    return scriptTargets.map(scriptTarget => {
-        let buildOptions = { ...options };
-        const supportES2015 = scriptTarget !== ts.ScriptTarget.ES3 && scriptTarget !== ts.ScriptTarget.ES5;
-        if (differentialLoading && utils_1.fullDifferential) {
-            buildOptions = {
-                ...options,
-                ... // FIXME: we do create better webpack config composition to achieve the below
-                // When DL is enabled and supportES2015 is true it means that we are on the second build
-                // This also means that we don't need to include styles and assets multiple times
-                (supportES2015
-                    ? {}
-                    : {
-                        styles: options.extractCss ? [] : options.styles,
-                        assets: [],
-                    }),
-                es5BrowserSupport: undefined,
-                esVersionInFileName: true,
-                scriptTargetOverride: scriptTarget,
-            };
-        }
-        else if (differentialLoading && !utils_1.fullDifferential) {
-            buildOptions = {
-                ...options,
-                // Under downlevel differential loading we copy the assets outside of webpack.
-                assets: [],
-                esVersionInFileName: true,
-                scriptTargetOverride: ts.ScriptTarget.ES5,
-                es5BrowserSupport: undefined,
-            };
-        }
-        const wco = {
-            root: workspaceRoot,
-            logger: logger.createChild('webpackConfigOptions'),
-            projectRoot,
-            sourceRoot,
-            buildOptions,
-            tsConfig,
-            tsConfigPath,
-            supportES2015,
+    let buildOptions = { ...options };
+    if (differentialLoading) {
+        buildOptions = {
+            ...options,
+            // Under downlevel differential loading we copy the assets outside of webpack.
+            assets: [],
+            esVersionInFileName: true,
+            es5BrowserSupport: undefined,
         };
-        wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
-        const partials = webpackPartialGenerator(wco);
-        const webpackConfig = webpackMerge(partials);
-        if (supportES2015) {
-            if (!webpackConfig.resolve) {
-                webpackConfig.resolve = {};
-            }
-            if (!webpackConfig.resolve.alias) {
-                webpackConfig.resolve.alias = {};
-            }
-            webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
+    }
+    const supportES2015 = scriptTarget !== ts.ScriptTarget.JSON && scriptTarget > ts.ScriptTarget.ES5;
+    const wco = {
+        root: workspaceRoot,
+        logger: logger.createChild('webpackConfigOptions'),
+        projectRoot,
+        sourceRoot,
+        buildOptions,
+        tsConfig,
+        tsConfigPath,
+        supportES2015,
+        differentialLoadingMode: differentialLoading,
+    };
+    wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
+    const partials = webpackPartialGenerator(wco);
+    const webpackConfig = webpackMerge(partials);
+    if (supportES2015) {
+        if (!webpackConfig.resolve) {
+            webpackConfig.resolve = {};
         }
-        if (options.profile || process.env['NG_BUILD_PROFILING']) {
-            const esVersionInFileName = webpack_configs_1.getEsVersionForFileName(utils_1.fullDifferential ? buildOptions.scriptTargetOverride : tsConfig.options.target, wco.buildOptions.esVersionInFileName);
-            const smp = new SpeedMeasurePlugin({
-                outputFormat: 'json',
-                outputTarget: path.resolve(workspaceRoot, `speed-measure-plugin${esVersionInFileName}.json`),
-            });
-            return smp.wrap(webpackConfig);
+        if (!webpackConfig.resolve.alias) {
+            webpackConfig.resolve.alias = {};
         }
-        return webpackConfig;
-    });
+        webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
+    }
+    if (options.profile || process.env['NG_BUILD_PROFILING']) {
+        const esVersionInFileName = webpack_configs_1.getEsVersionForFileName(tsConfig.options.target, wco.buildOptions.esVersionInFileName);
+        const smp = new SpeedMeasurePlugin({
+            outputFormat: 'json',
+            outputTarget: path.resolve(workspaceRoot, `speed-measure-plugin${esVersionInFileName}.json`),
+        });
+        return smp.wrap(webpackConfig);
+    }
+    return webpackConfig;
 }
 exports.generateWebpackConfig = generateWebpackConfig;
 async function generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost()) {

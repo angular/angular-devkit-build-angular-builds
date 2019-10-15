@@ -91,6 +91,6 @@ async function execute(options, context) {
             context.logger.error(stats_1.statsErrorsToString(json, config.stats));
         }
     };
-    return build_webpack_1.runWebpack(config[0], context, { logging }).toPromise();
+    return build_webpack_1.runWebpack(config, context, { logging }).toPromise();
 }
 exports.default = architect_1.createBuilder(execute);
