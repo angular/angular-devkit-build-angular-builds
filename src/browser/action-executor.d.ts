@@ -11,6 +11,6 @@ export declare class BundleActionExecutor {
     private ensureSmall;
     private executeAction;
     process(action: ProcessBundleOptions): Promise<ProcessBundleResult>;
-    processAll(actions: Iterable<ProcessBundleOptions>): AsyncIterableIterator<ProcessBundleResult>;
+    processAll(actions: Iterable<ProcessBundleOptions>): AsyncGenerator<ProcessBundleResult, void, unknown>;
     stop(): void;
 }
