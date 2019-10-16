@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const build_optimizer_1 = require("@angular-devkit/build-optimizer");
 const path = require("path");
 const webpack_1 = require("@ngtools/webpack");
-const utils_1 = require("../../../utils");
 function _pluginOptionsOverrides(buildOptions, pluginOptions) {
     const compilerOptions = {
         ...(pluginOptions.compilerOptions || {})
@@ -22,9 +21,6 @@ function _pluginOptionsOverrides(buildOptions, pluginOptions) {
         for (const replacement of buildOptions.fileReplacements) {
             hostReplacementPaths[replacement.replace] = replacement.with;
         }
-    }
-    if (utils_1.fullDifferential && buildOptions.scriptTargetOverride) {
-        compilerOptions.target = buildOptions.scriptTargetOverride;
     }
     if (buildOptions.preserveSymlinks) {
         compilerOptions.preserveSymlinks = true;

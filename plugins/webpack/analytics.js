@@ -130,14 +130,12 @@ class NgBuildAnalyticsPlugin {
             // Count the number of `Component({` strings (case sensitive), which happens in __decorate().
             // This does not include View Engine AOT compilation, we use the ngfactory for it.
             this._stats.numberOfComponents += countOccurrences(module._source.source(), ' Component({');
-            // For Ivy we just count ngComponentDef.
-            const numIvyComponents = countOccurrences(module._source.source(), 'ngComponentDef', true);
+            // For Ivy we just count ɵcmp.
+            const numIvyComponents = countOccurrences(module._source.source(), 'ɵcmp', true);
             this._stats.numberOfComponents += numIvyComponents;
             // Check whether this is an Ivy app so that it can reported as part of analytics.
-            if (!this._stats.isIvy) {
-                if (numIvyComponents > 0 || module._source.source().includes('ngModuleDef')) {
-                    this._stats.isIvy = true;
-                }
+            if (!this._stats.isIvy && numIvyComponents > 0) {
+                this._stats.isIvy = true;
             }
         }
     }
