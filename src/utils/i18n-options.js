@@ -1,12 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function createI18nOptions(metadata) {
-    const i18n = { locales: {} };
+function createI18nOptions(metadata, inline) {
+    if (metadata.i18n !== undefined &&
+        (typeof metadata.i18n !== 'object' || !metadata.i18n || Array.isArray(metadata.i18n))) {
+        throw new Error('Project i18n field is malformed. Expected an object.');
+    }
+    metadata = metadata.i18n || {};
     if (metadata.sourceLocale !== undefined && typeof metadata.sourceLocale !== 'string') {
         throw new Error('Project i18n sourceLocale field is malformed. Expected a string.');
     }
-    // en-US is the default locale added to Angular applications (https://angular.io/guide/i18n#i18n-pipes)
-    i18n.sourceLocale = metadata.sourceLocale || 'en-US';
+    const i18n = {
+        inlineLocales: new Set(),
+        // en-US is the default locale added to Angular applications (https://angular.io/guide/i18n#i18n-pipes)
+        sourceLocale: metadata.sourceLocale || 'en-US',
+        locales: {},
+        get shouldInline() {
+            return this.inlineLocales.size > 0;
+        },
+    };
     if (metadata.locales !== undefined &&
         (!metadata.locales || typeof metadata.locales !== 'object' || Array.isArray(metadata.locales))) {
         throw new Error('Project i18n locales field is malformed. Expected an object.');
@@ -16,11 +27,24 @@ function createI18nOptions(metadata) {
             if (typeof translationFile !== 'string') {
                 throw new Error(`Project i18n locales field value for '${locale}' is malformed. Expected a string.`);
             }
-            // TODO: Integrate translation file parsing from FW when available
+            if (locale === i18n.sourceLocale) {
+                throw new Error(`An i18n locale identifier ('${locale}') cannot both be a source locale and provide a translation.`);
+            }
             i18n.locales[locale] = {
                 file: translationFile,
-                translation: {},
             };
+        }
+    }
+    if (inline === true) {
+        i18n.inlineLocales.add(i18n.sourceLocale);
+        Object.keys(i18n.locales).forEach(locale => i18n.inlineLocales.add(locale));
+    }
+    else if (inline) {
+        for (const locale of inline) {
+            if (!i18n.locales[locale]) {
+                throw new Error(`Requested inline locale '${locale}' is not defined for the project.`);
+            }
+            i18n.inlineLocales.add(locale);
         }
     }
     return i18n;

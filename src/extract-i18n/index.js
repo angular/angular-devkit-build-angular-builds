@@ -45,6 +45,17 @@ async function execute(options, context) {
     if (options.i18nFormat !== schema_1.Format.Xlf) {
         options.format = options.i18nFormat;
     }
+    switch (options.format) {
+        case schema_1.Format.Xlf:
+        case schema_1.Format.Xlif:
+        case schema_1.Format.Xliff:
+            options.format = schema_1.Format.Xlf;
+            break;
+        case schema_1.Format.Xlf2:
+        case schema_1.Format.Xliff2:
+            options.format = schema_1.Format.Xlf2;
+            break;
+    }
     // We need to determine the outFile name so that AngularCompiler can retrieve it.
     let outFile = options.outFile || getI18nOutfile(options.format);
     if (options.outputPath) {

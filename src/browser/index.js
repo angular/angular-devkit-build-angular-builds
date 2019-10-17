@@ -13,6 +13,7 @@ const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const findCacheDirectory = require("find-cache-dir");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
@@ -26,6 +27,7 @@ const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
 const copy_assets_1 = require("../utils/copy-assets");
 const i18n_options_1 = require("../utils/i18n-options");
+const load_translations_1 = require("../utils/load-translations");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const action_executor_1 = require("./action-executor");
@@ -84,17 +86,44 @@ function getCompilerConfig(wco) {
     return {};
 }
 async function initialize(options, context, host, webpackConfigurationTransform) {
-    const { config, projectRoot, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(options, context, host);
-    // target is verified in the above call
-    // tslint:disable-next-line: no-non-null-assertion
+    if (!context.target) {
+        throw new Error('The builder requires a target.');
+    }
     const metadata = await context.getProjectMetadata(context.target);
-    const i18n = i18n_options_1.createI18nOptions(metadata);
+    const i18n = i18n_options_1.createI18nOptions(metadata, options.localize);
+    if (i18n.inlineLocales.size > 0) {
+        // Load locales
+        const loader = await load_translations_1.createTranslationLoader();
+        const usedFormats = new Set();
+        for (const [locale, desc] of Object.entries(i18n.locales)) {
+            if (i18n.inlineLocales.has(locale)) {
+                const result = loader(desc.file);
+                usedFormats.add(result.format);
+                if (usedFormats.size > 1) {
+                    // This limitation is technically only for legacy message id support
+                    throw new Error('Localization currently only supports using one type of translation file format for the entire application.');
+                }
+                desc.format = result.format;
+                desc.translation = result.translation;
+            }
+        }
+        // Legacy message id's require the format of the translations
+        if (usedFormats.size > 0) {
+            options.i18nFormat = [...usedFormats][0];
+        }
+    }
+    const originalOutputPath = options.outputPath;
+    // If inlining store the output in a temporary location to facilitate post-processing
+    if (i18n.shouldInline) {
+        options.outputPath = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-'));
+    }
+    const { config, projectRoot, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(options, context, host);
     let transformedConfig;
     if (webpackConfigurationTransform) {
         transformedConfig = await webpackConfigurationTransform(config);
     }
     if (options.deleteOutputPath) {
-        await utils_1.deleteOutputDir(core_1.normalize(context.workspaceRoot), core_1.normalize(options.outputPath), host).toPromise();
+        await utils_1.deleteOutputDir(core_1.normalize(context.workspaceRoot), core_1.normalize(originalOutputPath), host).toPromise();
     }
     return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
 }
@@ -142,6 +171,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 return { success };
             }
             else if (success) {
+                if (!fs.existsSync(baseOutputPath)) {
+                    fs.mkdirSync(baseOutputPath, { recursive: true });
+                }
                 let noModuleFiles;
                 let moduleFiles;
                 let files;
@@ -153,6 +185,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 else if (isDifferentialLoadingNeeded) {
                     moduleFiles = [];
                     noModuleFiles = [];
+                    if (!webpackStats) {
+                        throw new Error('Webpack stats build result is required.');
+                    }
                     // Common options for all bundle process actions
                     const sourceMapOptions = utils_1.normalizeSourceMaps(options.sourceMap || false);
                     const actionOptions = {
@@ -197,7 +232,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                         // Retrieve the content/map for the file
                         // NOTE: Additional future optimizations will read directly from memory
-                        let filename = path.join(baseOutputPath, file.file);
+                        // tslint:disable-next-line: no-non-null-assertion
+                        let filename = path.join(webpackStats.outputPath, file.file);
                         const code = fs.readFileSync(filename, 'utf8');
                         let map;
                         if (actionOptions.sourceMaps) {
@@ -237,8 +273,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             : file.file.replace('es2015', 'es5');
                         noModuleFiles.push({ ...file, file: newFilename });
                     }
-                    // Execute the bundle processing actions
-                    context.logger.info('Generating ES5 bundles for differential loading...');
                     const processActions = [];
                     let processRuntimeAction;
                     const processResults = [];
@@ -253,27 +287,94 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                     }
                     const executor = new action_executor_1.BundleActionExecutor({ cachePath: cacheDownlevelPath, i18n }, options.subresourceIntegrity ? 'sha384' : undefined);
+                    // Execute the bundle processing actions
                     try {
+                        context.logger.info('Generating ES5 bundles for differential loading...');
                         for await (const result of executor.processAll(processActions)) {
                             processResults.push(result);
                         }
+                        // Runtime must be processed after all other files
+                        if (processRuntimeAction) {
+                            const runtimeOptions = {
+                                ...processRuntimeAction,
+                                runtimeData: processResults,
+                            };
+                            processResults.push(await Promise.resolve().then(() => require('../utils/process-bundle')).then(m => m.process(runtimeOptions)));
+                        }
+                        context.logger.info('ES5 bundle generation complete.');
                     }
                     finally {
                         executor.stop();
                     }
-                    // Runtime must be processed after all other files
-                    if (processRuntimeAction) {
-                        const runtimeOptions = {
-                            ...processRuntimeAction,
-                            runtimeData: processResults,
-                        };
-                        processResults.push(await Promise.resolve().then(() => require('../utils/process-bundle')).then(m => m.process(runtimeOptions)));
+                    if (i18n.shouldInline) {
+                        context.logger.info('Generating localized bundles...');
+                        const localize = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/translate/main'));
+                        const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
+                        const diagnostics = new localizeDiag.Diagnostics();
+                        const translationFilePaths = [];
+                        let handleSourceLocale = false;
+                        for (const locale of i18n.inlineLocales) {
+                            if (locale === i18n.sourceLocale) {
+                                handleSourceLocale = true;
+                                continue;
+                            }
+                            translationFilePaths.push(i18n.locales[locale].file);
+                        }
+                        if (translationFilePaths.length > 0) {
+                            const sourceFilePaths = [];
+                            for (const result of processResults) {
+                                if (result.original) {
+                                    sourceFilePaths.push(result.original.filename);
+                                }
+                                if (result.downlevel) {
+                                    sourceFilePaths.push(result.downlevel.filename);
+                                }
+                            }
+                            try {
+                                localize.translateFiles({
+                                    // tslint:disable-next-line: no-non-null-assertion
+                                    sourceRootPath: webpackStats.outputPath,
+                                    sourceFilePaths,
+                                    translationFilePaths,
+                                    outputPathFn: (locale, relativePath) => path.join(baseOutputPath, locale, relativePath),
+                                    diagnostics,
+                                    missingTranslation: options.i18nMissingTranslation || 'warning',
+                                    sourceLocale: handleSourceLocale ? i18n.sourceLocale : undefined,
+                                });
+                            }
+                            catch (err) {
+                                context.logger.error('Localized bundle generation failed: ' + err.message);
+                                return { success: false };
+                            }
+                            finally {
+                                try {
+                                    // Remove temporary directory used for i18n processing
+                                    // tslint:disable-next-line: no-non-null-assertion
+                                    await host.delete(core_1.normalize(webpackStats.outputPath)).toPromise();
+                                }
+                                catch (_b) { }
+                            }
+                        }
+                        context.logger.info(`Localized bundle generation ${diagnostics.hasErrors ? 'failed' : 'complete'}.`);
+                        for (const message of diagnostics.messages) {
+                            if (message.type === 'error') {
+                                context.logger.error(message.message);
+                            }
+                            else {
+                                context.logger.warn(message.message);
+                            }
+                        }
+                        if (diagnostics.hasErrors) {
+                            return { success: false };
+                        }
                     }
-                    context.logger.info('ES5 bundle generation complete.');
                     // Copy assets
                     if (options.assets) {
+                        const outputPaths = i18n.shouldInline
+                            ? [...i18n.inlineLocales].map(l => path.join(baseOutputPath, l))
+                            : [baseOutputPath];
                         try {
-                            await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), [baseOutputPath], context.workspaceRoot);
+                            await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), outputPaths, context.workspaceRoot);
                         }
                         catch (err) {
                             context.logger.error('Unable to copy assets: ' + err.message);
@@ -333,32 +434,20 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
                 }
                 if (options.index) {
-                    return write_index_html_1.writeIndexHtml({
-                        host,
-                        outputPath: core_1.join(core_1.normalize(baseOutputPath), webpack_browser_config_1.getIndexOutputFile(options)),
-                        indexPath: core_1.join(root, webpack_browser_config_1.getIndexInputFile(options)),
-                        files,
-                        noModuleFiles,
-                        moduleFiles,
-                        baseHref: options.baseHref,
-                        deployUrl: options.deployUrl,
-                        sri: options.subresourceIntegrity,
-                        scripts: options.scripts,
-                        styles: options.styles,
-                        postTransform: transforms.indexHtml,
-                        crossOrigin: options.crossOrigin,
-                        lang: options.i18nLocale,
-                    })
-                        .pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(error => rxjs_1.of({ success: false, error: mapErrorToMessage(error) })))
-                        .toPromise();
-                }
-                else {
-                    return { success };
+                    const outputPaths = i18n.shouldInline
+                        ? [...i18n.inlineLocales].map(l => path.join(baseOutputPath, l))
+                        : [baseOutputPath];
+                    for (const outputPath of outputPaths) {
+                        try {
+                            await generateIndex(outputPath, options, root, files, noModuleFiles, moduleFiles, transforms.indexHtml);
+                        }
+                        catch (err) {
+                            return { success: false, error: mapErrorToMessage(err) };
+                        }
+                    }
                 }
             }
-            else {
-                return { success };
-            }
+            return { success };
         }), operators_1.concatMap(buildEvent => {
             if (buildEvent.success && !options.watch && options.serviceWorker) {
                 return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(baseOutputPath), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), error => ({ success: false, error: mapErrorToMessage(error) })));
@@ -374,6 +463,25 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     }));
 }
 exports.buildWebpackBrowser = buildWebpackBrowser;
+function generateIndex(baseOutputPath, options, root, files, noModuleFiles, moduleFiles, transformer) {
+    const host = new node_1.NodeJsSyncHost();
+    return write_index_html_1.writeIndexHtml({
+        host,
+        outputPath: core_1.join(core_1.normalize(baseOutputPath), webpack_browser_config_1.getIndexOutputFile(options)),
+        indexPath: core_1.join(core_1.normalize(root), webpack_browser_config_1.getIndexInputFile(options)),
+        files,
+        noModuleFiles,
+        moduleFiles,
+        baseHref: options.baseHref,
+        deployUrl: options.deployUrl,
+        sri: options.subresourceIntegrity,
+        scripts: options.scripts,
+        styles: options.styles,
+        postTransform: transformer,
+        crossOrigin: options.crossOrigin,
+        lang: options.i18nLocale,
+    }).toPromise();
+}
 function mapErrorToMessage(error) {
     if (error instanceof Error) {
         return error.message;

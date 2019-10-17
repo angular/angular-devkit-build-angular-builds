@@ -104,7 +104,7 @@ async function process(options) {
             await cachePut(mapContent, options.cacheKeys[3 /* DownlevelMap */]);
             fs.writeFileSync(downlevelPath + '.map', mapContent);
         }
-        result.downlevel = createFileEntry(downlevelFilename, downlevelCode, mapContent, options.integrityAlgorithm);
+        result.downlevel = createFileEntry(path.join(basePath, downlevelFilename), downlevelCode, mapContent, options.integrityAlgorithm);
         await cachePut(downlevelCode, options.cacheKeys[2 /* DownlevelCode */], result.downlevel.integrity);
         fs.writeFileSync(downlevelPath, downlevelCode);
     }

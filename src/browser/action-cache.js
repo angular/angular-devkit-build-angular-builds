@@ -10,31 +10,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const crypto_1 = require("crypto");
 const findCacheDirectory = require("find-cache-dir");
 const fs = require("fs");
+const copy_file_1 = require("../utils/copy-file");
 const mangle_options_1 = require("../utils/mangle-options");
 const cacache = require('cacache');
 const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
 const packageVersion = require('../../package.json').version;
-// Workaround Node.js issue prior to 10.16 with copyFile on macOS
-// https://github.com/angular/angular-cli/issues/15544 & https://github.com/nodejs/node/pull/27241
-let copyFileWorkaround = false;
-if (process.platform === 'darwin') {
-    const version = process.versions.node.split('.').map(part => Number(part));
-    if (version[0] < 10 || version[0] === 11 || (version[0] === 10 && version[1] < 16)) {
-        copyFileWorkaround = true;
-    }
-}
 class BundleActionCache {
     constructor(integrityAlgorithm) {
         this.integrityAlgorithm = integrityAlgorithm;
     }
     static copyEntryContent(entry, dest) {
-        if (copyFileWorkaround) {
-            try {
-                fs.unlinkSync(dest);
-            }
-            catch (_a) { }
-        }
-        fs.copyFileSync(typeof entry === 'string' ? entry : entry.path, dest, fs.constants.COPYFILE_FICLONE);
+        copy_file_1.copyFile(typeof entry === 'string' ? entry : entry.path, dest);
         if (process.platform !== 'win32') {
             // The cache writes entries as readonly and when using copyFile the permissions will also be copied.
             // See: https://github.com/npm/cacache/blob/073fbe1a9f789ba42d9a41de7b8429c93cf61579/lib/util/move-file.js#L36

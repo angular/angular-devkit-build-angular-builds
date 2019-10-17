@@ -7,10 +7,13 @@
  */
 import { json } from '@angular-devkit/core';
 export interface I18nOptions {
-    sourceLocale?: string;
+    inlineLocales: Set<string>;
+    sourceLocale: string;
     locales: Record<string, {
         file: string;
-        translation: unknown;
+        format?: string;
+        translation?: unknown;
     }>;
+    readonly shouldInline: boolean;
 }
-export declare function createI18nOptions(metadata: json.JsonObject): I18nOptions;
+export declare function createI18nOptions(metadata: json.JsonObject, inline?: boolean | string[]): I18nOptions;
