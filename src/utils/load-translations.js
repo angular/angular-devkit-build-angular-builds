@@ -24,7 +24,7 @@ async function createTranslationLoader() {
         const content = fs.readFileSync(path, 'utf8');
         for (const [format, parser] of Object.entries(parsers)) {
             if (parser.canParse(path, content)) {
-                return { format, translation: parser.parse(path, content) };
+                return { format, translation: parser.parse(path, content).translations };
             }
         }
         throw new Error('Unsupported translation file format.');

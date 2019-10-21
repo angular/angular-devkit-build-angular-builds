@@ -50,3 +50,18 @@ function createI18nOptions(metadata, inline) {
     return i18n;
 }
 exports.createI18nOptions = createI18nOptions;
+function mergeDeprecatedI18nOptions(i18n, i18nLocale, i18nFile) {
+    if (i18nFile !== undefined && i18nLocale === undefined) {
+        throw new Error(`Option 'i18nFile' cannot be used without the 'i18nLocale' option.`);
+    }
+    if (i18nLocale !== undefined) {
+        i18n.inlineLocales.clear();
+        i18n.inlineLocales.add(i18nLocale);
+        if (i18nFile !== undefined) {
+            i18n.locales[i18nLocale] = { file: i18nFile };
+            i18n.flatOutput = true;
+        }
+    }
+    return i18n;
+}
+exports.mergeDeprecatedI18nOptions = mergeDeprecatedI18nOptions;
