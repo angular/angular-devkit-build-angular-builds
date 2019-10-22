@@ -1,3 +1,4 @@
+import { I18nOptions } from './i18n-options';
 export interface ProcessBundleOptions {
     filename: string;
     code: string;
@@ -35,7 +36,24 @@ export declare const enum CacheKey {
     DownlevelCode = 2,
     DownlevelMap = 3
 }
-export declare function setup(options: {
+export declare function setup(data: number[] | {
     cachePath: string;
+    i18n: I18nOptions;
 }): void;
 export declare function process(options: ProcessBundleOptions): Promise<ProcessBundleResult>;
+export interface InlineOptions {
+    filename: string;
+    code: string;
+    map?: string;
+    es5: boolean;
+    outputPath: string;
+    missingTranslation?: 'warning' | 'error' | 'ignore';
+}
+export declare function inlineLocales(options: InlineOptions): Promise<{
+    file: string;
+    diagnostics: {
+        type: "error" | "warning";
+        message: string;
+    }[];
+    count: number;
+}>;
