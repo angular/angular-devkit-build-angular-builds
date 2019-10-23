@@ -7,8 +7,9 @@ export interface CacheEntry {
     integrity?: string;
 }
 export declare class BundleActionCache {
+    private readonly cachePath;
     private readonly integrityAlgorithm?;
-    constructor(integrityAlgorithm?: string | undefined);
+    constructor(cachePath: string, integrityAlgorithm?: string | undefined);
     static copyEntryContent(entry: CacheEntry | string, dest: fs.PathLike): void;
     generateBaseCacheKey(content: string): string;
     generateCacheKeys(action: ProcessBundleOptions): string[];

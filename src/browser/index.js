@@ -11,7 +11,6 @@ const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
-const findCacheDirectory = require("find-cache-dir");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
@@ -25,14 +24,16 @@ const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
 const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
+const cache_path_1 = require("../utils/cache-path");
 const copy_assets_1 = require("../utils/copy-assets");
+const environment_options_1 = require("../utils/environment-options");
 const i18n_inlining_1 = require("../utils/i18n-inlining");
 const i18n_options_1 = require("../utils/i18n-options");
 const load_translations_1 = require("../utils/load-translations");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const action_executor_1 = require("./action-executor");
-const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
+const cacheDownlevelPath = environment_options_1.cachingDisabled ? undefined : cache_path_1.findCachePath('angular-build-dl');
 function createBrowserLoggingCallback(verbose, logger) {
     return (stats, config) => {
         // config.stats contains our own stats settings, added during buildWebpackConfig().
