@@ -15,7 +15,7 @@ const source_map_1 = require("source-map");
 const terser_1 = require("terser");
 const v8 = require("v8");
 const webpack_sources_1 = require("webpack-sources");
-const mangle_options_1 = require("./mangle-options");
+const environment_options_1 = require("./environment-options");
 const cacache = require('cacache');
 const deserialize = v8.deserialize;
 let cachePath;
@@ -200,7 +200,7 @@ function terserMangle(code, options = {}) {
     const minifyOutput = terser_1.minify(code, {
         compress: options.compress || false,
         ecma: options.ecma || 5,
-        mangle: !mangle_options_1.manglingDisabled,
+        mangle: !environment_options_1.manglingDisabled,
         safari10: true,
         output: {
             ascii_only: true,
