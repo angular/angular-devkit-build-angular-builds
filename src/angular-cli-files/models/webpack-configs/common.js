@@ -15,7 +15,8 @@ const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
 const webpack_sources_1 = require("webpack-sources");
 const utils_1 = require("../../../utils");
-const mangle_options_1 = require("../../../utils/mangle-options");
+const cache_path_1 = require("../../../utils/cache-path");
+const environment_options_1 = require("../../../utils/environment-options");
 const bundle_budget_1 = require("../../plugins/bundle-budget");
 const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
 const named_chunks_plugin_1 = require("../../plugins/named-chunks-plugin");
@@ -317,14 +318,14 @@ function getCommonConfig(wco) {
                 },
             // We also want to avoid mangling on server.
             // Name mangling is handled within the browser builder
-            mangle: !mangle_options_1.manglingDisabled &&
+            mangle: !environment_options_1.manglingDisabled &&
                 buildOptions.platform !== 'server' &&
                 !differentialLoadingMode,
         };
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,
             parallel: true,
-            cache: true,
+            cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
             chunkFilter: (chunk) => !globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
             terserOptions,
@@ -334,7 +335,7 @@ function getCommonConfig(wco) {
         new TerserPlugin({
             sourceMap: scriptsSourceMap,
             parallel: true,
-            cache: true,
+            cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
             chunkFilter: (chunk) => globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
             terserOptions: {
@@ -347,7 +348,7 @@ function getCommonConfig(wco) {
                     ...terserOptions.output,
                     ecma: 5,
                 },
-                mangle: !mangle_options_1.manglingDisabled && buildOptions.platform !== 'server',
+                mangle: !environment_options_1.manglingDisabled && buildOptions.platform !== 'server',
             },
         }));
     }

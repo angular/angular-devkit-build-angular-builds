@@ -34,7 +34,9 @@ class BundleActionExecutor {
     constructor(workerOptions, integrityAlgorithm, sizeThreshold = 32 * 1024) {
         this.workerOptions = workerOptions;
         this.sizeThreshold = sizeThreshold;
-        this.cache = new action_cache_1.BundleActionCache(integrityAlgorithm);
+        if (workerOptions.cachePath) {
+            this.cache = new action_cache_1.BundleActionCache(workerOptions.cachePath, integrityAlgorithm);
+        }
     }
     static executeMethod(worker, method, input) {
         return worker[method](input);
@@ -72,16 +74,18 @@ class BundleActionExecutor {
         }
     }
     async process(action) {
-        const cacheKeys = this.cache.generateCacheKeys(action);
-        action.cacheKeys = cacheKeys;
-        // Try to get cached data, if it fails fallback to processing
-        try {
-            const cachedResult = await this.cache.getCachedBundleResult(action);
-            if (cachedResult) {
-                return cachedResult;
+        if (this.cache) {
+            const cacheKeys = this.cache.generateCacheKeys(action);
+            action.cacheKeys = cacheKeys;
+            // Try to get cached data, if it fails fallback to processing
+            try {
+                const cachedResult = await this.cache.getCachedBundleResult(action);
+                if (cachedResult) {
+                    return cachedResult;
+                }
             }
+            catch (_a) { }
         }
-        catch (_a) { }
         return this.executeAction('process', action);
     }
     processAll(actions) {
