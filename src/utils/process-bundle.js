@@ -307,7 +307,8 @@ async function inlineLocales(options) {
     if (i18n.flatOutput && i18n.inlineLocales.size > 1) {
         throw new Error('Flat output is only supported when inlining one locale.');
     }
-    if (!options.code.includes(localizeName)) {
+    const hasLocalizeName = options.code.includes(localizeName);
+    if (!hasLocalizeName && !options.setLocale) {
         return inlineCopyOnly(options);
     }
     const { default: MagicString } = await Promise.resolve().then(() => require('magic-string'));
@@ -318,11 +319,12 @@ async function inlineLocales(options) {
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
     const positions = findLocalizePositions(options, utils);
-    if (positions.length === 0) {
+    if (positions.length === 0 && !options.setLocale) {
         return inlineCopyOnly(options);
     }
-    const content = new MagicString(options.code);
+    let content = new MagicString(options.code);
     const inputMap = options.map && JSON.parse(options.map);
+    let contentClone;
     for (const locale of i18n.inlineLocales) {
         const isSourceLocale = locale === i18n.sourceLocale;
         // tslint:disable-next-line: no-any
@@ -333,6 +335,11 @@ async function inlineLocales(options) {
             const { code } = generate(expression);
             content.overwrite(position.start, position.end, code);
         }
+        if (options.setLocale) {
+            const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});`;
+            contentClone = content.clone();
+            content.prepend(setLocaleText);
+        }
         const output = content.toString();
         const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
         fs.writeFileSync(outputPath, output);
@@ -340,6 +347,10 @@ async function inlineLocales(options) {
             const contentMap = content.generateMap();
             const outputMap = mergeSourceMaps(options.code, inputMap, output, contentMap, options.filename);
             fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
+        }
+        if (contentClone) {
+            content = contentClone;
+            contentClone = undefined;
         }
     }
     return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };
@@ -368,7 +379,9 @@ function findLocalizePositions(options, utils) {
         core_1.traverse(ast, {
             CallExpression(path) {
                 const callee = path.get('callee');
-                if (callee.isIdentifier() && callee.node.name === localizeName) {
+                if (callee.isIdentifier() &&
+                    callee.node.name === localizeName &&
+                    utils.isGlobalIdentifier(callee)) {
                     const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
                     const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
                     positions.push({
