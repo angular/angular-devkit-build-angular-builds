@@ -94,6 +94,7 @@ async function initialize(options, context, host, webpackConfigurationTransform)
     const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
     const usingIvy = tsConfig.options.enableIvy !== false;
     const metadata = await context.getProjectMetadata(context.target);
+    const projectRoot = path.join(context.workspaceRoot, metadata.root || '');
     const i18n = i18n_options_1.createI18nOptions(metadata, options.localize);
     // Until 11.0, support deprecated i18n options when not using new localize option
     // i18nFormat is automatically calculated
@@ -104,16 +105,16 @@ async function initialize(options, context, host, webpackConfigurationTransform)
         options.localize = undefined;
         context.logger.warn(`Option 'localize' is not supported with View Engine.`);
     }
-    if (i18n.inlineLocales.size > 0) {
+    if (i18n.shouldInline) {
         // Load locales
         const loader = await load_translations_1.createTranslationLoader();
         const usedFormats = new Set();
         for (const [locale, desc] of Object.entries(i18n.locales)) {
             if (i18n.inlineLocales.has(locale)) {
-                const result = loader(desc.file);
+                const result = loader(path.join(projectRoot, desc.file));
                 usedFormats.add(result.format);
-                if (usedFormats.size > 1) {
-                    // This limitation is technically only for legacy message id support
+                if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
+                    // This limitation is only for legacy message id support (defaults to true as of 9.0)
                     throw new Error('Localization currently only supports using one type of translation file format for the entire application.');
                 }
                 desc.format = result.format;
@@ -130,7 +131,17 @@ async function initialize(options, context, host, webpackConfigurationTransform)
     if (i18n.shouldInline) {
         options.outputPath = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-'));
     }
-    const { config, projectRoot, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(options, context, host);
+    const { config, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(options, context, host);
+    if (i18n.shouldInline) {
+        // Remove localize "polyfill"
+        if (!config.resolve) {
+            config.resolve = {};
+        }
+        if (!config.resolve.alias) {
+            config.resolve.alias = {};
+        }
+        config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
+    }
     let transformedConfig;
     if (webpackConfigurationTransform) {
         transformedConfig = await webpackConfigurationTransform(config);
@@ -223,6 +234,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         vendorSourceMaps: sourceMapOptions.vendor,
                         integrityAlgorithm: options.subresourceIntegrity ? 'sha384' : undefined,
                     };
+                    let mainChunkId;
                     const actions = [];
                     const seen = new Set();
                     for (const file of emittedFiles) {
@@ -244,6 +256,10 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             continue;
                         }
                         seen.add(file.file);
+                        if (file.name === 'main') {
+                            // tslint:disable-next-line: no-non-null-assertion
+                            mainChunkId = file.id.toString();
+                        }
                         // All files at this point except ES5 polyfills are module scripts
                         const es5Polyfills = file.file.startsWith('polyfills-es5') ||
                             file.file.startsWith('polyfills-nomodule-es5');
@@ -342,6 +358,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                         outputPath: baseOutputPath,
                                         es5: false,
                                         missingTranslation: options.i18nMissingTranslation,
+                                        setLocale: result.name === mainChunkId,
                                     });
                                     processedFiles.add(result.original.filename);
                                 }
@@ -354,6 +371,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                         outputPath: baseOutputPath,
                                         es5: true,
                                         missingTranslation: options.i18nMissingTranslation,
+                                        setLocale: result.name === mainChunkId,
                                     });
                                     processedFiles.add(result.downlevel.filename);
                                 }
