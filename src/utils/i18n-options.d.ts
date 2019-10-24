@@ -14,6 +14,8 @@ export interface I18nOptions {
         format?: string;
         translation?: unknown;
     }>;
+    flatOutput?: boolean;
     readonly shouldInline: boolean;
 }
 export declare function createI18nOptions(metadata: json.JsonObject, inline?: boolean | string[]): I18nOptions;
+export declare function mergeDeprecatedI18nOptions(i18n: I18nOptions, i18nLocale: string | undefined, i18nFile: string | undefined): I18nOptions;

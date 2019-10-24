@@ -11,7 +11,6 @@ const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
-const findCacheDirectory = require("find-cache-dir");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
@@ -25,13 +24,16 @@ const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
 const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
+const cache_path_1 = require("../utils/cache-path");
 const copy_assets_1 = require("../utils/copy-assets");
+const environment_options_1 = require("../utils/environment-options");
+const i18n_inlining_1 = require("../utils/i18n-inlining");
 const i18n_options_1 = require("../utils/i18n-options");
 const load_translations_1 = require("../utils/load-translations");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const action_executor_1 = require("./action-executor");
-const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
+const cacheDownlevelPath = environment_options_1.cachingDisabled ? undefined : cache_path_1.findCachePath('angular-build-dl');
 function createBrowserLoggingCallback(verbose, logger) {
     return (stats, config) => {
         // config.stats contains our own stats settings, added during buildWebpackConfig().
@@ -89,8 +91,19 @@ async function initialize(options, context, host, webpackConfigurationTransform)
     if (!context.target) {
         throw new Error('The builder requires a target.');
     }
+    const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
+    const usingIvy = tsConfig.options.enableIvy !== false;
     const metadata = await context.getProjectMetadata(context.target);
     const i18n = i18n_options_1.createI18nOptions(metadata, options.localize);
+    // Until 11.0, support deprecated i18n options when not using new localize option
+    // i18nFormat is automatically calculated
+    if (options.localize === undefined && usingIvy) {
+        i18n_options_1.mergeDeprecatedI18nOptions(i18n, options.i18nLocale, options.i18nFile);
+    }
+    else if (options.localize !== undefined && !usingIvy) {
+        options.localize = undefined;
+        context.logger.warn(`Option 'localize' is not supported with View Engine.`);
+    }
     if (i18n.inlineLocales.size > 0) {
         // Load locales
         const loader = await load_translations_1.createTranslationLoader();
@@ -159,6 +172,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         // tslint:disable-next-line: no-big-function
         operators_1.concatMap(async (buildEvent) => {
             const { webpackStats, success, emittedFiles = [] } = buildEvent;
+            if (!webpackStats) {
+                throw new Error('Webpack stats build result is required.');
+            }
             if (!success && useBundleDownleveling) {
                 // If using bundle downleveling then there is only one build
                 // If it fails show any diagnostic messages and bail
@@ -171,8 +187,13 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 return { success };
             }
             else if (success) {
-                if (!fs.existsSync(baseOutputPath)) {
-                    fs.mkdirSync(baseOutputPath, { recursive: true });
+                const outputPaths = i18n.shouldInline && !i18n.flatOutput
+                    ? [...i18n.inlineLocales].map(l => path.join(baseOutputPath, l))
+                    : [baseOutputPath];
+                for (const outputPath of outputPaths) {
+                    if (!fs.existsSync(outputPath)) {
+                        fs.mkdirSync(outputPath, { recursive: true });
+                    }
                 }
                 let noModuleFiles;
                 let moduleFiles;
@@ -181,13 +202,18 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 if (isDifferentialLoadingNeeded && options.watch) {
                     moduleFiles = emittedFiles;
                     files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
+                    if (i18n.shouldInline) {
+                        const success = await i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, scriptsEntryPointName, 
+                        // tslint:disable-next-line: no-non-null-assertion
+                        webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
+                        if (!success) {
+                            return { success: false };
+                        }
+                    }
                 }
                 else if (isDifferentialLoadingNeeded) {
                     moduleFiles = [];
                     noModuleFiles = [];
-                    if (!webpackStats) {
-                        throw new Error('Webpack stats build result is required.');
-                    }
                     // Common options for all bundle process actions
                     const sourceMapOptions = utils_1.normalizeSourceMaps(options.sourceMap || false);
                     const actionOptions = {
@@ -302,77 +328,88 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             processResults.push(await Promise.resolve().then(() => require('../utils/process-bundle')).then(m => m.process(runtimeOptions)));
                         }
                         context.logger.info('ES5 bundle generation complete.');
-                    }
-                    finally {
-                        executor.stop();
-                    }
-                    if (i18n.shouldInline) {
-                        context.logger.info('Generating localized bundles...');
-                        const localize = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/translate/main'));
-                        const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
-                        const diagnostics = new localizeDiag.Diagnostics();
-                        const translationFilePaths = [];
-                        let handleSourceLocale = false;
-                        for (const locale of i18n.inlineLocales) {
-                            if (locale === i18n.sourceLocale) {
-                                handleSourceLocale = true;
-                                continue;
-                            }
-                            translationFilePaths.push(i18n.locales[locale].file);
-                        }
-                        if (translationFilePaths.length > 0) {
-                            const sourceFilePaths = [];
+                        if (i18n.shouldInline) {
+                            context.logger.info('Generating localized bundles...');
+                            const inlineActions = [];
+                            const processedFiles = new Set();
                             for (const result of processResults) {
                                 if (result.original) {
-                                    sourceFilePaths.push(result.original.filename);
+                                    inlineActions.push({
+                                        filename: path.basename(result.original.filename),
+                                        code: fs.readFileSync(result.original.filename, 'utf8'),
+                                        map: result.original.map &&
+                                            fs.readFileSync(result.original.map.filename, 'utf8'),
+                                        outputPath: baseOutputPath,
+                                        es5: false,
+                                        missingTranslation: options.i18nMissingTranslation,
+                                    });
+                                    processedFiles.add(result.original.filename);
                                 }
                                 if (result.downlevel) {
-                                    sourceFilePaths.push(result.downlevel.filename);
+                                    inlineActions.push({
+                                        filename: path.basename(result.downlevel.filename),
+                                        code: fs.readFileSync(result.downlevel.filename, 'utf8'),
+                                        map: result.downlevel.map &&
+                                            fs.readFileSync(result.downlevel.map.filename, 'utf8'),
+                                        outputPath: baseOutputPath,
+                                        es5: true,
+                                        missingTranslation: options.i18nMissingTranslation,
+                                    });
+                                    processedFiles.add(result.downlevel.filename);
                                 }
                             }
+                            let hasErrors = false;
                             try {
-                                localize.translateFiles({
-                                    // tslint:disable-next-line: no-non-null-assertion
-                                    sourceRootPath: webpackStats.outputPath,
-                                    sourceFilePaths,
-                                    translationFilePaths,
-                                    outputPathFn: (locale, relativePath) => path.join(baseOutputPath, locale, relativePath),
-                                    diagnostics,
-                                    missingTranslation: options.i18nMissingTranslation || 'warning',
-                                    sourceLocale: handleSourceLocale ? i18n.sourceLocale : undefined,
-                                });
+                                for await (const result of executor.inlineAll(inlineActions)) {
+                                    if (options.verbose) {
+                                        context.logger.info(`Localized "${result.file}" [${result.count} translation(s)].`);
+                                    }
+                                    for (const diagnostic of result.diagnostics) {
+                                        if (diagnostic.type === 'error') {
+                                            hasErrors = true;
+                                            context.logger.error(diagnostic.message);
+                                        }
+                                        else {
+                                            context.logger.warn(diagnostic.message);
+                                        }
+                                    }
+                                }
+                                // Copy any non-processed files into the output locations
+                                await copy_assets_1.copyAssets([
+                                    {
+                                        glob: '**/*',
+                                        // tslint:disable-next-line: no-non-null-assertion
+                                        input: webpackStats.outputPath,
+                                        output: '',
+                                        ignore: [...processedFiles].map(f => 
+                                        // tslint:disable-next-line: no-non-null-assertion
+                                        path.relative(webpackStats.outputPath, f)),
+                                    },
+                                ], outputPaths, '');
                             }
                             catch (err) {
                                 context.logger.error('Localized bundle generation failed: ' + err.message);
                                 return { success: false };
                             }
-                            finally {
-                                try {
-                                    // Remove temporary directory used for i18n processing
-                                    // tslint:disable-next-line: no-non-null-assertion
-                                    await host.delete(core_1.normalize(webpackStats.outputPath)).toPromise();
-                                }
-                                catch (_b) { }
+                            context.logger.info(`Localized bundle generation ${hasErrors ? 'failed' : 'complete'}.`);
+                            if (hasErrors) {
+                                return { success: false };
                             }
                         }
-                        context.logger.info(`Localized bundle generation ${diagnostics.hasErrors ? 'failed' : 'complete'}.`);
-                        for (const message of diagnostics.messages) {
-                            if (message.type === 'error') {
-                                context.logger.error(message.message);
+                    }
+                    finally {
+                        executor.stop();
+                        if (i18n.shouldInline) {
+                            try {
+                                // Remove temporary directory used for i18n processing
+                                // tslint:disable-next-line: no-non-null-assertion
+                                await host.delete(core_1.normalize(webpackStats.outputPath)).toPromise();
                             }
-                            else {
-                                context.logger.warn(message.message);
-                            }
-                        }
-                        if (diagnostics.hasErrors) {
-                            return { success: false };
+                            catch (_b) { }
                         }
                     }
                     // Copy assets
                     if (options.assets) {
-                        const outputPaths = i18n.shouldInline
-                            ? [...i18n.inlineLocales].map(l => path.join(baseOutputPath, l))
-                            : [baseOutputPath];
                         try {
                             await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), outputPaths, context.workspaceRoot);
                         }
@@ -432,11 +469,16 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 else {
                     files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
                     noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
+                    if (i18n.shouldInline) {
+                        const success = await i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, scriptsEntryPointName, 
+                        // tslint:disable-next-line: no-non-null-assertion
+                        webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
+                        if (!success) {
+                            return { success: false };
+                        }
+                    }
                 }
                 if (options.index) {
-                    const outputPaths = i18n.shouldInline
-                        ? [...i18n.inlineLocales].map(l => path.join(baseOutputPath, l))
-                        : [baseOutputPath];
                     for (const outputPath of outputPaths) {
                         try {
                             await generateIndex(outputPath, options, root, files, noModuleFiles, moduleFiles, transforms.indexHtml);
@@ -481,6 +523,45 @@ function generateIndex(baseOutputPath, options, root, files, noModuleFiles, modu
         crossOrigin: options.crossOrigin,
         lang: options.i18nLocale,
     }).toPromise();
+}
+async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, scriptsEntryPointName, emittedPath, es5, missingTranslation) {
+    const executor = new action_executor_1.BundleActionExecutor({ i18n });
+    let hasErrors = false;
+    try {
+        const { options, originalFiles: processedFiles } = i18n_inlining_1.emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emittedPath, baseOutputPath, es5, missingTranslation);
+        for await (const result of executor.inlineAll(options)) {
+            for (const diagnostic of result.diagnostics) {
+                if (diagnostic.type === 'error') {
+                    hasErrors = true;
+                    context.logger.error(diagnostic.message);
+                }
+                else {
+                    context.logger.warn(diagnostic.message);
+                }
+            }
+        }
+        // Copy any non-processed files into the output locations
+        await copy_assets_1.copyAssets([
+            {
+                glob: '**/*',
+                input: emittedPath,
+                output: '',
+                ignore: [...processedFiles].map(f => path.relative(emittedPath, f)),
+            },
+        ], outputPaths, '');
+    }
+    catch (err) {
+        context.logger.error('Localized bundle generation failed: ' + err.message);
+        return false;
+    }
+    finally {
+        executor.stop();
+    }
+    context.logger.info(`Localized bundle generation ${hasErrors ? 'failed' : 'complete'}.`);
+    if (hasErrors) {
+        return false;
+    }
+    return true;
 }
 function mapErrorToMessage(error) {
     if (error instanceof Error) {
