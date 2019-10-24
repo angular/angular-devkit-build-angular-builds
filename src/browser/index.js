@@ -94,7 +94,6 @@ async function initialize(options, context, host, webpackConfigurationTransform)
     const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
     const usingIvy = tsConfig.options.enableIvy !== false;
     const metadata = await context.getProjectMetadata(context.target);
-    const projectRoot = path.join(context.workspaceRoot, metadata.root || '');
     const i18n = i18n_options_1.createI18nOptions(metadata, options.localize);
     // Until 11.0, support deprecated i18n options when not using new localize option
     // i18nFormat is automatically calculated
@@ -105,16 +104,16 @@ async function initialize(options, context, host, webpackConfigurationTransform)
         options.localize = undefined;
         context.logger.warn(`Option 'localize' is not supported with View Engine.`);
     }
-    if (i18n.shouldInline) {
+    if (i18n.inlineLocales.size > 0) {
         // Load locales
         const loader = await load_translations_1.createTranslationLoader();
         const usedFormats = new Set();
         for (const [locale, desc] of Object.entries(i18n.locales)) {
             if (i18n.inlineLocales.has(locale)) {
-                const result = loader(path.join(projectRoot, desc.file));
+                const result = loader(desc.file);
                 usedFormats.add(result.format);
-                if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
-                    // This limitation is only for legacy message id support (defaults to true as of 9.0)
+                if (usedFormats.size > 1) {
+                    // This limitation is technically only for legacy message id support
                     throw new Error('Localization currently only supports using one type of translation file format for the entire application.');
                 }
                 desc.format = result.format;
@@ -131,17 +130,7 @@ async function initialize(options, context, host, webpackConfigurationTransform)
     if (i18n.shouldInline) {
         options.outputPath = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-'));
     }
-    const { config, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(options, context, host);
-    if (i18n.shouldInline) {
-        // Remove localize "polyfill"
-        if (!config.resolve) {
-            config.resolve = {};
-        }
-        if (!config.resolve.alias) {
-            config.resolve.alias = {};
-        }
-        config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
-    }
+    const { config, projectRoot, projectSourceRoot } = await buildBrowserWebpackConfigFromContext(options, context, host);
     let transformedConfig;
     if (webpackConfigurationTransform) {
         transformedConfig = await webpackConfigurationTransform(config);
