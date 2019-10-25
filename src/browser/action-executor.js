@@ -25,10 +25,10 @@ const hasThreadSupport = (() => {
 // Threads use the structured clone algorithm which handles more types
 // Processes use JSON which is much more limited
 const serialize = v8.serialize;
-let workerFile = require.resolve('./process-bundle');
+let workerFile = require.resolve('../utils/process-bundle');
 workerFile =
     path.extname(workerFile) === '.ts'
-        ? require.resolve('./process-bundle-bootstrap')
+        ? require.resolve('../utils/process-bundle-bootstrap')
         : workerFile;
 class BundleActionExecutor {
     constructor(workerOptions, integrityAlgorithm, sizeThreshold = 32 * 1024) {

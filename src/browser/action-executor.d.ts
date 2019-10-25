@@ -1,5 +1,5 @@
-import { I18nOptions } from './i18n-options';
-import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
+import { I18nOptions } from '../utils/i18n-options';
+import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from '../utils/process-bundle';
 export declare class BundleActionExecutor {
     private workerOptions;
     private readonly sizeThreshold;
