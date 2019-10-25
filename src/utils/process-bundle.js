@@ -293,7 +293,9 @@ async function processRuntime(options) {
     if (downlevelMap) {
         await cachePut(downlevelMap, (options.cacheKeys && options.cacheKeys[3 /* DownlevelMap */]) || null);
         fs.writeFileSync(downlevelFilePath + '.map', downlevelMap);
-        downlevelCode += `\n//# sourceMappingURL=${path.basename(downlevelFilePath)}.map`;
+        if (!options.hiddenSourceMaps) {
+            downlevelCode += `\n//# sourceMappingURL=${path.basename(downlevelFilePath)}.map`;
+        }
     }
     await cachePut(downlevelCode, (options.cacheKeys && options.cacheKeys[2 /* DownlevelCode */]) || null);
     fs.writeFileSync(downlevelFilePath, downlevelCode);
@@ -370,7 +372,23 @@ function inlineCopyOnly(options) {
     return { file: options.filename, diagnostics: [], count: 0 };
 }
 function findLocalizePositions(options, utils) {
-    const ast = core_1.parseSync(options.code, { babelrc: false });
+    let ast;
+    try {
+        ast = core_1.parseSync(options.code, {
+            babelrc: false,
+            sourceType: 'script',
+        });
+    }
+    catch (error) {
+        if (error.message) {
+            // Make the error more readable.
+            // Same errors will contain the full content of the file as the error message
+            // Which makes it hard to find the actual error message.
+            const index = error.message.indexOf(')\n');
+            const msg = index !== -1 ? error.message.substr(0, index + 1) : error.message;
+            throw new Error(`${msg}\nAn error occurred inlining file "${options.filename}"`);
+        }
+    }
     if (!ast) {
         throw new Error(`Unknown error occurred inlining file "${options.filename}"`);
     }
