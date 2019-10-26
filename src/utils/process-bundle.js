@@ -15,7 +15,7 @@ const source_map_1 = require("source-map");
 const terser_1 = require("terser");
 const v8 = require("v8");
 const webpack_sources_1 = require("webpack-sources");
-const mangle_options_1 = require("./mangle-options");
+const environment_options_1 = require("./environment-options");
 const cacache = require('cacache');
 const deserialize = v8.deserialize;
 let cachePath;
@@ -200,7 +200,7 @@ function terserMangle(code, options = {}) {
     const minifyOutput = terser_1.minify(code, {
         compress: options.compress || false,
         ecma: options.ecma || 5,
-        mangle: !mangle_options_1.manglingDisabled,
+        mangle: !environment_options_1.manglingDisabled,
         safari10: true,
         output: {
             ascii_only: true,
@@ -293,7 +293,9 @@ async function processRuntime(options) {
     if (downlevelMap) {
         await cachePut(downlevelMap, (options.cacheKeys && options.cacheKeys[3 /* DownlevelMap */]) || null);
         fs.writeFileSync(downlevelFilePath + '.map', downlevelMap);
-        downlevelCode += `\n//# sourceMappingURL=${path.basename(downlevelFilePath)}.map`;
+        if (!options.hiddenSourceMaps) {
+            downlevelCode += `\n//# sourceMappingURL=${path.basename(downlevelFilePath)}.map`;
+        }
     }
     await cachePut(downlevelCode, (options.cacheKeys && options.cacheKeys[2 /* DownlevelCode */]) || null);
     fs.writeFileSync(downlevelFilePath, downlevelCode);
@@ -307,7 +309,8 @@ async function inlineLocales(options) {
     if (i18n.flatOutput && i18n.inlineLocales.size > 1) {
         throw new Error('Flat output is only supported when inlining one locale.');
     }
-    if (!options.code.includes(localizeName)) {
+    const hasLocalizeName = options.code.includes(localizeName);
+    if (!hasLocalizeName && !options.setLocale) {
         return inlineCopyOnly(options);
     }
     const { default: MagicString } = await Promise.resolve().then(() => require('magic-string'));
@@ -318,11 +321,12 @@ async function inlineLocales(options) {
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
     const positions = findLocalizePositions(options, utils);
-    if (positions.length === 0) {
+    if (positions.length === 0 && !options.setLocale) {
         return inlineCopyOnly(options);
     }
-    const content = new MagicString(options.code);
+    let content = new MagicString(options.code);
     const inputMap = options.map && JSON.parse(options.map);
+    let contentClone;
     for (const locale of i18n.inlineLocales) {
         const isSourceLocale = locale === i18n.sourceLocale;
         // tslint:disable-next-line: no-any
@@ -333,6 +337,11 @@ async function inlineLocales(options) {
             const { code } = generate(expression);
             content.overwrite(position.start, position.end, code);
         }
+        if (options.setLocale) {
+            const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});`;
+            contentClone = content.clone();
+            content.prepend(setLocaleText);
+        }
         const output = content.toString();
         const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
         fs.writeFileSync(outputPath, output);
@@ -340,6 +349,10 @@ async function inlineLocales(options) {
             const contentMap = content.generateMap();
             const outputMap = mergeSourceMaps(options.code, inputMap, output, contentMap, options.filename);
             fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
+        }
+        if (contentClone) {
+            content = contentClone;
+            contentClone = undefined;
         }
     }
     return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };
@@ -359,7 +372,23 @@ function inlineCopyOnly(options) {
     return { file: options.filename, diagnostics: [], count: 0 };
 }
 function findLocalizePositions(options, utils) {
-    const ast = core_1.parseSync(options.code, { babelrc: false });
+    let ast;
+    try {
+        ast = core_1.parseSync(options.code, {
+            babelrc: false,
+            sourceType: 'script',
+        });
+    }
+    catch (error) {
+        if (error.message) {
+            // Make the error more readable.
+            // Same errors will contain the full content of the file as the error message
+            // Which makes it hard to find the actual error message.
+            const index = error.message.indexOf(')\n');
+            const msg = index !== -1 ? error.message.substr(0, index + 1) : error.message;
+            throw new Error(`${msg}\nAn error occurred inlining file "${options.filename}"`);
+        }
+    }
     if (!ast) {
         throw new Error(`Unknown error occurred inlining file "${options.filename}"`);
     }
@@ -368,7 +397,9 @@ function findLocalizePositions(options, utils) {
         core_1.traverse(ast, {
             CallExpression(path) {
                 const callee = path.get('callee');
-                if (callee.isIdentifier() && callee.node.name === localizeName) {
+                if (callee.isIdentifier() &&
+                    callee.node.name === localizeName &&
+                    utils.isGlobalIdentifier(callee)) {
                     const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
                     const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
                     positions.push({
