@@ -9,8 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const crypto_1 = require("crypto");
 const fs = require("fs");
-const copy_file_1 = require("../utils/copy-file");
-const environment_options_1 = require("../utils/environment-options");
+const copy_file_1 = require("./copy-file");
+const environment_options_1 = require("./environment-options");
 const cacache = require('cacache');
 const packageVersion = require('../../package.json').version;
 class BundleActionCache {
