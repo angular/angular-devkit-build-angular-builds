@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import * as fs from 'fs';
-import { ProcessBundleOptions, ProcessBundleResult } from '../utils/process-bundle';
+import { ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
 export interface CacheEntry {
     path: string;
     size: number;

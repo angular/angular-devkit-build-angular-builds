@@ -7,6 +7,7 @@ const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs")
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const utils_1 = require("../utils");
 const build_browser_features_1 = require("./build-browser-features");
+const i18n_options_1 = require("./i18n-options");
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const webpackMerge = require('webpack-merge');
 async function generateWebpackConfig(context, workspaceRoot, projectRoot, sourceRoot, options, webpackPartialGenerator, logger) {
@@ -80,6 +81,23 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
     return webpackConfig;
 }
 exports.generateWebpackConfig = generateWebpackConfig;
+async function generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost()) {
+    const { buildOptions, i18n } = await i18n_options_1.configureI18nBuild(context, host, options);
+    const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, webpackPartialGenerator, host);
+    const config = result.config;
+    if (i18n.shouldInline) {
+        // Remove localize "polyfill"
+        if (!config.resolve) {
+            config.resolve = {};
+        }
+        if (!config.resolve.alias) {
+            config.resolve.alias = {};
+        }
+        config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
+    }
+    return { ...result, i18n };
+}
+exports.generateI18nBrowserWebpackConfigFromContext = generateI18nBrowserWebpackConfigFromContext;
 async function generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost()) {
     const projectName = context.target && context.target.project;
     if (!projectName) {
