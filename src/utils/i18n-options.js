@@ -61,6 +61,10 @@ async function configureI18nBuild(context, options) {
         throw new Error('The builder requires a target.');
     }
     const buildOptions = { ...options };
+    if (buildOptions.localize === true ||
+        (Array.isArray(buildOptions.localize) && buildOptions.localize.length > 1)) {
+        throw new Error('Using the localize option for multiple locales is temporarily disabled.');
+    }
     const tsConfig = read_tsconfig_1.readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
     const usingIvy = tsConfig.options.enableIvy !== false;
     const metadata = await context.getProjectMetadata(context.target);
