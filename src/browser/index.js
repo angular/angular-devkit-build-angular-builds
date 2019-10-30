@@ -91,7 +91,7 @@ function getCompilerConfig(wco) {
 }
 async function initialize(options, context, host, webpackConfigurationTransform) {
     const originalOutputPath = options.outputPath;
-    const { config, projectRoot, projectSourceRoot, i18n } = await buildBrowserWebpackConfigFromContext(options, context, host, true);
+    const { config, projectRoot, projectSourceRoot, i18n, } = await buildBrowserWebpackConfigFromContext(options, context, host, true);
     let transformedConfig;
     if (webpackConfigurationTransform) {
         transformedConfig = await webpackConfigurationTransform(config);
@@ -442,15 +442,18 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                     }
                 }
+                if (!options.watch && options.serviceWorker) {
+                    for (const outputPath of outputPaths) {
+                        try {
+                            await service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(outputPath), options.baseHref || '/', options.ngswConfigPath);
+                        }
+                        catch (err) {
+                            return { success: false, error: mapErrorToMessage(err) };
+                        }
+                    }
+                }
             }
             return { success };
-        }), operators_1.concatMap(buildEvent => {
-            if (buildEvent.success && !options.watch && options.serviceWorker) {
-                return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(baseOutputPath), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), error => ({ success: false, error: mapErrorToMessage(error) })));
-            }
-            else {
-                return rxjs_1.of(buildEvent);
-            }
         }), operators_1.map(event => ({
             ...event,
             baseOutputPath,
