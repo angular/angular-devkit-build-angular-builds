@@ -56,7 +56,7 @@ function createI18nOptions(metadata, inline) {
     return i18n;
 }
 exports.createI18nOptions = createI18nOptions;
-async function configureI18nBuild(context, host, options) {
+async function configureI18nBuild(context, options) {
     if (!context.target) {
         throw new Error('The builder requires a target.');
     }

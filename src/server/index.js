@@ -9,7 +9,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
-const node_1 = require("@angular-devkit/core/node");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
@@ -22,14 +21,14 @@ const output_paths_1 = require("../utils/output-paths");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 function execute(options, context, transforms = {}) {
-    const host = new node_1.NodeJsSyncHost();
     const root = context.workspaceRoot;
     // Check Angular version.
-    version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
-    const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
+    version_1.assertCompatibleAngularVersion(root, context.logger);
+    const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, root);
     const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
-    const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
-    return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(operators_1.concatMap(({ config, i18n }) => {
+    const baseOutputPath = path.resolve(root, options.outputPath);
+    let outputPaths;
+    return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.concatMap(({ config, i18n }) => {
         return build_webpack_1.runWebpack(config, context).pipe(operators_1.concatMap(async (output) => {
             const { emittedFiles = [], webpackStats } = output;
             if (!output.success || !i18n.shouldInline) {
@@ -38,7 +37,7 @@ function execute(options, context, transforms = {}) {
             if (!webpackStats) {
                 throw new Error('Webpack stats build result is required.');
             }
-            const outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
+            outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
             const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, [], 
             // tslint:disable-next-line: no-non-null-assertion
             webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
@@ -50,13 +49,15 @@ function execute(options, context, transforms = {}) {
         }
         return {
             ...output,
-            outputPath: path.resolve(root, options.outputPath),
+            baseOutputPath,
+            outputPath: baseOutputPath,
+            outputPaths: outputPaths || [baseOutputPath],
         };
     }));
 }
 exports.execute = execute;
 exports.default = architect_1.createBuilder(execute);
-async function initialize(options, context, host, webpackConfigurationTransform) {
+async function initialize(options, context, webpackConfigurationTransform) {
     const originalOutputPath = options.outputPath;
     const { config, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext({
         ...options,
