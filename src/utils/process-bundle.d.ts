@@ -48,6 +48,7 @@ export interface InlineOptions {
     es5: boolean;
     outputPath: string;
     missingTranslation?: 'warning' | 'error' | 'ignore';
+    setLocale?: boolean;
 }
 export declare function inlineLocales(options: InlineOptions): Promise<{
     file: string;
