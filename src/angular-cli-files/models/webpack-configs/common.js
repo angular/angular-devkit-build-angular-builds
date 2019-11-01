@@ -297,7 +297,8 @@ function getCommonConfig(wco) {
             safari10: true,
             output: {
                 ecma: terserEcma,
-                comments: false,
+                // default behavior (undefined value) is to keep only important comments (licenses, etc.)
+                comments: !buildOptions.extractLicenses && undefined,
                 webkit: true,
             },
             // On server, we don't want to compress anything. We still set the ngDevMode = false for it
@@ -397,6 +398,8 @@ function getCommonConfig(wco) {
                     loader: 'file-loader',
                     options: {
                         name: `[name]${hashFormat.file}.[ext]`,
+                        // Re-use emitted files from browser builder on the server.
+                        emitFile: wco.buildOptions.platform !== 'server',
                     },
                 },
                 {
