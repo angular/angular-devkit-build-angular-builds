@@ -82,7 +82,7 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
 }
 exports.generateWebpackConfig = generateWebpackConfig;
 async function generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost()) {
-    const { buildOptions, i18n } = await i18n_options_1.configureI18nBuild(context, host, options);
+    const { buildOptions, i18n } = await i18n_options_1.configureI18nBuild(context, options);
     const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, webpackPartialGenerator, host);
     const config = result.config;
     if (i18n.shouldInline) {
