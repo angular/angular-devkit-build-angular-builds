@@ -135,4 +135,5 @@ async function execute(options, context) {
         }
     }
 }
+exports.execute = execute;
 exports.default = architect_1.createBuilder(execute);
