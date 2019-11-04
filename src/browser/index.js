@@ -78,7 +78,7 @@ function getAnalyticsConfig(wco, context) {
         }
         // The category is the builder name if it's an angular builder.
         return {
-            plugins: [new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category)],
+            plugins: [new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category, !!wco.tsConfig.options.enableIvy)],
         };
     }
     return {};
