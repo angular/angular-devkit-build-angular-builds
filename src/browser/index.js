@@ -78,7 +78,7 @@ function getAnalyticsConfig(wco, context) {
         }
         // The category is the builder name if it's an angular builder.
         return {
-            plugins: [new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category)],
+            plugins: [new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category, !!wco.tsConfig.options.enableIvy)],
         };
     }
     return {};
@@ -91,7 +91,7 @@ function getCompilerConfig(wco) {
 }
 async function initialize(options, context, host, webpackConfigurationTransform) {
     const originalOutputPath = options.outputPath;
-    const { config, projectRoot, projectSourceRoot, i18n } = await buildBrowserWebpackConfigFromContext(options, context, host, true);
+    const { config, projectRoot, projectSourceRoot, i18n, } = await buildBrowserWebpackConfigFromContext(options, context, host, true);
     let transformedConfig;
     if (webpackConfigurationTransform) {
         transformedConfig = await webpackConfigurationTransform(config);
@@ -106,6 +106,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     const host = new node_1.NodeJsSyncHost();
     const root = core_1.normalize(context.workspaceRoot);
     const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
+    let outputPaths;
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
@@ -148,7 +149,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 return { success };
             }
             else if (success) {
-                const outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
+                outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
                 let noModuleFiles;
                 let moduleFiles;
                 let files;
@@ -441,19 +442,23 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                     }
                 }
+                if (!options.watch && options.serviceWorker) {
+                    for (const outputPath of outputPaths) {
+                        try {
+                            await service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(outputPath), options.baseHref || '/', options.ngswConfigPath);
+                        }
+                        catch (err) {
+                            return { success: false, error: mapErrorToMessage(err) };
+                        }
+                    }
+                }
             }
             return { success };
-        }), operators_1.concatMap(buildEvent => {
-            if (buildEvent.success && !options.watch && options.serviceWorker) {
-                return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(baseOutputPath), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), error => ({ success: false, error: mapErrorToMessage(error) })));
-            }
-            else {
-                return rxjs_1.of(buildEvent);
-            }
         }), operators_1.map(event => ({
             ...event,
-            // If we use differential loading, both configs have the same outputs
+            baseOutputPath,
             outputPath: baseOutputPath,
+            outputPaths: outputPaths || [baseOutputPath],
         })));
     }));
 }
