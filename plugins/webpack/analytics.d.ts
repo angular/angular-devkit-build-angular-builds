@@ -26,7 +26,6 @@ export declare function countOccurrences(source: string, match: string, wordBrea
  * Holder of statistics related to the build.
  */
 declare class AnalyticsBuildStats {
-    isIvy: boolean;
     errors: string[];
     numberOfNgOnInit: number;
     numberOfComponents: number;
@@ -47,9 +46,10 @@ export declare class NgBuildAnalyticsPlugin {
     protected _projectRoot: string;
     protected _analytics: analytics.Analytics;
     protected _category: string;
+    private _isIvy;
     protected _built: boolean;
     protected _stats: AnalyticsBuildStats;
-    constructor(_projectRoot: string, _analytics: analytics.Analytics, _category: string);
+    constructor(_projectRoot: string, _analytics: analytics.Analytics, _category: string, _isIvy: boolean);
     protected _reset(): void;
     protected _getMetrics(stats: Stats): (string | number)[];
     protected _getDimensions(stats: Stats): import("../../../../../dist-schema/packages/angular/cli/commands/config").Value[];
