@@ -17,6 +17,11 @@ import { ExecutionTransformer } from '../transforms';
 import { I18nOptions } from '../utils/i18n-options';
 import { Schema as BrowserBuilderSchema } from './schema';
 export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
+    baseOutputPath: string;
+    outputPaths: string[];
+    /**
+     * @deprecated in version 9. Use 'outputPaths' instead.
+     */
     outputPath: string;
 };
 export declare function createBrowserLoggingCallback(verbose: boolean, logger: logging.LoggerApi): WebpackLoggingCallback;

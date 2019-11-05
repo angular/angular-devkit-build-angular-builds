@@ -316,8 +316,9 @@ async function inlineLocales(options) {
     const { default: MagicString } = await Promise.resolve().then(() => require('magic-string'));
     const { default: generate } = await Promise.resolve().then(() => require('@babel/generator'));
     const utils = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
     '@angular/localize/src/tools/src/translate/source_files/source_file_utils'));
+    // tslint:disable-next-line: no-implicit-dependencies
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
     const positions = findLocalizePositions(options, utils);
@@ -371,7 +372,9 @@ function inlineCopyOnly(options) {
     }
     return { file: options.filename, diagnostics: [], count: 0 };
 }
-function findLocalizePositions(options, utils) {
+function findLocalizePositions(options, 
+// tslint:disable-next-line: no-implicit-dependencies
+utils) {
     let ast;
     try {
         ast = core_1.parseSync(options.code, {

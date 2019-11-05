@@ -12,7 +12,12 @@ import * as webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import { Schema as ServerBuilderOptions } from './schema';
 export declare type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
-    outputPath?: string;
+    baseOutputPath: string;
+    outputPaths: string[];
+    /**
+     * @deprecated in version 9. Use 'outputPaths' instead.
+     */
+    outputPath: string;
 };
 export { ServerBuilderOptions };
 export declare function execute(options: ServerBuilderOptions, context: BuilderContext, transforms?: {

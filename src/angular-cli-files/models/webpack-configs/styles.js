@@ -59,6 +59,7 @@ function getStylesConfig(wco) {
                 loader,
                 rebaseRootRelative: buildOptions.rebaseRootRelativeCssUrls,
                 filename: `[name]${hashFormat.file}.[ext]`,
+                emitFile: buildOptions.platform !== 'server',
             }),
             autoprefixer(),
         ];
