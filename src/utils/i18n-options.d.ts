@@ -1,4 +1,3 @@
-/// <reference types="node" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -7,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
-import { json, virtualFs } from '@angular-devkit/core';
-import * as fs from 'fs';
+import { json } from '@angular-devkit/core';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { Schema as ServerBuilderSchema } from '../server/schema';
 export interface I18nOptions {
@@ -23,7 +21,7 @@ export interface I18nOptions {
     readonly shouldInline: boolean;
 }
 export declare function createI18nOptions(metadata: json.JsonObject, inline?: boolean | string[]): I18nOptions;
-export declare function configureI18nBuild<T extends BrowserBuilderSchema | ServerBuilderSchema>(context: BuilderContext, host: virtualFs.Host<fs.Stats>, options: T): Promise<{
+export declare function configureI18nBuild<T extends BrowserBuilderSchema | ServerBuilderSchema>(context: BuilderContext, options: T): Promise<{
     buildOptions: T;
     i18n: I18nOptions;
 }>;

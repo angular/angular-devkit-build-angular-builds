@@ -10,4 +10,5 @@ export { AssetPattern, AssetPatternClass as AssetPatternObject, Budget, ExtraEnt
 export { buildWebpackBrowser as executeBrowserBuilder, BrowserBuilderOutput, } from './browser';
 export { serveWebpackBrowser as executeDevServerBuilder, DevServerBuilderOptions, DevServerBuilderOutput, } from './dev-server';
 export { execute as executeKarmaBuilder, KarmaBuilderOptions, KarmaConfigOptions, } from './karma';
+export { execute as executeProtractorBuilder, ProtractorBuilderOptions, } from './protractor';
 export { execute as executeServerBuilder, ServerBuilderOptions, ServerBuilderOutput, } from './server';

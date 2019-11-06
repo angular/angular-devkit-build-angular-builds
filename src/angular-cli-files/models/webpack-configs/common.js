@@ -398,6 +398,8 @@ function getCommonConfig(wco) {
                     loader: 'file-loader',
                     options: {
                         name: `[name]${hashFormat.file}.[ext]`,
+                        // Re-use emitted files from browser builder on the server.
+                        emitFile: wco.buildOptions.platform !== 'server',
                     },
                 },
                 {

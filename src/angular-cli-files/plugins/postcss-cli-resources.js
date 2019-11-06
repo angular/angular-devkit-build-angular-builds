@@ -31,7 +31,7 @@ async function resolve(file, base, resolver) {
     }
 }
 exports.default = postcss.plugin('postcss-cli-resources', (options) => {
-    const { deployUrl = '', baseHref = '', resourcesOutputPath = '', rebaseRootRelative = false, filename, loader, } = options;
+    const { deployUrl = '', baseHref = '', resourcesOutputPath = '', rebaseRootRelative = false, filename, loader, emitFile, } = options;
     const dedupeSlashes = (url) => url.replace(/\/\/+/g, '/');
     const process = async (inputUrl, context, resourceCache) => {
         // If root-relative, absolute or protocol relative url, leave as is
@@ -93,7 +93,9 @@ exports.default = postcss.plugin('postcss-cli-resources', (options) => {
                     outputPath = path.posix.join(resourcesOutputPath, outputPath);
                 }
                 loader.addDependency(result);
-                loader.emitFile(outputPath, content, undefined);
+                if (emitFile) {
+                    loader.emitFile(outputPath, content, undefined);
+                }
                 let outputUrl = outputPath.replace(/\\/g, '/');
                 if (hash || search) {
                     outputUrl = url.format({ pathname: outputUrl, hash, search });
