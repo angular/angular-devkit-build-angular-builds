@@ -342,6 +342,13 @@ async function inlineLocales(options) {
             const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});`;
             contentClone = content.clone();
             content.prepend(setLocaleText);
+            // If locale data is provided, load it and prepend to file
+            const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
+            if (localeDataPath) {
+                const localDataContent = loadLocaleData(localeDataPath, true);
+                // The semicolon ensures that there is no syntax error between statements
+                content.prepend(localDataContent + ';');
+            }
         }
         const output = content.toString();
         const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
@@ -436,4 +443,17 @@ utils) {
         });
     }
     return positions;
+}
+function loadLocaleData(path, optimize) {
+    // The path is validated during option processing before the build starts
+    const content = fs.readFileSync(path, 'utf8');
+    // NOTE: This can be removed once the locale data files are preprocessed in the framework
+    if (optimize) {
+        const result = terserMangle(content, {
+            compress: true,
+            ecma: 5,
+        });
+        return result.code;
+    }
+    return content;
 }
