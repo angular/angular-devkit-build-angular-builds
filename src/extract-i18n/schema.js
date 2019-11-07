@@ -4,13 +4,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Output format for the generated file.
+ *
+ * Output format for the generated file.
+ * @deprecated Use 'format' option instead.
  */
-var I18NFormat;
-(function (I18NFormat) {
-    I18NFormat["Xlf"] = "xlf";
-    I18NFormat["Xlf2"] = "xlf2";
-    I18NFormat["Xlif"] = "xlif";
-    I18NFormat["Xliff"] = "xliff";
-    I18NFormat["Xliff2"] = "xliff2";
-    I18NFormat["Xmb"] = "xmb";
-})(I18NFormat = exports.I18NFormat || (exports.I18NFormat = {}));
+var Format;
+(function (Format) {
+    Format["Xlf"] = "xlf";
+    Format["Xlf2"] = "xlf2";
+    Format["Xlif"] = "xlif";
+    Format["Xliff"] = "xliff";
+    Format["Xliff2"] = "xliff2";
+    Format["Xmb"] = "xmb";
+})(Format = exports.Format || (exports.Format = {}));

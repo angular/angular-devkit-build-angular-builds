@@ -17,6 +17,7 @@ const karma_webpack_failure_cb_1 = require("./karma-webpack-failure-cb");
 const stats_1 = require("../utilities/stats");
 const stats_2 = require("../models/webpack-configs/stats");
 const node_1 = require("@angular-devkit/core/node");
+const index_1 = require("../../utils/index");
 /**
  * Enumerate needed (but not require/imported) dependencies from this file
  *  to let the dependency validator know they are used.
@@ -59,15 +60,14 @@ const init = (config, emitter, customFileHandlers) => {
     const logger = config.buildWebpack.logger || node_1.createConsoleLogger();
     successCb = config.buildWebpack.successCb;
     failureCb = config.buildWebpack.failureCb;
-    config.reporters.unshift('@angular-devkit/build-angular--event-reporter');
     // When using code-coverage, auto-add coverage-istanbul.
     config.reporters = config.reporters || [];
     if (options.codeCoverage && config.reporters.indexOf('coverage-istanbul') === -1) {
-        config.reporters.unshift('coverage-istanbul');
+        config.reporters.push('coverage-istanbul');
     }
     // Add a reporter that fixes sourcemap urls.
-    if (options.sourceMap.scripts) {
-        config.reporters.unshift('@angular-devkit/build-angular--sourcemap-reporter');
+    if (index_1.normalizeSourceMaps(options.sourceMap).scripts) {
+        config.reporters.push('@angular-devkit/build-angular--sourcemap-reporter');
         // Code taken from https://github.com/tschaub/karma-source-map-support.
         // We can't use it directly because we need to add it conditionally in this file, and karma
         // frameworks cannot be added dynamically.
@@ -78,6 +78,7 @@ const init = (config, emitter, customFileHandlers) => {
             { pattern: path.join(ksmsPath, 'client.js'), watched: false }
         ], true);
     }
+    config.reporters.push('@angular-devkit/build-angular--event-reporter');
     // Add webpack config.
     const webpackConfig = config.buildWebpack.webpackConfig;
     const webpackMiddlewareConfig = {
@@ -124,7 +125,6 @@ const init = (config, emitter, customFileHandlers) => {
     // Files need to be served from a custom path for Karma.
     webpackConfig.output.path = '/_karma_webpack_/';
     webpackConfig.output.publicPath = '/_karma_webpack_/';
-    webpackConfig.output.devtoolModuleFilenameTemplate = '[namespace]/[resource-path]?[loaders]';
     let compiler;
     try {
         compiler = webpack(webpackConfig);
@@ -179,6 +179,7 @@ const init = (config, emitter, customFileHandlers) => {
                 const alwaysServe = [
                     '/_karma_webpack_/runtime.js',
                     '/_karma_webpack_/polyfills.js',
+                    '/_karma_webpack_/polyfills-es5.js',
                     '/_karma_webpack_/scripts.js',
                     '/_karma_webpack_/styles.js',
                     '/_karma_webpack_/vendor.js',

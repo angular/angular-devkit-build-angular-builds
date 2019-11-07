@@ -8,7 +8,6 @@
 import { analytics } from '@angular-devkit/core';
 import { Compiler, Module, Stats, compilation } from 'webpack';
 import { Source } from 'webpack-sources';
-import Compilation = compilation.Compilation;
 declare const NormalModule: any;
 interface NormalModule extends Module {
     _source?: Source | null;
@@ -29,6 +28,7 @@ export declare function countOccurrences(source: string, match: string, wordBrea
 declare class AnalyticsBuildStats {
     errors: string[];
     numberOfNgOnInit: number;
+    numberOfComponents: number;
     initialChunkSize: number;
     totalChunkCount: number;
     totalChunkSize: number;
@@ -46,15 +46,17 @@ export declare class NgBuildAnalyticsPlugin {
     protected _projectRoot: string;
     protected _analytics: analytics.Analytics;
     protected _category: string;
+    private _isIvy;
     protected _built: boolean;
     protected _stats: AnalyticsBuildStats;
-    constructor(_projectRoot: string, _analytics: analytics.Analytics, _category: string);
+    constructor(_projectRoot: string, _analytics: analytics.Analytics, _category: string, _isIvy: boolean);
     protected _reset(): void;
     protected _getMetrics(stats: Stats): (string | number)[];
-    protected _getDimensions(stats: Stats): (string | number)[];
+    protected _getDimensions(stats: Stats): import("../../../../../dist-schema/packages/angular/cli/commands/config").Value[];
     protected _reportBuildMetrics(stats: Stats): void;
     protected _reportRebuildMetrics(stats: Stats): void;
     protected _checkTsNormalModule(module: NormalModule): void;
+    protected _checkNgFactoryNormalModule(module: NormalModule): void;
     protected _collectErrors(stats: Stats): void;
     protected _collectBundleStats(json: any): void;
     /************************************************************************************************
@@ -65,7 +67,7 @@ export declare class NgBuildAnalyticsPlugin {
      * @private
      */
     protected _succeedModule(mod: Module): void;
-    protected _compilation(compiler: Compiler, compilation: Compilation): void;
+    protected _compilation(compiler: Compiler, compilation: compilation.Compilation): void;
     protected _done(stats: Stats): void;
     apply(compiler: Compiler): void;
 }

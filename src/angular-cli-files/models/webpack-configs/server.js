@@ -8,6 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const path_1 = require("path");
+const webpack_1 = require("webpack");
 const utils_1 = require("./utils");
 /**
  * Returns a partial specific to creating a bundle for node
@@ -27,7 +28,12 @@ function getServerConfig(wco) {
         output: {
             libraryTarget: 'commonjs',
         },
-        plugins: extraPlugins,
+        plugins: [
+            // Fixes Critical dependency: the request of a dependency is an expression
+            new webpack_1.ContextReplacementPlugin(/@?hapi(\\|\/)/),
+            new webpack_1.ContextReplacementPlugin(/express(\\|\/)/),
+            ...extraPlugins,
+        ],
         node: false,
     };
     if (wco.buildOptions.bundleDependencies == 'none') {

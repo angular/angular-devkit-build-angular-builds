@@ -10,10 +10,29 @@ var Type;
     Type["All"] = "all";
     Type["AllScript"] = "allScript";
     Type["Any"] = "any";
+    Type["AnyComponentStyle"] = "anyComponentStyle";
     Type["AnyScript"] = "anyScript";
     Type["Bundle"] = "bundle";
     Type["Initial"] = "initial";
 })(Type = exports.Type || (exports.Type = {}));
+/**
+ * Define the crossorigin attribute setting of elements that provide CORS support.
+ */
+var CrossOrigin;
+(function (CrossOrigin) {
+    CrossOrigin["Anonymous"] = "anonymous";
+    CrossOrigin["None"] = "none";
+    CrossOrigin["UseCredentials"] = "use-credentials";
+})(CrossOrigin = exports.CrossOrigin || (exports.CrossOrigin = {}));
+/**
+ * How to handle missing translations for i18n.
+ */
+var I18NMissingTranslation;
+(function (I18NMissingTranslation) {
+    I18NMissingTranslation["Error"] = "error";
+    I18NMissingTranslation["Ignore"] = "ignore";
+    I18NMissingTranslation["Warning"] = "warning";
+})(I18NMissingTranslation = exports.I18NMissingTranslation || (exports.I18NMissingTranslation = {}));
 /**
  * Define the output filename cache-busting hashing mode.
  */

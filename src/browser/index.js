@@ -11,16 +11,27 @@ const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
+const fs = require("fs");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
+const typescript_1 = require("typescript");
 const analytics_1 = require("../../plugins/webpack/analytics");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const write_index_html_1 = require("../angular-cli-files/utilities/index-file/write-index-html");
+const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
 const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
+const action_executor_1 = require("../utils/action-executor");
+const cache_path_1 = require("../utils/cache-path");
+const copy_assets_1 = require("../utils/copy-assets");
+const environment_options_1 = require("../utils/environment-options");
+const i18n_inlining_1 = require("../utils/i18n-inlining");
+const output_paths_1 = require("../utils/output-paths");
+const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
+const cacheDownlevelPath = environment_options_1.cachingDisabled ? undefined : cache_path_1.findCachePath('angular-build-dl');
 function createBrowserLoggingCallback(verbose, logger) {
     return (stats, config) => {
         // config.stats contains our own stats settings, added during buildWebpackConfig().
@@ -40,8 +51,8 @@ function createBrowserLoggingCallback(verbose, logger) {
     };
 }
 exports.createBrowserLoggingCallback = createBrowserLoggingCallback;
-async function buildBrowserWebpackConfigFromContext(options, context, host = new node_1.NodeJsSyncHost()) {
-    return webpack_browser_config_1.generateBrowserWebpackConfigFromContext(options, context, wco => [
+async function buildBrowserWebpackConfigFromContext(options, context, host = new node_1.NodeJsSyncHost(), i18n = false) {
+    const webpackPartialGenerator = (wco) => [
         webpack_configs_1.getCommonConfig(wco),
         webpack_configs_1.getBrowserConfig(wco),
         webpack_configs_1.getStylesConfig(wco),
@@ -49,7 +60,11 @@ async function buildBrowserWebpackConfigFromContext(options, context, host = new
         getAnalyticsConfig(wco, context),
         getCompilerConfig(wco),
         wco.buildOptions.webWorkerTsConfig ? webpack_configs_1.getWorkerConfig(wco) : {},
-    ], host);
+    ];
+    if (i18n) {
+        return webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host);
+    }
+    return webpack_browser_config_1.generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host);
 }
 exports.buildBrowserWebpackConfigFromContext = buildBrowserWebpackConfigFromContext;
 function getAnalyticsConfig(wco, context) {
@@ -58,13 +73,12 @@ function getAnalyticsConfig(wco, context) {
         let category = 'build';
         if (context.builder) {
             // We already vetted that this is a "safe" package, otherwise the analytics would be noop.
-            category = context.builder.builderName.split(':')[1];
+            category =
+                context.builder.builderName.split(':')[1] || context.builder.builderName || 'build';
         }
         // The category is the builder name if it's an angular builder.
         return {
-            plugins: [
-                new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category),
-            ],
+            plugins: [new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category, !!wco.tsConfig.options.enableIvy)],
         };
     }
     return {};
@@ -76,69 +90,405 @@ function getCompilerConfig(wco) {
     return {};
 }
 async function initialize(options, context, host, webpackConfigurationTransform) {
-    const { config, workspace } = await buildBrowserWebpackConfigFromContext(options, context, host);
+    const originalOutputPath = options.outputPath;
+    const { config, projectRoot, projectSourceRoot, i18n, } = await buildBrowserWebpackConfigFromContext(options, context, host, true);
     let transformedConfig;
     if (webpackConfigurationTransform) {
-        transformedConfig = [];
-        for (const c of config) {
-            transformedConfig.push(await webpackConfigurationTransform(c));
-        }
+        transformedConfig = await webpackConfigurationTransform(config);
     }
     if (options.deleteOutputPath) {
-        await utils_1.deleteOutputDir(core_1.normalize(context.workspaceRoot), core_1.normalize(options.outputPath), host).toPromise();
+        utils_1.deleteOutputDir(context.workspaceRoot, originalOutputPath);
     }
-    return { config: transformedConfig || config, workspace };
+    return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
 }
+// tslint:disable-next-line: no-big-function
 function buildWebpackBrowser(options, context, transforms = {}) {
     const host = new node_1.NodeJsSyncHost();
     const root = core_1.normalize(context.workspaceRoot);
-    const loggingFn = transforms.logging
-        || createBrowserLoggingCallback(!!options.verbose, context.logger);
-    return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(operators_1.switchMap(({ workspace, config: configs }) => {
-        const projectName = context.target
-            ? context.target.project : workspace.getDefaultProjectName();
-        if (!projectName) {
-            throw new Error('Must either have a target from the context or a default project.');
+    const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
+    let outputPaths;
+    // Check Angular version.
+    version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
+    return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
+    // tslint:disable-next-line: no-big-function
+    operators_1.switchMap(({ config, projectRoot, projectSourceRoot, i18n }) => {
+        const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
+        const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
+        const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, target);
+        const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded();
+        if (target > typescript_1.ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
+            context.logger.warn(core_1.tags.stripIndent `
+          WARNING: Using differential loading with targets ES5 and ES2016 or higher may
+          cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
+          referenced with script[type="module"] but they may not support ES2016+ syntax.
+        `);
         }
-        const projectRoot = core_1.resolve(workspace.root, core_1.normalize(workspace.getProject(projectName).root));
-        // We use zip because when having multiple builds we want to wait
-        // for all builds to finish before processeding
-        return rxjs_1.zip(...configs.map(config => build_webpack_1.runWebpack(config, context, { logging: loggingFn })))
-            .pipe(operators_1.switchMap(buildEvents => {
-            const success = buildEvents.every(r => r.success);
-            if (success && buildEvents.length === 2 && options.index) {
-                const { emittedFiles: ES5BuildFiles = [] } = buildEvents[0];
-                const { emittedFiles: ES2015BuildFiles = [] } = buildEvents[1];
-                return write_index_html_1.writeIndexHtml({
-                    host,
-                    outputPath: core_1.join(root, options.outputPath),
-                    indexPath: core_1.join(root, options.index),
-                    ES5BuildFiles,
-                    ES2015BuildFiles,
-                    baseHref: options.baseHref,
-                    deployUrl: options.deployUrl,
-                    sri: options.subresourceIntegrity,
-                    scripts: options.scripts,
-                    styles: options.styles,
-                })
-                    .pipe(operators_1.map(() => ({ success: true })), operators_1.catchError(() => rxjs_1.of({ success: false })));
+        const useBundleDownleveling = isDifferentialLoadingNeeded && !options.watch;
+        const startTime = Date.now();
+        return build_webpack_1.runWebpack(config, context, {
+            logging: transforms.logging ||
+                (useBundleDownleveling
+                    ? () => { }
+                    : createBrowserLoggingCallback(!!options.verbose, context.logger)),
+        }).pipe(
+        // tslint:disable-next-line: no-big-function
+        operators_1.concatMap(async (buildEvent) => {
+            const { webpackStats, success, emittedFiles = [] } = buildEvent;
+            if (!webpackStats) {
+                throw new Error('Webpack stats build result is required.');
             }
-            else {
-                return rxjs_1.of({ success });
+            if (!success && useBundleDownleveling) {
+                // If using bundle downleveling then there is only one build
+                // If it fails show any diagnostic messages and bail
+                if (webpackStats && webpackStats.warnings.length > 0) {
+                    context.logger.warn(stats_1.statsWarningsToString(webpackStats, { colors: true }));
+                }
+                if (webpackStats && webpackStats.errors.length > 0) {
+                    context.logger.error(stats_1.statsErrorsToString(webpackStats, { colors: true }));
+                }
+                return { success };
             }
-        }), operators_1.concatMap(buildEvent => {
-            if (buildEvent.success && !options.watch && options.serviceWorker) {
-                return rxjs_1.from(service_worker_1.augmentAppWithServiceWorker(host, root, projectRoot, core_1.resolve(root, core_1.normalize(options.outputPath)), options.baseHref || '/', options.ngswConfigPath).then(() => ({ success: true }), () => ({ success: false })));
+            else if (success) {
+                outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
+                let noModuleFiles;
+                let moduleFiles;
+                let files;
+                const scriptsEntryPointName = webpack_configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map(x => x.bundleName);
+                if (isDifferentialLoadingNeeded && options.watch) {
+                    moduleFiles = emittedFiles;
+                    files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
+                    if (i18n.shouldInline) {
+                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, scriptsEntryPointName, 
+                        // tslint:disable-next-line: no-non-null-assertion
+                        webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
+                        if (!success) {
+                            return { success: false };
+                        }
+                    }
+                }
+                else if (isDifferentialLoadingNeeded) {
+                    moduleFiles = [];
+                    noModuleFiles = [];
+                    // Common options for all bundle process actions
+                    const sourceMapOptions = utils_1.normalizeSourceMaps(options.sourceMap || false);
+                    const actionOptions = {
+                        optimize: utils_1.normalizeOptimization(options.optimization).scripts,
+                        sourceMaps: sourceMapOptions.scripts,
+                        hiddenSourceMaps: sourceMapOptions.hidden,
+                        vendorSourceMaps: sourceMapOptions.vendor,
+                        integrityAlgorithm: options.subresourceIntegrity ? 'sha384' : undefined,
+                    };
+                    let mainChunkId;
+                    const actions = [];
+                    const seen = new Set();
+                    for (const file of emittedFiles) {
+                        // Assets are not processed nor injected into the index
+                        if (file.asset) {
+                            continue;
+                        }
+                        // Scripts and non-javascript files are not processed
+                        if (file.extension !== '.js' ||
+                            (file.name && scriptsEntryPointName.includes(file.name))) {
+                            if (files === undefined) {
+                                files = [];
+                            }
+                            files.push(file);
+                            continue;
+                        }
+                        // Ignore already processed files; emittedFiles can contain duplicates
+                        if (seen.has(file.file)) {
+                            continue;
+                        }
+                        seen.add(file.file);
+                        if (file.name === 'main') {
+                            // tslint:disable-next-line: no-non-null-assertion
+                            mainChunkId = file.id.toString();
+                        }
+                        // All files at this point except ES5 polyfills are module scripts
+                        const es5Polyfills = file.file.startsWith('polyfills-es5') ||
+                            file.file.startsWith('polyfills-nomodule-es5');
+                        if (!es5Polyfills) {
+                            moduleFiles.push(file);
+                        }
+                        // If not optimizing then ES2015 polyfills do not need processing
+                        // Unlike other module scripts, it is never downleveled
+                        const es2015Polyfills = file.file.startsWith('polyfills-es2015');
+                        if (!actionOptions.optimize && es2015Polyfills) {
+                            continue;
+                        }
+                        // Retrieve the content/map for the file
+                        // NOTE: Additional future optimizations will read directly from memory
+                        // tslint:disable-next-line: no-non-null-assertion
+                        let filename = path.join(webpackStats.outputPath, file.file);
+                        const code = fs.readFileSync(filename, 'utf8');
+                        let map;
+                        if (actionOptions.sourceMaps) {
+                            try {
+                                map = fs.readFileSync(filename + '.map', 'utf8');
+                                if (es5Polyfills) {
+                                    fs.unlinkSync(filename + '.map');
+                                }
+                            }
+                            catch (_a) { }
+                        }
+                        if (es5Polyfills) {
+                            fs.unlinkSync(filename);
+                            filename = filename.replace('-es2015', '');
+                        }
+                        // Record the bundle processing action
+                        // The runtime chunk gets special processing for lazy loaded files
+                        actions.push({
+                            ...actionOptions,
+                            filename,
+                            code,
+                            map,
+                            // id is always present for non-assets
+                            // tslint:disable-next-line: no-non-null-assertion
+                            name: file.id,
+                            runtime: file.file.startsWith('runtime'),
+                            ignoreOriginal: es5Polyfills,
+                            optimizeOnly: es2015Polyfills,
+                        });
+                        // ES2015 polyfills are only optimized; optimization check was performed above
+                        if (es2015Polyfills) {
+                            continue;
+                        }
+                        // Add the newly created ES5 bundles to the index as nomodule scripts
+                        const newFilename = es5Polyfills
+                            ? file.file.replace('-es2015', '')
+                            : file.file.replace('es2015', 'es5');
+                        noModuleFiles.push({ ...file, file: newFilename });
+                    }
+                    const processActions = [];
+                    let processRuntimeAction;
+                    const processResults = [];
+                    for (const action of actions) {
+                        // If SRI is enabled always process the runtime bundle
+                        // Lazy route integrity values are stored in the runtime bundle
+                        if (action.integrityAlgorithm && action.runtime) {
+                            processRuntimeAction = action;
+                        }
+                        else {
+                            processActions.push(action);
+                        }
+                    }
+                    const executor = new action_executor_1.BundleActionExecutor({ cachePath: cacheDownlevelPath, i18n }, options.subresourceIntegrity ? 'sha384' : undefined);
+                    // Execute the bundle processing actions
+                    try {
+                        context.logger.info('Generating ES5 bundles for differential loading...');
+                        for await (const result of executor.processAll(processActions)) {
+                            processResults.push(result);
+                        }
+                        // Runtime must be processed after all other files
+                        if (processRuntimeAction) {
+                            const runtimeOptions = {
+                                ...processRuntimeAction,
+                                runtimeData: processResults,
+                            };
+                            processResults.push(await Promise.resolve().then(() => require('../utils/process-bundle')).then(m => m.process(runtimeOptions)));
+                        }
+                        context.logger.info('ES5 bundle generation complete.');
+                        if (i18n.shouldInline) {
+                            context.logger.info('Generating localized bundles...');
+                            const inlineActions = [];
+                            const processedFiles = new Set();
+                            for (const result of processResults) {
+                                if (result.original) {
+                                    inlineActions.push({
+                                        filename: path.basename(result.original.filename),
+                                        code: fs.readFileSync(result.original.filename, 'utf8'),
+                                        map: result.original.map &&
+                                            fs.readFileSync(result.original.map.filename, 'utf8'),
+                                        outputPath: baseOutputPath,
+                                        es5: false,
+                                        missingTranslation: options.i18nMissingTranslation,
+                                        setLocale: result.name === mainChunkId,
+                                    });
+                                    processedFiles.add(result.original.filename);
+                                }
+                                if (result.downlevel) {
+                                    inlineActions.push({
+                                        filename: path.basename(result.downlevel.filename),
+                                        code: fs.readFileSync(result.downlevel.filename, 'utf8'),
+                                        map: result.downlevel.map &&
+                                            fs.readFileSync(result.downlevel.map.filename, 'utf8'),
+                                        outputPath: baseOutputPath,
+                                        es5: true,
+                                        missingTranslation: options.i18nMissingTranslation,
+                                        setLocale: result.name === mainChunkId,
+                                    });
+                                    processedFiles.add(result.downlevel.filename);
+                                }
+                            }
+                            let hasErrors = false;
+                            try {
+                                for await (const result of executor.inlineAll(inlineActions)) {
+                                    if (options.verbose) {
+                                        context.logger.info(`Localized "${result.file}" [${result.count} translation(s)].`);
+                                    }
+                                    for (const diagnostic of result.diagnostics) {
+                                        if (diagnostic.type === 'error') {
+                                            hasErrors = true;
+                                            context.logger.error(diagnostic.message);
+                                        }
+                                        else {
+                                            context.logger.warn(diagnostic.message);
+                                        }
+                                    }
+                                }
+                                // Copy any non-processed files into the output locations
+                                await copy_assets_1.copyAssets([
+                                    {
+                                        glob: '**/*',
+                                        // tslint:disable-next-line: no-non-null-assertion
+                                        input: webpackStats.outputPath,
+                                        output: '',
+                                        ignore: [...processedFiles].map(f => 
+                                        // tslint:disable-next-line: no-non-null-assertion
+                                        path.relative(webpackStats.outputPath, f)),
+                                    },
+                                ], outputPaths, '');
+                            }
+                            catch (err) {
+                                context.logger.error('Localized bundle generation failed: ' + err.message);
+                                return { success: false };
+                            }
+                            context.logger.info(`Localized bundle generation ${hasErrors ? 'failed' : 'complete'}.`);
+                            if (hasErrors) {
+                                return { success: false };
+                            }
+                        }
+                    }
+                    finally {
+                        executor.stop();
+                    }
+                    // Copy assets
+                    if (options.assets) {
+                        try {
+                            await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), outputPaths, context.workspaceRoot);
+                        }
+                        catch (err) {
+                            context.logger.error('Unable to copy assets: ' + err.message);
+                            return { success: false };
+                        }
+                    }
+                    function generateBundleInfoStats(id, bundle, chunk) {
+                        return stats_1.generateBundleStats({
+                            id,
+                            size: bundle.size,
+                            files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
+                            names: chunk && chunk.names,
+                            entry: !!chunk && chunk.names.includes('runtime'),
+                            initial: !!chunk && chunk.initial,
+                            rendered: true,
+                        }, true);
+                    }
+                    let bundleInfoText = '';
+                    const processedNames = new Set();
+                    for (const result of processResults) {
+                        processedNames.add(result.name);
+                        const chunk = webpackStats &&
+                            webpackStats.chunks &&
+                            webpackStats.chunks.find(c => result.name === c.id.toString());
+                        if (result.original) {
+                            bundleInfoText +=
+                                '\n' + generateBundleInfoStats(result.name, result.original, chunk);
+                        }
+                        if (result.downlevel) {
+                            bundleInfoText +=
+                                '\n' + generateBundleInfoStats(result.name, result.downlevel, chunk);
+                        }
+                    }
+                    if (webpackStats && webpackStats.chunks) {
+                        for (const chunk of webpackStats.chunks) {
+                            if (processedNames.has(chunk.id.toString())) {
+                                continue;
+                            }
+                            const asset = webpackStats.assets && webpackStats.assets.find(a => a.name === chunk.files[0]);
+                            bundleInfoText +=
+                                '\n' + stats_1.generateBundleStats({ ...chunk, size: asset && asset.size }, true);
+                        }
+                    }
+                    bundleInfoText +=
+                        '\n' +
+                            stats_1.generateBuildStats((webpackStats && webpackStats.hash) || '<unknown>', Date.now() - startTime, true);
+                    context.logger.info(bundleInfoText);
+                    if (webpackStats && webpackStats.warnings.length > 0) {
+                        context.logger.warn(stats_1.statsWarningsToString(webpackStats, { colors: true }));
+                    }
+                    if (webpackStats && webpackStats.errors.length > 0) {
+                        context.logger.error(stats_1.statsErrorsToString(webpackStats, { colors: true }));
+                    }
+                }
+                else {
+                    files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
+                    noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
+                    if (i18n.shouldInline) {
+                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, scriptsEntryPointName, 
+                        // tslint:disable-next-line: no-non-null-assertion
+                        webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
+                        if (!success) {
+                            return { success: false };
+                        }
+                    }
+                }
+                if (options.index) {
+                    for (const outputPath of outputPaths) {
+                        try {
+                            await generateIndex(outputPath, options, root, files, noModuleFiles, moduleFiles, transforms.indexHtml);
+                        }
+                        catch (err) {
+                            return { success: false, error: mapErrorToMessage(err) };
+                        }
+                    }
+                }
+                if (!options.watch && options.serviceWorker) {
+                    for (const outputPath of outputPaths) {
+                        try {
+                            await service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(outputPath), options.baseHref || '/', options.ngswConfigPath);
+                        }
+                        catch (err) {
+                            return { success: false, error: mapErrorToMessage(err) };
+                        }
+                    }
+                }
             }
-            else {
-                return rxjs_1.of(buildEvent);
-            }
+            return { success };
         }), operators_1.map(event => ({
             ...event,
-            // If we use differential loading, both configs have the same outputs
-            outputPath: path.resolve(context.workspaceRoot, options.outputPath),
+            baseOutputPath,
+            outputPath: baseOutputPath,
+            outputPaths: outputPaths || [baseOutputPath],
         })));
     }));
 }
 exports.buildWebpackBrowser = buildWebpackBrowser;
+function generateIndex(baseOutputPath, options, root, files, noModuleFiles, moduleFiles, transformer) {
+    const host = new node_1.NodeJsSyncHost();
+    return write_index_html_1.writeIndexHtml({
+        host,
+        outputPath: core_1.join(core_1.normalize(baseOutputPath), webpack_browser_config_1.getIndexOutputFile(options)),
+        indexPath: core_1.join(core_1.normalize(root), webpack_browser_config_1.getIndexInputFile(options)),
+        files,
+        noModuleFiles,
+        moduleFiles,
+        baseHref: options.baseHref,
+        deployUrl: options.deployUrl,
+        sri: options.subresourceIntegrity,
+        scripts: options.scripts,
+        styles: options.styles,
+        postTransform: transformer,
+        crossOrigin: options.crossOrigin,
+        lang: options.i18nLocale,
+    }).toPromise();
+}
+function mapErrorToMessage(error) {
+    if (error instanceof Error) {
+        return error.message;
+    }
+    if (typeof error === 'string') {
+        return error;
+    }
+    return undefined;
+}
 exports.default = architect_1.createBuilder(buildWebpackBrowser);

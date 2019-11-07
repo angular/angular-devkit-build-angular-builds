@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,13 +7,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-Object.defineProperty(exports, "__esModule", { value: true });
 const architect_1 = require("@angular-devkit/architect");
 const node_1 = require("@angular-devkit/architect/node");
 const testing_1 = require("@angular-devkit/architect/testing");
 const core_1 = require("@angular-devkit/core");
+exports.veEnabled = process.argv.includes('--ve');
 const devkitRoot = core_1.normalize(global._DevKitRoot); // tslint:disable-line:no-any
-exports.workspaceRoot = core_1.join(devkitRoot, 'tests/angular_devkit/build_angular/hello-world-app/');
+exports.workspaceRoot = core_1.join(devkitRoot, `tests/angular_devkit/build_angular/hello-world-app${exports.veEnabled ? '-ve' : ''}/`);
 exports.host = new testing_1.TestProjectHost(exports.workspaceRoot);
 exports.outputPath = core_1.normalize('dist');
 exports.browserTargetSpec = { project: 'app', target: 'build' };
@@ -25,7 +26,7 @@ async function createArchitect(workspaceRoot) {
     const registry = new core_1.schema.CoreSchemaRegistry();
     registry.addPostTransform(core_1.schema.transforms.addUndefinedDefaults);
     const workspaceSysPath = core_1.getSystemPath(workspaceRoot);
-    const workspace = await core_1.experimental.workspace.Workspace.fromPath(exports.host, exports.host.root(), registry);
+    const { workspace } = await core_1.workspaces.readWorkspace(workspaceSysPath, core_1.workspaces.createWorkspaceHost(exports.host));
     const architectHost = new testing_1.TestingArchitectHost(workspaceSysPath, workspaceSysPath, new node_1.WorkspaceNodeModulesArchitectHost(workspace, workspaceSysPath));
     const architect = new architect_1.Architect(architectHost, registry);
     return {
@@ -39,8 +40,8 @@ async function browserBuild(architect, host, target, overrides, scheduleOptions)
     const run = await architect.scheduleTarget(target, overrides, scheduleOptions);
     const output = (await run.result);
     expect(output.success).toBe(true);
-    expect(output.outputPath).not.toBeUndefined();
-    const outputPath = core_1.normalize(output.outputPath);
+    expect(output.outputPaths[0]).not.toBeUndefined();
+    const outputPath = core_1.normalize(output.outputPaths[0]);
     const fileNames = await host.list(outputPath).toPromise();
     const files = fileNames.reduce((acc, path) => {
         let cache = null;
@@ -98,7 +99,7 @@ exports.lazyModuleFiles = {
     export class LazyModule { }
   `,
 };
-exports.lazyModuleImport = {
+exports.lazyModuleStringImport = {
     'src/app/app.module.ts': `
     import { BrowserModule } from '@angular/platform-browser';
     import { NgModule } from '@angular/core';
@@ -121,4 +122,7 @@ exports.lazyModuleImport = {
     })
     export class AppModule { }
   `,
+};
+exports.lazyModuleFnImport = {
+    'src/app/app.module.ts': exports.lazyModuleStringImport['src/app/app.module.ts'].replace(`loadChildren: './lazy/lazy.module#LazyModule'`, `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`),
 };

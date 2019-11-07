@@ -6,6 +6,7 @@ function calculateSizes(budget, compilation) {
         allScript: AllScriptCalculator,
         any: AnyCalculator,
         anyScript: AnyScriptCalculator,
+        anyComponentStyle: AnyComponentStyleCalculator,
         bundle: BundleCalculator,
         initial: InitialCalculator,
     };
@@ -29,6 +30,7 @@ class BundleCalculator extends Calculator {
         const size = this.compilation.chunks
             .filter(chunk => chunk.name === this.budget.name)
             .reduce((files, chunk) => [...files, ...chunk.files], [])
+            .filter((file) => !file.endsWith('.map'))
             .map((file) => this.compilation.assets[file].size())
             .reduce((total, size) => total + size, 0);
         return [{ size, label: this.budget.name }];
@@ -71,6 +73,19 @@ class AllCalculator extends Calculator {
             .map(key => this.compilation.assets[key].size())
             .reduce((total, size) => total + size, 0);
         return [{ size, label: 'total' }];
+    }
+}
+/**
+ * Any components styles
+ */
+class AnyComponentStyleCalculator extends Calculator {
+    calculate() {
+        return Object.keys(this.compilation.assets)
+            .filter(key => key.endsWith('.css'))
+            .map(key => ({
+            size: this.compilation.assets[key].size(),
+            label: key,
+        }));
     }
 }
 /**

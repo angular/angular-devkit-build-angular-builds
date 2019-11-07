@@ -1,7 +1,7 @@
 export interface Schema {
     /**
      * Available on server platform only. Which external dependencies to bundle into the module.
-     * By default, all of node_modules will be kept as requires.
+     * By default, all of node_modules will be bundled.
      */
     bundleDependencies?: BundleDependencies;
     /**
@@ -35,25 +35,31 @@ export interface Schema {
     forkTypeChecker?: boolean;
     /**
      * Localization file to use for i18n.
+     * @deprecated Use 'locales' object in the project metadata instead.
      */
     i18nFile?: string;
     /**
      * Format of the localization file specified with --i18n-file.
+     * @deprecated No longer needed as the format will be determined automatically.
      */
     i18nFormat?: string;
     /**
      * Locale to use for i18n.
+     * @deprecated Use 'localize' instead.
      */
     i18nLocale?: string;
     /**
      * How to handle missing translations for i18n.
      */
-    i18nMissingTranslation?: string;
+    i18nMissingTranslation?: I18NMissingTranslation;
     /**
      * List of additional NgModule files that will be lazy loaded. Lazy router modules will be
      * discovered automatically.
+     * @deprecated 'SystemJsNgModuleLoader' is deprecated, and this is part of its usage. Use
+     * 'import()' syntax instead.
      */
     lazyModules?: string[];
+    localize?: Localize;
     /**
      * The name of the main entry-point file.
      */
@@ -131,7 +137,7 @@ export interface Schema {
 }
 /**
  * Available on server platform only. Which external dependencies to bundle into the module.
- * By default, all of node_modules will be kept as requires.
+ * By default, all of node_modules will be bundled.
  */
 export declare enum BundleDependencies {
     All = "all",
@@ -143,6 +149,15 @@ export interface FileReplacement {
     src?: string;
     with?: string;
 }
+/**
+ * How to handle missing translations for i18n.
+ */
+export declare enum I18NMissingTranslation {
+    Error = "error",
+    Ignore = "ignore",
+    Warning = "warning"
+}
+export declare type Localize = string[] | boolean;
 /**
  * Enables optimization of the build output.
  */

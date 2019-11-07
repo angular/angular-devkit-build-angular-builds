@@ -9,16 +9,22 @@ import { EmittedFiles } from '@angular-devkit/build-webpack';
 import { Path, virtualFs } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { ExtraEntryPoint } from '../../../browser/schema';
+import { CrossOriginValue } from './augment-index-html';
 export interface WriteIndexHtmlOptions {
     host: virtualFs.Host;
     outputPath: Path;
     indexPath: Path;
-    ES5BuildFiles: EmittedFiles[];
-    ES2015BuildFiles: EmittedFiles[];
+    files?: EmittedFiles[];
+    noModuleFiles?: EmittedFiles[];
+    moduleFiles?: EmittedFiles[];
     baseHref?: string;
     deployUrl?: string;
     sri?: boolean;
     scripts?: ExtraEntryPoint[];
     styles?: ExtraEntryPoint[];
+    postTransform?: IndexHtmlTransform;
+    crossOrigin?: CrossOriginValue;
+    lang?: string;
 }
-export declare function writeIndexHtml({ host, outputPath, indexPath, ES5BuildFiles, ES2015BuildFiles, baseHref, deployUrl, sri, scripts, styles, }: WriteIndexHtmlOptions): Observable<void>;
+export declare type IndexHtmlTransform = (content: string) => Promise<string>;
+export declare function writeIndexHtml({ host, outputPath, indexPath, files, noModuleFiles, moduleFiles, baseHref, deployUrl, sri, scripts, styles, postTransform, crossOrigin, lang, }: WriteIndexHtmlOptions): Observable<void>;

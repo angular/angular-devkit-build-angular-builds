@@ -8,10 +8,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const architect_1 = require("@angular-devkit/architect");
+const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
+const single_test_transform_1 = require("../angular-cli-files/plugins/single-test-transform");
+const find_tests_1 = require("../angular-cli-files/utilities/find-tests");
+const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 async function initialize(options, context, webpackConfigurationTransformer) {
     const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(
@@ -29,10 +33,12 @@ async function initialize(options, context, webpackConfigurationTransformer) {
     const karma = await Promise.resolve().then(() => require('karma'));
     return [
         karma,
-        webpackConfigurationTransformer ? await webpackConfigurationTransformer(config[0]) : config[0],
+        webpackConfigurationTransformer ? await webpackConfigurationTransformer(config) : config,
     ];
 }
 function execute(options, context, transforms = {}) {
+    // Check Angular version.
+    version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.switchMap(([karma, webpackConfig]) => new rxjs_1.Observable(subscriber => {
         const karmaOptions = {};
         if (options.watch !== undefined) {
@@ -50,6 +56,30 @@ function execute(options, context, transforms = {}) {
             if (reporters.length > 0) {
                 karmaOptions.reporters = reporters;
             }
+        }
+        // prepend special webpack loader that will transform test.ts
+        if (webpackConfig &&
+            webpackConfig.module &&
+            options.include &&
+            options.include.length > 0) {
+            const mainFilePath = core_1.getSystemPath(core_1.join(core_1.normalize(context.workspaceRoot), options.main));
+            const files = find_tests_1.findTests(options.include, path_1.dirname(mainFilePath), context.workspaceRoot);
+            // early exit, no reason to start karma
+            if (!files.length) {
+                subscriber.error(`Specified patterns: "${options.include.join(', ')}" did not match any spec files`);
+                return;
+            }
+            webpackConfig.module.rules.unshift({
+                test: path => path === mainFilePath,
+                use: {
+                    // cannot be a simple path as it differs between environments
+                    loader: single_test_transform_1.SingleTestTransformLoader,
+                    options: {
+                        files,
+                        logger: context.logger,
+                    },
+                },
+            });
         }
         // Assign additional karmaConfig options to the local ngapp config
         karmaOptions.configFile = path_1.resolve(context.workspaceRoot, options.karmaConfig);
@@ -78,7 +108,7 @@ function execute(options, context, transforms = {}) {
                 return karmaStart.then(() => karmaServerWithStop.stop());
             }
         };
-    })));
+    })), operators_1.defaultIfEmpty({ success: false }));
 }
 exports.execute = execute;
 exports.default = architect_1.createBuilder(execute);

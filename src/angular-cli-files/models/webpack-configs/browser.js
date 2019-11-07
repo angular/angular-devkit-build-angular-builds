@@ -8,13 +8,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const license_webpack_plugin_1 = require("license-webpack-plugin");
-const path = require("path");
-const index_html_webpack_plugin_1 = require("../../plugins/index-html-webpack-plugin");
-const package_chunk_sort_1 = require("../../utilities/package-chunk-sort");
 const utils_1 = require("./utils");
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 function getBrowserConfig(wco) {
-    const { root, buildOptions } = wco;
+    const { buildOptions } = wco;
     const extraPlugins = [];
     let isEval = false;
     const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
@@ -26,17 +23,6 @@ function getBrowserConfig(wco) {
         !scriptsOptimization) {
         // Produce eval sourcemaps for development with serve, which are faster.
         isEval = true;
-    }
-    if (buildOptions.index) {
-        extraPlugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({
-            input: path.resolve(root, buildOptions.index),
-            output: path.basename(buildOptions.index),
-            baseHref: buildOptions.baseHref,
-            entrypoints: package_chunk_sort_1.generateEntryPoints(buildOptions),
-            deployUrl: buildOptions.deployUrl,
-            sri: buildOptions.subresourceIntegrity,
-            noModuleEntrypoints: ['polyfills-es5'],
-        }));
     }
     if (buildOptions.subresourceIntegrity) {
         extraPlugins.push(new SubresourceIntegrityPlugin({
@@ -74,12 +60,12 @@ function getBrowserConfig(wco) {
             splitChunks: {
                 maxAsyncRequests: Infinity,
                 cacheGroups: {
-                    default: buildOptions.commonChunk && {
+                    default: !!buildOptions.commonChunk && {
                         chunks: 'async',
                         minChunks: 2,
                         priority: 10,
                     },
-                    common: buildOptions.commonChunk && {
+                    common: !!buildOptions.commonChunk && {
                         name: 'common',
                         chunks: 'async',
                         minChunks: 2,
@@ -87,14 +73,14 @@ function getBrowserConfig(wco) {
                         priority: 5,
                     },
                     vendors: false,
-                    vendor: buildOptions.vendorChunk && {
+                    vendor: !!buildOptions.vendorChunk && {
                         name: 'vendor',
                         chunks: 'initial',
                         enforce: true,
                         test: (module, chunks) => {
                             const moduleName = module.nameForCondition ? module.nameForCondition() : '';
                             return /[\\/]node_modules[\\/]/.test(moduleName)
-                                && !chunks.some(({ name }) => name === 'polyfills' || name === 'polyfills-es5'
+                                && !chunks.some(({ name }) => utils_1.isPolyfillsEntry(name)
                                     || globalStylesBundleNames.includes(name));
                         },
                     },

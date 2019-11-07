@@ -68,7 +68,7 @@ async function augmentAppWithServiceWorker(host, projectRoot, appRoot, outputPat
     if (!configExists) {
         throw new Error(core_1.tags.oneLine `
       Error: Expected to find an ngsw-config.json configuration
-      file in the ${appRoot} folder. Either provide one or disable Service Worker
+      file in the ${core_1.getSystemPath(appRoot)} folder. Either provide one or disable Service Worker
       in your angular.json configuration file.
     `);
     }

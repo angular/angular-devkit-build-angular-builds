@@ -7,7 +7,8 @@
  */
 import { Architect, BuilderOutput, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
-import { Path, experimental, json, virtualFs } from '@angular-devkit/core';
+import { Path, json, virtualFs, workspaces } from '@angular-devkit/core';
+export declare const veEnabled: boolean;
 export declare const workspaceRoot: Path;
 export declare const host: TestProjectHost;
 export declare const outputPath: Path;
@@ -36,19 +37,23 @@ export declare const protractorTargetSpec: {
     target: string;
 };
 export declare function createArchitect(workspaceRoot: Path): Promise<{
-    workspace: experimental.workspace.Workspace;
+    workspace: workspaces.WorkspaceDefinition;
     architectHost: TestingArchitectHost;
     architect: Architect;
 }>;
-export declare function browserBuild(architect: Architect, host: virtualFs.Host, target: Target, overrides?: json.JsonObject, scheduleOptions?: ScheduleOptions): Promise<{
+export interface BrowserBuildOutput {
     output: BuilderOutput;
     files: {
-        [file: string]: string;
+        [file: string]: Promise<string>;
     };
-}>;
+}
+export declare function browserBuild(architect: Architect, host: virtualFs.Host, target: Target, overrides?: json.JsonObject, scheduleOptions?: ScheduleOptions): Promise<BrowserBuildOutput>;
 export declare const lazyModuleFiles: {
     [path: string]: string;
 };
-export declare const lazyModuleImport: {
+export declare const lazyModuleStringImport: {
+    [path: string]: string;
+};
+export declare const lazyModuleFnImport: {
     [path: string]: string;
 };

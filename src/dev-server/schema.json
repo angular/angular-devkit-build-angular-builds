@@ -44,8 +44,7 @@
     },
     "verbose": {
       "type": "boolean",
-      "description": "Adds more details to output logging.",
-      "default": false
+      "description": "Adds more details to output logging."
     },
     "liveReload": {
       "type": "boolean",
@@ -54,7 +53,15 @@
     },
     "publicHost": {
       "type": "string",
-      "description": "Specify the URL that the browser client will use."
+      "description": "The URL that the browser client (or live-reload client, if enabled) should use to connect to the development server. Use for a complex dev server setup, such as one with reverse proxies."
+    },
+    "allowedHosts": {
+      "type": "array",
+      "description": "Whitelist of hosts that are allowed to access the dev server.",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
     },
     "servePath": {
       "type": "string",
@@ -117,7 +124,6 @@
     },
     "sourceMap": {
       "description": "Output sourcemaps.",
-      "default": true,
       "oneOf": [
         {
           "type": "object",
@@ -153,8 +159,7 @@
     "vendorSourceMap": {
       "type": "boolean",
       "description": "Resolve vendor packages sourcemaps.",
-      "x-deprecated": true,
-      "default": false
+      "x-deprecated": true
     },
     "evalSourceMap": {
       "type": "boolean",

@@ -28,6 +28,10 @@ export interface Schema {
      */
     commonChunk?: boolean;
     /**
+     * Define the crossorigin attribute setting of elements that provide CORS support.
+     */
+    crossOrigin?: CrossOrigin;
+    /**
      * Delete the output path before building.
      */
     deleteOutputPath?: boolean;
@@ -47,11 +51,9 @@ export interface Schema {
      */
     evalSourceMap?: boolean;
     /**
-     * **EXPERIMENTAL** Transform import statements for lazy routes to import factories when
-     * using View Engine. Should only be used when switching back and forth between View Engine
-     * and Ivy. See https://angular.io/guide/ivy for usage information.
+     * Concatenate modules with Rollup before bundling them with Webpack.
      */
-    experimentalImportFactories?: boolean;
+    experimentalRollupPass?: boolean;
     /**
      * Extract css from global styles into css files instead of js ones.
      */
@@ -70,29 +72,35 @@ export interface Schema {
     forkTypeChecker?: boolean;
     /**
      * Localization file to use for i18n.
+     * @deprecated Use 'locales' object in the project metadata instead.
      */
     i18nFile?: string;
     /**
      * Format of the localization file specified with --i18n-file.
+     * @deprecated No longer needed as the format will be determined automatically.
      */
     i18nFormat?: string;
     /**
      * Locale to use for i18n.
+     * @deprecated Use 'localize' instead.
      */
     i18nLocale?: string;
     /**
      * How to handle missing translations for i18n.
      */
-    i18nMissingTranslation?: string;
+    i18nMissingTranslation?: I18NMissingTranslation;
     /**
-     * The name of the index HTML file.
+     * Configures the generation of the application's HTML index.
      */
-    index: string;
+    index: IndexUnion;
     /**
      * List of additional NgModule files that will be lazy loaded. Lazy router modules will be
      * discovered automatically.
+     * @deprecated 'SystemJsNgModuleLoader' is deprecated, and this is part of its usage. Use
+     * 'import()' syntax instead.
      */
     lazyModules?: string[];
+    localize?: Localize;
     /**
      * The full path for the main entry point to the app, relative to the current workspace.
      */
@@ -279,9 +287,18 @@ export declare enum Type {
     All = "all",
     AllScript = "allScript",
     Any = "any",
+    AnyComponentStyle = "anyComponentStyle",
     AnyScript = "anyScript",
     Bundle = "bundle",
     Initial = "initial"
+}
+/**
+ * Define the crossorigin attribute setting of elements that provide CORS support.
+ */
+export declare enum CrossOrigin {
+    Anonymous = "anonymous",
+    None = "none",
+    UseCredentials = "use-credentials"
 }
 export interface FileReplacement {
     replace?: string;
@@ -289,6 +306,30 @@ export interface FileReplacement {
     src?: string;
     with?: string;
 }
+/**
+ * How to handle missing translations for i18n.
+ */
+export declare enum I18NMissingTranslation {
+    Error = "error",
+    Ignore = "ignore",
+    Warning = "warning"
+}
+/**
+ * Configures the generation of the application's HTML index.
+ */
+export declare type IndexUnion = IndexObject | string;
+export interface IndexObject {
+    /**
+     * The path of a file to use for the application's generated HTML index.
+     */
+    input: string;
+    /**
+     * The output path of the application's generated HTML index file. The full provided path
+     * will be used and will be considered relative to the application's configured output path.
+     */
+    output?: string;
+}
+export declare type Localize = string[] | boolean;
 /**
  * Enables optimization of the build output.
  */
@@ -318,6 +359,10 @@ export interface ExtraEntryPointClass {
      * The bundle name for this extra entry point.
      */
     bundleName?: string;
+    /**
+     * If the bundle will be referenced in the HTML file.
+     */
+    inject?: boolean;
     /**
      * The file to include.
      */

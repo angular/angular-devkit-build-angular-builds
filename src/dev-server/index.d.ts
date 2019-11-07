@@ -7,19 +7,18 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { DevServerBuildOutput, WebpackLoggingCallback } from '@angular-devkit/build-webpack';
-import { experimental, json, logging } from '@angular-devkit/core';
+import { json, logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
 import * as WebpackDevServer from 'webpack-dev-server';
+import { IndexHtmlTransform } from '../angular-cli-files/utilities/index-file/write-index-html';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
 import { ExecutionTransformer } from '../transforms';
 import { Schema } from './schema';
 export declare type DevServerBuilderOptions = Schema & json.JsonObject;
-export declare const devServerBuildOverriddenKeys: (keyof DevServerBuilderOptions)[];
 export declare type DevServerBuilderOutput = DevServerBuildOutput & {
     baseUrl: string;
 };
-export declare type ServerConfigTransformFn = (workspace: experimental.workspace.Workspace, config: WebpackDevServer.Configuration) => Observable<WebpackDevServer.Configuration>;
 /**
  * Reusable implementation of the build angular webpack dev server builder.
  * @param options Dev Server options.
@@ -30,6 +29,7 @@ export declare type ServerConfigTransformFn = (workspace: experimental.workspace
 export declare function serveWebpackBrowser(options: DevServerBuilderOptions, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
     logging?: WebpackLoggingCallback;
+    indexHtml?: IndexHtmlTransform;
 }): Observable<DevServerBuilderOutput>;
 /**
  * Create a webpack configuration for the dev server.

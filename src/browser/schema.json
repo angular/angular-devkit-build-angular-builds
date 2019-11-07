@@ -180,19 +180,41 @@
     },
     "i18nFile": {
       "type": "string",
-      "description": "Localization file to use for i18n."
+      "description": "Localization file to use for i18n.",
+      "x-deprecated": "Use 'locales' object in the project metadata instead."
     },
     "i18nFormat": {
       "type": "string",
-      "description": "Format of the localization file specified with --i18n-file."
+      "description": "Format of the localization file specified with --i18n-file.",
+      "x-deprecated": "No longer needed as the format will be determined automatically."
     },
     "i18nLocale": {
       "type": "string",
-      "description": "Locale to use for i18n."
+      "description": "Locale to use for i18n.",
+      "x-deprecated": "Use 'localize' instead."
     },
     "i18nMissingTranslation": {
       "type": "string",
-      "description": "How to handle missing translations for i18n."
+      "description": "How to handle missing translations for i18n.",
+      "enum": ["warning", "error", "ignore"],
+      "default": "warning"
+    },
+    "localize": {
+      "oneOf": [
+        {
+          "type": "boolean",
+          "description": "Translate all locales."
+        },
+        {
+          "type": "array",
+          "description": "List of locales ID's to translate.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]{2}(-[a-zA-Z]{2,})?$"
+          }
+        }
+      ]
     },
     "extractCss": {
       "type": "boolean",
@@ -270,8 +292,31 @@
       "x-deprecated": true
     },
     "index": {
-      "type": "string",
-      "description": "The name of the index HTML file."
+      "description": "Configures the generation of the application's HTML index.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "The path of a file to use for the application's HTML index. The filename of the specified path will be used for the generated file and will be created in the root of the application's configured output path."
+        },
+        {
+          "type": "object",
+          "description": "",
+          "properties": {
+            "input": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The path of a file to use for the application's generated HTML index."
+            },
+            "output": {
+              "type": "string",
+              "minLength": 1,
+              "default": "index.html",
+              "description": "The output path of the application's generated HTML index file. The full provided path will be used and will be considered relative to the application's configured output path."
+            }
+          },
+          "required": ["input"]
+        }
+      ]
     },
     "statsJson": {
       "type": "boolean",
@@ -289,6 +334,7 @@
       "items": {
         "type": "string"
       },
+      "x-deprecated": "'SystemJsNgModuleLoader' is deprecated, and this is part of its usage. Use 'import()' syntax instead.",
       "default": []
     },
     "budgets": {
@@ -316,14 +362,24 @@
       "default": false,
       "x-deprecated": true
     },
-    "experimentalImportFactories": {
-      "description": "**EXPERIMENTAL** Transform import statements for lazy routes to import factories when using View Engine. Should only be used when switching back and forth between View Engine and Ivy. See https://angular.io/guide/ivy for usage information.",
-      "type": "boolean",
-      "default": false
-    },
     "webWorkerTsConfig": {
       "type": "string",
       "description": "TypeScript configuration for Web Worker modules."
+    },
+    "crossOrigin": {
+      "type": "string",
+      "description": "Define the crossorigin attribute setting of elements that provide CORS support.",
+      "default": "none",
+      "enum": [
+        "none",
+        "anonymous",
+        "use-credentials"
+      ]
+    },
+    "experimentalRollupPass": {
+      "type": "boolean",
+      "description": "Concatenate modules with Rollup before bundling them with Webpack.",
+      "default": false
     }
   },
   "additionalProperties": false,
@@ -423,7 +479,13 @@
             "lazy": {
               "type": "boolean",
               "description": "If the bundle will be lazy loaded.",
-              "default": false
+              "default": false,
+              "x-deprecated": "Use 'inject' option with 'false' value instead."
+            },
+            "inject": {
+              "type": "boolean",
+              "description": "If the bundle will be referenced in the HTML file.",
+              "default": true
             }
           },
           "additionalProperties": false,
@@ -448,6 +510,7 @@
             "allScript",
             "any",
             "anyScript",
+            "anyComponentStyle",
             "bundle",
             "initial"
           ]

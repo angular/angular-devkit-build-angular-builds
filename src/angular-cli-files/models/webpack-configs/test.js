@@ -25,7 +25,7 @@ function getTestConfig(wco) {
     if (buildOptions.codeCoverage) {
         const codeCoverageExclude = buildOptions.codeCoverageExclude;
         const exclude = [
-            /\.(e2e|spec)\.ts$/,
+            /\.(e2e|spec)\.tsx?$/,
             /node_modules/,
         ];
         if (codeCoverageExclude) {
@@ -37,7 +37,7 @@ function getTestConfig(wco) {
             });
         }
         extraRules.push({
-            test: /\.(js|ts)$/,
+            test: /\.(jsx?|tsx?)$/,
             loader: 'istanbul-instrumenter-loader',
             options: { esModules: true },
             enforce: 'post',
@@ -67,7 +67,7 @@ function getTestConfig(wco) {
         plugins: extraPlugins,
         optimization: {
             splitChunks: {
-                chunks: ((chunk) => chunk.name !== 'polyfills'),
+                chunks: ((chunk) => !utils_1.isPolyfillsEntry(chunk.name)),
                 cacheGroups: {
                     vendors: false,
                     vendor: {
@@ -76,7 +76,7 @@ function getTestConfig(wco) {
                         test: (module, chunks) => {
                             const moduleName = module.nameForCondition ? module.nameForCondition() : '';
                             return /[\\/]node_modules[\\/]/.test(moduleName)
-                                && !chunks.some(({ name }) => name === 'polyfills');
+                                && !chunks.some(({ name }) => utils_1.isPolyfillsEntry(name));
                         },
                     },
                 },
