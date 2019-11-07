@@ -23,32 +23,34 @@ async function createTranslationLoader() {
 exports.createTranslationLoader = createTranslationLoader;
 async function importParsers() {
     try {
+        // In @angular/localize version 9.0.0-next.15 the parsers were located in the below locations.
         return {
             json: new (await Promise.resolve().then(() => require(
-            // tslint:disable-next-line:trailing-comma
-            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json/simple_json_translation_parser'))).SimpleJsonTranslationParser(),
+            // tslint:disable-next-line:trailing-comma no-implicit-dependencies
+            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json_translation_parser'))).SimpleJsonTranslationParser(),
             xlf: new (await Promise.resolve().then(() => require(
-            // tslint:disable-next-line:trailing-comma
-            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1/xliff1_translation_parser'))).Xliff1TranslationParser(),
+            // tslint:disable-next-line:trailing-comma no-implicit-dependencies
+            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1_translation_parser'))).Xliff1TranslationParser(),
             xlf2: new (await Promise.resolve().then(() => require(
-            // tslint:disable-next-line:trailing-comma
-            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2/xliff2_translation_parser'))).Xliff2TranslationParser(),
+            // tslint:disable-next-line:trailing-comma no-implicit-dependencies
+            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2_translation_parser'))).Xliff2TranslationParser(),
         };
     }
     catch (_a) {
+        // Prior to @angular/localize version 9.0.0-next.15 the parsers were located in the below locations.
         return {
             json: new (await Promise.resolve().then(() => require(
             // @ts-ignore
-            // tslint:disable-next-line:trailing-comma
-            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json_translation_parser'))).SimpleJsonTranslationParser(),
+            // tslint:disable-next-line:trailing-comma no-implicit-dependencies
+            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json/simple_json_translation_parser'))).SimpleJsonTranslationParser(),
             xlf: new (await Promise.resolve().then(() => require(
             // @ts-ignore
-            // tslint:disable-next-line:trailing-comma
-            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1_translation_parser'))).Xliff1TranslationParser(),
+            // tslint:disable-next-line:trailing-comma no-implicit-dependencies
+            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1/xliff1_translation_parser'))).Xliff1TranslationParser(),
             xlf2: new (await Promise.resolve().then(() => require(
             // @ts-ignore
-            // tslint:disable-next-line:trailing-comma
-            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2_translation_parser'))).Xliff2TranslationParser(),
+            // tslint:disable-next-line:trailing-comma no-implicit-dependencies
+            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2/xliff2_translation_parser'))).Xliff2TranslationParser(),
         };
     }
 }
