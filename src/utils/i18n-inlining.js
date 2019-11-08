@@ -20,7 +20,7 @@ function emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emitte
             es5,
             outputPath,
             missingTranslation,
-            setLocale: emittedFile.name === 'main',
+            setLocale: emittedFile.name === 'main' || emittedFile.name === 'vendor',
         };
         originalFiles.push(originalPath);
         try {
