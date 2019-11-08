@@ -102,13 +102,19 @@ async function configureI18nBuild(context, options) {
                     context.logger.warn(`Locale data for '${locale}' cannot be found.  No locale data will be included for this locale.`);
                 }
                 else {
-                    desc.dataPath = localeDataPath;
+                    // Temporarily disable pending FW locale data fix
+                    // desc.dataPath = localeDataPath;
                 }
             }
         }
         // Legacy message id's require the format of the translations
         if (usedFormats.size > 0) {
             buildOptions.i18nFormat = [...usedFormats][0];
+        }
+        // If only one locale is specified set the deprecated option to enable the webpack plugin
+        // transform to register the locale directly in the output bundle.
+        if (i18n.inlineLocales.size === 1) {
+            buildOptions.i18nLocale = [...i18n.inlineLocales][0];
         }
     }
     // If inlining store the output in a temporary location to facilitate post-processing
