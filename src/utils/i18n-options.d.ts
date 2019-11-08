@@ -16,6 +16,7 @@ export interface I18nOptions {
         file: string;
         format?: string;
         translation?: unknown;
+        dataPath?: string;
     }>;
     flatOutput?: boolean;
     readonly shouldInline: boolean;
