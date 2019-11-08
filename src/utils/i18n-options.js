@@ -1,5 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const rimraf = require("rimraf");
+const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
+const load_translations_1 = require("./load-translations");
 function createI18nOptions(metadata, inline) {
     if (metadata.i18n !== undefined &&
         (typeof metadata.i18n !== 'object' || !metadata.i18n || Array.isArray(metadata.i18n))) {
@@ -41,8 +47,8 @@ function createI18nOptions(metadata, inline) {
     }
     else if (inline) {
         for (const locale of inline) {
-            if (!i18n.locales[locale]) {
-                throw new Error(`Requested inline locale '${locale}' is not defined for the project.`);
+            if (!i18n.locales[locale] && i18n.sourceLocale !== locale) {
+                throw new Error(`Requested locale '${locale}' is not defined for the project.`);
             }
             i18n.inlineLocales.add(locale);
         }
@@ -50,6 +56,76 @@ function createI18nOptions(metadata, inline) {
     return i18n;
 }
 exports.createI18nOptions = createI18nOptions;
+async function configureI18nBuild(context, options) {
+    if (!context.target) {
+        throw new Error('The builder requires a target.');
+    }
+    const buildOptions = { ...options };
+    if (buildOptions.localize === true ||
+        (Array.isArray(buildOptions.localize) && buildOptions.localize.length > 1)) {
+        throw new Error('Using the localize option for multiple locales is temporarily disabled.');
+    }
+    const tsConfig = read_tsconfig_1.readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
+    const usingIvy = tsConfig.options.enableIvy !== false;
+    const metadata = await context.getProjectMetadata(context.target);
+    const i18n = createI18nOptions(metadata, buildOptions.localize);
+    // Until 11.0, support deprecated i18n options when not using new localize option
+    // i18nFormat is automatically calculated
+    if (buildOptions.localize === undefined && usingIvy) {
+        mergeDeprecatedI18nOptions(i18n, buildOptions.i18nLocale, buildOptions.i18nFile);
+    }
+    else if (buildOptions.localize !== undefined && !usingIvy) {
+        buildOptions.localize = undefined;
+        context.logger.warn(`Option 'localize' is not supported with View Engine.`);
+    }
+    if (i18n.inlineLocales.size > 0) {
+        const projectRoot = path.join(context.workspaceRoot, metadata.root || '');
+        const localeDataBasePath = findLocaleDataBasePath(projectRoot);
+        if (!localeDataBasePath) {
+            throw new Error(`Unable to find locale data within '@angular/common'. Please ensure '@angular/common' is installed.`);
+        }
+        // Load locales
+        const loader = await load_translations_1.createTranslationLoader();
+        const usedFormats = new Set();
+        for (const [locale, desc] of Object.entries(i18n.locales)) {
+            if (i18n.inlineLocales.has(locale) && desc.file) {
+                const result = loader(path.join(projectRoot, desc.file));
+                usedFormats.add(result.format);
+                if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
+                    // This limitation is only for legacy message id support (defaults to true as of 9.0)
+                    throw new Error('Localization currently only supports using one type of translation file format for the entire application.');
+                }
+                desc.format = result.format;
+                desc.translation = result.translation;
+                const localeDataPath = findLocaleDataPath(locale, localeDataBasePath);
+                if (!localeDataPath) {
+                    context.logger.warn(`Locale data for '${locale}' cannot be found.  No locale data will be included for this locale.`);
+                }
+                else {
+                    desc.dataPath = localeDataPath;
+                }
+            }
+        }
+        // Legacy message id's require the format of the translations
+        if (usedFormats.size > 0) {
+            buildOptions.i18nFormat = [...usedFormats][0];
+        }
+    }
+    // If inlining store the output in a temporary location to facilitate post-processing
+    if (i18n.shouldInline) {
+        const tempPath = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-i18n-'));
+        buildOptions.outputPath = tempPath;
+        // Remove temporary directory used for i18n processing
+        process.on('exit', () => {
+            try {
+                rimraf.sync(tempPath);
+            }
+            catch (_a) { }
+        });
+    }
+    return { buildOptions, i18n };
+}
+exports.configureI18nBuild = configureI18nBuild;
 function mergeDeprecatedI18nOptions(i18n, i18nLocale, i18nFile) {
     if (i18nFile !== undefined && i18nLocale === undefined) {
         throw new Error(`Option 'i18nFile' cannot be used without the 'i18nLocale' option.`);
@@ -59,9 +135,33 @@ function mergeDeprecatedI18nOptions(i18n, i18nLocale, i18nFile) {
         i18n.inlineLocales.add(i18nLocale);
         if (i18nFile !== undefined) {
             i18n.locales[i18nLocale] = { file: i18nFile };
-            i18n.flatOutput = true;
         }
+        else {
+            // If no file, treat the locale as the source locale
+            // This mimics deprecated behavior
+            i18n.sourceLocale = i18nLocale;
+        }
+        i18n.flatOutput = true;
     }
     return i18n;
 }
-exports.mergeDeprecatedI18nOptions = mergeDeprecatedI18nOptions;
+function findLocaleDataBasePath(projectRoot) {
+    try {
+        const commonPath = path.dirname(require.resolve('@angular/common/package.json', { paths: [projectRoot] }));
+        const localesPath = path.join(commonPath, 'locales/global');
+        if (!fs.existsSync(localesPath)) {
+            return null;
+        }
+        return localesPath;
+    }
+    catch (_a) {
+        return null;
+    }
+}
+function findLocaleDataPath(locale, basePath) {
+    const localeDataPath = path.join(basePath, locale + '.js');
+    if (!fs.existsSync(localeDataPath)) {
+        return null;
+    }
+    return localeDataPath;
+}

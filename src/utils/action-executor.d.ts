@@ -1,11 +1,15 @@
-import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from '../utils/process-bundle';
+import { I18nOptions } from './i18n-options';
+import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
 export declare class BundleActionExecutor {
     private workerOptions;
     private readonly sizeThreshold;
     private largeWorker?;
     private smallWorker?;
-    private cache;
-    constructor(workerOptions: unknown, integrityAlgorithm?: string, sizeThreshold?: number);
+    private cache?;
+    constructor(workerOptions: {
+        cachePath?: string;
+        i18n: I18nOptions;
+    }, integrityAlgorithm?: string, sizeThreshold?: number);
     private static executeMethod;
     private ensureLarge;
     private ensureSmall;
