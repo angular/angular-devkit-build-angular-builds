@@ -255,9 +255,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                     open(serverAddress);
                 }
             }
-            if (buildEvent.success) {
-                context.logger.info(': Compiled successfully.');
-            }
             return { ...buildEvent, baseUrl: serverAddress };
         }));
     }));
@@ -328,7 +325,6 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
         publicPath: servePath,
         hot: serverOptions.hmr,
         contentBase: false,
-        logLevel: 'silent',
     };
     if (serverOptions.ssl) {
         _addSslConfig(workspaceRoot, serverOptions, config);
