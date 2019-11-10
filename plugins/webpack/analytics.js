@@ -54,7 +54,6 @@ exports.countOccurrences = countOccurrences;
  */
 class AnalyticsBuildStats {
     constructor() {
-        this.isIvy = false;
         this.errors = [];
         this.numberOfNgOnInit = 0;
         this.numberOfComponents = 0;
@@ -73,10 +72,11 @@ class AnalyticsBuildStats {
  * Analytics plugin that reports the analytics we want from the CLI.
  */
 class NgBuildAnalyticsPlugin {
-    constructor(_projectRoot, _analytics, _category) {
+    constructor(_projectRoot, _analytics, _category, _isIvy) {
         this._projectRoot = _projectRoot;
         this._analytics = _analytics;
         this._category = _category;
+        this._isIvy = _isIvy;
         this._built = false;
         this._stats = new AnalyticsBuildStats();
     }
@@ -107,7 +107,7 @@ class NgBuildAnalyticsPlugin {
             // Adding commas before and after so the regex are easier to define filters.
             dimensions[core_1.analytics.NgCliAnalyticsDimensions.BuildErrors] = `,${this._stats.errors.join()},`;
         }
-        dimensions[core_1.analytics.NgCliAnalyticsDimensions.NgIvyEnabled] = this._stats.isIvy;
+        dimensions[core_1.analytics.NgCliAnalyticsDimensions.NgIvyEnabled] = this._isIvy;
         return dimensions;
     }
     _reportBuildMetrics(stats) {
@@ -131,12 +131,7 @@ class NgBuildAnalyticsPlugin {
             // This does not include View Engine AOT compilation, we use the ngfactory for it.
             this._stats.numberOfComponents += countOccurrences(module._source.source(), ' Component({');
             // For Ivy we just count ɵcmp.
-            const numIvyComponents = countOccurrences(module._source.source(), 'ɵcmp', true);
-            this._stats.numberOfComponents += numIvyComponents;
-            // Check whether this is an Ivy app so that it can reported as part of analytics.
-            if (!this._stats.isIvy && numIvyComponents > 0) {
-                this._stats.isIvy = true;
-            }
+            this._stats.numberOfComponents += countOccurrences(module._source.source(), '.ɵcmp', true);
         }
     }
     _checkNgFactoryNormalModule(module) {
