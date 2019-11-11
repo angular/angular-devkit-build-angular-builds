@@ -40,7 +40,7 @@ function getBrowserConfig(wco) {
         }));
     }
     if (!isEval && (scriptsSourceMap || stylesSourceMap)) {
-        extraPlugins.push(utils_1.getSourceMapDevTool(!!scriptsSourceMap, !!stylesSourceMap, hiddenSourceMap));
+        extraPlugins.push(utils_1.getSourceMapDevTool(!!scriptsSourceMap, !!stylesSourceMap, wco.differentialLoadingMode ? true : hiddenSourceMap));
     }
     const globalStylesBundleNames = utils_1.normalizeExtraEntryPoints(buildOptions.styles, 'styles')
         .map(style => style.bundleName);
