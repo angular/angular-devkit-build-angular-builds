@@ -22,10 +22,7 @@ async function _loadTslint() {
         throw new Error('Unable to find TSLint. Ensure TSLint is installed.');
     }
     const version = tslint.Linter.VERSION && tslint.Linter.VERSION.split('.');
-    if (!version || version.length < 2
-        || (Number(version[0]) === 5 && Number(version[1]) < 5) // 5.5+
-        || Number(version[0]) < 5 // 6.0+
-    ) {
+    if (!version || version.length < 2 || Number(version[0]) < 5 || Number(version[1]) < 5) {
         throw new Error('TSLint must be version 5.5 or higher.');
     }
     return tslint;

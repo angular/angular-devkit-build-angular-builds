@@ -385,7 +385,6 @@ function getCommonConfig(wco) {
         watch: buildOptions.watch,
         watchOptions: {
             poll: buildOptions.poll,
-            ignored: buildOptions.poll === undefined ? undefined : /[\\\/]node_modules[\\\/]/,
         },
         performance: {
             hints: false,

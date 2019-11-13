@@ -255,9 +255,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                     open(serverAddress);
                 }
             }
-            if (buildEvent.success) {
-                context.logger.info(': Compiled successfully.');
-            }
             return { ...buildEvent, baseUrl: serverAddress };
         }));
     }));
@@ -313,11 +310,7 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
         stats: false,
         compress: styles || scripts,
         watchOptions: {
-            // Using just `--poll` will result in a value of 0 which is very likely not the intention
-            // A value of 0 is falsy and will disable polling rather then enable
-            // 500 ms is a sensible default in this case
-            poll: serverOptions.poll === 0 ? 500 : serverOptions.poll,
-            ignored: serverOptions.poll === undefined ? undefined : /[\\\/]node_modules[\\\/]/,
+            poll: browserOptions.poll,
         },
         https: serverOptions.ssl,
         overlay: {
@@ -332,7 +325,6 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
         publicPath: servePath,
         hot: serverOptions.hmr,
         contentBase: false,
-        logLevel: 'silent',
     };
     if (serverOptions.ssl) {
         _addSslConfig(workspaceRoot, serverOptions, config);
