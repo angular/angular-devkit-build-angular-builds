@@ -313,7 +313,11 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
         stats: false,
         compress: styles || scripts,
         watchOptions: {
-            poll: browserOptions.poll,
+            // Using just `--poll` will result in a value of 0 which is very likely not the intention
+            // A value of 0 is falsy and will disable polling rather then enable
+            // 500 ms is a sensible default in this case
+            poll: serverOptions.poll === 0 ? 500 : serverOptions.poll,
+            ignored: serverOptions.poll === undefined ? undefined : /[\\\/]node_modules[\\\/]/,
         },
         https: serverOptions.ssl,
         overlay: {
