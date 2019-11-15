@@ -47,22 +47,20 @@ async function createI18nPlugins(locale, translation, missingTranslation) {
     // tslint:disable-next-line: no-implicit-dependencies
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
-    const es2015 = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'));
-    plugins.push(
-    // tslint:disable-next-line: no-any
-    es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}), {
-        missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }));
-    const es5 = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
-    plugins.push(
-    // tslint:disable-next-line: no-any
-    es5.makeEs5TranslatePlugin(diagnostics, (translation || {}), {
-        missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }));
+    if (translation) {
+        const es2015 = await Promise.resolve().then(() => require(
+        // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+        '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'));
+        plugins.push(
+        // tslint:disable-next-line: no-any
+        es2015.makeEs2015TranslatePlugin(diagnostics, translation, { missingTranslation }));
+        const es5 = await Promise.resolve().then(() => require(
+        // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+        '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
+        plugins.push(
+        // tslint:disable-next-line: no-any
+        es5.makeEs5TranslatePlugin(diagnostics, translation, { missingTranslation }));
+    }
     const inlineLocale = await Promise.resolve().then(() => require(
     // tslint:disable-next-line: trailing-comma no-implicit-dependencies
     '@angular/localize/src/tools/src/translate/source_files/locale_plugin'));
@@ -107,21 +105,8 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 throw new Error('The development server only supports localizing a single locale per build');
             }
             const locale = [...i18n.inlineLocales][0];
-            const localeDescription = i18n.locales[locale] && i18n.locales[locale];
-            const { plugins, diagnostics } = await createI18nPlugins(locale, localeDescription && localeDescription.translation, browserOptions.i18nMissingTranslation);
-            // Modify main entrypoint to include locale data
-            if (localeDescription &&
-                localeDescription.dataPath &&
-                typeof config.entry === 'object' &&
-                !Array.isArray(config.entry) &&
-                config.entry['main']) {
-                if (Array.isArray(config.entry['main'])) {
-                    config.entry['main'].unshift(localeDescription.dataPath);
-                }
-                else {
-                    config.entry['main'] = [localeDescription.dataPath, config.entry['main']];
-                }
-            }
+            const translation = i18n.locales[locale] && i18n.locales[locale].translation;
+            const { plugins, diagnostics } = await createI18nPlugins(locale, translation, browserOptions.i18nMissingTranslation);
             // Get the insertion point for the i18n babel loader rule
             // This is currently dependent on the rule order/construction in common.ts
             // A future refactor of the webpack configuration definition will improve this situation
@@ -150,6 +135,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             // Add a plugin to inject the i18n diagnostics
             // tslint:disable-next-line: no-non-null-assertion
             webpackConfig.plugins.push({
+                // tslint:disable-next-line:no-any
                 apply: (compiler) => {
                     compiler.hooks.thisCompilation.tap('build-angular', compilation => {
                         compilation.hooks.finishModules.tap('build-angular', () => {
