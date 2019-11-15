@@ -10,13 +10,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const glob = require("glob");
 const path = require("path");
 const utils_1 = require("./utils");
-/**
- * Enumerate loaders and their dependencies from this file to let the dependency validator
- * know they are used.
- *
- * require('istanbul-instrumenter-loader')
- *
- */
 function getTestConfig(wco) {
     const { root, buildOptions, sourceRoot: include } = wco;
     const extraRules = [];
@@ -38,7 +31,7 @@ function getTestConfig(wco) {
         }
         extraRules.push({
             test: /\.(jsx?|tsx?)$/,
-            loader: 'istanbul-instrumenter-loader',
+            loader: require.resolve('istanbul-instrumenter-loader'),
             options: { esModules: true },
             enforce: 'post',
             exclude,

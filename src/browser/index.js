@@ -126,6 +126,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         const useBundleDownleveling = isDifferentialLoadingNeeded && !options.watch;
         const startTime = Date.now();
         return build_webpack_1.runWebpack(config, context, {
+            webpackFactory: require('webpack'),
             logging: transforms.logging ||
                 (useBundleDownleveling
                     ? () => { }

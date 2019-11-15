@@ -228,7 +228,7 @@ function getCommonConfig(wco) {
         sourceMapUseRule = {
             use: [
                 {
-                    loader: 'source-map-loader',
+                    loader: require.resolve('source-map-loader'),
                 },
             ],
         };
@@ -396,7 +396,7 @@ function getCommonConfig(wco) {
             rules: [
                 {
                     test: /\.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)$/,
-                    loader: 'file-loader',
+                    loader: require.resolve('file-loader'),
                     options: {
                         name: `[name]${hashFormat.file}.[ext]`,
                         // Re-use emitted files from browser builder on the server.
