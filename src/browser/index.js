@@ -126,6 +126,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         const useBundleDownleveling = isDifferentialLoadingNeeded && !options.watch;
         const startTime = Date.now();
         return build_webpack_1.runWebpack(config, context, {
+            webpackFactory: require('webpack'),
             logging: transforms.logging ||
                 (useBundleDownleveling
                     ? () => { }
@@ -200,7 +201,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             continue;
                         }
                         seen.add(file.file);
-                        if (file.name === 'main') {
+                        if (file.name === 'vendor' || (!mainChunkId && file.name === 'main')) {
                             // tslint:disable-next-line: no-non-null-assertion
                             mainChunkId = file.id.toString();
                         }
