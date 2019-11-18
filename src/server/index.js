@@ -29,7 +29,9 @@ function execute(options, context, transforms = {}) {
     const baseOutputPath = path.resolve(root, options.outputPath);
     let outputPaths;
     return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.concatMap(({ config, i18n }) => {
-        return build_webpack_1.runWebpack(config, context).pipe(operators_1.concatMap(async (output) => {
+        return build_webpack_1.runWebpack(config, context, {
+            webpackFactory: require('webpack'),
+        }).pipe(operators_1.concatMap(async (output) => {
             const { emittedFiles = [], webpackStats } = output;
             if (!output.success || !i18n.shouldInline) {
                 return output;
