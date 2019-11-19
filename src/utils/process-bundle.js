@@ -293,7 +293,9 @@ async function processRuntime(options) {
     if (downlevelMap) {
         await cachePut(downlevelMap, (options.cacheKeys && options.cacheKeys[3 /* DownlevelMap */]) || null);
         fs.writeFileSync(downlevelFilePath + '.map', downlevelMap);
-        downlevelCode += `\n//# sourceMappingURL=${path.basename(downlevelFilePath)}.map`;
+        if (!options.hiddenSourceMaps) {
+            downlevelCode += `\n//# sourceMappingURL=${path.basename(downlevelFilePath)}.map`;
+        }
     }
     await cachePut(downlevelCode, (options.cacheKeys && options.cacheKeys[2 /* DownlevelCode */]) || null);
     fs.writeFileSync(downlevelFilePath, downlevelCode);
@@ -314,8 +316,9 @@ async function inlineLocales(options) {
     const { default: MagicString } = await Promise.resolve().then(() => require('magic-string'));
     const { default: generate } = await Promise.resolve().then(() => require('@babel/generator'));
     const utils = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
     '@angular/localize/src/tools/src/translate/source_files/source_file_utils'));
+    // tslint:disable-next-line: no-implicit-dependencies
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
     const positions = findLocalizePositions(options, utils);
@@ -339,6 +342,13 @@ async function inlineLocales(options) {
             const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});`;
             contentClone = content.clone();
             content.prepend(setLocaleText);
+            // If locale data is provided, load it and prepend to file
+            const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
+            if (localeDataPath) {
+                const localDataContent = loadLocaleData(localeDataPath, true);
+                // The semicolon ensures that there is no syntax error between statements
+                content.prepend(localDataContent + ';');
+            }
         }
         const output = content.toString();
         const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
@@ -369,8 +379,26 @@ function inlineCopyOnly(options) {
     }
     return { file: options.filename, diagnostics: [], count: 0 };
 }
-function findLocalizePositions(options, utils) {
-    const ast = core_1.parseSync(options.code, { babelrc: false });
+function findLocalizePositions(options, 
+// tslint:disable-next-line: no-implicit-dependencies
+utils) {
+    let ast;
+    try {
+        ast = core_1.parseSync(options.code, {
+            babelrc: false,
+            sourceType: 'script',
+        });
+    }
+    catch (error) {
+        if (error.message) {
+            // Make the error more readable.
+            // Same errors will contain the full content of the file as the error message
+            // Which makes it hard to find the actual error message.
+            const index = error.message.indexOf(')\n');
+            const msg = index !== -1 ? error.message.substr(0, index + 1) : error.message;
+            throw new Error(`${msg}\nAn error occurred inlining file "${options.filename}"`);
+        }
+    }
     if (!ast) {
         throw new Error(`Unknown error occurred inlining file "${options.filename}"`);
     }
@@ -415,4 +443,17 @@ function findLocalizePositions(options, utils) {
         });
     }
     return positions;
+}
+function loadLocaleData(path, optimize) {
+    // The path is validated during option processing before the build starts
+    const content = fs.readFileSync(path, 'utf8');
+    // NOTE: This can be removed once the locale data files are preprocessed in the framework
+    if (optimize) {
+        const result = terserMangle(content, {
+            compress: true,
+            ecma: 5,
+        });
+        return result.code;
+    }
+    return content;
 }
