@@ -78,7 +78,7 @@ function getAnalyticsConfig(wco, context) {
         }
         // The category is the builder name if it's an angular builder.
         return {
-            plugins: [new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category)],
+            plugins: [new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category, !!wco.tsConfig.options.enableIvy)],
         };
     }
     return {};
@@ -126,6 +126,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         const useBundleDownleveling = isDifferentialLoadingNeeded && !options.watch;
         const startTime = Date.now();
         return build_webpack_1.runWebpack(config, context, {
+            webpackFactory: require('webpack'),
             logging: transforms.logging ||
                 (useBundleDownleveling
                     ? () => { }
@@ -200,7 +201,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             continue;
                         }
                         seen.add(file.file);
-                        if (file.name === 'main') {
+                        if (file.name === 'vendor' || (!mainChunkId && file.name === 'main')) {
                             // tslint:disable-next-line: no-non-null-assertion
                             mainChunkId = file.id.toString();
                         }
