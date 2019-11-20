@@ -63,7 +63,7 @@ function assertCompatibleAngularVersion(projectRoot, logger) {
         but Angular version ${angularVersion} was found instead.
 
         Please visit the link below to find instructions on how to update Angular.
-        https://angular-update-guide.firebaseapp.com/
+        https://update.angular.io/
       ` + '\n');
         process.exit(3);
     }
