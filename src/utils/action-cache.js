@@ -9,8 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const crypto_1 = require("crypto");
 const fs = require("fs");
-const copy_file_1 = require("../utils/copy-file");
-const environment_options_1 = require("../utils/environment-options");
+const copy_file_1 = require("./copy-file");
+const environment_options_1 = require("./environment-options");
 const cacache = require('cacache');
 const packageVersion = require('../../package.json').version;
 class BundleActionCache {
@@ -125,7 +125,7 @@ class BundleActionCache {
         cacheEntry = entries[2 /* DownlevelCode */];
         if (cacheEntry) {
             result.downlevel = {
-                filename: action.filename.replace('es2015', 'es5'),
+                filename: action.filename.replace(/\-es20\d{2}/, '-es5'),
                 size: cacheEntry.size,
                 integrity: cacheEntry.integrity,
             };
@@ -133,7 +133,7 @@ class BundleActionCache {
             cacheEntry = entries[3 /* DownlevelMap */];
             if (cacheEntry) {
                 result.downlevel.map = {
-                    filename: action.filename.replace('es2015', 'es5') + '.map',
+                    filename: action.filename.replace(/\-es20\d{2}/, '-es5') + '.map',
                     size: cacheEntry.size,
                 };
                 BundleActionCache.copyEntryContent(cacheEntry, result.downlevel.filename + '.map');
