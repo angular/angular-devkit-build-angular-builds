@@ -61,10 +61,6 @@ async function configureI18nBuild(context, options) {
         throw new Error('The builder requires a target.');
     }
     const buildOptions = { ...options };
-    if (buildOptions.localize === true ||
-        (Array.isArray(buildOptions.localize) && buildOptions.localize.length > 1)) {
-        throw new Error('Using the localize option for multiple locales is temporarily disabled.');
-    }
     const tsConfig = read_tsconfig_1.readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
     const usingIvy = tsConfig.options.enableIvy !== false;
     const metadata = await context.getProjectMetadata(context.target);
@@ -75,8 +71,28 @@ async function configureI18nBuild(context, options) {
         mergeDeprecatedI18nOptions(i18n, buildOptions.i18nLocale, buildOptions.i18nFile);
     }
     else if (buildOptions.localize !== undefined && !usingIvy) {
-        buildOptions.localize = undefined;
-        context.logger.warn(`Option 'localize' is not supported with View Engine.`);
+        if (buildOptions.localize === true ||
+            (Array.isArray(buildOptions.localize) && buildOptions.localize.length > 1)) {
+            throw new Error(`Localization with multiple locales in one build is not supported with View Engine.`);
+        }
+        for (const deprecatedOption of ['i18nLocale', 'i18nFormat', 'i18nFile']) {
+            // tslint:disable-next-line: no-any
+            if (typeof buildOptions[deprecatedOption] !== 'undefined') {
+                context.logger.warn(`Option 'localize' and deprecated '${deprecatedOption}' found.  Using 'localize'.`);
+            }
+        }
+        if (buildOptions.localize === false ||
+            (Array.isArray(buildOptions.localize) && buildOptions.localize.length === 0)) {
+            buildOptions.i18nFile = undefined;
+            buildOptions.i18nLocale = undefined;
+            buildOptions.i18nFormat = undefined;
+        }
+    }
+    // Clear deprecated options when using Ivy to prevent unintended behavior
+    if (usingIvy) {
+        buildOptions.i18nFile = undefined;
+        buildOptions.i18nFormat = undefined;
+        buildOptions.i18nLocale = undefined;
     }
     if (i18n.inlineLocales.size > 0) {
         const projectRoot = path.join(context.workspaceRoot, metadata.root || '');
@@ -90,6 +106,14 @@ async function configureI18nBuild(context, options) {
         for (const [locale, desc] of Object.entries(i18n.locales)) {
             if (i18n.inlineLocales.has(locale) && desc.file) {
                 const result = loader(path.join(projectRoot, desc.file));
+                for (const diagnostics of result.diagnostics.messages) {
+                    if (diagnostics.type === 'error') {
+                        throw new Error(`Error parsing translation file '${desc.file}': ${diagnostics.message}`);
+                    }
+                    else {
+                        context.logger.warn(`WARNING [${desc.file}]: ${diagnostics.message}`);
+                    }
+                }
                 usedFormats.add(result.format);
                 if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
                     // This limitation is only for legacy message id support (defaults to true as of 9.0)
@@ -102,8 +126,7 @@ async function configureI18nBuild(context, options) {
                     context.logger.warn(`Locale data for '${locale}' cannot be found.  No locale data will be included for this locale.`);
                 }
                 else {
-                    // Temporarily disable pending FW locale data fix
-                    // desc.dataPath = localeDataPath;
+                    desc.dataPath = localeDataPath;
                 }
             }
         }
@@ -111,10 +134,16 @@ async function configureI18nBuild(context, options) {
         if (usedFormats.size > 0) {
             buildOptions.i18nFormat = [...usedFormats][0];
         }
-        // If only one locale is specified set the deprecated option to enable the webpack plugin
-        // transform to register the locale directly in the output bundle.
-        if (i18n.inlineLocales.size === 1) {
-            buildOptions.i18nLocale = [...i18n.inlineLocales][0];
+        // Provide support for using the Ivy i18n options with VE
+        if (!usingIvy) {
+            i18n.veCompatLocale = buildOptions.i18nLocale = [...i18n.inlineLocales][0];
+            if (buildOptions.i18nLocale !== i18n.sourceLocale) {
+                buildOptions.i18nFile = i18n.locales[buildOptions.i18nLocale].file;
+            }
+            // Clear inline locales to prevent any new i18n related processing
+            i18n.inlineLocales.clear();
+            // Update the output path to include the locale to mimic Ivy localize behavior
+            buildOptions.outputPath = path.join(buildOptions.outputPath, buildOptions.i18nLocale);
         }
     }
     // If inlining store the output in a temporary location to facilitate post-processing
