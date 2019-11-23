@@ -129,7 +129,7 @@ class NgBuildAnalyticsPlugin {
             this._stats.numberOfNgOnInit += countOccurrences(module._source.source(), 'ngOnInit', true);
             // Count the number of `Component({` strings (case sensitive), which happens in __decorate().
             // This does not include View Engine AOT compilation, we use the ngfactory for it.
-            this._stats.numberOfComponents += countOccurrences(module._source.source(), ' Component({');
+            this._stats.numberOfComponents += countOccurrences(module._source.source(), 'Component({');
             // For Ivy we just count ɵcmp.
             this._stats.numberOfComponents += countOccurrences(module._source.source(), '.ɵcmp', true);
         }

@@ -53,8 +53,9 @@ function assertCompatibleAngularVersion(projectRoot, logger) {
     }
     const cliMajor = new semver_1.SemVer(angularCliPkgJson['version']).major;
     // e.g. CLI 8.0 supports '>=8.0.0 <9.0.0', including pre-releases (betas, rcs, snapshots)
-    // of both 8 and 9.
-    const supportedAngularSemver = `^${cliMajor}.0.0-beta || ` + `>=${cliMajor}.0.0 <${cliMajor + 1}.0.0`;
+    // of both 8 and 9. Also allow version "0.0.0" for integration testing in the angular/angular
+    // repository with the generated development @angular/core npm package which is versioned "0.0.0".
+    const supportedAngularSemver = `0.0.0 || ^${cliMajor}.0.0-beta || ` + `>=${cliMajor}.0.0 <${cliMajor + 1}.0.0`;
     const angularVersion = new semver_1.SemVer(angularPkgJson['version']);
     const rxjsVersion = new semver_1.SemVer(rxjsPkgJson['version']);
     if (!semver_1.satisfies(angularVersion, supportedAngularSemver, { includePrerelease: true })) {
@@ -63,7 +64,7 @@ function assertCompatibleAngularVersion(projectRoot, logger) {
         but Angular version ${angularVersion} was found instead.
 
         Please visit the link below to find instructions on how to update Angular.
-        https://angular-update-guide.firebaseapp.com/
+        https://update.angular.io/
       ` + '\n');
         process.exit(3);
     }

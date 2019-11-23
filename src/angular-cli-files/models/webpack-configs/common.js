@@ -36,10 +36,11 @@ function getCommonConfig(wco) {
     if (!nodeModules) {
         throw new Error('Cannot locate node_modules directory.');
     }
-    // tslint:disable-next-line:no-any
     const extraPlugins = [];
     const extraRules = [];
     const entryPoints = {};
+    // determine hashing format
+    const hashFormat = utils_2.getOutputHashFormat(buildOptions.outputHashing || 'none');
     const targetInFileName = utils_2.getEsVersionForFileName(tsConfig.options.target, buildOptions.esVersionInFileName);
     if (buildOptions.main) {
         const mainPath = path.resolve(root, buildOptions.main);
@@ -107,6 +108,23 @@ function getCommonConfig(wco) {
                     // Add zone.js legacy support to the es5 polyfills
                     // This is a noop execution-wise if zone-evergreen is not used.
                     entryPoints[polyfillsChunkName].push('zone.js/dist/zone-legacy');
+                    // Since the chunkFileName option schema does not allow the function overload, add a plugin
+                    // that changes the name of the ES5 polyfills chunk to not include ES2015.
+                    extraPlugins.push({
+                        apply(compiler) {
+                            compiler.hooks.compilation.tap('build-angular', compilation => {
+                                // Webpack typings do not contain MainTemplate assetPath hook
+                                // The webpack.Compilation assetPath hook is a noop in 4.x so the template must be used
+                                // tslint:disable-next-line: no-any
+                                compilation.mainTemplate.hooks.assetPath.tap('build-angular', (filename, data) => {
+                                    const isMap = filename && filename.endsWith('.map');
+                                    return data.chunk && data.chunk.name === 'polyfills-es5'
+                                        ? `polyfills-es5${hashFormat.chunk}.js${isMap ? '.map' : ''}`
+                                        : filename;
+                                });
+                            });
+                        },
+                    });
                 }
                 if (!buildOptions.aot) {
                     if (differentialLoadingMode) {
@@ -138,8 +156,6 @@ function getCommonConfig(wco) {
             outputPath: path.resolve(root, `chrome-profiler-events${targetInFileName}.json`),
         }));
     }
-    // determine hashing format
-    const hashFormat = utils_2.getOutputHashFormat(buildOptions.outputHashing || 'none');
     // process global scripts
     const globalScriptsByBundleName = utils_2.normalizeExtraEntryPoints(buildOptions.scripts, 'scripts').reduce((prev, curr) => {
         const bundleName = curr.bundleName;
@@ -228,7 +244,7 @@ function getCommonConfig(wco) {
         sourceMapUseRule = {
             use: [
                 {
-                    loader: 'source-map-loader',
+                    loader: require.resolve('source-map-loader'),
                 },
             ],
         };
@@ -396,7 +412,7 @@ function getCommonConfig(wco) {
             rules: [
                 {
                     test: /\.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)$/,
-                    loader: 'file-loader',
+                    loader: require.resolve('file-loader'),
                     options: {
                         name: `[name]${hashFormat.file}.[ext]`,
                         // Re-use emitted files from browser builder on the server.
