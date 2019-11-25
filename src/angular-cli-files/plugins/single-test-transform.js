@@ -33,7 +33,7 @@ function loader(source) {
         ];
         options.logger.error(message.join(lineSeparator));
     }
-    const mockedRequireContext = '{ keys: () => ({ map: (_a) => { } }) };' + lineSeparator;
+    const mockedRequireContext = 'Object.assign(() => { }, { keys: () => [], resolve: () => undefined });' + lineSeparator;
     source = source.replace(regex, mockedRequireContext + targettedImports);
     return source;
 }
