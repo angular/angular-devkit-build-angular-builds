@@ -61,8 +61,7 @@
     },
     "environment": {
       "type": "string",
-      "description": "Defines the build environment.",
-      "x-deprecated": "This option has no effect."
+      "description": "Defines the build environment."
     },
     "include": {
       "type": "array",
