@@ -121,6 +121,7 @@ async function configureI18nBuild(context, options) {
                 }
                 desc.format = result.format;
                 desc.translation = result.translation;
+                desc.integrity = result.integrity;
                 const localeDataPath = findLocaleDataPath(locale, localeDataBasePath);
                 if (!localeDataPath) {
                     context.logger.warn(`Locale data for '${locale}' cannot be found.  No locale data will be included for this locale.`);
