@@ -20,6 +20,7 @@ export interface Schema {
     codeCoverageExclude?: string[];
     /**
      * Defines the build environment.
+     * @deprecated This option has no effect.
      */
     environment?: string;
     /**
