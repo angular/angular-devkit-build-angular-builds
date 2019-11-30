@@ -24,6 +24,7 @@ const package_chunk_sort_1 = require("../angular-cli-files/utilities/package-chu
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const browser_1 = require("../browser");
 const utils_1 = require("../utils");
+const cache_path_1 = require("../utils/cache-path");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const open = require('open');
@@ -106,69 +107,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             if (i18n.inlineLocales.size > 1) {
                 throw new Error('The development server only supports localizing a single locale per build');
             }
-            const locale = [...i18n.inlineLocales][0];
-            const localeDescription = i18n.locales[locale] && i18n.locales[locale];
-            const { plugins, diagnostics } = await createI18nPlugins(locale, localeDescription && localeDescription.translation, browserOptions.i18nMissingTranslation);
-            // Modify main entrypoint to include locale data
-            if (localeDescription &&
-                localeDescription.dataPath &&
-                typeof config.entry === 'object' &&
-                !Array.isArray(config.entry) &&
-                config.entry['main']) {
-                if (Array.isArray(config.entry['main'])) {
-                    config.entry['main'].unshift(localeDescription.dataPath);
-                }
-                else {
-                    config.entry['main'] = [localeDescription.dataPath, config.entry['main']];
-                }
-            }
-            // Get the insertion point for the i18n babel loader rule
-            // This is currently dependent on the rule order/construction in common.ts
-            // A future refactor of the webpack configuration definition will improve this situation
-            // tslint:disable-next-line: no-non-null-assertion
-            const rules = webpackConfig.module.rules;
-            const index = rules.findIndex(r => r.enforce === 'pre');
-            if (index === -1) {
-                throw new Error('Invalid internal webpack configuration');
-            }
-            const i18nRule = {
-                test: /\.(?:m?js|ts)$/,
-                enforce: 'post',
-                use: [
-                    {
-                        loader: 'babel-loader',
-                        options: {
-                            babelrc: false,
-                            compact: false,
-                            cacheCompression: false,
-                            plugins,
-                        },
-                    },
-                ],
-            };
-            rules.splice(index, 0, i18nRule);
-            // Add a plugin to inject the i18n diagnostics
-            // tslint:disable-next-line: no-non-null-assertion
-            webpackConfig.plugins.push({
-                apply: (compiler) => {
-                    compiler.hooks.thisCompilation.tap('build-angular', compilation => {
-                        compilation.hooks.finishModules.tap('build-angular', () => {
-                            if (!diagnostics) {
-                                return;
-                            }
-                            for (const diagnostic of diagnostics.messages) {
-                                if (diagnostic.type === 'error') {
-                                    compilation.errors.push(diagnostic.message);
-                                }
-                                else {
-                                    compilation.warnings.push(diagnostic.message);
-                                }
-                            }
-                            diagnostics.messages.length = 0;
-                        });
-                    });
-                },
-            });
+            await setupLocalize(i18n, browserOptions, webpackConfig);
         }
         const port = await check_port_1.checkPort(options.port || 0, options.host || 'localhost', 4200);
         const webpackDevServerConfig = (webpackConfig.devServer = buildServerConfig(root, options, browserOptions, context.logger));
@@ -277,6 +216,80 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     }));
 }
 exports.serveWebpackBrowser = serveWebpackBrowser;
+async function setupLocalize(i18n, browserOptions, webpackConfig) {
+    const locale = [...i18n.inlineLocales][0];
+    const localeDescription = i18n.locales[locale];
+    const { plugins, diagnostics } = await createI18nPlugins(locale, localeDescription && localeDescription.translation, browserOptions.i18nMissingTranslation);
+    // Modify main entrypoint to include locale data
+    if (localeDescription &&
+        localeDescription.dataPath &&
+        typeof webpackConfig.entry === 'object' &&
+        !Array.isArray(webpackConfig.entry) &&
+        webpackConfig.entry['main']) {
+        if (Array.isArray(webpackConfig.entry['main'])) {
+            webpackConfig.entry['main'].unshift(localeDescription.dataPath);
+        }
+        else {
+            webpackConfig.entry['main'] = [localeDescription.dataPath, webpackConfig.entry['main']];
+        }
+    }
+    // Get the insertion point for the i18n babel loader rule
+    // This is currently dependent on the rule order/construction in common.ts
+    // A future refactor of the webpack configuration definition will improve this situation
+    // tslint:disable-next-line: no-non-null-assertion
+    const rules = webpackConfig.module.rules;
+    const index = rules.findIndex(r => r.enforce === 'pre');
+    if (index === -1) {
+        throw new Error('Invalid internal webpack configuration');
+    }
+    const i18nRule = {
+        test: /\.(?:m?js|ts)$/,
+        enforce: 'post',
+        use: [
+            {
+                loader: require.resolve('babel-loader'),
+                options: {
+                    babelrc: false,
+                    compact: false,
+                    cacheCompression: false,
+                    cacheDirectory: cache_path_1.findCachePath('babel-loader'),
+                    cacheIdentifier: JSON.stringify({
+                        buildAngular: require('../../package.json').version,
+                        locale,
+                        translationIntegrity: localeDescription && localeDescription.integrity,
+                    }),
+                    plugins,
+                    parserOpts: {
+                        plugins: ['dynamicImport'],
+                    },
+                },
+            },
+        ],
+    };
+    rules.splice(index, 0, i18nRule);
+    // Add a plugin to inject the i18n diagnostics
+    // tslint:disable-next-line: no-non-null-assertion
+    webpackConfig.plugins.push({
+        apply: (compiler) => {
+            compiler.hooks.thisCompilation.tap('build-angular', compilation => {
+                compilation.hooks.finishModules.tap('build-angular', () => {
+                    if (!diagnostics) {
+                        return;
+                    }
+                    for (const diagnostic of diagnostics.messages) {
+                        if (diagnostic.type === 'error') {
+                            compilation.errors.push(diagnostic.message);
+                        }
+                        else {
+                            compilation.warnings.push(diagnostic.message);
+                        }
+                    }
+                    diagnostics.messages.length = 0;
+                });
+            });
+        },
+    });
+}
 /**
  * Create a webpack configuration for the dev server.
  * @param workspaceRoot The root of the workspace. This comes from the context.
