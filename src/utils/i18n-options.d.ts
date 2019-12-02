@@ -17,9 +17,11 @@ export interface I18nOptions {
         format?: string;
         translation?: unknown;
         dataPath?: string;
+        integrity?: string;
     }>;
     flatOutput?: boolean;
     readonly shouldInline: boolean;
+    veCompatLocale?: string;
 }
 export declare function createI18nOptions(metadata: json.JsonObject, inline?: boolean | string[]): I18nOptions;
 export declare function configureI18nBuild<T extends BrowserBuilderSchema | ServerBuilderSchema>(context: BuilderContext, options: T): Promise<{
