@@ -181,11 +181,24 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     };
                     let mainChunkId;
                     const actions = [];
+                    let workerReplacements;
                     const seen = new Set();
                     for (const file of emittedFiles) {
                         // Assets are not processed nor injected into the index
                         if (file.asset) {
-                            continue;
+                            // WorkerPlugin adds worker files to assets
+                            if (file.file.endsWith('.worker.js')) {
+                                if (!workerReplacements) {
+                                    workerReplacements = [];
+                                }
+                                workerReplacements.push([
+                                    file.file,
+                                    file.file.replace(/\-es20\d{2}/, '-es5'),
+                                ]);
+                            }
+                            else {
+                                continue;
+                            }
                         }
                         // Scripts and non-javascript files are not processed
                         if (file.extension !== '.js' ||
@@ -270,7 +283,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             processRuntimeAction = action;
                         }
                         else {
-                            processActions.push(action);
+                            processActions.push({ replacements: workerReplacements, ...action });
                         }
                     }
                     const executor = new action_executor_1.BundleActionExecutor({ cachePath: cacheDownlevelPath, i18n }, options.subresourceIntegrity ? 'sha384' : undefined);
