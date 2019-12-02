@@ -188,11 +188,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
           ****************************************************************************************
         `);
         }
-        return build_webpack_1.runWebpackDevServer(webpackConfig, context, {
-            logging: loggingFn,
-            webpackFactory: require('webpack'),
-            webpackDevServerFactory: require('webpack-dev-server'),
-        }).pipe(operators_1.map(buildEvent => {
+        return build_webpack_1.runWebpackDevServer(webpackConfig, context, { logging: loggingFn }).pipe(operators_1.map(buildEvent => {
             // Resolve serve address.
             const serverAddress = url.format({
                 protocol: options.ssl ? 'https' : 'http',
