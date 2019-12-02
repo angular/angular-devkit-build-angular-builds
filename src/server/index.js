@@ -40,7 +40,7 @@ function execute(options, context, transforms = {}) {
                 throw new Error('Webpack stats build result is required.');
             }
             outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
-            const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, [], 
+            const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), [], 
             // tslint:disable-next-line: no-non-null-assertion
             webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
             return { output, success };
