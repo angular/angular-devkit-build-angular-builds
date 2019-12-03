@@ -6,13 +6,11 @@
   "properties": {
     "browserTarget": {
       "type": "string",
-      "description": "Target to build.",
-      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+      "description": "Target to build."
     },
     "serverTarget": {
       "type": "string",
-      "description": "Server target to use for rendering the app shell.",
-      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+      "description": "Server target to use for rendering the app shell."
     },
     "appModuleBundle": {
       "type": "string",

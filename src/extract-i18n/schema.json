@@ -6,8 +6,7 @@
   "properties": {
     "browserTarget": {
       "type": "string",
-      "description": "Target to extract from.",
-      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+      "description": "Target to extract from."
     },
     "format": {
       "type": "string",

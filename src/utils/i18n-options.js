@@ -105,7 +105,7 @@ async function configureI18nBuild(context, options) {
         const usedFormats = new Set();
         for (const [locale, desc] of Object.entries(i18n.locales)) {
             if (i18n.inlineLocales.has(locale) && desc.file) {
-                const result = loader(path.join(context.workspaceRoot, desc.file));
+                const result = loader(path.join(projectRoot, desc.file));
                 for (const diagnostics of result.diagnostics.messages) {
                     if (diagnostics.type === 'error') {
                         throw new Error(`Error parsing translation file '${desc.file}': ${diagnostics.message}`);
@@ -121,7 +121,6 @@ async function configureI18nBuild(context, options) {
                 }
                 desc.format = result.format;
                 desc.translation = result.translation;
-                desc.integrity = result.integrity;
                 const localeDataPath = findLocaleDataPath(locale, localeDataBasePath);
                 if (!localeDataPath) {
                     context.logger.warn(`Locale data for '${locale}' cannot be found.  No locale data will be included for this locale.`);

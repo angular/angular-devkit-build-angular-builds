@@ -7,7 +7,7 @@
     "browserTarget": {
       "type": "string",
       "description": "Target to serve.",
-      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+      "pattern": ".+:.+(:.+)?"
     },
     "port": {
       "type": "number",

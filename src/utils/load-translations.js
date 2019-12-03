@@ -7,7 +7,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const crypto_1 = require("crypto");
 const fs = require("fs");
 async function createTranslationLoader() {
     const { parsers, diagnostics } = await importParsers();
@@ -16,8 +15,7 @@ async function createTranslationLoader() {
         for (const [format, parser] of Object.entries(parsers)) {
             if (parser.canParse(path, content)) {
                 const result = parser.parse(path, content);
-                const integrity = 'sha256-' + crypto_1.createHash('sha256').update(content).digest('base64');
-                return { format, translation: result.translations, diagnostics, integrity };
+                return { format, translation: result.translations, diagnostics };
             }
         }
         throw new Error('Unsupported translation file format.');
