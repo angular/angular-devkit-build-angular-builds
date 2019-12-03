@@ -159,7 +159,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     moduleFiles = emittedFiles;
                     files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
                     if (i18n.shouldInline) {
-                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, 
+                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, scriptsEntryPointName, 
                         // tslint:disable-next-line: no-non-null-assertion
                         webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
                         if (!success) {
@@ -181,24 +181,11 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     };
                     let mainChunkId;
                     const actions = [];
-                    let workerReplacements;
                     const seen = new Set();
                     for (const file of emittedFiles) {
                         // Assets are not processed nor injected into the index
                         if (file.asset) {
-                            // WorkerPlugin adds worker files to assets
-                            if (file.file.endsWith('.worker.js')) {
-                                if (!workerReplacements) {
-                                    workerReplacements = [];
-                                }
-                                workerReplacements.push([
-                                    file.file,
-                                    file.file.replace(/\-es20\d{2}/, '-es5'),
-                                ]);
-                            }
-                            else {
-                                continue;
-                            }
+                            continue;
                         }
                         // Scripts and non-javascript files are not processed
                         if (file.extension !== '.js' ||
@@ -283,7 +270,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             processRuntimeAction = action;
                         }
                         else {
-                            processActions.push({ replacements: workerReplacements, ...action });
+                            processActions.push(action);
                         }
                     }
                     const executor = new action_executor_1.BundleActionExecutor({ cachePath: cacheDownlevelPath, i18n }, options.subresourceIntegrity ? 'sha384' : undefined);
@@ -361,7 +348,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                         // tslint:disable-next-line: no-non-null-assertion
                                         path.relative(webpackStats.outputPath, f)),
                                     },
-                                ], Array.from(outputPaths.values()), '');
+                                ], outputPaths, '');
                             }
                             catch (err) {
                                 context.logger.error('Localized bundle generation failed: ' + err.message);
@@ -379,7 +366,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     // Copy assets
                     if (options.assets) {
                         try {
-                            await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), Array.from(outputPaths.values()), context.workspaceRoot);
+                            await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), outputPaths, context.workspaceRoot);
                         }
                         catch (err) {
                             context.logger.error('Unable to copy assets: ' + err.message);
@@ -438,7 +425,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
                     noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
                     if (i18n.shouldInline) {
-                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, 
+                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, scriptsEntryPointName, 
                         // tslint:disable-next-line: no-non-null-assertion
                         webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
                         if (!success) {
@@ -447,11 +434,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     }
                 }
                 if (options.index) {
-                    for (const [locale, outputPath] of outputPaths.entries()) {
+                    for (const outputPath of outputPaths) {
                         try {
-                            await generateIndex(outputPath, options, root, files, noModuleFiles, moduleFiles, transforms.indexHtml, 
-                            // i18nLocale is used when Ivy is disabled
-                            locale || options.i18nLocale);
+                            await generateIndex(outputPath, options, root, files, noModuleFiles, moduleFiles, transforms.indexHtml);
                         }
                         catch (err) {
                             return { success: false, error: mapErrorToMessage(err) };
@@ -459,7 +444,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     }
                 }
                 if (!options.watch && options.serviceWorker) {
-                    for (const outputPath of outputPaths.values()) {
+                    for (const outputPath of outputPaths) {
                         try {
                             await service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(outputPath), options.baseHref || '/', options.ngswConfigPath);
                         }
@@ -474,12 +459,12 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             ...event,
             baseOutputPath,
             outputPath: baseOutputPath,
-            outputPaths: outputPaths && Array.from(outputPaths.values()) || [baseOutputPath],
+            outputPaths: outputPaths || [baseOutputPath],
         })));
     }));
 }
 exports.buildWebpackBrowser = buildWebpackBrowser;
-function generateIndex(baseOutputPath, options, root, files, noModuleFiles, moduleFiles, transformer, locale) {
+function generateIndex(baseOutputPath, options, root, files, noModuleFiles, moduleFiles, transformer) {
     const host = new node_1.NodeJsSyncHost();
     return write_index_html_1.writeIndexHtml({
         host,
@@ -495,7 +480,7 @@ function generateIndex(baseOutputPath, options, root, files, noModuleFiles, modu
         styles: options.styles,
         postTransform: transformer,
         crossOrigin: options.crossOrigin,
-        lang: locale,
+        lang: options.i18nLocale,
     }).toPromise();
 }
 function mapErrorToMessage(error) {
