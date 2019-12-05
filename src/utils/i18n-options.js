@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const core_1 = require("@angular-devkit/core");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
@@ -7,37 +8,69 @@ const rimraf = require("rimraf");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const load_translations_1 = require("./load-translations");
 function createI18nOptions(metadata, inline) {
-    if (metadata.i18n !== undefined &&
-        (typeof metadata.i18n !== 'object' || !metadata.i18n || Array.isArray(metadata.i18n))) {
+    if (metadata.i18n !== undefined && !core_1.json.isJsonObject(metadata.i18n)) {
         throw new Error('Project i18n field is malformed. Expected an object.');
     }
     metadata = metadata.i18n || {};
-    if (metadata.sourceLocale !== undefined && typeof metadata.sourceLocale !== 'string') {
-        throw new Error('Project i18n sourceLocale field is malformed. Expected a string.');
-    }
     const i18n = {
         inlineLocales: new Set(),
         // en-US is the default locale added to Angular applications (https://angular.io/guide/i18n#i18n-pipes)
-        sourceLocale: metadata.sourceLocale || 'en-US',
+        sourceLocale: 'en-US',
         locales: {},
         get shouldInline() {
             return this.inlineLocales.size > 0;
         },
     };
-    if (metadata.locales !== undefined &&
-        (!metadata.locales || typeof metadata.locales !== 'object' || Array.isArray(metadata.locales))) {
+    let rawSourceLocale;
+    let rawSourceLocaleBaseHref;
+    if (core_1.json.isJsonObject(metadata.sourceLocale)) {
+        rawSourceLocale = metadata.sourceLocale.code;
+        if (metadata.sourceLocale.baseHref !== undefined && typeof metadata.sourceLocale.baseHref !== 'string') {
+            throw new Error('Project i18n sourceLocale baseHref field is malformed. Expected a string.');
+        }
+        rawSourceLocaleBaseHref = metadata.sourceLocale.baseHref;
+    }
+    else {
+        rawSourceLocale = metadata.sourceLocale;
+    }
+    if (rawSourceLocale !== undefined) {
+        if (typeof rawSourceLocale !== 'string') {
+            throw new Error('Project i18n sourceLocale field is malformed. Expected a string.');
+        }
+        i18n.sourceLocale = rawSourceLocale;
+    }
+    i18n.locales[i18n.sourceLocale] = {
+        file: '',
+        baseHref: rawSourceLocaleBaseHref,
+    };
+    if (metadata.locales !== undefined && !core_1.json.isJsonObject(metadata.locales)) {
         throw new Error('Project i18n locales field is malformed. Expected an object.');
     }
     else if (metadata.locales) {
-        for (const [locale, translationFile] of Object.entries(metadata.locales)) {
-            if (typeof translationFile !== 'string') {
-                throw new Error(`Project i18n locales field value for '${locale}' is malformed. Expected a string.`);
+        for (const [locale, options] of Object.entries(metadata.locales)) {
+            let translationFile;
+            let baseHref;
+            if (core_1.json.isJsonObject(options)) {
+                if (typeof options.translation !== 'string') {
+                    throw new Error(`Project i18n locales translation field value for '${locale}' is malformed. Expected a string.`);
+                }
+                translationFile = options.translation;
+                if (typeof options.baseHref === 'string') {
+                    baseHref = options.baseHref;
+                }
+            }
+            else if (typeof options !== 'string') {
+                throw new Error(`Project i18n locales field value for '${locale}' is malformed. Expected a string or object.`);
+            }
+            else {
+                translationFile = options;
             }
             if (locale === i18n.sourceLocale) {
-                throw new Error(`An i18n locale identifier ('${locale}') cannot both be a source locale and provide a translation.`);
+                throw new Error(`An i18n locale ('${locale}') cannot both be a source locale and provide a translation.`);
             }
             i18n.locales[locale] = {
                 file: translationFile,
+                baseHref,
             };
         }
     }
@@ -170,12 +203,13 @@ function mergeDeprecatedI18nOptions(i18n, i18nLocale, i18nFile) {
         i18n.inlineLocales.clear();
         i18n.inlineLocales.add(i18nLocale);
         if (i18nFile !== undefined) {
-            i18n.locales[i18nLocale] = { file: i18nFile };
+            i18n.locales[i18nLocale] = { file: i18nFile, baseHref: '' };
         }
         else {
             // If no file, treat the locale as the source locale
             // This mimics deprecated behavior
             i18n.sourceLocale = i18nLocale;
+            i18n.locales[i18nLocale] = { file: '', baseHref: '' };
         }
         i18n.flatOutput = true;
     }
