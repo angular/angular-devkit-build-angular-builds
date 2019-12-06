@@ -6,6 +6,7 @@ export interface Schema {
     bundleDependencies?: BundleDependencies;
     /**
      * Use a separate bundle containing code used across multiple bundles.
+     * @deprecated Since version 9. This option has no effect on server platform.
      */
     commonChunk?: boolean;
     /**
@@ -66,6 +67,7 @@ export interface Schema {
     main: string;
     /**
      * Use file name for lazy loaded chunks.
+     * @deprecated Since version 9. This option has no effect on server platform.
      */
     namedChunks?: boolean;
     /**
@@ -119,6 +121,7 @@ export interface Schema {
     tsConfig: string;
     /**
      * Use a separate bundle containing only vendor libraries.
+     * @deprecated Since version 9. This option has no effect on server platform.
      */
     vendorChunk?: boolean;
     /**
