@@ -1,9 +1,9 @@
 export interface Schema {
     /**
-     * Available on server platform only. Which external dependencies to bundle into the module.
-     * By default, all of node_modules will be bundled.
+     * Which external dependencies to bundle into the bundle. By default, all of node_modules
+     * will be bundled.
      */
-    bundleDependencies?: BundleDependencies;
+    bundleDependencies?: BundleDependenciesUnion;
     /**
      * Use a separate bundle containing code used across multiple bundles.
      * @deprecated Since version 9. This option has no effect on server platform.
@@ -22,6 +22,11 @@ export interface Schema {
      * @deprecated
      */
     evalSourceMap?: boolean;
+    /**
+     * Exclude the listed external dependencies from being bundled into the bundle. Instead, the
+     * created bundle relies on these dependencies to be available during runtime.
+     */
+    externalDependencies?: string[];
     /**
      * Extract all licenses in a separate file, in the case of production builds only.
      */
@@ -139,10 +144,11 @@ export interface Schema {
     watch?: boolean;
 }
 /**
- * Available on server platform only. Which external dependencies to bundle into the module.
- * By default, all of node_modules will be bundled.
+ * Which external dependencies to bundle into the bundle. By default, all of node_modules
+ * will be bundled.
  */
-export declare enum BundleDependencies {
+export declare type BundleDependenciesUnion = boolean | BundleDependenciesEnum;
+export declare enum BundleDependenciesEnum {
     All = "all",
     None = "none"
 }

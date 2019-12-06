@@ -60,9 +60,18 @@ function execute(options, context, transforms = {}) {
 exports.execute = execute;
 exports.default = architect_1.createBuilder(execute);
 async function initialize(options, context, webpackConfigurationTransform) {
+    let bundleDependencies;
+    if (typeof options.bundleDependencies === 'string') {
+        bundleDependencies = options.bundleDependencies === 'all';
+        context.logger.warn(`Option 'bundleDependencies' string value is deprecated since version 9. Use a boolean value instead.`);
+    }
+    else {
+        bundleDependencies = options.bundleDependencies;
+    }
     const originalOutputPath = options.outputPath;
     const { config, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext({
         ...options,
+        bundleDependencies,
         buildOptimizer: false,
         aot: true,
         platform: 'server',
