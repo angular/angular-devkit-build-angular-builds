@@ -16,5 +16,7 @@ var dev_server_1 = require("./dev-server");
 exports.executeDevServerBuilder = dev_server_1.serveWebpackBrowser;
 var karma_1 = require("./karma");
 exports.executeKarmaBuilder = karma_1.execute;
+var protractor_1 = require("./protractor");
+exports.executeProtractorBuilder = protractor_1.execute;
 var server_1 = require("./server");
 exports.executeServerBuilder = server_1.execute;
