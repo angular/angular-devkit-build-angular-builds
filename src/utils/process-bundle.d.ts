@@ -14,6 +14,7 @@ export interface ProcessBundleOptions {
     cacheKeys?: (string | null)[];
     integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
     runtimeData?: ProcessBundleResult[];
+    replacements?: [string, string][];
 }
 export interface ProcessBundleResult {
     name: string;
