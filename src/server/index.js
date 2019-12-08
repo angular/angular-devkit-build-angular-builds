@@ -40,7 +40,7 @@ function execute(options, context, transforms = {}) {
                 throw new Error('Webpack stats build result is required.');
             }
             outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
-            const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, [], 
+            const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), [], 
             // tslint:disable-next-line: no-non-null-assertion
             webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
             return { output, success };
@@ -60,9 +60,18 @@ function execute(options, context, transforms = {}) {
 exports.execute = execute;
 exports.default = architect_1.createBuilder(execute);
 async function initialize(options, context, webpackConfigurationTransform) {
+    let bundleDependencies;
+    if (typeof options.bundleDependencies === 'string') {
+        bundleDependencies = options.bundleDependencies === 'all';
+        context.logger.warn(`Option 'bundleDependencies' string value is deprecated since version 9. Use a boolean value instead.`);
+    }
+    else {
+        bundleDependencies = options.bundleDependencies;
+    }
     const originalOutputPath = options.outputPath;
     const { config, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext({
         ...options,
+        bundleDependencies,
         buildOptimizer: false,
         aot: true,
         platform: 'server',

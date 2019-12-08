@@ -18,7 +18,7 @@ export declare function getOutputHashFormat(option: string, length?: number): Ha
 declare type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export declare type NormalizedEntryPoint = Required<Omit<ExtraEntryPointClass, 'lazy'>>;
 export declare function normalizeExtraEntryPoints(extraEntryPoints: ExtraEntryPoint[], defaultBundleName: string): NormalizedEntryPoint[];
-export declare function getSourceMapDevTool(scriptsSourceMap: boolean, stylesSourceMap: boolean, hiddenSourceMap?: boolean, inlineSourceMap?: boolean): SourceMapDevToolPlugin;
+export declare function getSourceMapDevTool(scriptsSourceMap: boolean | undefined, stylesSourceMap: boolean | undefined, hiddenSourceMap?: boolean, inlineSourceMap?: boolean): SourceMapDevToolPlugin;
 /**
  * Returns an ES version file suffix to differentiate between various builds.
  */
