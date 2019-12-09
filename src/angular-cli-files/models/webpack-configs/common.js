@@ -388,7 +388,6 @@ function getCommonConfig(wco) {
             alias,
         },
         resolveLoader: {
-            symlinks: !buildOptions.preserveSymlinks,
             modules: loaderNodeModules,
         },
         context: projectRoot,
