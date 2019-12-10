@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
+const core_1 = require("@angular-devkit/core");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
@@ -28,8 +29,27 @@ function execute(options, context, transforms = {}) {
     const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
     const baseOutputPath = path.resolve(root, options.outputPath);
     let outputPaths;
+    if (typeof options.bundleDependencies === 'string') {
+        options.bundleDependencies = options.bundleDependencies === 'all';
+        context.logger.warn(`Option 'bundleDependencies' string value is deprecated since version 9. Use a boolean value instead.`);
+    }
+    if (!options.bundleDependencies && tsConfig.options.enableIvy) {
+        // tslint:disable-next-line: no-implicit-dependencies
+        const { __processed_by_ivy_ngcc__, main = '' } = require('@angular/core/package.json');
+        if (!__processed_by_ivy_ngcc__ ||
+            !__processed_by_ivy_ngcc__.main ||
+            main.includes('__ivy_ngcc__')) {
+            context.logger.warn(core_1.tags.stripIndent `
+      WARNING: Turning off 'bundleDependencies' with Ivy may result in undefined behaviour
+      unless 'node_modules' are transformed using the standalone Angular compatibility compiler (NGCC).
+      See: http://v9.angular.io/guide/ivy#ivy-and-universal-app-shell
+    `);
+        }
+    }
     return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.concatMap(({ config, i18n }) => {
-        return build_webpack_1.runWebpack(config, context).pipe(operators_1.concatMap(async (output) => {
+        return build_webpack_1.runWebpack(config, context, {
+            webpackFactory: require('webpack'),
+        }).pipe(operators_1.concatMap(async (output) => {
             const { emittedFiles = [], webpackStats } = output;
             if (!output.success || !i18n.shouldInline) {
                 return output;
@@ -38,7 +58,7 @@ function execute(options, context, transforms = {}) {
                 throw new Error('Webpack stats build result is required.');
             }
             outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
-            const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, [], 
+            const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), [], 
             // tslint:disable-next-line: no-non-null-assertion
             webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
             return { output, success };
