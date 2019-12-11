@@ -5,33 +5,29 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import * as webpack from 'webpack';
+import { ProcessBundleResult } from '../../../src/utils/process-bundle';
 import { Budget } from '../../browser/schema';
-export interface Compilation {
-    assets: {
-        [name: string]: {
-            size: () => number;
-        };
-    };
-    chunks: {
-        name: string;
-        files: string[];
-        isOnlyInitial: () => boolean;
-    }[];
-    warnings: string[];
-    errors: string[];
+interface Threshold {
+    limit: number;
+    type: ThresholdType;
+    severity: ThresholdSeverity;
 }
-export interface Size {
-    size: number;
-    label?: string;
+declare enum ThresholdType {
+    Max = "maximum",
+    Min = "minimum"
 }
-export declare function calculateSizes(budget: Budget, compilation: Compilation): Size[];
-export declare abstract class Calculator {
-    protected budget: Budget;
-    protected compilation: Compilation;
-    constructor(budget: Budget, compilation: Compilation);
-    abstract calculate(): Size[];
+export declare enum ThresholdSeverity {
+    Warning = "warning",
+    Error = "error"
 }
-/**
- * Calculate the bytes given a string value.
- */
-export declare function calculateBytes(input: string, baseline?: string, factor?: 1 | -1): number;
+export declare function calculateThresholds(budget: Budget): IterableIterator<Threshold>;
+export declare function checkBudgets(budgets: Budget[], webpackStats: webpack.Stats.ToJsonOutput, processResults: ProcessBundleResult[]): IterableIterator<{
+    severity: ThresholdSeverity;
+    message: string;
+}>;
+export declare function checkThresholds(thresholds: IterableIterator<Threshold>, size: number, label?: string): IterableIterator<{
+    severity: ThresholdSeverity;
+    message: string;
+}>;
+export {};
