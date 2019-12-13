@@ -7,19 +7,6 @@
  */
 import * as webpack from 'webpack';
 import { WebpackConfigOptions } from '../build-options';
-/**
- * Enumerate loaders and their dependencies from this file to let the dependency validator
- * know they are used.
- *
- * require('style-loader')
- * require('postcss-loader')
- * require('stylus')
- * require('stylus-loader')
- * require('less')
- * require('less-loader')
- * require('node-sass')
- * require('sass-loader')
- */
 export declare function getStylesConfig(wco: WebpackConfigOptions): {
     entry: {
         [key: string]: string[];
@@ -27,5 +14,5 @@ export declare function getStylesConfig(wco: WebpackConfigOptions): {
     module: {
         rules: webpack.RuleSetRule[];
     };
-    plugins: any[];
+    plugins: webpack.Plugin[];
 };
