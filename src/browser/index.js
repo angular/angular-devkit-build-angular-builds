@@ -487,15 +487,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     }
                 }
                 if (!options.watch && options.serviceWorker) {
-                    for (const [locale, outputPath] of outputPaths.entries()) {
-                        let localeBaseHref;
-                        if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
-                            localeBaseHref = path.posix.join(options.baseHref || '', i18n.locales[locale].baseHref === undefined
-                                ? `/${locale}/`
-                                : i18n.locales[locale].baseHref);
-                        }
+                    for (const outputPath of outputPaths.values()) {
                         try {
-                            await service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(outputPath), localeBaseHref || options.baseHref || '/', options.ngswConfigPath);
+                            await service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(outputPath), options.baseHref || '/', options.ngswConfigPath);
                         }
                         catch (err) {
                             return { success: false, error: mapErrorToMessage(err) };
