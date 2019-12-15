@@ -35,7 +35,8 @@ export interface BuildOptions {
     localize?: Localize;
     i18nMissingTranslation?: I18NMissingTranslation;
     extractCss?: boolean;
-    bundleDependencies?: 'none' | 'all';
+    bundleDependencies?: boolean;
+    externalDependencies?: string[];
     watch?: boolean;
     outputHashing?: string;
     poll?: number;
