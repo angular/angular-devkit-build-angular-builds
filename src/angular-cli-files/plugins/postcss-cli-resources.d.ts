@@ -7,6 +7,7 @@ export interface PostcssCliResourcesOptions {
     rebaseRootRelative?: boolean;
     filename: string;
     loader: webpack.loader.LoaderContext;
+    emitFile: boolean;
 }
 declare const _default: postcss.Plugin<PostcssCliResourcesOptions>;
 export default _default;

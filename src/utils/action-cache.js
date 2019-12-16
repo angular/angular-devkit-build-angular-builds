@@ -8,15 +8,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const crypto_1 = require("crypto");
-const findCacheDirectory = require("find-cache-dir");
 const fs = require("fs");
-const copy_file_1 = require("../utils/copy-file");
-const mangle_options_1 = require("../utils/mangle-options");
+const copy_file_1 = require("./copy-file");
+const environment_options_1 = require("./environment-options");
 const cacache = require('cacache');
-const cacheDownlevelPath = findCacheDirectory({ name: 'angular-build-dl' });
 const packageVersion = require('../../package.json').version;
 class BundleActionCache {
-    constructor(integrityAlgorithm) {
+    constructor(cachePath, integrityAlgorithm) {
+        this.cachePath = cachePath;
         this.integrityAlgorithm = integrityAlgorithm;
     }
     static copyEntryContent(entry, dest) {
@@ -36,7 +35,7 @@ class BundleActionCache {
             .update(content)
             .digest('base64');
         let baseCacheKey = `${packageVersion}|${content.length}|${algorithm}-${codeHash}`;
-        if (mangle_options_1.manglingDisabled) {
+        if (environment_options_1.manglingDisabled) {
             baseCacheKey += '|MD';
         }
         return baseCacheKey;
@@ -71,7 +70,7 @@ class BundleActionCache {
         const cacheEntries = [];
         for (const key of cacheKeys) {
             if (key) {
-                const entry = await cacache.get.info(cacheDownlevelPath, key);
+                const entry = await cacache.get.info(this.cachePath, key);
                 if (!entry) {
                     return false;
                 }
@@ -126,7 +125,7 @@ class BundleActionCache {
         cacheEntry = entries[2 /* DownlevelCode */];
         if (cacheEntry) {
             result.downlevel = {
-                filename: action.filename.replace('es2015', 'es5'),
+                filename: action.filename.replace(/\-es20\d{2}/, '-es5'),
                 size: cacheEntry.size,
                 integrity: cacheEntry.integrity,
             };
@@ -134,7 +133,7 @@ class BundleActionCache {
             cacheEntry = entries[3 /* DownlevelMap */];
             if (cacheEntry) {
                 result.downlevel.map = {
-                    filename: action.filename.replace('es2015', 'es5') + '.map',
+                    filename: action.filename.replace(/\-es20\d{2}/, '-es5') + '.map',
                     size: cacheEntry.size,
                 };
                 BundleActionCache.copyEntryContent(cacheEntry, result.downlevel.filename + '.map');

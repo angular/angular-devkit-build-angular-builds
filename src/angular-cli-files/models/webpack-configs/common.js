@@ -15,7 +15,8 @@ const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
 const webpack_sources_1 = require("webpack-sources");
 const utils_1 = require("../../../utils");
-const mangle_options_1 = require("../../../utils/mangle-options");
+const cache_path_1 = require("../../../utils/cache-path");
+const environment_options_1 = require("../../../utils/environment-options");
 const bundle_budget_1 = require("../../plugins/bundle-budget");
 const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
 const named_chunks_plugin_1 = require("../../plugins/named-chunks-plugin");
@@ -35,10 +36,11 @@ function getCommonConfig(wco) {
     if (!nodeModules) {
         throw new Error('Cannot locate node_modules directory.');
     }
-    // tslint:disable-next-line:no-any
     const extraPlugins = [];
     const extraRules = [];
     const entryPoints = {};
+    // determine hashing format
+    const hashFormat = utils_2.getOutputHashFormat(buildOptions.outputHashing || 'none');
     const targetInFileName = utils_2.getEsVersionForFileName(tsConfig.options.target, buildOptions.esVersionInFileName);
     if (buildOptions.main) {
         const mainPath = path.resolve(root, buildOptions.main);
@@ -106,6 +108,23 @@ function getCommonConfig(wco) {
                     // Add zone.js legacy support to the es5 polyfills
                     // This is a noop execution-wise if zone-evergreen is not used.
                     entryPoints[polyfillsChunkName].push('zone.js/dist/zone-legacy');
+                    // Since the chunkFileName option schema does not allow the function overload, add a plugin
+                    // that changes the name of the ES5 polyfills chunk to not include ES2015.
+                    extraPlugins.push({
+                        apply(compiler) {
+                            compiler.hooks.compilation.tap('build-angular', compilation => {
+                                // Webpack typings do not contain MainTemplate assetPath hook
+                                // The webpack.Compilation assetPath hook is a noop in 4.x so the template must be used
+                                // tslint:disable-next-line: no-any
+                                compilation.mainTemplate.hooks.assetPath.tap('build-angular', (filename, data) => {
+                                    const isMap = filename && filename.endsWith('.map');
+                                    return data.chunk && data.chunk.name === 'polyfills-es5'
+                                        ? `polyfills-es5${hashFormat.chunk}.js${isMap ? '.map' : ''}`
+                                        : filename;
+                                });
+                            });
+                        },
+                    });
                 }
                 if (!buildOptions.aot) {
                     if (differentialLoadingMode) {
@@ -137,8 +156,6 @@ function getCommonConfig(wco) {
             outputPath: path.resolve(root, `chrome-profiler-events${targetInFileName}.json`),
         }));
     }
-    // determine hashing format
-    const hashFormat = utils_2.getOutputHashFormat(buildOptions.outputHashing || 'none');
     // process global scripts
     const globalScriptsByBundleName = utils_2.normalizeExtraEntryPoints(buildOptions.scripts, 'scripts').reduce((prev, curr) => {
         const bundleName = curr.bundleName;
@@ -227,7 +244,7 @@ function getCommonConfig(wco) {
         sourceMapUseRule = {
             use: [
                 {
-                    loader: 'source-map-loader',
+                    loader: require.resolve('source-map-loader'),
                 },
             ],
         };
@@ -296,7 +313,8 @@ function getCommonConfig(wco) {
             safari10: true,
             output: {
                 ecma: terserEcma,
-                comments: false,
+                // default behavior (undefined value) is to keep only important comments (licenses, etc.)
+                comments: !buildOptions.extractLicenses && undefined,
                 webkit: true,
             },
             // On server, we don't want to compress anything. We still set the ngDevMode = false for it
@@ -317,14 +335,14 @@ function getCommonConfig(wco) {
                 },
             // We also want to avoid mangling on server.
             // Name mangling is handled within the browser builder
-            mangle: !mangle_options_1.manglingDisabled &&
+            mangle: !environment_options_1.manglingDisabled &&
                 buildOptions.platform !== 'server' &&
                 !differentialLoadingMode,
         };
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,
             parallel: true,
-            cache: true,
+            cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
             chunkFilter: (chunk) => !globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
             terserOptions,
@@ -334,7 +352,7 @@ function getCommonConfig(wco) {
         new TerserPlugin({
             sourceMap: scriptsSourceMap,
             parallel: true,
-            cache: true,
+            cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
             chunkFilter: (chunk) => globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
             terserOptions: {
@@ -347,7 +365,7 @@ function getCommonConfig(wco) {
                     ...terserOptions.output,
                     ecma: 5,
                 },
-                mangle: !mangle_options_1.manglingDisabled && buildOptions.platform !== 'server',
+                mangle: !environment_options_1.manglingDisabled && buildOptions.platform !== 'server',
             },
         }));
     }
@@ -370,6 +388,7 @@ function getCommonConfig(wco) {
             alias,
         },
         resolveLoader: {
+            symlinks: !buildOptions.preserveSymlinks,
             modules: loaderNodeModules,
         },
         context: projectRoot,
@@ -383,6 +402,7 @@ function getCommonConfig(wco) {
         watch: buildOptions.watch,
         watchOptions: {
             poll: buildOptions.poll,
+            ignored: buildOptions.poll === undefined ? undefined : /[\\\/]node_modules[\\\/]/,
         },
         performance: {
             hints: false,
@@ -393,9 +413,11 @@ function getCommonConfig(wco) {
             rules: [
                 {
                     test: /\.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)$/,
-                    loader: 'file-loader',
+                    loader: require.resolve('file-loader'),
                     options: {
                         name: `[name]${hashFormat.file}.[ext]`,
+                        // Re-use emitted files from browser builder on the server.
+                        emitFile: wco.buildOptions.platform !== 'server',
                     },
                 },
                 {
@@ -431,10 +453,14 @@ function getCommonConfig(wco) {
             noEmitOnErrors: true,
             minimizer: [
                 new webpack_1.HashedModuleIdsPlugin(),
-                // TODO: check with Mike what this feature needs.
-                new bundle_budget_1.BundleBudgetPlugin({ budgets: buildOptions.budgets }),
                 ...extraMinimizers,
-            ],
+            ].concat(differentialLoadingMode ? [
+            // Budgets are computed after differential builds, not via a plugin.
+            // https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_angular/src/browser/index.ts
+            ] : [
+                // Non differential builds should be computed here, as a plugin.
+                new bundle_budget_1.BundleBudgetPlugin({ budgets: buildOptions.budgets }),
+            ]),
         },
         plugins: [
             // Always replace the context for the System.import in angular/core to prevent warnings.
