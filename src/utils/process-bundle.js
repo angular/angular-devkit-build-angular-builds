@@ -314,7 +314,7 @@ function createReplacePlugin(replacements) {
             StringLiteral(path) {
                 for (const replacement of replacements) {
                     if (path.node.value === replacement[0]) {
-                        path.replaceWith(core_1.types.stringLiteral(replacement[1]));
+                        path.node.value = replacement[1];
                     }
                 }
             },
