@@ -188,7 +188,11 @@ function serveWebpackBrowser(options, context, transforms = {}) {
           ****************************************************************************************
         `);
         }
-        return build_webpack_1.runWebpackDevServer(webpackConfig, context, { logging: loggingFn }).pipe(operators_1.map(buildEvent => {
+        return build_webpack_1.runWebpackDevServer(webpackConfig, context, {
+            logging: loggingFn,
+            webpackFactory: require('webpack'),
+            webpackDevServerFactory: require('webpack-dev-server'),
+        }).pipe(operators_1.map(buildEvent => {
             // Resolve serve address.
             const serverAddress = url.format({
                 protocol: options.ssl ? 'https' : 'http',
@@ -435,10 +439,6 @@ function _addLiveReload(options, browserOptions, webpackConfig, clientAddress, l
     if (clientAddress.pathname) {
         clientAddress.pathname = path.posix.join(clientAddress.pathname, 'sockjs-node');
         sockjsPath = '&sockPath=' + clientAddress.pathname;
-        // ensure webpack-dev-server uses the correct path to connect to the reloading socket
-        if (webpackConfig.devServer) {
-            webpackConfig.devServer.sockPath = clientAddress.pathname;
-        }
     }
     const entryPoints = [`${webpackDevServerPath}?${url.format(clientAddress)}${sockjsPath}`];
     if (options.hmr) {
