@@ -8,8 +8,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 // Exports the webpack plugins we use internally.
-var any_component_style_budget_checker_1 = require("./any-component-style-budget-checker");
-exports.AnyComponentStyleBudgetChecker = any_component_style_budget_checker_1.AnyComponentStyleBudgetChecker;
 var cleancss_webpack_plugin_1 = require("./cleancss-webpack-plugin");
 exports.CleanCssWebpackPlugin = cleancss_webpack_plugin_1.CleanCssWebpackPlugin;
 var bundle_budget_1 = require("./bundle-budget");

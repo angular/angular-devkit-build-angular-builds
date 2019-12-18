@@ -1,14 +1,4 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-import { BuilderContext } from '@angular-devkit/architect';
 import { JsonObject } from '@angular-devkit/core';
-import { Schema } from './schema';
-export declare type ExtractI18nBuilderOptions = Schema & JsonObject;
-export declare function execute(options: ExtractI18nBuilderOptions, context: BuilderContext): Promise<import("../../../build_webpack/src").BuildResult>;
-declare const _default: import("@angular-devkit/architect/src/internal").Builder<JsonObject & Schema>;
+import { Schema as ExtractI18nBuilderOptions } from './schema';
+declare const _default: import("@angular-devkit/architect/src/internal").Builder<JsonObject & ExtractI18nBuilderOptions>;
 export default _default;

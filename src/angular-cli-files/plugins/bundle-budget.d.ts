@@ -14,5 +14,8 @@ export declare class BundleBudgetPlugin {
     private options;
     constructor(options: BundleBudgetPluginOptions);
     apply(compiler: Compiler): void;
+    private checkMinimum;
+    private checkMaximum;
+    private calculate;
     private runChecks;
 }
