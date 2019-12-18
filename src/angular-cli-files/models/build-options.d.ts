@@ -81,5 +81,4 @@ export interface WebpackConfigOptions<T = BuildOptions> {
     tsConfig: ParsedConfiguration;
     tsConfigPath: string;
     supportES2015: boolean;
-    differentialLoadingMode?: boolean;
 }
