@@ -323,6 +323,10 @@ function _addLiveReload(options, browserOptions, webpackConfig, clientAddress, l
     if (clientAddress.pathname) {
         clientAddress.pathname = path.posix.join(clientAddress.pathname, 'sockjs-node');
         sockjsPath = '&sockPath=' + clientAddress.pathname;
+        // ensure webpack-dev-server uses the correct path to connect to the reloading socket
+        if (webpackConfig.devServer) {
+            webpackConfig.devServer.sockPath = clientAddress.pathname;
+        }
     }
     const entryPoints = [`${webpackDevServerPath}?${url.format(clientAddress)}${sockjsPath}`];
     if (options.hmr) {
