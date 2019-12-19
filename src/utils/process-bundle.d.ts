@@ -14,6 +14,7 @@ export interface ProcessBundleOptions {
     cacheKeys?: (string | null)[];
     integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
     runtimeData?: ProcessBundleResult[];
+    replacements?: [string, string][];
 }
 export interface ProcessBundleResult {
     name: string;
@@ -48,6 +49,7 @@ export interface InlineOptions {
     es5: boolean;
     outputPath: string;
     missingTranslation?: 'warning' | 'error' | 'ignore';
+    setLocale?: boolean;
 }
 export declare function inlineLocales(options: InlineOptions): Promise<{
     file: string;
