@@ -63,6 +63,7 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
             tsConfig,
             tsConfigPath,
             supportES2015,
+            differentialLoadingMode: differentialLoading && !utils_1.fullDifferential,
         };
         wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
         const partials = webpackPartialGenerator(wco);

@@ -7,13 +7,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+const core_1 = require("@babel/core");
 const crypto_1 = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const source_map_1 = require("source-map");
 const terser_1 = require("terser");
-const typescript_1 = require("typescript");
-const webpack_sources_1 = require("webpack-sources");
 const mangle_options_1 = require("./mangle-options");
 const cacache = require('cacache');
 let cachePath;
@@ -43,7 +42,7 @@ async function process(options) {
     }
     const basePath = path.dirname(options.filename);
     const filename = path.basename(options.filename);
-    const downlevelFilename = filename.replace('es2015', 'es5');
+    const downlevelFilename = filename.replace(/\-es20\d{2}/, '-es5');
     const downlevel = !options.optimizeOnly;
     // if code size is larger than 1 MB, manually handle sourcemaps with newer source-map package.
     const codeSize = Buffer.byteLength(options.code);
@@ -55,23 +54,36 @@ async function process(options) {
     let downlevelMap;
     if (downlevel) {
         // Downlevel the bundle
-        const transformResult = typescript_1.transpileModule(sourceCode, {
-            fileName: downlevelFilename,
-            compilerOptions: {
-                sourceMap: !!sourceMap,
-                target: typescript_1.ScriptTarget.ES5,
-            },
+        const transformResult = await core_1.transformAsync(sourceCode, {
+            filename: options.filename,
+            inputSourceMap: manualSourceMaps ? undefined : sourceMap,
+            babelrc: false,
+            presets: [
+                [
+                    require.resolve('@babel/preset-env'),
+                    {
+                        // modules aren't needed since the bundles use webpack's custom module loading
+                        modules: false,
+                        // 'transform-typeof-symbol' generates slower code
+                        exclude: ['transform-typeof-symbol'],
+                    },
+                ],
+            ],
+            minified: options.optimize,
+            // `false` ensures it is disabled and prevents large file warnings
+            compact: options.optimize || false,
+            sourceMaps: !!sourceMap,
         });
-        downlevelCode = transformResult.outputText;
-        if (sourceMap && transformResult.sourceMapText) {
-            if (manualSourceMaps) {
-                downlevelMap = await mergeSourcemaps(sourceMap, JSON.parse(transformResult.sourceMapText));
-            }
-            else {
-                // More accurate but significantly more costly
-                const tempSource = new webpack_sources_1.SourceMapSource(transformResult.outputText, downlevelFilename, JSON.parse(transformResult.sourceMapText), sourceCode, sourceMap);
-                downlevelMap = tempSource.map();
-            }
+        if (!transformResult || !transformResult.code) {
+            throw new Error(`Unknown error occurred processing bundle for "${options.filename}".`);
+        }
+        downlevelCode = transformResult.code;
+        if (manualSourceMaps && sourceMap && transformResult.map) {
+            downlevelMap = await mergeSourcemaps(sourceMap, transformResult.map);
+        }
+        else {
+            // undefined is needed here to normalize the property type
+            downlevelMap = transformResult.map || undefined;
         }
     }
     if (options.optimize) {
@@ -244,8 +256,8 @@ async function processRuntime(options) {
     }
     // Adjust lazy loaded scripts to point to the proper variant
     // Extra spacing is intentional to align source line positions
-    downlevelCode = downlevelCode.replace('"-es2015.', '   "-es5.');
-    const downlevelFilePath = options.filename.replace('es2015', 'es5');
+    downlevelCode = downlevelCode.replace(/"\-es20\d{2}\./, '   "-es5.');
+    const downlevelFilePath = options.filename.replace(/\-es20\d{2}/, '-es5');
     let downlevelMap;
     let result;
     if (options.optimize) {
