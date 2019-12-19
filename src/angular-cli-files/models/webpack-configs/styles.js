@@ -18,7 +18,9 @@ function getStylesConfig(wco) {
     const { root, buildOptions } = wco;
     const entryPoints = {};
     const globalStylePaths = [];
-    const extraPlugins = [];
+    const extraPlugins = [
+        new webpack_1.AnyComponentStyleBudgetChecker(buildOptions.budgets),
+    ];
     const cssSourceMap = buildOptions.sourceMap.styles;
     // Determine hashing format.
     const hashFormat = utils_1.getOutputHashFormat(buildOptions.outputHashing);
