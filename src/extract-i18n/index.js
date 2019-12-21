@@ -107,4 +107,5 @@ async function execute(options, context) {
         webpackFactory: await Promise.resolve().then(() => require('webpack')),
     }).toPromise();
 }
+exports.execute = execute;
 exports.default = architect_1.createBuilder(execute);

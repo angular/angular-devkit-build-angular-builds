@@ -50,7 +50,7 @@ async function process(options) {
     }
     const basePath = path.dirname(options.filename);
     const filename = path.basename(options.filename);
-    const downlevelFilename = filename.replace('es2015', 'es5');
+    const downlevelFilename = filename.replace(/\-es20\d{2}/, '-es5');
     const downlevel = !options.optimizeOnly;
     // if code size is larger than 500kB, manually handle sourcemaps with newer source-map package.
     // babel currently uses an older version that still supports sync calls
@@ -67,9 +67,16 @@ async function process(options) {
             filename: options.filename,
             inputSourceMap: manualSourceMaps ? undefined : sourceMap,
             babelrc: false,
-            // modules aren't needed since the bundles use webpack's custom module loading
-            // 'transform-typeof-symbol' generates slower code
-            presets: [['@babel/preset-env', { modules: false, exclude: ['transform-typeof-symbol'] }]],
+            presets: [[
+                    require.resolve('@babel/preset-env'),
+                    {
+                        // modules aren't needed since the bundles use webpack's custom module loading
+                        modules: false,
+                        // 'transform-typeof-symbol' generates slower code
+                        exclude: ['transform-typeof-symbol'],
+                    },
+                ]],
+            plugins: options.replacements ? [createReplacePlugin(options.replacements)] : [],
             minified: options.optimize,
             // `false` ensures it is disabled and prevents large file warnings
             compact: options.optimize || false,
@@ -263,8 +270,8 @@ async function processRuntime(options) {
     }
     // Adjust lazy loaded scripts to point to the proper variant
     // Extra spacing is intentional to align source line positions
-    downlevelCode = downlevelCode.replace('"-es2015.', '   "-es5.');
-    const downlevelFilePath = options.filename.replace('es2015', 'es5');
+    downlevelCode = downlevelCode.replace(/"\-es20\d{2}\./, '   "-es5.');
+    const downlevelFilePath = options.filename.replace(/\-es20\d{2}/, '-es5');
     let downlevelMap;
     let result;
     if (options.optimize) {
@@ -300,6 +307,19 @@ async function processRuntime(options) {
     await cachePut(downlevelCode, (options.cacheKeys && options.cacheKeys[2 /* DownlevelCode */]) || null);
     fs.writeFileSync(downlevelFilePath, downlevelCode);
     return result;
+}
+function createReplacePlugin(replacements) {
+    return {
+        visitor: {
+            StringLiteral(path) {
+                for (const replacement of replacements) {
+                    if (path.node.value === replacement[0]) {
+                        path.node.value = replacement[1];
+                    }
+                }
+            },
+        },
+    };
 }
 const localizeName = '$localize';
 async function inlineLocales(options) {
