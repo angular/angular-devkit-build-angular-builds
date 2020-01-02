@@ -56,26 +56,30 @@ class BundleActionCache {
         return baseCacheKey;
     }
     generateCacheKeys(action) {
-        const baseCacheKey = this.generateBaseCacheKey(action.code);
-        // Postfix added to sourcemap cache keys when vendor sourcemaps are present
+        // Postfix added to sourcemap cache keys when vendor, hidden sourcemaps are present
         // Allows non-destructive caching of both variants
-        const SourceMapVendorPostfix = !!action.sourceMaps && action.vendorSourceMaps ? '|vendor' : '';
+        const sourceMapVendorPostfix = action.sourceMaps && action.vendorSourceMaps ? '|vendor' : '';
+        // sourceMappingURL is added at the very end which causes the code to be the same when sourcemaps are enabled/disabled
+        // When using hiddenSourceMaps we can omit the postfix since sourceMappingURL will not be added.
+        // When having sourcemaps a hashed file and non hashed file can have the same content. But the sourceMappingURL will differ.
+        const sourceMapPostFix = action.sourceMaps && !action.hiddenSourceMaps ? `|sourcemap|${action.filename}` : '';
+        const baseCacheKey = this.generateBaseCacheKey(action.code);
         // Determine cache entries required based on build settings
         const cacheKeys = [];
         // If optimizing and the original is not ignored, add original as required
-        if ((action.optimize || action.optimizeOnly) && !action.ignoreOriginal) {
-            cacheKeys[0 /* OriginalCode */] = baseCacheKey + '|orig';
+        if (!action.ignoreOriginal) {
+            cacheKeys[0 /* OriginalCode */] = baseCacheKey + sourceMapPostFix + '|orig';
             // If sourcemaps are enabled, add original sourcemap as required
             if (action.sourceMaps) {
-                cacheKeys[1 /* OriginalMap */] = baseCacheKey + SourceMapVendorPostfix + '|orig-map';
+                cacheKeys[1 /* OriginalMap */] = baseCacheKey + sourceMapVendorPostfix + '|orig-map';
             }
         }
         // If not only optimizing, add downlevel as required
         if (!action.optimizeOnly) {
-            cacheKeys[2 /* DownlevelCode */] = baseCacheKey + '|dl';
+            cacheKeys[2 /* DownlevelCode */] = baseCacheKey + sourceMapPostFix + '|dl';
             // If sourcemaps are enabled, add downlevel sourcemap as required
             if (action.sourceMaps) {
-                cacheKeys[3 /* DownlevelMap */] = baseCacheKey + SourceMapVendorPostfix + '|dl-map';
+                cacheKeys[3 /* DownlevelMap */] = baseCacheKey + sourceMapVendorPostfix + '|dl-map';
             }
         }
         return cacheKeys;

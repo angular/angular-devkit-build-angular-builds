@@ -12,6 +12,6 @@ export declare class BundleActionCache {
     static copyEntryContent(entry: CacheEntry | string, dest: fs.PathLike): void;
     generateBaseCacheKey(content: string): string;
     generateCacheKeys(action: ProcessBundleOptions): string[];
-    getCacheEntries(cacheKeys: (string | null)[]): Promise<(CacheEntry | null)[] | false>;
+    getCacheEntries(cacheKeys: (string | undefined)[]): Promise<(CacheEntry | null)[] | false>;
     getCachedBundleResult(action: ProcessBundleOptions): Promise<ProcessBundleResult | null>;
 }

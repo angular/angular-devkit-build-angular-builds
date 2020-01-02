@@ -212,12 +212,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         if (!es5Polyfills) {
                             moduleFiles.push(file);
                         }
-                        // If not optimizing then ES2015 polyfills do not need processing
-                        // Unlike other module scripts, it is never downleveled
-                        const es2015Polyfills = file.file.startsWith('polyfills-es20');
-                        if (!actionOptions.optimize && es2015Polyfills) {
-                            continue;
-                        }
                         // Retrieve the content/map for the file
                         // NOTE: Additional future optimizations will read directly from memory
                         let filename = path.resolve(core_1.getSystemPath(root), options.outputPath, file.file);
@@ -236,6 +230,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             fs.unlinkSync(filename);
                             filename = filename.replace(/\-es20\d{2}/, '');
                         }
+                        const es2015Polyfills = file.file.startsWith('polyfills-es20');
                         // Record the bundle processing action
                         // The runtime chunk gets special processing for lazy loaded files
                         actions.push({
