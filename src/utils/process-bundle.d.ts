@@ -11,7 +11,7 @@ export interface ProcessBundleOptions {
     optimize?: boolean;
     optimizeOnly?: boolean;
     ignoreOriginal?: boolean;
-    cacheKeys?: (string | null)[];
+    cacheKeys?: (string | undefined)[];
     integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
     runtimeData?: ProcessBundleResult[];
     replacements?: [string, string][];
