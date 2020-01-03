@@ -40,7 +40,9 @@ function getTestConfig(wco) {
     }
     if (wco.buildOptions.sourceMap) {
         const { styles, scripts } = wco.buildOptions.sourceMap;
-        extraPlugins.push(utils_1.getSourceMapDevTool(scripts || false, styles || false, false, true));
+        if (styles || scripts) {
+            extraPlugins.push(utils_1.getSourceMapDevTool(scripts, styles, false, true));
+        }
     }
     return {
         mode: 'development',
