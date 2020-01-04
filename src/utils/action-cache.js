@@ -46,8 +46,7 @@ class BundleActionCache {
         const sourceMapVendorPostfix = action.sourceMaps && action.vendorSourceMaps ? '|vendor' : '';
         // sourceMappingURL is added at the very end which causes the code to be the same when sourcemaps are enabled/disabled
         // When using hiddenSourceMaps we can omit the postfix since sourceMappingURL will not be added.
-        // When having sourcemaps a hashed file and non hashed file can have the same content. But the sourceMappingURL will differ.
-        const sourceMapPostFix = action.sourceMaps && !action.hiddenSourceMaps ? `|sourcemap|${action.filename}` : '';
+        const sourceMapPostFix = action.sourceMaps && !action.hiddenSourceMaps ? '|sourcemap' : '';
         const baseCacheKey = this.generateBaseCacheKey(action.code);
         // Determine cache entries required based on build settings
         const cacheKeys = [];
