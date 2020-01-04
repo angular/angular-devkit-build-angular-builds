@@ -24,6 +24,7 @@ exports.formatSize = formatSize;
 function generateBundleStats(info, colors) {
     const g = (x) => (colors ? bold(green(x)) : x);
     const y = (x) => (colors ? bold(yellow(x)) : x);
+    const id = info.id ? y(info.id.toString()) : '';
     const size = typeof info.size === 'number' ? ` ${formatSize(info.size)}` : '';
     const files = info.files.map(f => path.basename(f)).join(', ');
     const names = info.names ? ` (${info.names.join(', ')})` : '';
@@ -31,7 +32,7 @@ function generateBundleStats(info, colors) {
     const flags = ['rendered', 'recorded']
         .map(f => (f && info[f] ? g(` [${f}]`) : ''))
         .join('');
-    return `chunk {${y(info.id.toString())}} ${g(files)}${names}${size} ${initial}${flags}`;
+    return `chunk {${id}} ${g(files)}${names}${size} ${initial}${flags}`;
 }
 exports.generateBundleStats = generateBundleStats;
 function generateBuildStats(hash, time, colors) {
@@ -66,11 +67,19 @@ function statsToString(json, statsConfig) {
     }
 }
 exports.statsToString = statsToString;
+// TODO(#16193): Don't emit this warning in the first place rather than just suppressing it.
+const ERRONEOUS_WARNINGS = [
+    /multiple assets emit different content.*3rdpartylicenses\.txt/i,
+];
 function statsWarningsToString(json, statsConfig) {
     const colors = statsConfig.colors;
     const rs = (x) => colors ? reset(x) : x;
     const y = (x) => colors ? bold(yellow(x)) : x;
-    return rs('\n' + json.warnings.map((warning) => y(`WARNING in ${warning}`)).join('\n\n'));
+    return rs('\n' + json.warnings
+        .map((warning) => `${warning}`)
+        .filter((warning) => !ERRONEOUS_WARNINGS.some((erroneous) => erroneous.test(warning)))
+        .map((warning) => y(`WARNING in ${warning}`))
+        .join('\n\n'));
 }
 exports.statsWarningsToString = statsWarningsToString;
 function statsErrorsToString(json, statsConfig) {

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const core_1 = require("@angular-devkit/core");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
@@ -7,37 +8,69 @@ const rimraf = require("rimraf");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const load_translations_1 = require("./load-translations");
 function createI18nOptions(metadata, inline) {
-    if (metadata.i18n !== undefined &&
-        (typeof metadata.i18n !== 'object' || !metadata.i18n || Array.isArray(metadata.i18n))) {
+    if (metadata.i18n !== undefined && !core_1.json.isJsonObject(metadata.i18n)) {
         throw new Error('Project i18n field is malformed. Expected an object.');
     }
     metadata = metadata.i18n || {};
-    if (metadata.sourceLocale !== undefined && typeof metadata.sourceLocale !== 'string') {
-        throw new Error('Project i18n sourceLocale field is malformed. Expected a string.');
-    }
     const i18n = {
         inlineLocales: new Set(),
         // en-US is the default locale added to Angular applications (https://angular.io/guide/i18n#i18n-pipes)
-        sourceLocale: metadata.sourceLocale || 'en-US',
+        sourceLocale: 'en-US',
         locales: {},
         get shouldInline() {
             return this.inlineLocales.size > 0;
         },
     };
-    if (metadata.locales !== undefined &&
-        (!metadata.locales || typeof metadata.locales !== 'object' || Array.isArray(metadata.locales))) {
+    let rawSourceLocale;
+    let rawSourceLocaleBaseHref;
+    if (core_1.json.isJsonObject(metadata.sourceLocale)) {
+        rawSourceLocale = metadata.sourceLocale.code;
+        if (metadata.sourceLocale.baseHref !== undefined && typeof metadata.sourceLocale.baseHref !== 'string') {
+            throw new Error('Project i18n sourceLocale baseHref field is malformed. Expected a string.');
+        }
+        rawSourceLocaleBaseHref = metadata.sourceLocale.baseHref;
+    }
+    else {
+        rawSourceLocale = metadata.sourceLocale;
+    }
+    if (rawSourceLocale !== undefined) {
+        if (typeof rawSourceLocale !== 'string') {
+            throw new Error('Project i18n sourceLocale field is malformed. Expected a string.');
+        }
+        i18n.sourceLocale = rawSourceLocale;
+    }
+    i18n.locales[i18n.sourceLocale] = {
+        file: '',
+        baseHref: rawSourceLocaleBaseHref,
+    };
+    if (metadata.locales !== undefined && !core_1.json.isJsonObject(metadata.locales)) {
         throw new Error('Project i18n locales field is malformed. Expected an object.');
     }
     else if (metadata.locales) {
-        for (const [locale, translationFile] of Object.entries(metadata.locales)) {
-            if (typeof translationFile !== 'string') {
-                throw new Error(`Project i18n locales field value for '${locale}' is malformed. Expected a string.`);
+        for (const [locale, options] of Object.entries(metadata.locales)) {
+            let translationFile;
+            let baseHref;
+            if (core_1.json.isJsonObject(options)) {
+                if (typeof options.translation !== 'string') {
+                    throw new Error(`Project i18n locales translation field value for '${locale}' is malformed. Expected a string.`);
+                }
+                translationFile = options.translation;
+                if (typeof options.baseHref === 'string') {
+                    baseHref = options.baseHref;
+                }
+            }
+            else if (typeof options !== 'string') {
+                throw new Error(`Project i18n locales field value for '${locale}' is malformed. Expected a string or object.`);
+            }
+            else {
+                translationFile = options;
             }
             if (locale === i18n.sourceLocale) {
-                throw new Error(`An i18n locale identifier ('${locale}') cannot both be a source locale and provide a translation.`);
+                throw new Error(`An i18n locale ('${locale}') cannot both be a source locale and provide a translation.`);
             }
             i18n.locales[locale] = {
                 file: translationFile,
+                baseHref,
             };
         }
     }
@@ -61,10 +94,6 @@ async function configureI18nBuild(context, options) {
         throw new Error('The builder requires a target.');
     }
     const buildOptions = { ...options };
-    if (buildOptions.localize === true ||
-        (Array.isArray(buildOptions.localize) && buildOptions.localize.length > 1)) {
-        throw new Error('Using the localize option for multiple locales is temporarily disabled.');
-    }
     const tsConfig = read_tsconfig_1.readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
     const usingIvy = tsConfig.options.enableIvy !== false;
     const metadata = await context.getProjectMetadata(context.target);
@@ -75,8 +104,28 @@ async function configureI18nBuild(context, options) {
         mergeDeprecatedI18nOptions(i18n, buildOptions.i18nLocale, buildOptions.i18nFile);
     }
     else if (buildOptions.localize !== undefined && !usingIvy) {
-        buildOptions.localize = undefined;
-        context.logger.warn(`Option 'localize' is not supported with View Engine.`);
+        if (buildOptions.localize === true ||
+            (Array.isArray(buildOptions.localize) && buildOptions.localize.length > 1)) {
+            throw new Error(`Localization with multiple locales in one build is not supported with View Engine.`);
+        }
+        for (const deprecatedOption of ['i18nLocale', 'i18nFormat', 'i18nFile']) {
+            // tslint:disable-next-line: no-any
+            if (typeof buildOptions[deprecatedOption] !== 'undefined') {
+                context.logger.warn(`Option 'localize' and deprecated '${deprecatedOption}' found.  Using 'localize'.`);
+            }
+        }
+        if (buildOptions.localize === false ||
+            (Array.isArray(buildOptions.localize) && buildOptions.localize.length === 0)) {
+            buildOptions.i18nFile = undefined;
+            buildOptions.i18nLocale = undefined;
+            buildOptions.i18nFormat = undefined;
+        }
+    }
+    // Clear deprecated options when using Ivy to prevent unintended behavior
+    if (usingIvy) {
+        buildOptions.i18nFile = undefined;
+        buildOptions.i18nFormat = undefined;
+        buildOptions.i18nLocale = undefined;
     }
     if (i18n.inlineLocales.size > 0) {
         const projectRoot = path.join(context.workspaceRoot, metadata.root || '');
@@ -88,33 +137,51 @@ async function configureI18nBuild(context, options) {
         const loader = await load_translations_1.createTranslationLoader();
         const usedFormats = new Set();
         for (const [locale, desc] of Object.entries(i18n.locales)) {
-            if (i18n.inlineLocales.has(locale) && desc.file) {
-                const result = loader(path.join(projectRoot, desc.file));
-                usedFormats.add(result.format);
-                if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
-                    // This limitation is only for legacy message id support (defaults to true as of 9.0)
-                    throw new Error('Localization currently only supports using one type of translation file format for the entire application.');
-                }
-                desc.format = result.format;
-                desc.translation = result.translation;
-                const localeDataPath = findLocaleDataPath(locale, localeDataBasePath);
-                if (!localeDataPath) {
-                    context.logger.warn(`Locale data for '${locale}' cannot be found.  No locale data will be included for this locale.`);
+            if (!i18n.inlineLocales.has(locale)) {
+                continue;
+            }
+            const localeDataPath = findLocaleDataPath(locale, localeDataBasePath);
+            if (!localeDataPath) {
+                context.logger.warn(`Locale data for '${locale}' cannot be found.  No locale data will be included for this locale.`);
+            }
+            else {
+                desc.dataPath = localeDataPath;
+            }
+            if (!desc.file) {
+                continue;
+            }
+            const result = loader(path.join(context.workspaceRoot, desc.file));
+            for (const diagnostics of result.diagnostics.messages) {
+                if (diagnostics.type === 'error') {
+                    throw new Error(`Error parsing translation file '${desc.file}': ${diagnostics.message}`);
                 }
                 else {
-                    // Temporarily disable pending FW locale data fix
-                    // desc.dataPath = localeDataPath;
+                    context.logger.warn(`WARNING [${desc.file}]: ${diagnostics.message}`);
                 }
             }
+            usedFormats.add(result.format);
+            if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
+                // This limitation is only for legacy message id support (defaults to true as of 9.0)
+                throw new Error('Localization currently only supports using one type of translation file format for the entire application.');
+            }
+            desc.format = result.format;
+            desc.translation = result.translation;
+            desc.integrity = result.integrity;
         }
         // Legacy message id's require the format of the translations
         if (usedFormats.size > 0) {
             buildOptions.i18nFormat = [...usedFormats][0];
         }
-        // If only one locale is specified set the deprecated option to enable the webpack plugin
-        // transform to register the locale directly in the output bundle.
-        if (i18n.inlineLocales.size === 1) {
-            buildOptions.i18nLocale = [...i18n.inlineLocales][0];
+        // Provide support for using the Ivy i18n options with VE
+        if (!usingIvy) {
+            i18n.veCompatLocale = buildOptions.i18nLocale = [...i18n.inlineLocales][0];
+            if (buildOptions.i18nLocale !== i18n.sourceLocale) {
+                buildOptions.i18nFile = i18n.locales[buildOptions.i18nLocale].file;
+            }
+            // Clear inline locales to prevent any new i18n related processing
+            i18n.inlineLocales.clear();
+            // Update the output path to include the locale to mimic Ivy localize behavior
+            buildOptions.outputPath = path.join(buildOptions.outputPath, buildOptions.i18nLocale);
         }
     }
     // If inlining store the output in a temporary location to facilitate post-processing
@@ -140,12 +207,13 @@ function mergeDeprecatedI18nOptions(i18n, i18nLocale, i18nFile) {
         i18n.inlineLocales.clear();
         i18n.inlineLocales.add(i18nLocale);
         if (i18nFile !== undefined) {
-            i18n.locales[i18nLocale] = { file: i18nFile };
+            i18n.locales[i18nLocale] = { file: i18nFile, baseHref: '' };
         }
         else {
             // If no file, treat the locale as the source locale
             // This mimics deprecated behavior
             i18n.sourceLocale = i18nLocale;
+            i18n.locales[i18nLocale] = { file: '', baseHref: '' };
         }
         i18n.flatOutput = true;
     }
