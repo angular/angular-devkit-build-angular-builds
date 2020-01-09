@@ -21,7 +21,6 @@ function getTestConfig(wco) {
     const { root, buildOptions, sourceRoot: include } = wco;
     const extraRules = [];
     const extraPlugins = [];
-    // if (buildOptions.codeCoverage && CliConfig.fromProject()) {
     if (buildOptions.codeCoverage) {
         const codeCoverageExclude = buildOptions.codeCoverageExclude;
         const exclude = [
@@ -37,8 +36,8 @@ function getTestConfig(wco) {
             });
         }
         extraRules.push({
-            test: /\.(js|ts)$/,
-            loader: 'istanbul-instrumenter-loader',
+            test: /\.(jsx?|tsx?)$/,
+            loader: require.resolve('coverage-istanbul-loader'),
             options: { esModules: true },
             enforce: 'post',
             exclude,
