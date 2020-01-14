@@ -7,14 +7,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const CleanCSS = require("clean-css");
+const cssNano = require("cssnano");
 const webpack_sources_1 = require("webpack-sources");
 function hook(compiler, action) {
-    compiler.hooks.compilation.tap('cleancss-webpack-plugin', (compilation) => {
-        compilation.hooks.optimizeChunkAssets.tapPromise('cleancss-webpack-plugin', chunks => action(compilation, chunks));
+    compiler.hooks.compilation.tap('optimize-css-webpack-plugin', (compilation) => {
+        compilation.hooks.optimizeChunkAssets.tapPromise('optimize-css-webpack-plugin', chunks => action(compilation, chunks));
     });
 }
-class CleanCssWebpackPlugin {
+class OptimizeCssWebpackPlugin {
     constructor(options) {
         this._options = {
             sourceMap: false,
@@ -24,20 +24,6 @@ class CleanCssWebpackPlugin {
     }
     apply(compiler) {
         hook(compiler, (compilation, chunks) => {
-            const cleancss = new CleanCSS({
-                compatibility: 'ie9',
-                level: {
-                    2: {
-                        skipProperties: [
-                            'transition',
-                            'font',
-                        ],
-                    },
-                },
-                inline: false,
-                returnPromise: true,
-                sourceMap: this._options.sourceMap,
-            });
             const files = [...compilation.additionalChunkAssets];
             chunks.forEach(chunk => {
                 if (chunk.files && chunk.files.length > 0) {
@@ -65,28 +51,32 @@ class CleanCssWebpackPlugin {
                 if (content.length === 0) {
                     return;
                 }
-                const output = await cleancss.minify(content, map);
-                let hasWarnings = false;
-                if (output.warnings && output.warnings.length > 0) {
-                    compilation.warnings.push(...output.warnings);
-                    hasWarnings = true;
-                }
-                if (output.errors && output.errors.length > 0) {
-                    output.errors.forEach((error) => compilation.errors.push(new Error(error)));
-                    return;
-                }
-                // generally means invalid syntax so bail
-                if (hasWarnings && output.stats.minifiedSize === 0) {
-                    return;
+                const cssNanoOptions = {
+                    preset: 'default',
+                };
+                const postCssOptions = {
+                    from: file,
+                    map: map && { annotation: false, prev: map },
+                };
+                const output = await new Promise((resolve, reject) => {
+                    // the last parameter is not in the typings
+                    // tslint:disable-next-line: no-any
+                    cssNano.process(content, postCssOptions, cssNanoOptions)
+                        .then(resolve)
+                        .catch(reject);
+                });
+                const warnings = output.warnings();
+                if (warnings.length) {
+                    compilation.warnings.push(...warnings.map(({ text }) => text));
                 }
                 let newSource;
-                if (output.sourceMap) {
-                    newSource = new webpack_sources_1.SourceMapSource(output.styles, file, 
+                if (output.map) {
+                    newSource = new webpack_sources_1.SourceMapSource(output.css, file, 
                     // tslint:disable-next-line: no-any
-                    output.sourceMap.toString(), content, map);
+                    output.map.toString(), content, map);
                 }
                 else {
-                    newSource = new webpack_sources_1.RawSource(output.styles);
+                    newSource = new webpack_sources_1.RawSource(output.css);
                 }
                 compilation.assets[file] = newSource;
             });
@@ -94,4 +84,4 @@ class CleanCssWebpackPlugin {
         });
     }
 }
-exports.CleanCssWebpackPlugin = CleanCssWebpackPlugin;
+exports.OptimizeCssWebpackPlugin = OptimizeCssWebpackPlugin;
