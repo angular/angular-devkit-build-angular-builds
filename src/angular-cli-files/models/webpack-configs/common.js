@@ -18,8 +18,8 @@ const utils_1 = require("../../../utils");
 const cache_path_1 = require("../../../utils/cache-path");
 const environment_options_1 = require("../../../utils/environment-options");
 const bundle_budget_1 = require("../../plugins/bundle-budget");
-const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
 const named_chunks_plugin_1 = require("../../plugins/named-chunks-plugin");
+const optimize_css_webpack_plugin_1 = require("../../plugins/optimize-css-webpack-plugin");
 const scripts_webpack_plugin_1 = require("../../plugins/scripts-webpack-plugin");
 const webpack_2 = require("../../plugins/webpack");
 const find_up_1 = require("../../utilities/find-up");
@@ -279,7 +279,7 @@ function getCommonConfig(wco) {
     catch (_a) { }
     const extraMinimizers = [];
     if (stylesOptimization) {
-        extraMinimizers.push(new cleancss_webpack_plugin_1.CleanCssWebpackPlugin({
+        extraMinimizers.push(new optimize_css_webpack_plugin_1.OptimizeCssWebpackPlugin({
             sourceMap: stylesSourceMap,
             // component styles retain their original file name
             test: file => /\.(?:css|scss|sass|less|styl)$/.test(file),
@@ -388,6 +388,7 @@ function getCommonConfig(wco) {
             alias,
         },
         resolveLoader: {
+            symlinks: !buildOptions.preserveSymlinks,
             modules: loaderNodeModules,
         },
         context: projectRoot,
@@ -452,10 +453,14 @@ function getCommonConfig(wco) {
             noEmitOnErrors: true,
             minimizer: [
                 new webpack_1.HashedModuleIdsPlugin(),
-                // TODO: check with Mike what this feature needs.
-                new bundle_budget_1.BundleBudgetPlugin({ budgets: buildOptions.budgets }),
                 ...extraMinimizers,
-            ],
+            ].concat(differentialLoadingMode ? [
+            // Budgets are computed after differential builds, not via a plugin.
+            // https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_angular/src/browser/index.ts
+            ] : [
+                // Non differential builds should be computed here, as a plugin.
+                new bundle_budget_1.BundleBudgetPlugin({ budgets: buildOptions.budgets }),
+            ]),
         },
         plugins: [
             // Always replace the context for the System.import in angular/core to prevent warnings.

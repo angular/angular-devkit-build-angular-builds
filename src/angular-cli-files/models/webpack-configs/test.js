@@ -14,7 +14,6 @@ function getTestConfig(wco) {
     const { root, buildOptions, sourceRoot: include } = wco;
     const extraRules = [];
     const extraPlugins = [];
-    // if (buildOptions.codeCoverage && CliConfig.fromProject()) {
     if (buildOptions.codeCoverage) {
         const codeCoverageExclude = buildOptions.codeCoverageExclude;
         const exclude = [
@@ -31,7 +30,7 @@ function getTestConfig(wco) {
         }
         extraRules.push({
             test: /\.(jsx?|tsx?)$/,
-            loader: require.resolve('istanbul-instrumenter-loader'),
+            loader: require.resolve('coverage-istanbul-loader'),
             options: { esModules: true },
             enforce: 'post',
             exclude,
@@ -40,7 +39,9 @@ function getTestConfig(wco) {
     }
     if (wco.buildOptions.sourceMap) {
         const { styles, scripts } = wco.buildOptions.sourceMap;
-        extraPlugins.push(utils_1.getSourceMapDevTool(scripts || false, styles || false, false, true));
+        if (styles || scripts) {
+            extraPlugins.push(utils_1.getSourceMapDevTool(scripts, styles, false, true));
+        }
     }
     return {
         mode: 'development',

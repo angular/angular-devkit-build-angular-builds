@@ -11,7 +11,6 @@ const core_1 = require("@babel/core");
 const crypto_1 = require("crypto");
 const fs = require("fs");
 const path = require("path");
-const source_map_1 = require("source-map");
 const terser_1 = require("terser");
 const v8 = require("v8");
 const webpack_sources_1 = require("webpack-sources");
@@ -30,7 +29,7 @@ function setup(data) {
 exports.setup = setup;
 async function cachePut(content, key, integrity) {
     if (cachePath && key) {
-        await cacache.put(cachePath, key, content, {
+        await cacache.put(cachePath, key || null, content, {
             metadata: { integrity },
         });
     }
@@ -52,11 +51,6 @@ async function process(options) {
     const filename = path.basename(options.filename);
     const downlevelFilename = filename.replace(/\-es20\d{2}/, '-es5');
     const downlevel = !options.optimizeOnly;
-    // if code size is larger than 500kB, manually handle sourcemaps with newer source-map package.
-    // babel currently uses an older version that still supports sync calls
-    const codeSize = Buffer.byteLength(options.code);
-    const mapSize = options.map ? Buffer.byteLength(options.map) : 0;
-    const manualSourceMaps = codeSize >= 500 * 1024 || mapSize >= 500 * 1024;
     const sourceCode = options.code;
     const sourceMap = options.map ? JSON.parse(options.map) : undefined;
     let downlevelCode;
@@ -64,12 +58,22 @@ async function process(options) {
     if (downlevel) {
         // Downlevel the bundle
         const transformResult = await core_1.transformAsync(sourceCode, {
-            filename: options.filename,
-            inputSourceMap: manualSourceMaps ? undefined : sourceMap,
+            filename,
+            // using false ensures that babel will NOT search and process sourcemap comments (large memory usage)
+            // The types do not include the false option even though it is valid
+            // tslint:disable-next-line: no-any
+            inputSourceMap: false,
             babelrc: false,
-            // modules aren't needed since the bundles use webpack's custom module loading
-            // 'transform-typeof-symbol' generates slower code
-            presets: [['@babel/preset-env', { modules: false, exclude: ['transform-typeof-symbol'] }]],
+            presets: [[
+                    require.resolve('@babel/preset-env'),
+                    {
+                        // modules aren't needed since the bundles use webpack's custom module loading
+                        modules: false,
+                        // 'transform-typeof-symbol' generates slower code
+                        exclude: ['transform-typeof-symbol'],
+                    },
+                ]],
+            plugins: options.replacements ? [createReplacePlugin(options.replacements)] : [],
             minified: options.optimize,
             // `false` ensures it is disabled and prevents large file warnings
             compact: options.optimize || false,
@@ -79,125 +83,75 @@ async function process(options) {
             throw new Error(`Unknown error occurred processing bundle for "${options.filename}".`);
         }
         downlevelCode = transformResult.code;
-        if (manualSourceMaps && sourceMap && transformResult.map) {
-            downlevelMap = await mergeSourceMapsFast(sourceMap, transformResult.map);
-        }
-        else {
-            // undefined is needed here to normalize the property type
-            downlevelMap = transformResult.map || undefined;
-        }
-    }
-    if (options.optimize) {
-        if (downlevelCode) {
-            const minifyResult = terserMangle(downlevelCode, {
-                filename: downlevelFilename,
-                map: downlevelMap,
-                compress: true,
-            });
-            downlevelCode = minifyResult.code;
-            downlevelMap = minifyResult.map;
-        }
-        if (!options.ignoreOriginal) {
-            result.original = await mangleOriginal(options);
+        if (sourceMap && transformResult.map) {
+            downlevelMap = mergeSourceMaps(sourceCode, sourceMap, downlevelCode, transformResult.map, filename);
         }
     }
     if (downlevelCode) {
-        const downlevelPath = path.join(basePath, downlevelFilename);
-        let mapContent;
-        if (downlevelMap) {
-            if (!options.hiddenSourceMaps) {
-                downlevelCode += `\n//# sourceMappingURL=${downlevelFilename}.map`;
-            }
-            mapContent = JSON.stringify(downlevelMap);
-            await cachePut(mapContent, options.cacheKeys[3 /* DownlevelMap */]);
-            fs.writeFileSync(downlevelPath + '.map', mapContent);
-        }
-        result.downlevel = createFileEntry(path.join(basePath, downlevelFilename), downlevelCode, mapContent, options.integrityAlgorithm);
-        await cachePut(downlevelCode, options.cacheKeys[2 /* DownlevelCode */], result.downlevel.integrity);
-        fs.writeFileSync(downlevelPath, downlevelCode);
+        result.downlevel = await processBundle({
+            ...options,
+            code: downlevelCode,
+            map: downlevelMap,
+            filename: path.join(basePath, downlevelFilename),
+            isOriginal: false,
+        });
     }
-    // If original was not processed, add info
     if (!result.original && !options.ignoreOriginal) {
-        result.original = createFileEntry(options.filename, options.code, options.map, options.integrityAlgorithm);
+        result.original = await processBundle({
+            ...options,
+            isOriginal: true,
+        });
     }
     return result;
 }
 exports.process = process;
+// SourceMapSource produces high-quality sourcemaps
 function mergeSourceMaps(inputCode, inputSourceMap, resultCode, resultSourceMap, filename) {
-    // More accurate but significantly more costly
     // The last argument is not yet in the typings
     // tslint:disable-next-line: no-any
     return new webpack_sources_1.SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
 }
-async function mergeSourceMapsFast(first, second) {
-    const sourceRoot = first.sourceRoot;
-    const generator = new source_map_1.SourceMapGenerator();
-    // sourcemap package adds the sourceRoot to all position source paths if not removed
-    delete first.sourceRoot;
-    await source_map_1.SourceMapConsumer.with(first, null, originalConsumer => {
-        return source_map_1.SourceMapConsumer.with(second, null, newConsumer => {
-            newConsumer.eachMapping(mapping => {
-                if (mapping.originalLine === null) {
-                    return;
-                }
-                const originalPosition = originalConsumer.originalPositionFor({
-                    line: mapping.originalLine,
-                    column: mapping.originalColumn,
-                });
-                if (originalPosition.line === null ||
-                    originalPosition.column === null ||
-                    originalPosition.source === null) {
-                    return;
-                }
-                generator.addMapping({
-                    generated: {
-                        line: mapping.generatedLine,
-                        column: mapping.generatedColumn,
-                    },
-                    name: originalPosition.name || undefined,
-                    original: {
-                        line: originalPosition.line,
-                        column: originalPosition.column,
-                    },
-                    source: originalPosition.source,
-                });
-            });
-        });
-    });
-    const map = generator.toJSON();
-    map.file = second.file;
-    map.sourceRoot = sourceRoot;
-    // Put the sourceRoot back
-    if (sourceRoot) {
-        first.sourceRoot = sourceRoot;
+async function processBundle(options) {
+    const { optimize, isOriginal, code, map, filename: filepath, hiddenSourceMaps, cacheKeys = [], integrityAlgorithm, } = options;
+    const rawMap = typeof map === 'string' ? JSON.parse(map) : map;
+    const filename = path.basename(filepath);
+    let result;
+    if (rawMap) {
+        rawMap.file = filename;
     }
-    return map;
-}
-async function mangleOriginal(options) {
-    const result = terserMangle(options.code, {
-        filename: path.basename(options.filename),
-        map: options.map ? JSON.parse(options.map) : undefined,
-        ecma: 6,
-    });
+    if (optimize) {
+        result = terserMangle(code, {
+            filename,
+            map: rawMap,
+            compress: !isOriginal,
+            ecma: isOriginal ? 6 : 5,
+        });
+    }
+    else {
+        result = {
+            map: rawMap,
+            code,
+        };
+    }
     let mapContent;
     if (result.map) {
-        if (!options.hiddenSourceMaps) {
-            result.code += `\n//# sourceMappingURL=${path.basename(options.filename)}.map`;
+        if (!hiddenSourceMaps) {
+            result.code += `\n//# sourceMappingURL=${filename}.map`;
         }
         mapContent = JSON.stringify(result.map);
-        await cachePut(mapContent, (options.cacheKeys && options.cacheKeys[1 /* OriginalMap */]) || null);
-        fs.writeFileSync(options.filename + '.map', mapContent);
+        await cachePut(mapContent, cacheKeys[isOriginal ? 1 /* OriginalMap */ : 3 /* DownlevelMap */]);
+        fs.writeFileSync(filepath + '.map', mapContent);
     }
-    const fileResult = createFileEntry(options.filename, result.code, mapContent, options.integrityAlgorithm);
-    await cachePut(result.code, (options.cacheKeys && options.cacheKeys[0 /* OriginalCode */]) || null, fileResult.integrity);
-    fs.writeFileSync(options.filename, result.code);
+    const fileResult = createFileEntry(filepath, result.code, mapContent, integrityAlgorithm);
+    await cachePut(result.code, cacheKeys[isOriginal ? 0 /* OriginalCode */ : 2 /* DownlevelCode */], fileResult.integrity);
+    fs.writeFileSync(filepath, result.code);
     return fileResult;
 }
 function terserMangle(code, options = {}) {
     // Note: Investigate converting the AST instead of re-parsing
     // estree -> terser is already supported; need babel -> estree/terser
     // Mangle downlevel code
-    const minifyOutput = terser_1.minify(code, {
+    const minifyOutput = terser_1.minify(options.filename ? { [options.filename]: code } : code, {
         compress: options.compress || false,
         ecma: options.ecma || 5,
         mangle: !environment_options_1.manglingDisabled,
@@ -208,10 +162,6 @@ function terserMangle(code, options = {}) {
         },
         sourceMap: !!options.map &&
             {
-                filename: options.filename,
-                // terser uses an old version of the sourcemap typings
-                // tslint:disable-next-line: no-any
-                content: options.map,
                 asObject: true,
             },
     });
@@ -219,7 +169,12 @@ function terserMangle(code, options = {}) {
         throw minifyOutput.error;
     }
     // tslint:disable-next-line: no-non-null-assertion
-    return { code: minifyOutput.code, map: minifyOutput.map };
+    const outputCode = minifyOutput.code;
+    let outputMap;
+    if (options.map && minifyOutput.map) {
+        outputMap = mergeSourceMaps(code, options.map, outputCode, minifyOutput.map, options.filename || '0');
+    }
+    return { code: outputCode, map: outputMap };
 }
 function createFileEntry(filename, code, map, integrityAlgorithm) {
     return {
@@ -264,42 +219,32 @@ async function processRuntime(options) {
     // Adjust lazy loaded scripts to point to the proper variant
     // Extra spacing is intentional to align source line positions
     downlevelCode = downlevelCode.replace(/"\-es20\d{2}\./, '   "-es5.');
-    const downlevelFilePath = options.filename.replace(/\-es20\d{2}/, '-es5');
-    let downlevelMap;
-    let result;
-    if (options.optimize) {
-        const minifiyResults = terserMangle(downlevelCode, {
-            filename: path.basename(downlevelFilePath),
-            map: options.map === undefined ? undefined : JSON.parse(options.map),
-        });
-        downlevelCode = minifiyResults.code;
-        downlevelMap = JSON.stringify(minifiyResults.map);
-        result = {
-            original: await mangleOriginal({ ...options, code: originalCode }),
-            downlevel: createFileEntry(downlevelFilePath, downlevelCode, downlevelMap, options.integrityAlgorithm),
-        };
-    }
-    else {
-        if (options.map) {
-            const rawMap = JSON.parse(options.map);
-            rawMap.file = path.basename(downlevelFilePath);
-            downlevelMap = JSON.stringify(rawMap);
-        }
-        result = {
-            original: createFileEntry(options.filename, originalCode, options.map, options.integrityAlgorithm),
-            downlevel: createFileEntry(downlevelFilePath, downlevelCode, downlevelMap, options.integrityAlgorithm),
-        };
-    }
-    if (downlevelMap) {
-        await cachePut(downlevelMap, (options.cacheKeys && options.cacheKeys[3 /* DownlevelMap */]) || null);
-        fs.writeFileSync(downlevelFilePath + '.map', downlevelMap);
-        if (!options.hiddenSourceMaps) {
-            downlevelCode += `\n//# sourceMappingURL=${path.basename(downlevelFilePath)}.map`;
-        }
-    }
-    await cachePut(downlevelCode, (options.cacheKeys && options.cacheKeys[2 /* DownlevelCode */]) || null);
-    fs.writeFileSync(downlevelFilePath, downlevelCode);
-    return result;
+    return {
+        original: await processBundle({
+            ...options,
+            code: originalCode,
+            isOriginal: true,
+        }),
+        downlevel: await processBundle({
+            ...options,
+            code: downlevelCode,
+            filename: options.filename.replace(/\-es20\d{2}/, '-es5'),
+            isOriginal: false,
+        }),
+    };
+}
+function createReplacePlugin(replacements) {
+    return {
+        visitor: {
+            StringLiteral(path) {
+                for (const replacement of replacements) {
+                    if (path.node.value === replacement[0]) {
+                        path.node.value = replacement[1];
+                    }
+                }
+            },
+        },
+    };
 }
 const localizeName = '$localize';
 async function inlineLocales(options) {
@@ -325,7 +270,8 @@ async function inlineLocales(options) {
     if (positions.length === 0 && !options.setLocale) {
         return inlineCopyOnly(options);
     }
-    let content = new MagicString(options.code);
+    // tslint:disable-next-line: no-any
+    let content = new MagicString(options.code, { filename: options.filename });
     const inputMap = options.map && JSON.parse(options.map);
     let contentClone;
     for (const locale of i18n.inlineLocales) {
