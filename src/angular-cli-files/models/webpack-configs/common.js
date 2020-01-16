@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const build_optimizer_1 = require("@angular-devkit/build-optimizer");
 const core_1 = require("@angular-devkit/core");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const fs_1 = require("fs");
 const path = require("path");
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
@@ -158,21 +159,24 @@ function getCommonConfig(wco) {
     }
     // process global scripts
     const globalScriptsByBundleName = utils_2.normalizeExtraEntryPoints(buildOptions.scripts, 'scripts').reduce((prev, curr) => {
-        const bundleName = curr.bundleName;
-        const resolvedPath = path.resolve(root, curr.input);
+        const { bundleName, inject, input } = curr;
+        const resolvedPath = path.resolve(root, input);
+        if (!fs_1.existsSync(resolvedPath)) {
+            throw new Error(`Script file ${input} does not exist.`);
+        }
         const existingEntry = prev.find(el => el.bundleName === bundleName);
         if (existingEntry) {
-            if (existingEntry.inject && !curr.inject) {
+            if (existingEntry.inject && !inject) {
                 // All entries have to be lazy for the bundle to be lazy.
-                throw new Error(`The ${curr.bundleName} bundle is mixing injected and non-injected scripts.`);
+                throw new Error(`The ${bundleName} bundle is mixing injected and non-injected scripts.`);
             }
             existingEntry.paths.push(resolvedPath);
         }
         else {
             prev.push({
                 bundleName,
+                inject,
                 paths: [resolvedPath],
-                inject: curr.inject,
             });
         }
         return prev;
