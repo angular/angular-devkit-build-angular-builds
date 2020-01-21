@@ -1,10 +1,10 @@
 import { Compiler } from 'webpack';
-export interface CleanCssWebpackPluginOptions {
+export interface OptimizeCssWebpackPluginOptions {
     sourceMap: boolean;
     test: (file: string) => boolean;
 }
-export declare class CleanCssWebpackPlugin {
+export declare class OptimizeCssWebpackPlugin {
     private readonly _options;
-    constructor(options: Partial<CleanCssWebpackPluginOptions>);
+    constructor(options: Partial<OptimizeCssWebpackPluginOptions>);
     apply(compiler: Compiler): void;
 }
