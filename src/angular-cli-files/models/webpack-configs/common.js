@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const build_optimizer_1 = require("@angular-devkit/build-optimizer");
 const core_1 = require("@angular-devkit/core");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const fs_1 = require("fs");
 const path = require("path");
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
@@ -18,8 +19,8 @@ const utils_1 = require("../../../utils");
 const cache_path_1 = require("../../../utils/cache-path");
 const environment_options_1 = require("../../../utils/environment-options");
 const bundle_budget_1 = require("../../plugins/bundle-budget");
-const cleancss_webpack_plugin_1 = require("../../plugins/cleancss-webpack-plugin");
 const named_chunks_plugin_1 = require("../../plugins/named-chunks-plugin");
+const optimize_css_webpack_plugin_1 = require("../../plugins/optimize-css-webpack-plugin");
 const scripts_webpack_plugin_1 = require("../../plugins/scripts-webpack-plugin");
 const webpack_2 = require("../../plugins/webpack");
 const find_up_1 = require("../../utilities/find-up");
@@ -32,10 +33,6 @@ function getCommonConfig(wco) {
     const { root, projectRoot, buildOptions, tsConfig } = wco;
     const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
     const { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap, } = buildOptions.sourceMap;
-    const nodeModules = find_up_1.findUp('node_modules', projectRoot);
-    if (!nodeModules) {
-        throw new Error('Cannot locate node_modules directory.');
-    }
     const extraPlugins = [];
     const extraRules = [];
     const entryPoints = {};
@@ -158,21 +155,24 @@ function getCommonConfig(wco) {
     }
     // process global scripts
     const globalScriptsByBundleName = utils_2.normalizeExtraEntryPoints(buildOptions.scripts, 'scripts').reduce((prev, curr) => {
-        const bundleName = curr.bundleName;
-        const resolvedPath = path.resolve(root, curr.input);
+        const { bundleName, inject, input } = curr;
+        const resolvedPath = path.resolve(root, input);
+        if (!fs_1.existsSync(resolvedPath)) {
+            throw new Error(`Script file ${input} does not exist.`);
+        }
         const existingEntry = prev.find(el => el.bundleName === bundleName);
         if (existingEntry) {
-            if (existingEntry.inject && !curr.inject) {
+            if (existingEntry.inject && !inject) {
                 // All entries have to be lazy for the bundle to be lazy.
-                throw new Error(`The ${curr.bundleName} bundle is mixing injected and non-injected scripts.`);
+                throw new Error(`The ${bundleName} bundle is mixing injected and non-injected scripts.`);
             }
             existingEntry.paths.push(resolvedPath);
         }
         else {
             prev.push({
                 bundleName,
+                inject,
                 paths: [resolvedPath],
-                inject: curr.inject,
             });
         }
         return prev;
@@ -274,12 +274,12 @@ function getCommonConfig(wco) {
             ? 'rxjs/_esm2015/path-mapping'
             : 'rxjs/_esm5/path-mapping';
         const rxPaths = require(require.resolve(rxjsPathMappingImport, { paths: [projectRoot] }));
-        alias = rxPaths(nodeModules);
+        alias = rxPaths();
     }
     catch (_a) { }
     const extraMinimizers = [];
     if (stylesOptimization) {
-        extraMinimizers.push(new cleancss_webpack_plugin_1.CleanCssWebpackPlugin({
+        extraMinimizers.push(new optimize_css_webpack_plugin_1.OptimizeCssWebpackPlugin({
             sourceMap: stylesSourceMap,
             // component styles retain their original file name
             test: file => /\.(?:css|scss|sass|less|styl)$/.test(file),
