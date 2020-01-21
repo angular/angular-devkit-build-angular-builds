@@ -33,6 +33,10 @@ function getCommonConfig(wco) {
     const { root, projectRoot, buildOptions, tsConfig } = wco;
     const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
     const { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap, } = buildOptions.sourceMap;
+    const nodeModules = find_up_1.findUp('node_modules', projectRoot);
+    if (!nodeModules) {
+        throw new Error('Cannot locate node_modules directory.');
+    }
     const extraPlugins = [];
     const extraRules = [];
     const entryPoints = {};
@@ -274,7 +278,7 @@ function getCommonConfig(wco) {
             ? 'rxjs/_esm2015/path-mapping'
             : 'rxjs/_esm5/path-mapping';
         const rxPaths = require(require.resolve(rxjsPathMappingImport, { paths: [projectRoot] }));
-        alias = rxPaths();
+        alias = rxPaths(nodeModules);
     }
     catch (_a) { }
     const extraMinimizers = [];
