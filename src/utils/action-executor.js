@@ -110,12 +110,12 @@ class BundleActionExecutor {
             yield Promise.race(executions.values());
         }
     }
-    stop() {
+    async stop() {
         if (this.largeWorker) {
-            this.largeWorker.end();
+            await this.largeWorker.end();
         }
         if (this.smallWorker) {
-            this.smallWorker.end();
+            await this.smallWorker.end();
         }
     }
 }

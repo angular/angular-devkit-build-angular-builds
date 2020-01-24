@@ -33,5 +33,5 @@ export declare class BundleActionExecutor {
         count: number;
     }>;
     private static executeAll;
-    stop(): void;
+    stop(): Promise<void>;
 }

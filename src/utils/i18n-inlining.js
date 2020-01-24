@@ -68,7 +68,7 @@ async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPat
         return false;
     }
     finally {
-        executor.stop();
+        await executor.stop();
     }
     if (hasErrors) {
         context.logger.error('Localized bundle generation failed.');

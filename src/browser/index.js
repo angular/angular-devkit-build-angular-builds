@@ -378,7 +378,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                     }
                     finally {
-                        executor.stop();
+                        await executor.stop();
                     }
                     // Copy assets
                     if (options.assets) {
