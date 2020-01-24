@@ -319,28 +319,28 @@ function getCommonConfig(wco) {
                 // default behavior (undefined value) is to keep only important comments (licenses, etc.)
                 comments: !buildOptions.extractLicenses && undefined,
                 webkit: true,
-                beautify: environment_options_1.beautifyEnabled,
             },
             // On server, we don't want to compress anything. We still set the ngDevMode = false for it
             // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
-            compress: !environment_options_1.minifyDisabled &&
-                (buildOptions.platform == 'server'
-                    ? {
-                        ecma: terserEcma,
-                        global_defs: angularGlobalDefinitions,
-                        keep_fnames: true,
-                    }
-                    : {
-                        ecma: terserEcma,
-                        pure_getters: buildOptions.buildOptimizer,
-                        // PURE comments work best with 3 passes.
-                        // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
-                        passes: buildOptions.buildOptimizer ? 3 : 1,
-                        global_defs: angularGlobalDefinitions,
-                    }),
+            compress: buildOptions.platform == 'server'
+                ? {
+                    ecma: terserEcma,
+                    global_defs: angularGlobalDefinitions,
+                    keep_fnames: true,
+                }
+                : {
+                    ecma: terserEcma,
+                    pure_getters: buildOptions.buildOptimizer,
+                    // PURE comments work best with 3 passes.
+                    // See https://github.com/webpack/webpack/issues/2899#issuecomment-317425926.
+                    passes: buildOptions.buildOptimizer ? 3 : 1,
+                    global_defs: angularGlobalDefinitions,
+                },
             // We also want to avoid mangling on server.
             // Name mangling is handled within the browser builder
-            mangle: !environment_options_1.manglingDisabled && buildOptions.platform !== 'server' && !differentialLoadingMode,
+            mangle: !environment_options_1.manglingDisabled &&
+                buildOptions.platform !== 'server' &&
+                !differentialLoadingMode,
         };
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,
@@ -360,7 +360,7 @@ function getCommonConfig(wco) {
             chunkFilter: (chunk) => globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
             terserOptions: {
                 ...terserOptions,
-                compress: !environment_options_1.minifyDisabled && {
+                compress: {
                     ...terserOptions.compress,
                     ecma: 5,
                 },

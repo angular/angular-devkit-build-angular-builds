@@ -8,25 +8,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const path = require("path");
-function isDisabled(variable) {
-    return variable === '0' || variable.toLowerCase() === 'false';
-}
-function isEnabled(variable) {
-    return variable === '1' || variable.toLowerCase() === 'true';
-}
-function isPresent(variable) {
-    return typeof variable === 'string' && variable !== '';
-}
 const mangleVariable = process.env['NG_BUILD_MANGLE'];
-exports.manglingDisabled = isPresent(mangleVariable) && isDisabled(mangleVariable);
-const beautifyVariable = process.env['NG_BUILD_BEAUTIFY'];
-exports.beautifyEnabled = isPresent(beautifyVariable) && !isDisabled(beautifyVariable);
-const minifyVariable = process.env['NG_BUILD_MINIFY'];
-exports.minifyDisabled = isPresent(minifyVariable) && isDisabled(minifyVariable);
+exports.manglingDisabled = !!mangleVariable && (mangleVariable === '0' || mangleVariable.toLowerCase() === 'false');
 const cacheVariable = process.env['NG_BUILD_CACHE'];
-exports.cachingDisabled = isPresent(cacheVariable) && isDisabled(cacheVariable);
+exports.cachingDisabled = !!cacheVariable && (cacheVariable === '0' || cacheVariable.toLowerCase() === 'false');
 exports.cachingBasePath = (() => {
-    if (exports.cachingDisabled || !isPresent(cacheVariable) || isEnabled(cacheVariable)) {
+    if (exports.cachingDisabled ||
+        !cacheVariable ||
+        (cacheVariable === '1' || cacheVariable.toLowerCase() === 'true')) {
         return null;
     }
     if (!path.isAbsolute(cacheVariable)) {
