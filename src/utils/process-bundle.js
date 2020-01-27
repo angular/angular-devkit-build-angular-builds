@@ -11,12 +11,15 @@ const core_1 = require("@babel/core");
 const crypto_1 = require("crypto");
 const fs = require("fs");
 const path = require("path");
+const source_map_1 = require("source-map");
 const terser_1 = require("terser");
 const v8 = require("v8");
 const webpack_sources_1 = require("webpack-sources");
 const environment_options_1 = require("./environment-options");
 const cacache = require('cacache');
 const deserialize = v8.deserialize;
+// If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
+const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
 let cachePath;
 let i18n;
 function setup(data) {
@@ -83,7 +86,12 @@ async function process(options) {
         }
         downlevelCode = transformResult.code;
         if (sourceMap && transformResult.map) {
-            downlevelMap = mergeSourceMaps(sourceCode, sourceMap, downlevelCode, transformResult.map, filename);
+            // String length is used as an estimate for byte length
+            const fastSourceMaps = sourceCode.length > FAST_SOURCEMAP_THRESHOLD;
+            downlevelMap = await mergeSourceMaps(sourceCode, sourceMap, downlevelCode, transformResult.map, filename, 
+            // When not optimizing, the sourcemaps are significantly less complex
+            // and can use the higher fidelity merge
+            !!options.optimize && fastSourceMaps);
         }
     }
     if (downlevelCode) {
@@ -104,11 +112,58 @@ async function process(options) {
     return result;
 }
 exports.process = process;
-// SourceMapSource produces high-quality sourcemaps
-function mergeSourceMaps(inputCode, inputSourceMap, resultCode, resultSourceMap, filename) {
+async function mergeSourceMaps(inputCode, inputSourceMap, resultCode, resultSourceMap, filename, fast = false) {
+    if (fast) {
+        return mergeSourceMapsFast(inputSourceMap, resultSourceMap);
+    }
+    // SourceMapSource produces high-quality sourcemaps
     // The last argument is not yet in the typings
     // tslint:disable-next-line: no-any
     return new webpack_sources_1.SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
+}
+async function mergeSourceMapsFast(first, second) {
+    const sourceRoot = first.sourceRoot;
+    const generator = new source_map_1.SourceMapGenerator();
+    // sourcemap package adds the sourceRoot to all position source paths if not removed
+    delete first.sourceRoot;
+    await source_map_1.SourceMapConsumer.with(first, null, originalConsumer => {
+        return source_map_1.SourceMapConsumer.with(second, null, newConsumer => {
+            newConsumer.eachMapping(mapping => {
+                if (mapping.originalLine === null) {
+                    return;
+                }
+                const originalPosition = originalConsumer.originalPositionFor({
+                    line: mapping.originalLine,
+                    column: mapping.originalColumn,
+                });
+                if (originalPosition.line === null ||
+                    originalPosition.column === null ||
+                    originalPosition.source === null) {
+                    return;
+                }
+                generator.addMapping({
+                    generated: {
+                        line: mapping.generatedLine,
+                        column: mapping.generatedColumn,
+                    },
+                    name: originalPosition.name || undefined,
+                    original: {
+                        line: originalPosition.line,
+                        column: originalPosition.column,
+                    },
+                    source: originalPosition.source,
+                });
+            });
+        });
+    });
+    const map = generator.toJSON();
+    map.file = second.file;
+    map.sourceRoot = sourceRoot;
+    // Put the sourceRoot back
+    if (sourceRoot) {
+        first.sourceRoot = sourceRoot;
+    }
+    return map;
 }
 async function processBundle(options) {
     const { optimize, isOriginal, code, map, filename: filepath, hiddenSourceMaps, cacheKeys = [], integrityAlgorithm, } = options;
@@ -119,7 +174,7 @@ async function processBundle(options) {
         rawMap.file = filename;
     }
     if (optimize) {
-        result = terserMangle(code, {
+        result = await terserMangle(code, {
             filename,
             map: rawMap,
             compress: !isOriginal,
@@ -146,7 +201,7 @@ async function processBundle(options) {
     fs.writeFileSync(filepath, result.code);
     return fileResult;
 }
-function terserMangle(code, options = {}) {
+async function terserMangle(code, options = {}) {
     // Note: Investigate converting the AST instead of re-parsing
     // estree -> terser is already supported; need babel -> estree/terser
     // Mangle downlevel code
@@ -172,7 +227,7 @@ function terserMangle(code, options = {}) {
     const outputCode = minifyOutput.code;
     let outputMap;
     if (options.map && minifyOutput.map) {
-        outputMap = mergeSourceMaps(code, options.map, outputCode, minifyOutput.map, options.filename || '0');
+        outputMap = await mergeSourceMaps(code, options.map, outputCode, minifyOutput.map, options.filename || '0', code.length > FAST_SOURCEMAP_THRESHOLD);
     }
     return { code: outputCode, map: outputMap };
 }
@@ -291,7 +346,7 @@ async function inlineLocales(options) {
             // If locale data is provided, load it and prepend to file
             const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
             if (localeDataPath) {
-                const localDataContent = loadLocaleData(localeDataPath, true);
+                const localDataContent = await loadLocaleData(localeDataPath, true);
                 // The semicolon ensures that there is no syntax error between statements
                 content.prepend(localDataContent + ';');
             }
@@ -301,7 +356,7 @@ async function inlineLocales(options) {
         fs.writeFileSync(outputPath, output);
         if (inputMap) {
             const contentMap = content.generateMap();
-            const outputMap = mergeSourceMaps(options.code, inputMap, output, contentMap, options.filename);
+            const outputMap = mergeSourceMaps(options.code, inputMap, output, contentMap, options.filename, options.code.length > FAST_SOURCEMAP_THRESHOLD);
             fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
         }
         if (contentClone) {
@@ -390,12 +445,12 @@ utils) {
     }
     return positions;
 }
-function loadLocaleData(path, optimize) {
+async function loadLocaleData(path, optimize) {
     // The path is validated during option processing before the build starts
     const content = fs.readFileSync(path, 'utf8');
     // NOTE: This can be removed once the locale data files are preprocessed in the framework
     if (optimize) {
-        const result = terserMangle(content, {
+        const result = await terserMangle(content, {
             compress: true,
             ecma: 5,
         });
