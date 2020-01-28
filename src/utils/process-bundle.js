@@ -67,7 +67,6 @@ async function process(options) {
             // tslint:disable-next-line: no-any
             inputSourceMap: false,
             babelrc: false,
-            configFile: false,
             presets: [[
                     require.resolve('@babel/preset-env'),
                     {
@@ -388,7 +387,6 @@ utils) {
     try {
         ast = core_1.parseSync(options.code, {
             babelrc: false,
-            configFile: false,
             sourceType: 'script',
             filename: options.filename,
         });
