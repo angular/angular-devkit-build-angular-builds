@@ -254,6 +254,7 @@ async function setupLocalize(i18n, browserOptions, webpackConfig) {
                 loader: require.resolve('babel-loader'),
                 options: {
                     babelrc: false,
+                    configFile: false,
                     compact: false,
                     cacheCompression: false,
                     cacheDirectory: cache_path_1.findCachePath('babel-loader'),
