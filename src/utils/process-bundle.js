@@ -388,6 +388,7 @@ utils) {
         ast = core_1.parseSync(options.code, {
             babelrc: false,
             sourceType: 'script',
+            filename: options.filename,
         });
     }
     catch (error) {
