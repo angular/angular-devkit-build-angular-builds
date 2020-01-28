@@ -92,9 +92,12 @@ function getAotConfig(wco, i18nExtract = false) {
         });
     }
     const test = /(?:\.ngfactory\.js|\.ngstyle\.js|\.tsx?)$/;
+    const optimize = wco.buildOptions.optimization.scripts;
     return {
         module: { rules: [{ test, use: loaders }] },
-        plugins: [_createAotPlugin(wco, { tsConfigPath }, i18nExtract)]
+        plugins: [
+            _createAotPlugin(wco, { tsConfigPath, emitClassMetadata: !optimize, emitNgModuleScope: !optimize }, i18nExtract),
+        ],
     };
 }
 exports.getAotConfig = getAotConfig;
