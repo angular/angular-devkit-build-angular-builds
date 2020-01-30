@@ -78,8 +78,8 @@ async function process(options) {
                     },
                 ]],
             plugins: options.replacements ? [createReplacePlugin(options.replacements)] : [],
-            minified: !environment_options_1.minifyDisabled && !!options.optimize,
-            compact: !environment_options_1.beautifyEnabled && !!options.optimize,
+            minified: environment_options_1.allowMinify && !!options.optimize,
+            compact: !environment_options_1.shouldBeautify && !!options.optimize,
             sourceMaps: !!sourceMap,
         });
         if (!transformResult || !transformResult.code) {
@@ -207,14 +207,14 @@ async function terserMangle(code, options = {}) {
     // estree -> terser is already supported; need babel -> estree/terser
     // Mangle downlevel code
     const minifyOutput = terser_1.minify(options.filename ? { [options.filename]: code } : code, {
-        compress: !environment_options_1.minifyDisabled && !!options.compress,
+        compress: environment_options_1.allowMinify && !!options.compress,
         ecma: options.ecma || 5,
-        mangle: !environment_options_1.manglingDisabled,
+        mangle: environment_options_1.allowMangle,
         safari10: true,
         output: {
             ascii_only: true,
             webkit: true,
-            beautify: environment_options_1.beautifyEnabled,
+            beautify: environment_options_1.shouldBeautify,
         },
         sourceMap: !!options.map &&
             {

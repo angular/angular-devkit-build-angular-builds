@@ -17,12 +17,44 @@ function isEnabled(variable) {
 function isPresent(variable) {
     return typeof variable === 'string' && variable !== '';
 }
+const debugOptimizeVariable = process.env['NG_BUILD_DEBUG_OPTIMIZE'];
+const debugOptimize = (() => {
+    if (!isPresent(debugOptimizeVariable) || isDisabled(debugOptimizeVariable)) {
+        return {
+            mangle: true,
+            minify: true,
+            beautify: false,
+        };
+    }
+    const debugValue = {
+        mangle: false,
+        minify: false,
+        beautify: true,
+    };
+    if (isEnabled(debugOptimizeVariable)) {
+        return debugValue;
+    }
+    for (const part of debugOptimizeVariable.split(',')) {
+        switch (part.trim().toLowerCase()) {
+            case 'mangle':
+                debugValue.mangle = true;
+                break;
+            case 'minify':
+                debugValue.minify = true;
+                break;
+            case 'beautify':
+                debugValue.beautify = true;
+                break;
+        }
+    }
+    return debugValue;
+})();
 const mangleVariable = process.env['NG_BUILD_MANGLE'];
-exports.manglingDisabled = isPresent(mangleVariable) && isDisabled(mangleVariable);
-const beautifyVariable = process.env['NG_BUILD_BEAUTIFY'];
-exports.beautifyEnabled = isPresent(beautifyVariable) && !isDisabled(beautifyVariable);
-const minifyVariable = process.env['NG_BUILD_MINIFY'];
-exports.minifyDisabled = isPresent(minifyVariable) && isDisabled(minifyVariable);
+exports.allowMangle = isPresent(mangleVariable)
+    ? !isDisabled(mangleVariable)
+    : debugOptimize.mangle;
+exports.shouldBeautify = debugOptimize.beautify;
+exports.allowMinify = debugOptimize.minify;
 const cacheVariable = process.env['NG_BUILD_CACHE'];
 exports.cachingDisabled = isPresent(cacheVariable) && isDisabled(cacheVariable);
 exports.cachingBasePath = (() => {

@@ -35,7 +35,7 @@ class BundleActionCache {
             .update(content)
             .digest('base64');
         let baseCacheKey = `${packageVersion}|${content.length}|${algorithm}-${codeHash}`;
-        if (environment_options_1.manglingDisabled) {
+        if (!environment_options_1.allowMangle) {
             baseCacheKey += '|MD';
         }
         return baseCacheKey;
