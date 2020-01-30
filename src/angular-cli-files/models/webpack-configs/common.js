@@ -319,11 +319,11 @@ function getCommonConfig(wco) {
                 // default behavior (undefined value) is to keep only important comments (licenses, etc.)
                 comments: !buildOptions.extractLicenses && undefined,
                 webkit: true,
-                beautify: environment_options_1.beautifyEnabled,
+                beautify: environment_options_1.shouldBeautify,
             },
             // On server, we don't want to compress anything. We still set the ngDevMode = false for it
             // to remove dev code, and ngI18nClosureMode to remove Closure compiler i18n code
-            compress: !environment_options_1.minifyDisabled &&
+            compress: environment_options_1.allowMinify &&
                 (buildOptions.platform == 'server'
                     ? {
                         ecma: terserEcma,
@@ -340,7 +340,7 @@ function getCommonConfig(wco) {
                     }),
             // We also want to avoid mangling on server.
             // Name mangling is handled within the browser builder
-            mangle: !environment_options_1.manglingDisabled && buildOptions.platform !== 'server' && !differentialLoadingMode,
+            mangle: environment_options_1.allowMangle && buildOptions.platform !== 'server' && !differentialLoadingMode,
         };
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,
@@ -360,7 +360,7 @@ function getCommonConfig(wco) {
             chunkFilter: (chunk) => globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
             terserOptions: {
                 ...terserOptions,
-                compress: !environment_options_1.minifyDisabled && {
+                compress: environment_options_1.allowMinify && {
                     ...terserOptions.compress,
                     ecma: 5,
                 },
@@ -368,7 +368,7 @@ function getCommonConfig(wco) {
                     ...terserOptions.output,
                     ecma: 5,
                 },
-                mangle: !environment_options_1.manglingDisabled && buildOptions.platform !== 'server',
+                mangle: environment_options_1.allowMangle && buildOptions.platform !== 'server',
             },
         }));
     }
