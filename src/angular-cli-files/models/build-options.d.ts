@@ -8,7 +8,7 @@
 import { logging } from '@angular-devkit/core';
 import { ParsedConfiguration } from '@angular/compiler-cli';
 import { ScriptTarget } from 'typescript';
-import { AssetPatternClass, Budget, ExtraEntryPoint, OptimizationClass, SourceMapClass } from '../../browser/schema';
+import { AssetPatternClass, Budget, CrossOrigin, ExtraEntryPoint, OptimizationClass, SourceMapClass } from '../../browser/schema';
 import { NormalizedFileReplacement } from '../../utils/normalize-file-replacements';
 export interface BuildOptions {
     optimization: OptimizationClass;
@@ -43,6 +43,7 @@ export interface BuildOptions {
     showCircularDependencies?: boolean;
     buildOptimizer?: boolean;
     namedChunks?: boolean;
+    crossOrigin?: CrossOrigin;
     subresourceIntegrity?: boolean;
     serviceWorker?: boolean;
     webWorkerTsConfig?: string;
