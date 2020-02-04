@@ -9,8 +9,8 @@ import * as ts from 'typescript';
 export declare class BuildBrowserFeatures {
     private projectRoot;
     private scriptTarget;
+    private readonly _supportedBrowsers;
     private readonly _es6TargetOrLater;
-    readonly supportedBrowsers: string[];
     constructor(projectRoot: string, scriptTarget: ts.ScriptTarget);
     /**
      * True, when one or more browsers requires ES5
