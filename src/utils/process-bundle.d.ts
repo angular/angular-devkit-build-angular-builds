@@ -15,6 +15,7 @@ export interface ProcessBundleOptions {
     integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
     runtimeData?: ProcessBundleResult[];
     replacements?: [string, string][];
+    supportedBrowsers?: string[] | Record<string, string>;
 }
 export interface ProcessBundleResult {
     name: string;
