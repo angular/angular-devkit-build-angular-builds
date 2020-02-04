@@ -94,6 +94,27 @@ async function generateI18nBrowserWebpackConfigFromContext(options, context, web
             config.resolve.alias = {};
         }
         config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
+        // Update file hashes to include translation file content
+        const i18nHash = Object.values(i18n.locales).reduce((data, locale) => data + (locale.integrity || ''), '');
+        if (!config.plugins) {
+            config.plugins = [];
+        }
+        config.plugins.push({
+            apply(compiler) {
+                compiler.hooks.compilation.tap('build-angular', compilation => {
+                    // Webpack typings do not contain template hashForChunk hook
+                    // tslint:disable-next-line: no-any
+                    compilation.mainTemplate.hooks.hashForChunk.tap('build-angular', (hash) => {
+                        hash.update('$localize' + i18nHash);
+                    });
+                    // Webpack typings do not contain hooks property
+                    // tslint:disable-next-line: no-any
+                    compilation.chunkTemplate.hooks.hashForChunk.tap('build-angular', (hash) => {
+                        hash.update('$localize' + i18nHash);
+                    });
+                });
+            },
+        });
     }
     return { ...result, i18n };
 }
