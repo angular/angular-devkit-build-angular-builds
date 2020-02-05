@@ -18,7 +18,7 @@ class BuildBrowserFeatures {
     constructor(projectRoot, scriptTarget) {
         this.projectRoot = projectRoot;
         this.scriptTarget = scriptTarget;
-        this._supportedBrowsers = browserslist(undefined, { path: this.projectRoot });
+        this.supportedBrowsers = browserslist(undefined, { path: this.projectRoot });
         this._es6TargetOrLater = this.scriptTarget > ts.ScriptTarget.ES5;
     }
     /**
@@ -48,7 +48,7 @@ class BuildBrowserFeatures {
             'safari 10.1',
             'ios_saf 10.3',
         ];
-        return this._supportedBrowsers.some(browser => safariBrowsers.includes(browser));
+        return this.supportedBrowsers.some(browser => safariBrowsers.includes(browser));
     }
     /**
      * True, when a browser feature is supported partially or fully.
@@ -63,7 +63,7 @@ class BuildBrowserFeatures {
             'a',
         ];
         const data = caniuse_lite_1.feature(caniuse_lite_1.features[featureId]);
-        return !this._supportedBrowsers
+        return !this.supportedBrowsers
             .some(browser => {
             const [agentId, version] = browser.split(' ');
             const browserData = data.stats[agentId];

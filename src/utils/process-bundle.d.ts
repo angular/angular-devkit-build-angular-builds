@@ -13,6 +13,7 @@ export interface ProcessBundleOptions {
     cacheKeys?: (string | undefined)[];
     integrityAlgorithm?: 'sha256' | 'sha384' | 'sha512';
     runtimeData?: ProcessBundleResult[];
+    supportedBrowsers?: string[] | Record<string, string>;
 }
 export interface ProcessBundleResult {
     name: string;

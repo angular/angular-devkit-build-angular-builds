@@ -63,6 +63,8 @@ async function process(options) {
                 [
                     require.resolve('@babel/preset-env'),
                     {
+                        // browserslist-compatible query or object of minimum environment versions to support
+                        targets: options.supportedBrowsers,
                         // modules aren't needed since the bundles use webpack's custom module loading
                         modules: false,
                         // 'transform-typeof-symbol' generates slower code
