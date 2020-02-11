@@ -22,13 +22,6 @@ export declare class BuildBrowserFeatures {
      */
     isEs5SupportNeeded(): boolean;
     /**
-     * Safari 10.1 and iOS Safari 10.3 supports modules,
-     * but does not support the `nomodule` attribute.
-     * While return `true`, when support for Safari 10.1 and iOS Safari 10.3
-     * is required and in differential loading is enabled.
-     */
-    isNoModulePolyfillNeeded(): boolean;
-    /**
      * True, when a browser feature is supported partially or fully.
      */
     isFeatureSupported(featureId: string): boolean;

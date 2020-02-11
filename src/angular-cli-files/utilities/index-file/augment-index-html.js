@@ -97,16 +97,13 @@ async function augmentIndexHtml(params) {
         // such as runtime.js
         const scriptPredictor = ({ file }) => file === script;
         if (!files.some(scriptPredictor)) {
-            // in some cases for differential loading file with the same name is avialable in both
+            // in some cases for differential loading file with the same name is available in both
             // nomodule and module such as scripts.js
             // we shall not add these attributes if that's the case
             const isNoModuleType = noModuleFiles.some(scriptPredictor);
             const isModuleType = moduleFiles.some(scriptPredictor);
             if (isNoModuleType && !isModuleType) {
-                attrs.push({ name: 'nomodule', value: null });
-                if (!script.startsWith('polyfills-nomodule-es5')) {
-                    attrs.push({ name: 'defer', value: null });
-                }
+                attrs.push({ name: 'nomodule', value: null }, { name: 'defer', value: null });
             }
             else if (isModuleType && !isNoModuleType) {
                 attrs.push({ name: 'type', value: 'module' });
