@@ -228,8 +228,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             mainChunkId = file.id.toString();
                         }
                         // All files at this point except ES5 polyfills are module scripts
-                        const es5Polyfills = file.file.startsWith('polyfills-es5') ||
-                            file.file.startsWith('polyfills-nomodule-es5');
+                        const es5Polyfills = file.file.startsWith('polyfills-es5');
                         if (!es5Polyfills) {
                             moduleFiles.push(file);
                         }
