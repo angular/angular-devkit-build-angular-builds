@@ -87,18 +87,6 @@ function getCommonConfig(wco) {
             const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, tsConfig.options.target || typescript_1.ScriptTarget.ES5);
             if (buildOptions.es5BrowserSupport ||
                 (buildOptions.es5BrowserSupport === undefined && buildBrowserFeatures.isEs5SupportNeeded())) {
-                // The nomodule polyfill needs to be inject prior to any script and be
-                // outside of webpack compilation because otherwise webpack will cause the
-                // script to be wrapped in window["webpackJsonp"] which causes this to fail.
-                if (buildBrowserFeatures.isNoModulePolyfillNeeded()) {
-                    const noModuleScript = {
-                        bundleName: 'polyfills-nomodule-es5',
-                        input: path.join(__dirname, '..', 'safari-nomodule.js'),
-                    };
-                    buildOptions.scripts = buildOptions.scripts
-                        ? [...buildOptions.scripts, noModuleScript]
-                        : [noModuleScript];
-                }
                 const polyfillsChunkName = 'polyfills-es5';
                 entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
                 if (differentialLoadingMode) {
