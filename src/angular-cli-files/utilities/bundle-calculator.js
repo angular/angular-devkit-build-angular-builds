@@ -282,7 +282,7 @@ function* checkThresholds(thresholds, size, label) {
                 if (size <= threshold.limit) {
                     continue;
                 }
-                const sizeDifference = stats_1.formatSize(threshold.limit - size);
+                const sizeDifference = stats_1.formatSize(size - threshold.limit);
                 yield {
                     severity: threshold.severity,
                     message: `Exceeded maximum budget for ${label}. Budget ${stats_1.formatSize(threshold.limit)} was not met by ${sizeDifference} with a total of ${stats_1.formatSize(size)}.`,
