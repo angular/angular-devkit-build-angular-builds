@@ -11,6 +11,7 @@ function generateEntryPoints(appConfig) {
         return [...new Set(entryPoints)];
     };
     const entryPoints = [
+        'polyfills-nomodule-es5',
         'runtime',
         'polyfills-es5',
         'polyfills',
