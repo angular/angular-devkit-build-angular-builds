@@ -202,7 +202,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 }
                                 workerReplacements.push([
                                     file.file,
-                                    file.file.replace(/\-(es20\d{2}|esnext)/, '-es5'),
+                                    file.file.replace(/\-es20\d{2}/, '-es5'),
                                 ]);
                             }
                             else {
@@ -273,7 +273,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         // Add the newly created ES5 bundles to the index as nomodule scripts
                         const newFilename = es5Polyfills
                             ? file.file.replace(/\-es20\d{2}/, '')
-                            : file.file.replace(/\-(es20\d{2}|esnext)/, '-es5');
+                            : file.file.replace(/\-es20\d{2}/, '-es5');
                         noModuleFiles.push({ ...file, file: newFilename });
                     }
                     const processActions = [];
