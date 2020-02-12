@@ -52,7 +52,7 @@ async function process(options) {
     }
     const basePath = path.dirname(options.filename);
     const filename = path.basename(options.filename);
-    const downlevelFilename = filename.replace(/\-es20\d{2}/, '-es5');
+    const downlevelFilename = filename.replace(/\-(es20\d{2}|esnext)/, '-es5');
     const downlevel = !options.optimizeOnly;
     const sourceCode = options.code;
     const sourceMap = options.map ? JSON.parse(options.map) : undefined;
@@ -276,7 +276,7 @@ async function processRuntime(options) {
     }
     // Adjust lazy loaded scripts to point to the proper variant
     // Extra spacing is intentional to align source line positions
-    downlevelCode = downlevelCode.replace(/"\-es20\d{2}\./, '   "-es5.');
+    downlevelCode = downlevelCode.replace(/"\-(es20\d{2}|esnext)\./, '   "-es5.');
     return {
         original: await processBundle({
             ...options,
@@ -286,7 +286,7 @@ async function processRuntime(options) {
         downlevel: await processBundle({
             ...options,
             code: downlevelCode,
-            filename: options.filename.replace(/\-es20\d{2}/, '-es5'),
+            filename: options.filename.replace(/\-(es20\d{2}|esnext)/, '-es5'),
             isOriginal: false,
         }),
     };
