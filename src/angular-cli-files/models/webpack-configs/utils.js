@@ -83,9 +83,13 @@ exports.getSourceMapDevTool = getSourceMapDevTool;
  * Returns an ES version file suffix to differentiate between various builds.
  */
 function getEsVersionForFileName(scriptTargetOverride, esVersionInFileName = false) {
-    return scriptTargetOverride && esVersionInFileName
-        ? '-' + typescript_1.ScriptTarget[scriptTargetOverride].toLowerCase()
-        : '';
+    if (!esVersionInFileName || scriptTargetOverride === undefined) {
+        return '';
+    }
+    if (scriptTargetOverride === typescript_1.ScriptTarget.ESNext) {
+        return '-esnext';
+    }
+    return '-' + typescript_1.ScriptTarget[scriptTargetOverride].toLowerCase();
 }
 exports.getEsVersionForFileName = getEsVersionForFileName;
 function isPolyfillsEntry(name) {

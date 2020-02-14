@@ -129,7 +129,7 @@ class BundleActionCache {
         cacheEntry = entries[2 /* DownlevelCode */];
         if (cacheEntry) {
             result.downlevel = {
-                filename: action.filename.replace(/\-es20\d{2}/, '-es5'),
+                filename: action.filename.replace(/\-(es20\d{2}|esnext)/, '-es5'),
                 size: cacheEntry.size,
                 integrity: cacheEntry.integrity,
             };
@@ -137,7 +137,7 @@ class BundleActionCache {
             cacheEntry = entries[3 /* DownlevelMap */];
             if (cacheEntry) {
                 result.downlevel.map = {
-                    filename: action.filename.replace(/\-es20\d{2}/, '-es5') + '.map',
+                    filename: action.filename.replace(/\-(es20\d{2}|esnext)/, '-es5') + '.map',
                     size: cacheEntry.size,
                 };
                 BundleActionCache.copyEntryContent(cacheEntry, result.downlevel.filename + '.map');
