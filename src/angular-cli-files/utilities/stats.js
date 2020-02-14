@@ -47,9 +47,8 @@ function statsToString(json, statsConfig) {
     const changedChunksStats = json.chunks
         .filter((chunk) => chunk.rendered)
         .map((chunk) => {
-        const assets = json.assets.filter((asset) => chunk.files.indexOf(asset.name) != -1);
-        const summedSize = assets.filter((asset) => !asset.name.endsWith(".map")).reduce((total, asset) => { return total + asset.size; }, 0);
-        return generateBundleStats({ ...chunk, size: summedSize }, colors);
+        const asset = json.assets.filter((x) => x.name == chunk.files[0])[0];
+        return generateBundleStats({ ...chunk, size: asset && asset.size }, colors);
     });
     const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
     if (unchangedChunkNumber > 0) {
