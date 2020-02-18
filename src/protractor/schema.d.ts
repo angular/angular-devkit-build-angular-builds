@@ -15,9 +15,17 @@ export interface Schema {
      */
     elementExplorer?: boolean;
     /**
+     * Execute specs whose names match the pattern, which is internally compiled to a RegExp.
+     */
+    grep?: string;
+    /**
      * Host to listen on.
      */
     host?: string;
+    /**
+     * Invert the selection specified by the 'grep' option.
+     */
+    invertGrep?: boolean;
     /**
      * The port to use to serve the application.
      */

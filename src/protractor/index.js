@@ -18,6 +18,10 @@ function runProtractor(root, options) {
         baseUrl: options.baseUrl,
         specs: options.specs && options.specs.length ? options.specs : undefined,
         suite: options.suite,
+        jasmineNodeOpts: {
+            grep: options.grep,
+            invertGrep: options.invertGrep,
+        },
     };
     // TODO: Protractor manages process.exit itself, so this target will allways quit the
     // process. To work around this we run it in a subprocess.
