@@ -12,6 +12,7 @@ const os = require("os");
 const path = require("path");
 const v8 = require("v8");
 const action_cache_1 = require("./action-cache");
+const workers_1 = require("./workers");
 const hasThreadSupport = (() => {
     try {
         require('worker_threads');
@@ -49,6 +50,7 @@ class BundleActionExecutor {
         return (this.largeWorker = new jest_worker_1.default(workerFile, {
             exposedMethods: ['process', 'inlineLocales'],
             setupArgs: [[...serialize(this.workerOptions)]],
+            numWorkers: workers_1.maxWorkers,
         }));
     }
     ensureSmall() {

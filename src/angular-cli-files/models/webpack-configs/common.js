@@ -11,7 +11,6 @@ const build_optimizer_1 = require("@angular-devkit/build-optimizer");
 const core_1 = require("@angular-devkit/core");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const fs_1 = require("fs");
-const os_1 = require("os");
 const path = require("path");
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
@@ -331,14 +330,9 @@ function getCommonConfig(wco) {
             // Name mangling is handled within the browser builder
             mangle: environment_options_1.allowMangle && buildOptions.platform !== 'server' && !differentialLoadingMode,
         };
-        // Use up to 7 CPUs for Terser workers, but no more.
-        // Some environments, like CircleCI, report a large number of CPUs but trying to use them
-        // Will cause `Error: Call retries were exceeded` errors.
-        // https://github.com/webpack-contrib/terser-webpack-plugin/issues/143
-        const maxCpus = Math.min(os_1.cpus().length, 7);
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,
-            parallel: maxCpus,
+            parallel: utils_1.maxWorkers,
             cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
             chunkFilter: (chunk) => !globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
@@ -348,7 +342,7 @@ function getCommonConfig(wco) {
         // They are shared between ES2015 & ES5 outputs so must support ES5.
         new TerserPlugin({
             sourceMap: scriptsSourceMap,
-            parallel: maxCpus,
+            parallel: utils_1.maxWorkers,
             cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
             chunkFilter: (chunk) => globalScriptsByBundleName.some(s => s.bundleName === chunk.name),

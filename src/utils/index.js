@@ -20,3 +20,4 @@ __export(require("./normalize-source-maps"));
 __export(require("./normalize-optimization"));
 __export(require("./normalize-builder-schema"));
 __export(require("./url"));
+__export(require("./workers"));
