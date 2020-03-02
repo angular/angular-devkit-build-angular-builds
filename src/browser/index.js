@@ -468,7 +468,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     for (const [locale, outputPath] of outputPaths.entries()) {
                         let localeBaseHref;
                         if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
-                            localeBaseHref = utils_1.urlJoin(options.baseHref || '', (_a = i18n.locales[locale].baseHref, (_a !== null && _a !== void 0 ? _a : `/${locale}/`)));
+                            localeBaseHref = utils_1.urlJoin(options.baseHref || '', (_a = i18n.locales[locale].baseHref) !== null && _a !== void 0 ? _a : `/${locale}/`);
                         }
                         try {
                             await generateIndex(outputPath, options, root, files, noModuleFiles, moduleFiles, transforms.indexHtml, 
@@ -484,7 +484,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     for (const [locale, outputPath] of outputPaths.entries()) {
                         let localeBaseHref;
                         if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
-                            localeBaseHref = utils_1.urlJoin(options.baseHref || '', (_b = i18n.locales[locale].baseHref, (_b !== null && _b !== void 0 ? _b : `/${locale}/`)));
+                            localeBaseHref = utils_1.urlJoin(options.baseHref || '', (_b = i18n.locales[locale].baseHref) !== null && _b !== void 0 ? _b : `/${locale}/`);
                         }
                         try {
                             await service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(outputPath), localeBaseHref || options.baseHref || '/', options.ngswConfigPath);
