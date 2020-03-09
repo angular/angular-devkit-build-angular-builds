@@ -30,7 +30,7 @@ function getTestConfig(wco) {
         }
         extraRules.push({
             test: /\.(jsx?|tsx?)$/,
-            loader: require.resolve('coverage-istanbul-loader'),
+            loader: require.resolve('@jsdevtools/coverage-istanbul-loader'),
             options: { esModules: true },
             enforce: 'post',
             exclude,
