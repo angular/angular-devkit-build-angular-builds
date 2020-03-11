@@ -42,7 +42,7 @@ async function importParsers() {
             // The name ('xmb') needs to match the AOT compiler option
             xmb: new (await Promise.resolve().then(() => require(
             // tslint:disable-next-line:trailing-comma no-implicit-dependencies
-            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xtb_translation_parser'))).XtbTranslationParser(diagnostics),
+            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xtb_translation_parser'))).XtbTranslationParser(),
         };
         return { parsers, diagnostics };
     }
