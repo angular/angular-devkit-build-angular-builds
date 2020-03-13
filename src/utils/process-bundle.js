@@ -334,6 +334,7 @@ function createReplacePlugin(replacements) {
         },
     };
 }
+const USE_LOCALIZE_PLUGINS = false;
 async function createI18nPlugins(locale, translation, missingTranslation, localeDataContent) {
     const plugins = [];
     // tslint:disable-next-line: no-implicit-dependencies
@@ -405,6 +406,9 @@ async function inlineLocales(options) {
     if (!ast) {
         throw new Error(`Unknown error occurred inlining file "${options.filename}"`);
     }
+    if (!USE_LOCALIZE_PLUGINS) {
+        return inlineLocalesDirect(ast, options);
+    }
     const diagnostics = [];
     const inputMap = options.map && JSON.parse(options.map);
     for (const locale of i18n.inlineLocales) {
@@ -446,6 +450,63 @@ async function inlineLocales(options) {
     return { file: options.filename, diagnostics };
 }
 exports.inlineLocales = inlineLocales;
+async function inlineLocalesDirect(ast, options) {
+    if (!i18n || i18n.inlineLocales.size === 0) {
+        return { file: options.filename, diagnostics: [], count: 0 };
+    }
+    const { default: MagicString } = await Promise.resolve().then(() => require('magic-string'));
+    const { default: generate } = await Promise.resolve().then(() => require('@babel/generator'));
+    const utils = await Promise.resolve().then(() => require(
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
+    '@angular/localize/src/tools/src/translate/source_files/source_file_utils'));
+    // tslint:disable-next-line: no-implicit-dependencies
+    const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
+    const diagnostics = new localizeDiag.Diagnostics();
+    const positions = findLocalizePositions(ast, options, utils);
+    if (positions.length === 0 && !options.setLocale) {
+        return inlineCopyOnly(options);
+    }
+    // tslint:disable-next-line: no-any
+    let content = new MagicString(options.code, { filename: options.filename });
+    const inputMap = options.map && JSON.parse(options.map);
+    let contentClone;
+    for (const locale of i18n.inlineLocales) {
+        const isSourceLocale = locale === i18n.sourceLocale;
+        // tslint:disable-next-line: no-any
+        const translations = isSourceLocale ? {} : i18n.locales[locale].translation || {};
+        for (const position of positions) {
+            const translated = utils.translate(diagnostics, translations, position.messageParts, position.expressions, isSourceLocale ? 'ignore' : options.missingTranslation || 'warning');
+            const expression = utils.buildLocalizeReplacement(translated[0], translated[1]);
+            const { code } = generate(expression);
+            content.overwrite(position.start, position.end, code);
+        }
+        if (options.setLocale) {
+            const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});`;
+            contentClone = content.clone();
+            content.prepend(setLocaleText);
+            // If locale data is provided, load it and prepend to file
+            const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
+            if (localeDataPath) {
+                const localDataContent = await loadLocaleData(localeDataPath, true);
+                // The semicolon ensures that there is no syntax error between statements
+                content.prepend(localDataContent + ';');
+            }
+        }
+        const output = content.toString();
+        const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
+        fs.writeFileSync(outputPath, output);
+        if (inputMap) {
+            const contentMap = content.generateMap();
+            const outputMap = mergeSourceMaps(options.code, inputMap, output, contentMap, options.filename, options.code.length > FAST_SOURCEMAP_THRESHOLD);
+            fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
+        }
+        if (contentClone) {
+            content = contentClone;
+            contentClone = undefined;
+        }
+    }
+    return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };
+}
 function inlineCopyOnly(options) {
     if (!i18n) {
         throw new Error('i18n options are missing');
@@ -458,6 +519,51 @@ function inlineCopyOnly(options) {
         }
     }
     return { file: options.filename, diagnostics: [], count: 0 };
+}
+function findLocalizePositions(ast, options, 
+// tslint:disable-next-line: no-implicit-dependencies
+utils) {
+    const positions = [];
+    if (options.es5) {
+        core_1.traverse(ast, {
+            CallExpression(path) {
+                const callee = path.get('callee');
+                if (callee.isIdentifier() &&
+                    callee.node.name === localizeName &&
+                    utils.isGlobalIdentifier(callee)) {
+                    const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
+                    const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
+                    positions.push({
+                        // tslint:disable-next-line: no-non-null-assertion
+                        start: path.node.start,
+                        // tslint:disable-next-line: no-non-null-assertion
+                        end: path.node.end,
+                        messageParts,
+                        expressions,
+                    });
+                }
+            },
+        });
+    }
+    else {
+        const traverseFast = core_1.types.traverseFast;
+        traverseFast(ast, node => {
+            if (node.type === 'TaggedTemplateExpression' &&
+                core_1.types.isIdentifier(node.tag) &&
+                node.tag.name === localizeName) {
+                const messageParts = utils.unwrapMessagePartsFromTemplateLiteral(node.quasi.quasis);
+                positions.push({
+                    // tslint:disable-next-line: no-non-null-assertion
+                    start: node.start,
+                    // tslint:disable-next-line: no-non-null-assertion
+                    end: node.end,
+                    messageParts,
+                    expressions: node.quasi.expressions,
+                });
+            }
+        });
+    }
+    return positions;
 }
 async function loadLocaleData(path, optimize) {
     // The path is validated during option processing before the build starts

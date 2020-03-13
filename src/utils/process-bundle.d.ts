@@ -54,7 +54,10 @@ export interface InlineOptions {
 }
 export declare function inlineLocales(options: InlineOptions): Promise<{
     file: string;
-    diagnostics: never[];
+    diagnostics: {
+        type: "error" | "warning";
+        message: string;
+    }[];
     count: number;
 } | {
     file: string;
@@ -62,5 +65,4 @@ export declare function inlineLocales(options: InlineOptions): Promise<{
         type: "error" | "warning";
         message: string;
     }[];
-    count?: undefined;
 }>;
