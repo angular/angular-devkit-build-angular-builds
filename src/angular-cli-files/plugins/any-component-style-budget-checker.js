@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+const path = require("path");
 const schema_1 = require("../../../src/browser/schema");
 const bundle_calculator_1 = require("../utilities/bundle-calculator");
 const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
@@ -27,8 +28,15 @@ class AnyComponentStyleBudgetChecker {
                 if (!parentCompilation) {
                     return;
                 }
+                const cssExtensions = [
+                    '.css',
+                    '.scss',
+                    '.less',
+                    '.styl',
+                    '.sass',
+                ];
                 const componentStyles = Object.keys(compilation.assets)
-                    .filter((name) => name.endsWith('.css'))
+                    .filter((name) => cssExtensions.includes(path.extname(name)))
                     .map((name) => ({
                     size: compilation.assets[name].size(),
                     label: name,
