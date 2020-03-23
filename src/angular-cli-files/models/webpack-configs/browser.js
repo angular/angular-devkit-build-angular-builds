@@ -8,14 +8,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const license_webpack_plugin_1 = require("license-webpack-plugin");
+const webpack_1 = require("../../plugins/webpack");
 const utils_1 = require("./utils");
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 function getBrowserConfig(wco) {
     const { buildOptions } = wco;
-    const { crossOrigin = 'none', subresourceIntegrity, evalSourceMap, extractLicenses, vendorChunk, commonChunk, styles, } = buildOptions;
+    const { crossOrigin = 'none', subresourceIntegrity, evalSourceMap, extractLicenses, vendorChunk, commonChunk, styles, allowedCommonJsDependencies, optimization, } = buildOptions;
     const extraPlugins = [];
     let isEval = false;
-    const { styles: stylesOptimization, scripts: scriptsOptimization } = buildOptions.optimization;
+    const { styles: stylesOptimization, scripts: scriptsOptimization } = optimization;
     const { styles: stylesSourceMap, scripts: scriptsSourceMap, hidden: hiddenSourceMap, } = buildOptions.sourceMap;
     // See https://webpack.js.org/configuration/devtool/ for sourcemap types.
     if ((stylesSourceMap || scriptsSourceMap) &&
@@ -95,7 +96,12 @@ function getBrowserConfig(wco) {
                 },
             },
         },
-        plugins: extraPlugins,
+        plugins: [
+            new webpack_1.CommonJsUsageWarnPlugin({
+                allowedDepedencies: allowedCommonJsDependencies,
+            }),
+            ...extraPlugins,
+        ],
         node: false,
     };
 }

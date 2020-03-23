@@ -248,8 +248,7 @@
     },
     "preserveSymlinks": {
       "type": "boolean",
-      "description": "Do not use the real path when resolving modules.",
-      "default": false
+      "description": "Do not use the real path when resolving modules. If unset then will default to `true` if NodeJS option --preserve-symlinks is set."
     },
     "extractLicenses": {
       "type": "boolean",
@@ -380,6 +379,14 @@
       "type": "boolean",
       "description": "Concatenate modules with Rollup before bundling them with Webpack.",
       "default": false
+    },
+    "allowedCommonJsDependencies": {
+      "description": "A list of CommonJS packages that are allowed to be used without a built time warning.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
     }
   },
   "additionalProperties": false,

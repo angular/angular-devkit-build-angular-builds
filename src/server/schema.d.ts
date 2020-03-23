@@ -92,7 +92,8 @@ export interface Schema {
      */
     poll?: number;
     /**
-     * Do not use the real path when resolving modules.
+     * Do not use the real path when resolving modules. If unset then will default to `true` if
+     * NodeJS option --preserve-symlinks is set.
      */
     preserveSymlinks?: boolean;
     /**

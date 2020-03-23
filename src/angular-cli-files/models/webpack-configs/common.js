@@ -18,10 +18,6 @@ const webpack_sources_1 = require("webpack-sources");
 const utils_1 = require("../../../utils");
 const cache_path_1 = require("../../../utils/cache-path");
 const environment_options_1 = require("../../../utils/environment-options");
-const bundle_budget_1 = require("../../plugins/bundle-budget");
-const named_chunks_plugin_1 = require("../../plugins/named-chunks-plugin");
-const optimize_css_webpack_plugin_1 = require("../../plugins/optimize-css-webpack-plugin");
-const scripts_webpack_plugin_1 = require("../../plugins/scripts-webpack-plugin");
 const webpack_2 = require("../../plugins/webpack");
 const find_up_1 = require("../../utilities/find-up");
 const utils_2 = require("./utils");
@@ -172,7 +168,7 @@ function getCommonConfig(wco) {
             // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
             const hash = script.inject ? hashFormat.script : '';
             const bundleName = script.bundleName;
-            extraPlugins.push(new scripts_webpack_plugin_1.ScriptsWebpackPlugin({
+            extraPlugins.push(new webpack_2.ScriptsWebpackPlugin({
                 name: bundleName,
                 sourceMap: scriptsSourceMap,
                 filename: `${path.basename(bundleName)}${hash}.js`,
@@ -226,7 +222,12 @@ function getCommonConfig(wco) {
         })());
     }
     if (buildOptions.namedChunks) {
-        extraPlugins.push(new named_chunks_plugin_1.NamedLazyChunksPlugin());
+        extraPlugins.push(new webpack_2.NamedLazyChunksPlugin());
+    }
+    if (!differentialLoadingMode) {
+        // Budgets are computed after differential builds, not via a plugin.
+        // https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_angular/src/browser/index.ts
+        extraPlugins.push(new webpack_2.BundleBudgetPlugin({ budgets: buildOptions.budgets }));
     }
     let sourceMapUseRule;
     if ((scriptsSourceMap || stylesSourceMap) && vendorSourceMap) {
@@ -268,7 +269,7 @@ function getCommonConfig(wco) {
     catch (_a) { }
     const extraMinimizers = [];
     if (stylesOptimization) {
-        extraMinimizers.push(new optimize_css_webpack_plugin_1.OptimizeCssWebpackPlugin({
+        extraMinimizers.push(new webpack_2.OptimizeCssWebpackPlugin({
             sourceMap: stylesSourceMap,
             // component styles retain their original file name
             test: file => /\.(?:css|scss|sass|less|styl)$/.test(file),
@@ -438,13 +439,7 @@ function getCommonConfig(wco) {
             minimizer: [
                 new webpack_1.HashedModuleIdsPlugin(),
                 ...extraMinimizers,
-            ].concat(differentialLoadingMode ? [
-            // Budgets are computed after differential builds, not via a plugin.
-            // https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_angular/src/browser/index.ts
-            ] : [
-                // Non differential builds should be computed here, as a plugin.
-                new bundle_budget_1.BundleBudgetPlugin({ budgets: buildOptions.budgets }),
-            ]),
+            ],
         },
         plugins: [
             // Always replace the context for the System.import in angular/core to prevent warnings.
