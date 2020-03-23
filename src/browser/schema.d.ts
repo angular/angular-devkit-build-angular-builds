@@ -3,10 +3,6 @@
  */
 export interface Schema {
     /**
-     * A list of CommonJS packages that are allowed to be used without a built time warning.
-     */
-    allowedCommonJsDependencies?: string[];
-    /**
      * Build using Ahead of Time compilation.
      */
     aot?: boolean;
@@ -140,8 +136,7 @@ export interface Schema {
      */
     polyfills?: string;
     /**
-     * Do not use the real path when resolving modules. If unset then will default to `true` if
-     * NodeJS option --preserve-symlinks is set.
+     * Do not use the real path when resolving modules.
      */
     preserveSymlinks?: boolean;
     /**

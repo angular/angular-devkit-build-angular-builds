@@ -58,8 +58,7 @@ export interface Schema {
      */
     polyfills?: string;
     /**
-     * Do not use the real path when resolving modules. If unset then will default to `true` if
-     * NodeJS option --preserve-symlinks is set.
+     * Do not use the real path when resolving modules.
      */
     preserveSymlinks?: boolean;
     /**
