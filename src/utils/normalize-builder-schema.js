@@ -22,6 +22,7 @@ function normalizeBrowserSchema(host, root, projectRoot, sourceRoot, options) {
         fileReplacements: normalize_file_replacements_1.normalizeFileReplacements(options.fileReplacements || [], syncHost, root),
         optimization: normalize_optimization_1.normalizeOptimization(options.optimization),
         sourceMap: normalizedSourceMapOptions,
+        preserveSymlinks: options.preserveSymlinks === undefined ? process.execArgv.includes('--preserve-symlinks') : options.preserveSymlinks,
         statsJson: options.statsJson || false,
         forkTypeChecker: options.forkTypeChecker || false,
         budgets: options.budgets || [],
