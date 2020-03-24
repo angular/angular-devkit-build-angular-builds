@@ -19,8 +19,8 @@ const webpack_sources_1 = require("webpack-sources");
 const environment_options_1 = require("./environment-options");
 const cacache = require('cacache');
 const deserialize = v8.deserialize;
-// If code size is larger than 1MB, consider lower fidelity but faster sourcemap merge
-const FAST_SOURCEMAP_THRESHOLD = 1024 * 1024;
+// If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
+const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
 let cachePath;
 let i18n;
 function setup(data) {
