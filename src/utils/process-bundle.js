@@ -53,6 +53,16 @@ async function process(options) {
     let downlevelCode;
     let downlevelMap;
     if (downlevel) {
+        const { supportedBrowsers: targets = [] } = options;
+        // todo: revisit this in version 10, when we update our defaults browserslist
+        // Without this workaround bundles will not be downlevelled because Babel doesn't know handle to 'op_mini all'
+        // See: https://github.com/babel/babel/issues/11155
+        if (Array.isArray(targets) && targets.includes('op_mini all')) {
+            targets.push('ie_mob 11');
+        }
+        else if ('op_mini' in targets) {
+            targets['ie_mob'] = '11';
+        }
         // Downlevel the bundle
         const transformResult = await core_1.transformAsync(sourceCode, {
             filename: options.filename,
@@ -64,7 +74,7 @@ async function process(options) {
                     require.resolve('@babel/preset-env'),
                     {
                         // browserslist-compatible query or object of minimum environment versions to support
-                        targets: options.supportedBrowsers,
+                        targets,
                         // modules aren't needed since the bundles use webpack's custom module loading
                         modules: false,
                         // 'transform-typeof-symbol' generates slower code
