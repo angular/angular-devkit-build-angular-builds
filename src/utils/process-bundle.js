@@ -443,7 +443,7 @@ async function inlineLocales(options) {
         const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
         fs.writeFileSync(outputPath, transformResult.code);
         if (inputMap && transformResult.map) {
-            const outputMap = await mergeSourceMaps(options.code, inputMap, transformResult.code, transformResult.map, options.filename, options.code.length > FAST_SOURCEMAP_THRESHOLD);
+            const outputMap = mergeSourceMaps(options.code, inputMap, transformResult.code, transformResult.map, options.filename, options.code.length > FAST_SOURCEMAP_THRESHOLD);
             fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
         }
     }
@@ -454,6 +454,7 @@ async function inlineLocalesDirect(ast, options) {
     if (!i18n || i18n.inlineLocales.size === 0) {
         return { file: options.filename, diagnostics: [], count: 0 };
     }
+    const { default: MagicString } = await Promise.resolve().then(() => require('magic-string'));
     const { default: generate } = await Promise.resolve().then(() => require('@babel/generator'));
     const utils = await Promise.resolve().then(() => require(
     // tslint:disable-next-line: trailing-comma no-implicit-dependencies
@@ -465,17 +466,11 @@ async function inlineLocalesDirect(ast, options) {
     if (positions.length === 0 && !options.setLocale) {
         return inlineCopyOnly(options);
     }
+    // tslint:disable-next-line: no-any
+    let content = new MagicString(options.code, { filename: options.filename });
     const inputMap = options.map && JSON.parse(options.map);
-    // Cleanup source root otherwise it will be added to each source entry
-    const mapSourceRoot = inputMap && inputMap.sourceRoot;
-    if (inputMap) {
-        delete inputMap.sourceRoot;
-    }
+    let contentClone;
     for (const locale of i18n.inlineLocales) {
-        const content = new webpack_sources_1.ReplaceSource(inputMap
-            ? // tslint:disable-next-line: no-any
-                new webpack_sources_1.SourceMapSource(options.code, options.filename, inputMap)
-            : new webpack_sources_1.OriginalSource(options.code, options.filename));
         const isSourceLocale = locale === i18n.sourceLocale;
         // tslint:disable-next-line: no-any
         const translations = isSourceLocale ? {} : i18n.locales[locale].translation || {};
@@ -483,32 +478,31 @@ async function inlineLocalesDirect(ast, options) {
             const translated = utils.translate(diagnostics, translations, position.messageParts, position.expressions, isSourceLocale ? 'ignore' : options.missingTranslation || 'warning');
             const expression = utils.buildLocalizeReplacement(translated[0], translated[1]);
             const { code } = generate(expression);
-            content.replace(position.start, position.end - 1, code);
+            content.overwrite(position.start, position.end, code);
         }
-        let outputSource = content;
         if (options.setLocale) {
-            const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});\n`;
+            const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});`;
+            contentClone = content.clone();
+            content.prepend(setLocaleText);
             // If locale data is provided, load it and prepend to file
-            let localeDataSource = null;
             const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
             if (localeDataPath) {
-                const localeDataContent = await loadLocaleData(localeDataPath, true);
-                localeDataSource = new webpack_sources_1.OriginalSource(localeDataContent, path.basename(localeDataPath));
-            }
-            outputSource = localeDataSource
+                const localDataContent = await loadLocaleData(localeDataPath, true);
                 // The semicolon ensures that there is no syntax error between statements
-                ? new webpack_sources_1.ConcatSource(setLocaleText, localeDataSource, ';\n', content)
-                : new webpack_sources_1.ConcatSource(setLocaleText, content);
-        }
-        const { source: outputCode, map: outputMap } = outputSource.sourceAndMap();
-        const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
-        fs.writeFileSync(outputPath, outputCode);
-        if (inputMap && outputMap) {
-            outputMap.file = options.filename;
-            if (mapSourceRoot) {
-                outputMap.sourceRoot = mapSourceRoot;
+                content.prepend(localDataContent + ';');
             }
+        }
+        const output = content.toString();
+        const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
+        fs.writeFileSync(outputPath, output);
+        if (inputMap) {
+            const contentMap = content.generateMap();
+            const outputMap = mergeSourceMaps(options.code, inputMap, output, contentMap, options.filename, options.code.length > FAST_SOURCEMAP_THRESHOLD);
             fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
+        }
+        if (contentClone) {
+            content = contentClone;
+            contentClone = undefined;
         }
     }
     return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };
