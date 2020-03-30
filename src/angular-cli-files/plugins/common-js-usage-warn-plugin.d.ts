@@ -13,7 +13,6 @@ export interface CommonJsUsageWarnPluginOptions {
 export declare class CommonJsUsageWarnPlugin {
     private options;
     private shownWarnings;
-    private allowedDepedencies;
     constructor(options?: CommonJsUsageWarnPluginOptions);
     apply(compiler: Compiler): void;
     private hasCommonJsDependencies;
