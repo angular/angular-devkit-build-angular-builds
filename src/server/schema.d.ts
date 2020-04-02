@@ -72,7 +72,6 @@ export interface Schema {
     main: string;
     /**
      * Use file name for lazy loaded chunks.
-     * @deprecated Since version 9. This option has no effect on server platform.
      */
     namedChunks?: boolean;
     /**
