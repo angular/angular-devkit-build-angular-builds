@@ -24,6 +24,7 @@ const utils_2 = require("./utils");
 const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const PnpWebpackPlugin = require('pnp-webpack-plugin');
 // tslint:disable-next-line:no-big-function
 function getCommonConfig(wco) {
     const { root, projectRoot, buildOptions, tsConfig } = wco;
@@ -379,10 +380,12 @@ function getCommonConfig(wco) {
             symlinks: !buildOptions.preserveSymlinks,
             modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
             alias,
+            plugins: [PnpWebpackPlugin],
         },
         resolveLoader: {
             symlinks: !buildOptions.preserveSymlinks,
             modules: loaderNodeModules,
+            plugins: [PnpWebpackPlugin.moduleLoader(module)],
         },
         context: projectRoot,
         entry: entryPoints,
