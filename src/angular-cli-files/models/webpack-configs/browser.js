@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const license_webpack_plugin_1 = require("license-webpack-plugin");
+const LicenseCheckerWebpackPlugin = require("license-checker-webpack-plugin");
 const webpack_1 = require("../../plugins/webpack");
 const utils_1 = require("./utils");
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
@@ -32,12 +32,7 @@ function getBrowserConfig(wco) {
         }));
     }
     if (extractLicenses) {
-        extraPlugins.push(new license_webpack_plugin_1.LicenseWebpackPlugin({
-            stats: {
-                warnings: false,
-                errors: false,
-            },
-            perChunkOutput: false,
+        extraPlugins.push(new LicenseCheckerWebpackPlugin({
             outputFilename: '3rdpartylicenses.txt',
         }));
     }
