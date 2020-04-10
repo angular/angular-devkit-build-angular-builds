@@ -14,5 +14,4 @@ export { RemoveHashPlugin, RemoveHashPluginOptions } from './remove-hash-plugin'
 export { NamedLazyChunksPlugin } from './named-chunks-plugin';
 export { CommonJsUsageWarnPlugin } from './common-js-usage-warn-plugin';
 export { default as PostcssCliResources, PostcssCliResourcesOptions, } from './postcss-cli-resources';
-export declare const RawCssLoader: string;
 export declare const WebpackRollupLoader: string;

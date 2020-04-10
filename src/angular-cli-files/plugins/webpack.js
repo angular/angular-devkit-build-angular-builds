@@ -27,5 +27,4 @@ exports.CommonJsUsageWarnPlugin = common_js_usage_warn_plugin_1.CommonJsUsageWar
 var postcss_cli_resources_1 = require("./postcss-cli-resources");
 exports.PostcssCliResources = postcss_cli_resources_1.default;
 const path_1 = require("path");
-exports.RawCssLoader = require.resolve(path_1.join(__dirname, 'raw-css-loader'));
 exports.WebpackRollupLoader = require.resolve(path_1.join(__dirname, 'webpack-rollup-loader'));

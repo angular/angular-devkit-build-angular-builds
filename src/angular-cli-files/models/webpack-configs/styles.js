@@ -178,7 +178,13 @@ function getStylesConfig(wco) {
                 test,
                 use: [
                     buildOptions.extractCss ? MiniCssExtractPlugin.loader : require.resolve('style-loader'),
-                    webpack_1.RawCssLoader,
+                    {
+                        loader: require.resolve('css-loader'),
+                        options: {
+                            url: false,
+                            sourceMap: cssSourceMap,
+                        },
+                    },
                     {
                         loader: require.resolve('postcss-loader'),
                         options: {
