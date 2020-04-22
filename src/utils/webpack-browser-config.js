@@ -43,7 +43,6 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
             // Under downlevel differential loading we copy the assets outside of webpack.
             assets: [],
             esVersionInFileName: true,
-            es5BrowserSupport: undefined,
         };
     }
     const supportES2015 = scriptTarget !== ts.ScriptTarget.JSON && scriptTarget > ts.ScriptTarget.ES5;

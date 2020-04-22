@@ -82,8 +82,7 @@ function getCommonConfig(wco) {
     if (wco.buildOptions.platform !== 'server') {
         if (differentialLoadingMode || tsConfig.options.target === typescript_1.ScriptTarget.ES5) {
             const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, tsConfig.options.target || typescript_1.ScriptTarget.ES5);
-            if (buildOptions.es5BrowserSupport ||
-                (buildOptions.es5BrowserSupport === undefined && buildBrowserFeatures.isEs5SupportNeeded())) {
+            if (buildBrowserFeatures.isEs5SupportNeeded()) {
                 const polyfillsChunkName = 'polyfills-es5';
                 entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
                 if (differentialLoadingMode) {
