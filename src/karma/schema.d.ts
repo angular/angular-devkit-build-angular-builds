@@ -24,11 +24,6 @@ export interface Schema {
      */
     environment?: string;
     /**
-     * Output in-file eval sourcemaps.
-     * @deprecated
-     */
-    evalSourceMap?: boolean;
-    /**
      * Replace files with other files in the build.
      */
     fileReplacements?: FileReplacement[];
@@ -90,11 +85,6 @@ export interface Schema {
      * The name of the TypeScript configuration file.
      */
     tsConfig: string;
-    /**
-     * Resolve vendor packages sourcemaps.
-     * @deprecated
-     */
-    vendorSourceMap?: boolean;
     /**
      * Run build when files change.
      */

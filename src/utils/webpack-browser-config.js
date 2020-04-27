@@ -7,6 +7,7 @@ const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs")
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const utils_1 = require("../utils");
 const build_browser_features_1 = require("./build-browser-features");
+const environment_options_1 = require("./environment-options");
 const i18n_options_1 = require("./i18n-options");
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
 const webpackMerge = require('webpack-merge');
@@ -69,7 +70,7 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
         }
         webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
     }
-    if (options.profile || process.env['NG_BUILD_PROFILING']) {
+    if (environment_options_1.profilingEnabled) {
         const esVersionInFileName = webpack_configs_1.getEsVersionForFileName(tsConfig.options.target, wco.buildOptions.esVersionInFileName);
         const smp = new SpeedMeasurePlugin({
             outputFormat: 'json',

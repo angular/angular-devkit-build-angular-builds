@@ -44,11 +44,6 @@ export interface Schema {
      */
     deployUrl?: string;
     /**
-     * Output in-file eval sourcemaps.
-     * @deprecated
-     */
-    evalSourceMap?: boolean;
-    /**
      * Concatenate modules with Rollup before bundling them with Webpack.
      */
     experimentalRollupPass?: boolean;
@@ -139,11 +134,6 @@ export interface Schema {
      */
     preserveSymlinks?: boolean;
     /**
-     * Output profile events for Chrome profiler.
-     * @deprecated Use "NG_BUILD_PROFILING" environment variable instead.
-     */
-    profile?: boolean;
-    /**
      * Log progress to the console while building.
      */
     progress?: boolean;
@@ -170,11 +160,6 @@ export interface Schema {
      * Show circular dependency warnings on builds.
      */
     showCircularDependencies?: boolean;
-    /**
-     * Flag to prevent building an app shell.
-     * @deprecated
-     */
-    skipAppShell?: boolean;
     /**
      * Output sourcemaps.
      */
@@ -204,11 +189,6 @@ export interface Schema {
      * Use a separate bundle containing only vendor libraries.
      */
     vendorChunk?: boolean;
-    /**
-     * Resolve vendor packages sourcemaps.
-     * @deprecated
-     */
-    vendorSourceMap?: boolean;
     /**
      * Adds more details to output logging.
      */

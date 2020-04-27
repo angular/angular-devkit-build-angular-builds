@@ -13,19 +13,9 @@ const utils_1 = require("./utils");
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
 function getBrowserConfig(wco) {
     const { buildOptions } = wco;
-    const { crossOrigin = 'none', subresourceIntegrity, evalSourceMap, extractLicenses, vendorChunk, commonChunk, styles, allowedCommonJsDependencies, optimization, } = buildOptions;
+    const { crossOrigin = 'none', subresourceIntegrity, extractLicenses, vendorChunk, commonChunk, styles, allowedCommonJsDependencies, } = buildOptions;
     const extraPlugins = [];
-    let isEval = false;
-    const { styles: stylesOptimization, scripts: scriptsOptimization } = optimization;
     const { styles: stylesSourceMap, scripts: scriptsSourceMap, hidden: hiddenSourceMap, } = buildOptions.sourceMap;
-    // See https://webpack.js.org/configuration/devtool/ for sourcemap types.
-    if ((stylesSourceMap || scriptsSourceMap) &&
-        evalSourceMap &&
-        !stylesOptimization &&
-        !scriptsOptimization) {
-        // Produce eval sourcemaps for development with serve, which are faster.
-        isEval = true;
-    }
     if (subresourceIntegrity) {
         extraPlugins.push(new SubresourceIntegrityPlugin({
             hashFuncNames: ['sha384'],
@@ -36,7 +26,7 @@ function getBrowserConfig(wco) {
             outputFilename: '3rdpartylicenses.txt',
         }));
     }
-    if (!isEval && (scriptsSourceMap || stylesSourceMap)) {
+    if (scriptsSourceMap || stylesSourceMap) {
         extraPlugins.push(utils_1.getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, wco.differentialLoadingMode ? true : hiddenSourceMap));
     }
     const globalStylesBundleNames = utils_1.normalizeExtraEntryPoints(styles, 'styles')
@@ -49,7 +39,7 @@ function getBrowserConfig(wco) {
         crossOriginLoading = crossOrigin;
     }
     return {
-        devtool: isEval ? 'eval' : false,
+        devtool: false,
         resolve: {
             mainFields: [
                 ...(wco.supportES2015 ? ['es2015'] : []),

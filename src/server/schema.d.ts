@@ -18,11 +18,6 @@ export interface Schema {
      */
     deployUrl?: string;
     /**
-     * Output in-file eval sourcemaps.
-     * @deprecated
-     */
-    evalSourceMap?: boolean;
-    /**
      * Exclude the listed external dependencies from being bundled into the bundle. Instead, the
      * created bundle relies on these dependencies to be available during runtime.
      */
@@ -129,11 +124,6 @@ export interface Schema {
      * @deprecated Since version 9. This option has no effect on server platform.
      */
     vendorChunk?: boolean;
-    /**
-     * Resolve vendor packages sourcemaps.
-     * @deprecated
-     */
-    vendorSourceMap?: boolean;
     /**
      * Adds more details to output logging.
      */

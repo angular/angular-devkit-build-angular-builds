@@ -31,11 +31,6 @@ export interface Schema {
      */
     disableHostCheck?: boolean;
     /**
-     * Output in-file eval sourcemaps.
-     * @deprecated
-     */
-    evalSourceMap?: boolean;
-    /**
      * Enable hot module replacement.
      */
     hmr?: boolean;
@@ -109,11 +104,6 @@ export interface Schema {
      * Use a separate bundle containing only vendor libraries.
      */
     vendorChunk?: boolean;
-    /**
-     * Resolve vendor packages sourcemaps.
-     * @deprecated
-     */
-    vendorSourceMap?: boolean;
     /**
      * Adds more details to output logging.
      */

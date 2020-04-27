@@ -133,7 +133,7 @@ function getCommonConfig(wco) {
             ];
         }
     }
-    if (buildOptions.profile || process.env['NG_BUILD_PROFILING']) {
+    if (environment_options_1.profilingEnabled) {
         extraPlugins.push(new webpack_1.debug.ProfilingPlugin({
             outputPath: path.resolve(root, `chrome-profiler-events${targetInFileName}.json`),
         }));

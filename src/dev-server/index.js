@@ -33,8 +33,6 @@ const devServerBuildOverriddenKeys = [
     'optimization',
     'aot',
     'sourceMap',
-    'vendorSourceMap',
-    'evalSourceMap',
     'vendorChunk',
     'commonChunk',
     'baseHref',

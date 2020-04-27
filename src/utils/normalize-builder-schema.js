@@ -15,7 +15,6 @@ const normalize_source_maps_1 = require("./normalize-source-maps");
 function normalizeBrowserSchema(host, root, projectRoot, sourceRoot, options) {
     const syncHost = new core_1.virtualFs.SyncDelegateHost(host);
     const normalizedSourceMapOptions = normalize_source_maps_1.normalizeSourceMaps(options.sourceMap || false);
-    normalizedSourceMapOptions.vendor = normalizedSourceMapOptions.vendor || options.vendorSourceMap;
     return {
         ...options,
         assets: normalize_asset_patterns_1.normalizeAssetPatterns(options.assets || [], syncHost, root, projectRoot, sourceRoot),
