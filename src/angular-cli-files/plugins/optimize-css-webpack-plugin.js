@@ -52,7 +52,10 @@ class OptimizeCssWebpackPlugin {
                     return;
                 }
                 const cssNanoOptions = {
-                    preset: 'default',
+                    preset: ['default', {
+                            // Disable SVG optimization, as this can cause optimizations which are not compatible in all browsers.
+                            svgo: false,
+                        }],
                 };
                 const postCssOptions = {
                     from: file,
