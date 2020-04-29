@@ -25,6 +25,7 @@ const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const browser_1 = require("../browser");
 const utils_1 = require("../utils");
 const cache_path_1 = require("../utils/cache-path");
+const process_bundle_1 = require("../utils/process-bundle");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const open = require('open');
@@ -41,33 +42,6 @@ const devServerBuildOverriddenKeys = [
     'verbose',
     'deployUrl',
 ];
-async function createI18nPlugins(locale, translation, missingTranslation) {
-    const plugins = [];
-    // tslint:disable-next-line: no-implicit-dependencies
-    const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
-    const diagnostics = new localizeDiag.Diagnostics();
-    const es2015 = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'));
-    plugins.push(
-    // tslint:disable-next-line: no-any
-    es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}), {
-        missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }));
-    const es5 = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
-    plugins.push(
-    // tslint:disable-next-line: no-any
-    es5.makeEs5TranslatePlugin(diagnostics, (translation || {}), {
-        missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }));
-    const inlineLocale = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/locale_plugin'));
-    plugins.push(inlineLocale.makeLocalePlugin(locale));
-    return { diagnostics, plugins };
-}
 /**
  * Reusable implementation of the build angular webpack dev server builder.
  * @param options Dev Server options.
@@ -221,7 +195,7 @@ exports.serveWebpackBrowser = serveWebpackBrowser;
 async function setupLocalize(i18n, browserOptions, webpackConfig) {
     const locale = [...i18n.inlineLocales][0];
     const localeDescription = i18n.locales[locale];
-    const { plugins, diagnostics } = await createI18nPlugins(locale, localeDescription && localeDescription.translation, browserOptions.i18nMissingTranslation);
+    const { plugins, diagnostics } = await process_bundle_1.createI18nPlugins(locale, localeDescription && localeDescription.translation, browserOptions.i18nMissingTranslation || 'ignore');
     // Modify main entrypoint to include locale data
     if (localeDescription &&
         localeDescription.dataPath &&

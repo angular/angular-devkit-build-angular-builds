@@ -1,3 +1,11 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { PluginObj } from '@babel/core';
 import { I18nOptions } from './i18n-options';
 export interface ProcessBundleOptions {
     filename: string;
@@ -43,6 +51,10 @@ export declare function setup(data: number[] | {
     i18n: I18nOptions;
 }): void;
 export declare function process(options: ProcessBundleOptions): Promise<ProcessBundleResult>;
+export declare function createI18nPlugins(locale: string, translation: unknown | undefined, missingTranslation: 'error' | 'warning' | 'ignore', localeDataContent?: string): Promise<{
+    diagnostics: import("@angular/localize/src/tools/src/diagnostics").Diagnostics;
+    plugins: PluginObj<{}>[];
+}>;
 export interface InlineOptions {
     filename: string;
     code: string;

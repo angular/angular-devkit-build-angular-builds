@@ -371,6 +371,7 @@ async function createI18nPlugins(locale, translation, missingTranslation, locale
     }
     return { diagnostics, plugins };
 }
+exports.createI18nPlugins = createI18nPlugins;
 const localizeName = '$localize';
 async function inlineLocales(options) {
     var _a;
@@ -455,9 +456,10 @@ async function inlineLocalesDirect(ast, options) {
         return { file: options.filename, diagnostics: [], count: 0 };
     }
     const { default: generate } = await Promise.resolve().then(() => require('@babel/generator'));
-    const utils = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
-    '@angular/localize/src/tools/src/translate/source_files/source_file_utils'));
+    // In Angular v10.0.0 the `source_file_utils` file was moved.
+    // (Remember to remove the `tryImport()` function when only one import path is required.)
+    // tslint:disable-next-line: no-implicit-dependencies
+    const utils = await tryImport('@angular/localize/src/tools/src/source_file_utils', '@angular/localize/src/tools/src/translate/source_files/source_file_utils');
     // tslint:disable-next-line: no-implicit-dependencies
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
@@ -512,6 +514,17 @@ async function inlineLocalesDirect(ast, options) {
         }
     }
     return { file: options.filename, diagnostics: diagnostics.messages, count: positions.length };
+}
+async function tryImport(...importPaths) {
+    for (const importPath of importPaths) {
+        try {
+            return await Promise.resolve().then(() => require(importPath));
+        }
+        catch (_a) {
+            // Do nothing
+        }
+    }
+    throw new Error('Unable to import from any of these paths:\n' + importPaths.map(p => ` - ${p}`).join('\n'));
 }
 function inlineCopyOnly(options) {
     if (!i18n) {
