@@ -11,9 +11,11 @@ const architect_1 = require("@angular-devkit/architect");
 const node_1 = require("@angular-devkit/architect/node");
 const testing_1 = require("@angular-devkit/architect/testing");
 const core_1 = require("@angular-devkit/core");
-exports.veEnabled = process.argv.includes('--ve');
-const devkitRoot = core_1.normalize(global._DevKitRoot); // tslint:disable-line:no-any
-exports.workspaceRoot = core_1.join(devkitRoot, `tests/angular_devkit/build_angular/hello-world-app${exports.veEnabled ? '-ve' : ''}/`);
+// Default timeout for large specs is 2.5 minutes.
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
+// This flag controls whether AOT compilation uses Ivy or View Engine (VE).
+exports.veEnabled = process.argv.some(arg => arg == 'view_engine');
+exports.workspaceRoot = core_1.join(core_1.normalize(__dirname), `../test/hello-world-app/`);
 exports.host = new testing_1.TestProjectHost(exports.workspaceRoot);
 exports.outputPath = core_1.normalize('dist');
 exports.browserTargetSpec = { project: 'app', target: 'build' };
@@ -29,6 +31,10 @@ async function createArchitect(workspaceRoot) {
     const { workspace } = await core_1.workspaces.readWorkspace(workspaceSysPath, core_1.workspaces.createWorkspaceHost(exports.host));
     const architectHost = new testing_1.TestingArchitectHost(workspaceSysPath, workspaceSysPath, new node_1.WorkspaceNodeModulesArchitectHost(workspace, workspaceSysPath));
     const architect = new architect_1.Architect(architectHost, registry);
+    // Set AOT compilation to use VE if needed.
+    if (exports.veEnabled) {
+        exports.host.replaceInFile('tsconfig.json', `"enableIvy": true,`, `"enableIvy": false,`);
+    }
     return {
         workspace,
         architectHost,

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export * from './transforms';
-export { AssetPattern, AssetPatternClass as AssetPatternObject, Budget, ExtraEntryPoint, ExtraEntryPointClass as ExtraEntryPointObject, FileReplacement, OptimizationClass as OptimizationObject, OptimizationUnion, OutputHashing, Schema as BrowserBuilderOptions, SourceMapClass as SourceMapObject, SourceMapUnion, StylePreprocessorOptions, Type, } from './browser/schema';
+export { AssetPattern, AssetPatternClass as AssetPatternObject, Budget, CrossOrigin, ExtraEntryPoint, ExtraEntryPointClass as ExtraEntryPointObject, FileReplacement, OptimizationClass as OptimizationObject, OptimizationUnion, OutputHashing, Schema as BrowserBuilderOptions, SourceMapClass as SourceMapObject, SourceMapUnion, StylePreprocessorOptions, Type, } from './browser/schema';
 export { buildWebpackBrowser as executeBrowserBuilder, BrowserBuilderOutput, } from './browser';
 export { serveWebpackBrowser as executeDevServerBuilder, DevServerBuilderOptions, DevServerBuilderOutput, } from './dev-server';
 export { execute as executeExtractI18nBuilder, ExtractI18nBuilderOptions, } from './extract-i18n';

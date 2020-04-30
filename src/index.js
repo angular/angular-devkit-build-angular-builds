@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 var schema_1 = require("./browser/schema");
+exports.CrossOrigin = schema_1.CrossOrigin;
 exports.OutputHashing = schema_1.OutputHashing;
 exports.Type = schema_1.Type;
 var browser_1 = require("./browser");
