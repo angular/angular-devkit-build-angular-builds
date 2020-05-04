@@ -1,22 +1,22 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "0.901.4",
+  "version": "0.901.4+3.49a462f",
   "description": "Angular Webpack Build Facade",
   "experimental": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#7819b2a53",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#7819b2a53",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#7819b2a53",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#7819b2a53",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#49a462f75",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#49a462f75",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#49a462f75",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#49a462f75",
     "@babel/core": "7.9.0",
     "@babel/generator": "7.9.3",
     "@babel/preset-env": "7.9.0",
     "@babel/template": "7.8.6",
     "@jsdevtools/coverage-istanbul-loader": "3.0.3",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#7819b2a53",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#49a462f75",
     "ajv": "6.12.0",
     "autoprefixer": "9.7.4",
     "babel-loader": "8.0.6",
@@ -67,7 +67,7 @@
     "webpack-merge": "4.2.2",
     "webpack-sources": "1.4.3",
     "webpack-subresource-integrity": "1.4.0",
-    "worker-plugin": "4.0.2"
+    "worker-plugin": "4.0.3"
   },
   "peerDependencies": {
     "@angular/compiler-cli": ">=9.0.0 < 10",
