@@ -256,6 +256,17 @@ function getCommonConfig(wco) {
     // If this file moves to another location, alter potentialNodeModules as well.
     const loaderNodeModules = find_up_1.findAllNodeModules(__dirname, projectRoot);
     loaderNodeModules.unshift('node_modules');
+    // Load rxjs path aliases.
+    // https://github.com/ReactiveX/rxjs/blob/master/doc/pipeable-operators.md#build-and-treeshaking
+    let alias = {};
+    try {
+        const rxjsPathMappingImport = wco.supportES2015
+            ? 'rxjs/_esm2015/path-mapping'
+            : 'rxjs/_esm5/path-mapping';
+        const rxPaths = require(require.resolve(rxjsPathMappingImport, { paths: [projectRoot] }));
+        alias = rxPaths();
+    }
+    catch (_a) { }
     const extraMinimizers = [];
     if (stylesOptimization) {
         extraMinimizers.push(new webpack_2.OptimizeCssWebpackPlugin({
@@ -368,6 +379,7 @@ function getCommonConfig(wco) {
             extensions: ['.ts', '.tsx', '.mjs', '.js'],
             symlinks: !buildOptions.preserveSymlinks,
             modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
+            alias,
             plugins: [PnpWebpackPlugin],
         },
         resolveLoader: {
