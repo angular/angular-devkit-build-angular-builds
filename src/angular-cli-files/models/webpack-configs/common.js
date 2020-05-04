@@ -256,17 +256,6 @@ function getCommonConfig(wco) {
     // If this file moves to another location, alter potentialNodeModules as well.
     const loaderNodeModules = find_up_1.findAllNodeModules(__dirname, projectRoot);
     loaderNodeModules.unshift('node_modules');
-    // Load rxjs path aliases.
-    // https://github.com/ReactiveX/rxjs/blob/master/doc/pipeable-operators.md#build-and-treeshaking
-    let alias = {};
-    try {
-        const rxjsPathMappingImport = wco.supportES2015
-            ? 'rxjs/_esm2015/path-mapping'
-            : 'rxjs/_esm5/path-mapping';
-        const rxPaths = require(require.resolve(rxjsPathMappingImport, { paths: [projectRoot] }));
-        alias = rxPaths();
-    }
-    catch (_a) { }
     const extraMinimizers = [];
     if (stylesOptimization) {
         extraMinimizers.push(new webpack_2.OptimizeCssWebpackPlugin({
@@ -332,12 +321,13 @@ function getCommonConfig(wco) {
             // Name mangling is handled within the browser builder
             mangle: environment_options_1.allowMangle && buildOptions.platform !== 'server' && !differentialLoadingMode,
         };
+        const globalScriptsNames = globalScriptsByBundleName.map(s => s.bundleName);
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,
             parallel: utils_1.maxWorkers,
             cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
-            chunkFilter: (chunk) => !globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
+            exclude: globalScriptsNames,
             terserOptions,
         }), 
         // Script bundles are fully optimized here in one step since they are never downleveled.
@@ -347,7 +337,7 @@ function getCommonConfig(wco) {
             parallel: utils_1.maxWorkers,
             cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
-            chunkFilter: (chunk) => globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
+            include: globalScriptsNames,
             terserOptions: {
                 ...terserOptions,
                 compress: environment_options_1.allowMinify && {
@@ -378,7 +368,6 @@ function getCommonConfig(wco) {
             extensions: ['.ts', '.tsx', '.mjs', '.js'],
             symlinks: !buildOptions.preserveSymlinks,
             modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
-            alias,
             plugins: [PnpWebpackPlugin],
         },
         resolveLoader: {

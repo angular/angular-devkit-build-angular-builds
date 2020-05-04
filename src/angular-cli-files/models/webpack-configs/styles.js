@@ -134,8 +134,10 @@ function getStylesConfig(wco) {
                     loader: require.resolve('less-loader'),
                     options: {
                         sourceMap: cssSourceMap,
-                        javascriptEnabled: true,
-                        ...lessPathOptions,
+                        lessOptions: {
+                            javascriptEnabled: true,
+                            ...lessPathOptions,
+                        },
                     },
                 },
             ],
