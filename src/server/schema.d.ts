@@ -5,6 +5,11 @@ export interface Schema {
      */
     bundleDependencies?: BundleDependenciesUnion;
     /**
+     * Use a separate bundle containing code used across multiple bundles.
+     * @deprecated Since version 9. This option has no effect on server platform.
+     */
+    commonChunk?: boolean;
+    /**
      * Delete the output path before building.
      */
     deleteOutputPath?: boolean;
@@ -114,6 +119,11 @@ export interface Schema {
      * The name of the TypeScript configuration file.
      */
     tsConfig: string;
+    /**
+     * Use a separate bundle containing only vendor libraries.
+     * @deprecated Since version 9. This option has no effect on server platform.
+     */
+    vendorChunk?: boolean;
     /**
      * Adds more details to output logging.
      */
