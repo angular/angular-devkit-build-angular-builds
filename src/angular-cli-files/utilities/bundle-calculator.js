@@ -14,6 +14,7 @@ var ThresholdSeverity;
 })(ThresholdSeverity = exports.ThresholdSeverity || (exports.ThresholdSeverity = {}));
 var DifferentialBuildType;
 (function (DifferentialBuildType) {
+    // FIXME: this should match the actual file suffix and not hardcoded.
     DifferentialBuildType["ORIGINAL"] = "es2015";
     DifferentialBuildType["DOWNLEVEL"] = "es5";
 })(DifferentialBuildType || (DifferentialBuildType = {}));

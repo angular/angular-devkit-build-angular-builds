@@ -25,7 +25,7 @@ function getServerConfig(wco) {
     }
     const config = {
         resolve: {
-            mainFields: [...(wco.supportES2015 ? ['es2015'] : []), 'main', 'module'],
+            mainFields: ['es2015', 'main', 'module'],
         },
         target: 'node',
         output: {
