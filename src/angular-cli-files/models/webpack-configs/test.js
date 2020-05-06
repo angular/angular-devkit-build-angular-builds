@@ -46,10 +46,7 @@ function getTestConfig(wco) {
     return {
         mode: 'development',
         resolve: {
-            mainFields: [
-                ...(wco.supportES2015 ? ['es2015'] : []),
-                'browser', 'module', 'main',
-            ],
+            mainFields: ['es2015', 'browser', 'module', 'main'],
         },
         devtool: buildOptions.sourceMap ? false : 'eval',
         entry: {
