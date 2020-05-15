@@ -11,10 +11,6 @@ export interface Schema {
      */
     devServerTarget?: string;
     /**
-     * Start Protractor's Element Explorer for debugging.
-     */
-    elementExplorer?: boolean;
-    /**
      * Execute specs whose names match the pattern, which is internally compiled to a RegExp.
      */
     grep?: string;

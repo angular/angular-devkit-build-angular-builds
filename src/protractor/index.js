@@ -14,7 +14,6 @@ const url = require("url");
 const utils_1 = require("../utils");
 function runProtractor(root, options) {
     const additionalProtractorConfig = {
-        elementExplorer: options.elementExplorer,
         baseUrl: options.baseUrl,
         specs: options.specs && options.specs.length ? options.specs : undefined,
         suite: options.suite,
