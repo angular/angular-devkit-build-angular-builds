@@ -12,6 +12,9 @@ export interface Schema {
     devServerTarget?: string;
     /**
      * Start Protractor's Element Explorer for debugging.
+     * @deprecated This option has no effect. See:
+     * https://github.com/angular/protractor/blob/master/docs/debugging.md#enabled-control-flow
+     * for alternative methods.
      */
     elementExplorer?: boolean;
     /**
