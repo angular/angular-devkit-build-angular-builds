@@ -420,7 +420,7 @@ async function inlineLocales(options) {
             // If locale data is provided, load it and prepend to file
             const localeDataPath = (_a = i18n.locales[locale]) === null || _a === void 0 ? void 0 : _a.dataPath;
             if (localeDataPath) {
-                localeDataContent = await loadLocaleData(localeDataPath, true);
+                localeDataContent = await loadLocaleData(localeDataPath, true, options.es5);
             }
         }
         const { diagnostics: localeDiagnostics, plugins } = await createI18nPlugins(locale, translations, isSourceLocale ? 'ignore' : options.missingTranslation || 'warning', localeDataContent);
@@ -492,7 +492,7 @@ async function inlineLocalesDirect(ast, options) {
             let localeDataSource = null;
             const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
             if (localeDataPath) {
-                const localeDataContent = await loadLocaleData(localeDataPath, true);
+                const localeDataContent = await loadLocaleData(localeDataPath, true, options.es5);
                 localeDataSource = new webpack_sources_1.OriginalSource(localeDataContent, path.basename(localeDataPath));
             }
             outputSource = localeDataSource
@@ -571,16 +571,33 @@ utils) {
     }
     return positions;
 }
-async function loadLocaleData(path, optimize) {
+async function loadLocaleData(path, optimize, es5) {
     // The path is validated during option processing before the build starts
     const content = fs.readFileSync(path, 'utf8');
-    // NOTE: This can be removed once the locale data files are preprocessed in the framework
-    if (optimize) {
-        const result = await terserMangle(content, {
-            compress: true,
-            ecma: 5,
-        });
-        return result.code;
+    // Downlevel and optimize the data
+    const transformResult = await core_1.transformAsync(content, {
+        filename: path,
+        // The types do not include the false option even though it is valid
+        // tslint:disable-next-line: no-any
+        inputSourceMap: false,
+        babelrc: false,
+        configFile: false,
+        presets: [
+            [
+                require.resolve('@babel/preset-env'),
+                {
+                    bugfixes: true,
+                    // IE 9 is the oldest supported browser
+                    targets: es5 ? { ie: '9' } : { esmodules: true },
+                },
+            ],
+        ],
+        minified: environment_options_1.allowMinify && optimize,
+        compact: !environment_options_1.shouldBeautify && optimize,
+        comments: !optimize,
+    });
+    if (!transformResult || !transformResult.code) {
+        throw new Error(`Unknown error occurred processing bundle for "${path}".`);
     }
-    return content;
+    return transformResult.code;
 }
