@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.buildWebpackBrowser = exports.buildBrowserWebpackConfigFromContext = exports.createBrowserLoggingCallback = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -385,7 +386,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                     }
                     finally {
-                        await executor.stop();
+                        executor.stop();
                     }
                     // Copy assets
                     if (options.assets) {

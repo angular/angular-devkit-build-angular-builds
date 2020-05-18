@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SingleTestTransformLoader = void 0;
 const loader_utils_1 = require("loader-utils");
 const path_1 = require("path");
 exports.SingleTestTransformLoader = require.resolve(path_1.join(__dirname, 'single-test-transform'));

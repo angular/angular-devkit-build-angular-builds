@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.NgBuildAnalyticsPlugin = exports.countOccurrences = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

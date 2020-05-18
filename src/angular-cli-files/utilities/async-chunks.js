@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.markAsyncChunksNonInitial = void 0;
 /**
  * Webpack stats may incorrectly mark extra entry points `initial` chunks, when
  * they are actually loaded asynchronously and thus not in the main bundle. This

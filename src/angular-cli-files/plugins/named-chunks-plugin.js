@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.NamedLazyChunksPlugin = void 0;
 // Webpack doesn't export these so the deep imports can potentially break.
 // There doesn't seem to exist any ergonomic way to alter chunk names for non-context lazy chunks
 // (https://github.com/webpack/webpack/issues/9075) so this is the best alternative for now.

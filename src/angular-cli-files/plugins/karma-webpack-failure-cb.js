@@ -9,6 +9,7 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.KarmaWebpackFailureCb = void 0;
 // Force Webpack to throw compilation errors. Useful with karma-webpack when in single-run mode.
 // Workaround for https://github.com/webpack-contrib/karma-webpack/issues/66
 class KarmaWebpackFailureCb {

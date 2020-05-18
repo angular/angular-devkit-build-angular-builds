@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BuildBrowserFeatures = void 0;
 const browserslist = require("browserslist");
 const caniuse_lite_1 = require("caniuse-lite");
 const ts = require("typescript");

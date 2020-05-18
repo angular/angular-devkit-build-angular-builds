@@ -9,6 +9,7 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SuppressExtractedTextChunksWebpackPlugin = void 0;
 // Remove .js files from entry points consisting entirely of .css|scss|sass|less|styl.
 // To be used together with ExtractTextPlugin.
 class SuppressExtractedTextChunksWebpackPlugin {

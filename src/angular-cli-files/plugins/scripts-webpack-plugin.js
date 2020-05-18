@@ -2,6 +2,7 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ScriptsWebpackPlugin = void 0;
 const webpack_sources_1 = require("webpack-sources");
 const loader_utils_1 = require("loader-utils");
 const path = require("path");

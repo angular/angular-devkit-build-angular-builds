@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.normalizeSourceMaps = void 0;
 function normalizeSourceMaps(sourceMap) {
     const scripts = typeof sourceMap === 'object' ? sourceMap.scripts : sourceMap;
     const styles = typeof sourceMap === 'object' ? sourceMap.styles : sourceMap;

@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.urlJoin = void 0;
 function urlJoin(...parts) {
     const [p, ...rest] = parts;
     // Remove trailing slash from first part

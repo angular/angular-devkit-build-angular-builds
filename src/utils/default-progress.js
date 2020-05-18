@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.defaultProgress = void 0;
 function defaultProgress(progress) {
     if (progress === undefined) {
         return process.stdout.isTTY === true;

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.configureI18nBuild = exports.createI18nOptions = void 0;
 const core_1 = require("@angular-devkit/core");
 const fs = require("fs");
 const os = require("os");

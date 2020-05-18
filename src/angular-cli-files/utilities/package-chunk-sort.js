@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.generateEntryPoints = void 0;
 const utils_1 = require("../models/webpack-configs/utils");
 function generateEntryPoints(appConfig) {
     // Add all styles/scripts, except lazy-loaded ones.

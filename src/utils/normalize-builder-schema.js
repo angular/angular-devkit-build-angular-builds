@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.normalizeBrowserSchema = void 0;
 const core_1 = require("@angular-devkit/core");
 const normalize_asset_patterns_1 = require("./normalize-asset-patterns");
 const normalize_file_replacements_1 = require("./normalize-file-replacements");

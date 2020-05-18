@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RemoveHashPlugin = void 0;
 class RemoveHashPlugin {
     constructor(options) {
         this.options = options;

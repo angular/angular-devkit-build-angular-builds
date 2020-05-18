@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.i18nInlineEmittedFiles = void 0;
 const fs = require("fs");
 const path = require("path");
 const action_executor_1 = require("./action-executor");
@@ -68,7 +69,7 @@ async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPat
         return false;
     }
     finally {
-        await executor.stop();
+        executor.stop();
     }
     if (hasErrors) {
         context.logger.error('Localized bundle generation failed.');

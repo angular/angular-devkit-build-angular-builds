@@ -9,6 +9,7 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isPolyfillsEntry = exports.getEsVersionForFileName = exports.getSourceMapDevTool = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
 const core_1 = require("@angular-devkit/core");
 const webpack_1 = require("webpack");
 const typescript_1 = require("typescript");

@@ -9,6 +9,7 @@
 // tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isDirectory = void 0;
 const fs = require("fs");
 function isDirectory(path) {
     try {

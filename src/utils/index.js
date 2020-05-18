@@ -6,18 +6,25 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !exports.hasOwnProperty(p)) __createBinding(exports, m, p);
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./build-browser-features"));
-__export(require("./default-progress"));
-__export(require("./delete-output-dir"));
-__export(require("./run-module-as-observable-fork"));
-__export(require("./normalize-file-replacements"));
-__export(require("./normalize-asset-patterns"));
-__export(require("./normalize-source-maps"));
-__export(require("./normalize-optimization"));
-__export(require("./normalize-builder-schema"));
-__export(require("./url"));
-__export(require("./workers"));
+__exportStar(require("./build-browser-features"), exports);
+__exportStar(require("./default-progress"), exports);
+__exportStar(require("./delete-output-dir"), exports);
+__exportStar(require("./run-module-as-observable-fork"), exports);
+__exportStar(require("./normalize-file-replacements"), exports);
+__exportStar(require("./normalize-asset-patterns"), exports);
+__exportStar(require("./normalize-source-maps"), exports);
+__exportStar(require("./normalize-optimization"), exports);
+__exportStar(require("./normalize-builder-schema"), exports);
+__exportStar(require("./url"), exports);
+__exportStar(require("./workers"), exports);

@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getTestConfig = void 0;
 const glob = require("glob");
 const path = require("path");
 const utils_1 = require("./utils");

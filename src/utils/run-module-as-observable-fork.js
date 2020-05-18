@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.runModuleAsObservableFork = void 0;
 const child_process_1 = require("child_process");
 const path_1 = require("path");
 const rxjs_1 = require("rxjs");

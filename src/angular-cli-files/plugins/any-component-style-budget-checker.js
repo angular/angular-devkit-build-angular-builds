@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AnyComponentStyleBudgetChecker = void 0;
 const path = require("path");
 const schema_1 = require("../../../src/browser/schema");
 const bundle_calculator_1 = require("../utilities/bundle-calculator");

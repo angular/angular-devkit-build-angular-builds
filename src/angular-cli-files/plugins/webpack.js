@@ -7,24 +7,25 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.WebpackRollupLoader = void 0;
 // Exports the webpack plugins we use internally.
 var any_component_style_budget_checker_1 = require("./any-component-style-budget-checker");
-exports.AnyComponentStyleBudgetChecker = any_component_style_budget_checker_1.AnyComponentStyleBudgetChecker;
+Object.defineProperty(exports, "AnyComponentStyleBudgetChecker", { enumerable: true, get: function () { return any_component_style_budget_checker_1.AnyComponentStyleBudgetChecker; } });
 var optimize_css_webpack_plugin_1 = require("./optimize-css-webpack-plugin");
-exports.OptimizeCssWebpackPlugin = optimize_css_webpack_plugin_1.OptimizeCssWebpackPlugin;
+Object.defineProperty(exports, "OptimizeCssWebpackPlugin", { enumerable: true, get: function () { return optimize_css_webpack_plugin_1.OptimizeCssWebpackPlugin; } });
 var bundle_budget_1 = require("./bundle-budget");
-exports.BundleBudgetPlugin = bundle_budget_1.BundleBudgetPlugin;
+Object.defineProperty(exports, "BundleBudgetPlugin", { enumerable: true, get: function () { return bundle_budget_1.BundleBudgetPlugin; } });
 var scripts_webpack_plugin_1 = require("./scripts-webpack-plugin");
-exports.ScriptsWebpackPlugin = scripts_webpack_plugin_1.ScriptsWebpackPlugin;
+Object.defineProperty(exports, "ScriptsWebpackPlugin", { enumerable: true, get: function () { return scripts_webpack_plugin_1.ScriptsWebpackPlugin; } });
 var suppress_entry_chunks_webpack_plugin_1 = require("./suppress-entry-chunks-webpack-plugin");
-exports.SuppressExtractedTextChunksWebpackPlugin = suppress_entry_chunks_webpack_plugin_1.SuppressExtractedTextChunksWebpackPlugin;
+Object.defineProperty(exports, "SuppressExtractedTextChunksWebpackPlugin", { enumerable: true, get: function () { return suppress_entry_chunks_webpack_plugin_1.SuppressExtractedTextChunksWebpackPlugin; } });
 var remove_hash_plugin_1 = require("./remove-hash-plugin");
-exports.RemoveHashPlugin = remove_hash_plugin_1.RemoveHashPlugin;
+Object.defineProperty(exports, "RemoveHashPlugin", { enumerable: true, get: function () { return remove_hash_plugin_1.RemoveHashPlugin; } });
 var named_chunks_plugin_1 = require("./named-chunks-plugin");
-exports.NamedLazyChunksPlugin = named_chunks_plugin_1.NamedLazyChunksPlugin;
+Object.defineProperty(exports, "NamedLazyChunksPlugin", { enumerable: true, get: function () { return named_chunks_plugin_1.NamedLazyChunksPlugin; } });
 var common_js_usage_warn_plugin_1 = require("./common-js-usage-warn-plugin");
-exports.CommonJsUsageWarnPlugin = common_js_usage_warn_plugin_1.CommonJsUsageWarnPlugin;
+Object.defineProperty(exports, "CommonJsUsageWarnPlugin", { enumerable: true, get: function () { return common_js_usage_warn_plugin_1.CommonJsUsageWarnPlugin; } });
 var postcss_cli_resources_1 = require("./postcss-cli-resources");
-exports.PostcssCliResources = postcss_cli_resources_1.default;
+Object.defineProperty(exports, "PostcssCliResources", { enumerable: true, get: function () { return postcss_cli_resources_1.default; } });
 const path_1 = require("path");
 exports.WebpackRollupLoader = require.resolve(path_1.join(__dirname, 'webpack-rollup-loader'));

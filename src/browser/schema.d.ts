@@ -3,7 +3,7 @@
  */
 export interface Schema {
     /**
-     * A list of CommonJS packages that are allowed to be used without a built time warning.
+     * A list of CommonJS packages that are allowed to be used without a build time warning.
      */
     allowedCommonJsDependencies?: string[];
     /**

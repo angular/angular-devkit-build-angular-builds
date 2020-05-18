@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getStylesConfig = void 0;
 const path = require("path");
 const webpack_1 = require("../../plugins/webpack");
 const utils_1 = require("./utils");

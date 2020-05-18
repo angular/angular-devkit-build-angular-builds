@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.readTsconfig = void 0;
 const path = require("path");
 /**
  * Reads and parses a given TsConfig file.

@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.normalizeFileReplacements = exports.MissingFileReplacementException = void 0;
 const core_1 = require("@angular-devkit/core");
 class MissingFileReplacementException extends core_1.BaseException {
     constructor(path) {

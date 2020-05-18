@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BundleBudgetPlugin = void 0;
 const bundle_calculator_1 = require("../utilities/bundle-calculator");
 class BundleBudgetPlugin {
     constructor(options) {

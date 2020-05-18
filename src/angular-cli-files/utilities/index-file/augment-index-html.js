@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.augmentIndexHtml = void 0;
 const crypto_1 = require("crypto");
 const webpack_sources_1 = require("webpack-sources");
 const parse5 = require('parse5');

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.inlineLocales = exports.createI18nPlugins = exports.process = exports.setup = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
