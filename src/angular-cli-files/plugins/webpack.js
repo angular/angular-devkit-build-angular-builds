@@ -23,6 +23,8 @@ var remove_hash_plugin_1 = require("./remove-hash-plugin");
 Object.defineProperty(exports, "RemoveHashPlugin", { enumerable: true, get: function () { return remove_hash_plugin_1.RemoveHashPlugin; } });
 var named_chunks_plugin_1 = require("./named-chunks-plugin");
 Object.defineProperty(exports, "NamedLazyChunksPlugin", { enumerable: true, get: function () { return named_chunks_plugin_1.NamedLazyChunksPlugin; } });
+var dedupe_module_resolve_plugin_1 = require("./dedupe-module-resolve-plugin");
+Object.defineProperty(exports, "DedupeModuleResolvePlugin", { enumerable: true, get: function () { return dedupe_module_resolve_plugin_1.DedupeModuleResolvePlugin; } });
 var common_js_usage_warn_plugin_1 = require("./common-js-usage-warn-plugin");
 Object.defineProperty(exports, "CommonJsUsageWarnPlugin", { enumerable: true, get: function () { return common_js_usage_warn_plugin_1.CommonJsUsageWarnPlugin; } });
 var postcss_cli_resources_1 = require("./postcss-cli-resources");

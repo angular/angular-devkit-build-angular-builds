@@ -367,7 +367,10 @@ function getCommonConfig(wco) {
             extensions: ['.ts', '.tsx', '.mjs', '.js'],
             symlinks: !buildOptions.preserveSymlinks,
             modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
-            plugins: [PnpWebpackPlugin],
+            plugins: [
+                PnpWebpackPlugin,
+                new webpack_2.DedupeModuleResolvePlugin({ verbose: buildOptions.verbose }),
+            ],
         },
         resolveLoader: {
             symlinks: !buildOptions.preserveSymlinks,
