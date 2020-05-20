@@ -1,17 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBrowserConfig = void 0;
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-const LicenseCheckerWebpackPlugin = require("license-checker-webpack-plugin");
 const webpack_1 = require("../../plugins/webpack");
 const utils_1 = require("./utils");
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
+const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
 function getBrowserConfig(wco) {
     const { buildOptions } = wco;
     const { crossOrigin = 'none', subresourceIntegrity, extractLicenses, vendorChunk, commonChunk, styles, allowedCommonJsDependencies, } = buildOptions;
@@ -23,7 +16,12 @@ function getBrowserConfig(wco) {
         }));
     }
     if (extractLicenses) {
-        extraPlugins.push(new LicenseCheckerWebpackPlugin({
+        extraPlugins.push(new LicenseWebpackPlugin({
+            stats: {
+                warnings: false,
+                errors: false,
+            },
+            perChunkOutput: false,
             outputFilename: '3rdpartylicenses.txt',
         }));
     }
