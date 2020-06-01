@@ -8,8 +8,8 @@
 import { logging } from '@angular-devkit/core';
 import { loader } from 'webpack';
 export interface SingleTestTransformLoaderOptions {
-    files: string[];
-    logger: logging.Logger;
+    files?: string[];
+    logger?: logging.Logger;
 }
 export declare const SingleTestTransformLoader: string;
 /**

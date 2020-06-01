@@ -1,6 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SingleTestTransformLoader = void 0;
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+const core_1 = require("@angular-devkit/core");
 const loader_utils_1 = require("loader-utils");
 const path_1 = require("path");
 exports.SingleTestTransformLoader = require.resolve(path_1.join(__dirname, 'single-test-transform'));
@@ -18,24 +26,19 @@ exports.SingleTestTransformLoader = require.resolve(path_1.join(__dirname, 'sing
  * array to import them directly, and thus run the tests there.
  */
 function loader(source) {
-    const options = loader_utils_1.getOptions(this);
-    const lineSeparator = process.platform === 'win32' ? '\r\n' : '\n';
-    const targettedImports = options.files
-        .map(path => `require('./${path.replace('.' + path_1.extname(path), '')}');`)
-        .join(lineSeparator);
-    // TODO: maybe a documented 'marker/comment' inside test.ts would be nicer?
-    const regex = /require\.context\(.*/;
-    // signal the user that expected content is not present
-    if (!regex.test(source)) {
-        const message = [
-            `The 'include' option requires that the 'main' file for tests include the line below:`,
-            `const context = require.context('./', true, /\.spec\.ts$/);`,
-            `Arguments passed to require.context are not strict and can be changed`,
-        ];
-        options.logger.error(message.join(lineSeparator));
+    const { files = [], logger = console } = loader_utils_1.getOptions(this);
+    // signal the user that expected content is not present.
+    if (!source.includes('require.context(')) {
+        logger.error(core_1.tags.stripIndent `The 'include' option requires that the 'main' file for tests includes the below line:
+      const context = require.context('./', true, /\.spec\.ts$/);
+      Arguments passed to require.context are not strict and can be changed.`);
+        return source;
     }
-    const mockedRequireContext = 'Object.assign(() => { }, { keys: () => [], resolve: () => undefined });' + lineSeparator;
-    source = source.replace(regex, mockedRequireContext + targettedImports);
+    const targettedImports = files
+        .map(path => `require('./${path.replace('.' + path_1.extname(path), '')}');`)
+        .join('\n');
+    const mockedRequireContext = 'Object.assign(() => { }, { keys: () => [], resolve: () => undefined });\n';
+    source = source.replace(/require\.context\(.*/, mockedRequireContext + targettedImports);
     return source;
 }
 exports.default = loader;
