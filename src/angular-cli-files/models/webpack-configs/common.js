@@ -185,27 +185,37 @@ function getCommonConfig(wco) {
     if (buildOptions.assets.length) {
         const copyWebpackPluginPatterns = buildOptions.assets.map((asset) => {
             // Resolve input paths relative to workspace root and add slash at the end.
-            asset.input = path.resolve(root, asset.input).replace(/\\/g, '/');
-            asset.input = asset.input.endsWith('/') ? asset.input : asset.input + '/';
-            asset.output = asset.output.endsWith('/') ? asset.output : asset.output + '/';
-            if (asset.output.startsWith('..')) {
-                const message = 'An asset cannot be written to a location outside of the output path.';
-                throw new Error(message);
+            // tslint:disable-next-line: prefer-const
+            let { input, output, ignore = [], glob } = asset;
+            input = path.resolve(root, input).replace(/\\/g, '/');
+            input = input.endsWith('/') ? input : input + '/';
+            output = output.endsWith('/') ? output : output + '/';
+            if (output.startsWith('..')) {
+                throw new Error('An asset cannot be written to a location outside of the output path.');
             }
             return {
-                context: asset.input,
+                context: input,
                 // Now we remove starting slash to make Webpack place it from the output root.
-                to: asset.output.replace(/^\//, ''),
-                ignore: asset.ignore,
-                from: {
-                    glob: asset.glob,
+                to: output.replace(/^\//, ''),
+                from: glob,
+                noErrorOnMissing: true,
+                globOptions: {
                     dot: true,
+                    ignore: [
+                        '.gitkeep',
+                        '**/.DS_Store',
+                        '**/Thumbs.db',
+                        // Negate patterns needs to be absolute because copy-webpack-plugin uses absolute globs which
+                        // causes negate patterns not to match.
+                        // See: https://github.com/webpack-contrib/copy-webpack-plugin/issues/498#issuecomment-639327909
+                        ...ignore,
+                    ].map(i => path.posix.join(input, i)),
                 },
             };
         });
-        const copyWebpackPluginOptions = { ignore: ['.gitkeep', '**/.DS_Store', '**/Thumbs.db'] };
-        const copyWebpackPluginInstance = new CopyWebpackPlugin(copyWebpackPluginPatterns, copyWebpackPluginOptions);
-        extraPlugins.push(copyWebpackPluginInstance);
+        extraPlugins.push(new CopyWebpackPlugin({
+            patterns: copyWebpackPluginPatterns,
+        }));
     }
     if (buildOptions.progress) {
         extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose }));
