@@ -296,11 +296,12 @@ function getCommonConfig(wco) {
                 buildOptions.platform !== 'server' &&
                 (!differentialLoadingNeeded || (differentialLoadingNeeded && utils_1.fullDifferential)),
         };
+        const globalScriptsNames = globalScriptsByBundleName.map(s => s.bundleName);
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,
             parallel: true,
             cache: true,
-            chunkFilter: (chunk) => !globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
+            exclude: globalScriptsNames,
             terserOptions,
         }), 
         // Script bundles are fully optimized here in one step since they are never downleveled.
@@ -309,7 +310,7 @@ function getCommonConfig(wco) {
             sourceMap: scriptsSourceMap,
             parallel: true,
             cache: true,
-            chunkFilter: (chunk) => globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
+            include: globalScriptsNames,
             terserOptions: {
                 ...terserOptions,
                 compress: {
