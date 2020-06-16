@@ -341,12 +341,13 @@ function getCommonConfig(wco) {
             // Name mangling is handled within the browser builder
             mangle: environment_options_1.allowMangle && buildOptions.platform !== 'server' && !differentialLoadingMode,
         };
+        const globalScriptsNames = globalScriptsByBundleName.map(s => s.bundleName);
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,
             parallel: utils_1.maxWorkers,
             cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
-            chunkFilter: (chunk) => !globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
+            exclude: globalScriptsNames,
             terserOptions,
         }), 
         // Script bundles are fully optimized here in one step since they are never downleveled.
@@ -356,7 +357,7 @@ function getCommonConfig(wco) {
             parallel: utils_1.maxWorkers,
             cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
-            chunkFilter: (chunk) => globalScriptsByBundleName.some(s => s.bundleName === chunk.name),
+            include: globalScriptsNames,
             terserOptions: {
                 ...terserOptions,
                 compress: environment_options_1.allowMinify && {
