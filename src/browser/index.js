@@ -93,19 +93,8 @@ function getCompilerConfig(wco) {
     return {};
 }
 async function initialize(options, context, host, webpackConfigurationTransform) {
-    var _a, _b;
     const originalOutputPath = options.outputPath;
-    // Assets are processed directly by the builder except when watching
-    const adjustedOptions = options.watch ? options : { ...options, assets: [] };
-    const { config, projectRoot, projectSourceRoot, i18n, } = await buildBrowserWebpackConfigFromContext(adjustedOptions, context, host, true);
-    // Validate asset option values if processed directly
-    if (((_a = options.assets) === null || _a === void 0 ? void 0 : _a.length) && !((_b = adjustedOptions.assets) === null || _b === void 0 ? void 0 : _b.length)) {
-        utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), core_1.normalize(context.workspaceRoot), core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)).forEach(({ output }) => {
-            if (output.startsWith('..')) {
-                throw new Error('An asset cannot be written to a location outside of the output path.');
-            }
-        });
-    }
+    const { config, projectRoot, projectSourceRoot, i18n, } = await buildBrowserWebpackConfigFromContext(options, context, host, true);
     let transformedConfig;
     if (webpackConfigurationTransform) {
         transformedConfig = await webpackConfigurationTransform(config);
@@ -399,6 +388,16 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     finally {
                         executor.stop();
                     }
+                    // Copy assets
+                    if (options.assets) {
+                        try {
+                            await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), Array.from(outputPaths.values()), context.workspaceRoot);
+                        }
+                        catch (err) {
+                            context.logger.error('Unable to copy assets: ' + err.message);
+                            return { success: false };
+                        }
+                    }
                     function generateBundleInfoStats(id, bundle, chunk) {
                         return stats_1.generateBundleStats({
                             id,
@@ -470,16 +469,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         if (!success) {
                             return { success: false };
                         }
-                    }
-                }
-                // Copy assets
-                if (!options.watch && options.assets) {
-                    try {
-                        await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), Array.from(outputPaths.values()), context.workspaceRoot);
-                    }
-                    catch (err) {
-                        context.logger.error('Unable to copy assets: ' + err.message);
-                        return { success: false };
                     }
                 }
                 if (options.index) {
