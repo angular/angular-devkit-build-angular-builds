@@ -58,8 +58,7 @@ class CommonJsUsageWarnPlugin {
                         // will require CommonJS libraries for live reloading such as 'sockjs-node'.
                         if ((mainIssuer === null || mainIssuer === void 0 ? void 0 : mainIssuer.name) === 'main' && !((_d = issuer === null || issuer === void 0 ? void 0 : issuer.userRequest) === null || _d === void 0 ? void 0 : _d.includes('webpack-dev-server'))) {
                             const warning = `${issuer === null || issuer === void 0 ? void 0 : issuer.userRequest} depends on ${rawRequest}. CommonJS or AMD dependencies can cause optimization bailouts.\n` +
-                                'For more info see: https://web.dev/commonjs-larger-bundles\n' +
-                                `To disable this warning add "${rawRequest}" to the "allowedCommonJsDependencies" option under "build" options in "angular.json".`;
+                                'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
                             // Avoid showing the same warning multiple times when in 'watch' mode.
                             if (!this.shownWarnings.has(warning)) {
                                 compilation.warnings.push(warning);
