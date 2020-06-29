@@ -226,7 +226,7 @@ function getCommonConfig(wco) {
         extraPlugins.push(new (class {
             apply(compiler) {
                 compiler.hooks.emit.tap('angular-cli-stats', compilation => {
-                    const data = JSON.stringify(compilation.getStats().toJson('verbose'));
+                    const data = JSON.stringify(compilation.getStats().toJson('verbose'), undefined, 2);
                     compilation.assets['stats.json'] = new webpack_sources_1.RawSource(data);
                 });
             }
