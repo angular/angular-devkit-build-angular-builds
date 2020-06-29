@@ -13,11 +13,13 @@ interface NormalModuleFactoryRequest {
     relativePath: string;
     path: string;
     descriptionFileData: {
-        name: string;
-        version: string;
+        name?: string;
+        version?: string;
     };
     descriptionFileRoot: string;
     descriptionFilePath: string;
+    directory?: boolean;
+    file?: boolean;
 }
 export interface DedupeModuleResolvePluginOptions {
     verbose?: boolean;
