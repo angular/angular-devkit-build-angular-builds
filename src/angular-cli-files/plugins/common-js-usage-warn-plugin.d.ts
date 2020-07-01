@@ -17,5 +17,4 @@ export declare class CommonJsUsageWarnPlugin {
     constructor(options?: CommonJsUsageWarnPluginOptions);
     apply(compiler: Compiler): void;
     private hasCommonJsDependencies;
-    private rawRequestToPackageName;
 }
