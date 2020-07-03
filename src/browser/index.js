@@ -163,10 +163,10 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             if (!success && useBundleDownleveling) {
                 // If using bundle downleveling then there is only one build
                 // If it fails show any diagnostic messages and bail
-                if (webpackStats && webpackStats.warnings.length > 0) {
+                if (stats_1.statsHasWarnings(webpackStats)) {
                     context.logger.warn(stats_1.statsWarningsToString(webpackStats, { colors: true }));
                 }
-                if (webpackStats && webpackStats.errors.length > 0) {
+                if (stats_1.statsHasErrors(webpackStats)) {
                     context.logger.error(stats_1.statsErrorsToString(webpackStats, { colors: true }));
                 }
                 return { success };
@@ -449,13 +449,12 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 break;
                             default:
                                 assertNever(severity);
-                                break;
                         }
                     }
-                    if (webpackStats && webpackStats.warnings.length > 0) {
+                    if (stats_1.statsHasWarnings(webpackStats)) {
                         context.logger.warn(stats_1.statsWarningsToString(webpackStats, { colors: true }));
                     }
-                    if (webpackStats && webpackStats.errors.length > 0) {
+                    if (stats_1.statsHasErrors(webpackStats)) {
                         context.logger.error(stats_1.statsErrorsToString(webpackStats, { colors: true }));
                         return { success: false };
                     }
