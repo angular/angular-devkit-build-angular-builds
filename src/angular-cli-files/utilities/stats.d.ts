@@ -12,3 +12,5 @@ export declare function generateBuildStats(hash: string, time: number, colors: b
 export declare function statsToString(json: any, statsConfig: any): string;
 export declare function statsWarningsToString(json: any, statsConfig: any): string;
 export declare function statsErrorsToString(json: any, statsConfig: any): string;
+export declare function statsHasErrors(json: any): boolean;
+export declare function statsHasWarnings(json: any): boolean;

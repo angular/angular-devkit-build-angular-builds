@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.statsErrorsToString = exports.statsWarningsToString = exports.statsToString = exports.generateBuildStats = exports.generateBundleStats = exports.formatSize = void 0;
+exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.statsToString = exports.generateBuildStats = exports.generateBundleStats = exports.formatSize = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -77,7 +77,11 @@ function statsWarningsToString(json, statsConfig) {
     const colors = statsConfig.colors;
     const rs = (x) => colors ? reset(x) : x;
     const y = (x) => colors ? bold(yellow(x)) : x;
-    return rs('\n' + json.warnings
+    const warnings = [...json.warnings];
+    if (json.children) {
+        warnings.push(...json.children.map((c) => c.warnings));
+    }
+    return rs('\n' + warnings
         .map((warning) => `${warning}`)
         .filter((warning) => !ERRONEOUS_WARNINGS.some((erroneous) => erroneous.test(warning)))
         .map((warning) => y(`WARNING in ${warning}`))
@@ -88,6 +92,20 @@ function statsErrorsToString(json, statsConfig) {
     const colors = statsConfig.colors;
     const rs = (x) => colors ? reset(x) : x;
     const r = (x) => colors ? bold(red(x)) : x;
-    return rs('\n' + json.errors.map((error) => r(`ERROR in ${error}`)).join('\n'));
+    const errors = [...json.errors];
+    if (json.children) {
+        errors.push(...json.children.map((c) => c.errors));
+    }
+    return rs('\n' + errors.map((error) => r(`ERROR in ${error}`)).join('\n'));
 }
 exports.statsErrorsToString = statsErrorsToString;
+function statsHasErrors(json) {
+    var _a;
+    return json.errors.length > 0 || !!((_a = json.children) === null || _a === void 0 ? void 0 : _a.some((c) => c.errors.length));
+}
+exports.statsHasErrors = statsHasErrors;
+function statsHasWarnings(json) {
+    var _a;
+    return json.warnings.length > 0 || !!((_a = json.children) === null || _a === void 0 ? void 0 : _a.some((c) => c.warnings.length));
+}
+exports.statsHasWarnings = statsHasWarnings;
