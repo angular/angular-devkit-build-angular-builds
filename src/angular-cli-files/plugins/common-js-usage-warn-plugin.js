@@ -30,13 +30,16 @@ class CommonJsUsageWarnPlugin {
                 for (const { dependencies, rawRequest, issuer } of modules) {
                     if (!rawRequest ||
                         rawRequest.startsWith('.') ||
-                        path_1.isAbsolute(rawRequest)) {
-                        // Skip if module is absolute or relative.
-                        continue;
-                    }
-                    if (this.allowedDepedencies.has(rawRequest) ||
-                        this.allowedDepedencies.has(this.rawRequestToPackageName(rawRequest))) {
-                        // Skip as this module is allowed even if it's a CommonJS.
+                        path_1.isAbsolute(rawRequest) ||
+                        this.allowedDepedencies.has(rawRequest) ||
+                        this.allowedDepedencies.has(this.rawRequestToPackageName(rawRequest)) ||
+                        rawRequest.startsWith('@angular/common/locales/')) {
+                        /**
+                         * Skip when:
+                         * - module is absolute or relative.
+                         * - module is allowed even if it's a CommonJS.
+                         * - module is a locale imported from '@angular/common'.
+                         */
                         continue;
                     }
                     if (this.hasCommonJsDependencies(dependencies)) {
@@ -56,16 +59,9 @@ class CommonJsUsageWarnPlugin {
                         // And if the issuer request is not from 'webpack-dev-server', as 'webpack-dev-server'
                         // will require CommonJS libraries for live reloading such as 'sockjs-node'.
                         if ((mainIssuer === null || mainIssuer === void 0 ? void 0 : mainIssuer.name) === 'main' && !((_b = issuer === null || issuer === void 0 ? void 0 : issuer.userRequest) === null || _b === void 0 ? void 0 : _b.includes('webpack-dev-server'))) {
-                            let warning = `${issuer === null || issuer === void 0 ? void 0 : issuer.userRequest} depends on '${rawRequest}'.`;
-                            if (rawRequest.startsWith('@angular/common/locales')) {
-                                warning += `\nWhen using the 'localize' option this import is not needed. ` +
-                                    `Did you mean to import '${rawRequest.replace(/locales(\/extra)?\//, 'locales/global/')}'?\n` +
-                                    'For more info see: https://angular.io/guide/i18n#import-global-variants-of-the-locale-data';
-                            }
-                            else {
-                                warning += ' CommonJS or AMD dependencies can cause optimization bailouts.\n' +
-                                    'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
-                            }
+                            const warning = `${issuer === null || issuer === void 0 ? void 0 : issuer.userRequest} depends on '${rawRequest}'. ` +
+                                'CommonJS or AMD dependencies can cause optimization bailouts.\n' +
+                                'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
                             // Avoid showing the same warning multiple times when in 'watch' mode.
                             if (!this.shownWarnings.has(warning)) {
                                 compilation.warnings.push(warning);
