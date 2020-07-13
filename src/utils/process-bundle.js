@@ -91,7 +91,10 @@ async function process(options) {
                         exclude: ['transform-typeof-symbol'],
                     },
                 ]],
-            plugins: options.replacements ? [createReplacePlugin(options.replacements)] : [],
+            plugins: [
+                createIifeWrapperPlugin(),
+                ...(options.replacements ? [createReplacePlugin(options.replacements)] : []),
+            ],
             minified: environment_options_1.allowMinify && !!options.optimize,
             compact: !environment_options_1.shouldBeautify && !!options.optimize,
             sourceMaps: !!sourceMap,
@@ -331,6 +334,25 @@ function createReplacePlugin(replacements) {
                         path.node.value = replacement[1];
                     }
                 }
+            },
+        },
+    };
+}
+function createIifeWrapperPlugin() {
+    return {
+        visitor: {
+            Program: {
+                exit(path) {
+                    // Save existing body and directives
+                    const { body, directives } = path.node;
+                    // Clear out body and directives for wrapper
+                    path.node.body = [];
+                    path.node.directives = [];
+                    // Create the wrapper - "(function() { ... })();"
+                    const wrapper = core_1.types.expressionStatement(core_1.types.callExpression(core_1.types.parenthesizedExpression(core_1.types.functionExpression(undefined, [], core_1.types.blockStatement(body, directives))), []));
+                    // Insert the wrapper
+                    path.pushContainer('body', wrapper);
+                },
             },
         },
     };
