@@ -82,6 +82,7 @@ function statsWarningsToString(json, statsConfig) {
         warnings.push(...json.children.map((c) => c.warnings));
     }
     return rs('\n' + warnings
+        .filter(m => !!m)
         .map((warning) => `${warning}`)
         .filter((warning) => !ERRONEOUS_WARNINGS.some((erroneous) => erroneous.test(warning)))
         .map((warning) => y(`WARNING in ${warning}`))
@@ -96,7 +97,10 @@ function statsErrorsToString(json, statsConfig) {
     if (json.children) {
         errors.push(...json.children.map((c) => c.errors));
     }
-    return rs('\n' + errors.map((error) => r(`ERROR in ${error}`)).join('\n'));
+    return rs('\n' + errors
+        .filter(m => !!m)
+        .map((error) => r(`ERROR in ${error}`))
+        .join('\n\n'));
 }
 exports.statsErrorsToString = statsErrorsToString;
 function statsHasErrors(json) {
