@@ -79,11 +79,10 @@ function statsWarningsToString(json, statsConfig) {
     const y = (x) => colors ? bold(yellow(x)) : x;
     const warnings = [...json.warnings];
     if (json.children) {
-        warnings.push(...json.children
-            .map((c) => c.warnings)
-            .reduce((a, b) => [...a, ...b], []));
+        warnings.push(...json.children.map((c) => c.warnings));
     }
     return rs('\n' + warnings
+        .filter(m => !!m)
         .map((warning) => `${warning}`)
         .filter((warning) => !ERRONEOUS_WARNINGS.some((erroneous) => erroneous.test(warning)))
         .map((warning) => y(`WARNING in ${warning}`))
@@ -96,11 +95,10 @@ function statsErrorsToString(json, statsConfig) {
     const r = (x) => colors ? bold(red(x)) : x;
     const errors = [...json.errors];
     if (json.children) {
-        errors.push(...json.children
-            .map((c) => c.errors)
-            .reduce((a, b) => [...a, ...b], []));
+        errors.push(...json.children.map((c) => c.errors));
     }
     return rs('\n' + errors
+        .filter(m => !!m)
         .map((error) => r(`ERROR in ${error}`))
         .join('\n\n'));
 }
