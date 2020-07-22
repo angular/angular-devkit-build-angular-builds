@@ -17,12 +17,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !exports.hasOwnProperty(p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// TODO: remove this commented AJV require.
-// We don't actually require AJV, but there is a bug with NPM and peer dependencies that is
-// whose workaround is to depend on AJV.
-// See https://github.com/angular/angular-cli/issues/9691#issuecomment-367322703 for details.
-// We need to add a require here to satisfy the dependency checker.
-// require('ajv');
 __exportStar(require("./transforms"), exports);
 var schema_1 = require("./browser/schema");
 Object.defineProperty(exports, "CrossOrigin", { enumerable: true, get: function () { return schema_1.CrossOrigin; } });
