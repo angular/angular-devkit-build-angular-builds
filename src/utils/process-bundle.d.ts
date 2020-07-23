@@ -1,3 +1,4 @@
+/// <reference types="packages/angular_devkit/build_angular/src/typings" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -53,7 +54,7 @@ export declare function setup(data: number[] | {
 export declare function process(options: ProcessBundleOptions): Promise<ProcessBundleResult>;
 export declare function createI18nPlugins(locale: string, translation: unknown | undefined, missingTranslation: 'error' | 'warning' | 'ignore', localeDataContent?: string): Promise<{
     diagnostics: import("@angular/localize/src/tools/src/diagnostics").Diagnostics;
-    plugins: PluginObj<{}>[];
+    plugins: PluginObj<import("@babel/core").PluginPass>[];
 }>;
 export interface InlineOptions {
     filename: string;
