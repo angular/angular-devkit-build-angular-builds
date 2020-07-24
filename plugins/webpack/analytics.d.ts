@@ -52,7 +52,7 @@ export declare class NgBuildAnalyticsPlugin {
     constructor(_projectRoot: string, _analytics: analytics.Analytics, _category: string, _isIvy: boolean);
     protected _reset(): void;
     protected _getMetrics(stats: Stats): (string | number)[];
-    protected _getDimensions(stats: Stats): import("../../../../../dist-schema/packages/angular/cli/commands/config").Value[];
+    protected _getDimensions(): import("../../../../../dist-schema/packages/angular/cli/commands/config").Value[];
     protected _reportBuildMetrics(stats: Stats): void;
     protected _reportRebuildMetrics(stats: Stats): void;
     protected _checkTsNormalModule(module: NormalModule): void;

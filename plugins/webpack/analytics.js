@@ -102,7 +102,7 @@ class NgBuildAnalyticsPlugin {
         metrics[core_1.analytics.NgCliAnalyticsMetrics.CssSize] = this._stats.cssSize;
         return metrics;
     }
-    _getDimensions(stats) {
+    _getDimensions() {
         const dimensions = [];
         if (this._stats.errors.length) {
             // Adding commas before and after so the regex are easier to define filters.
@@ -112,12 +112,12 @@ class NgBuildAnalyticsPlugin {
         return dimensions;
     }
     _reportBuildMetrics(stats) {
-        const dimensions = this._getDimensions(stats);
+        const dimensions = this._getDimensions();
         const metrics = this._getMetrics(stats);
         this._analytics.event(this._category, 'build', { dimensions, metrics });
     }
     _reportRebuildMetrics(stats) {
-        const dimensions = this._getDimensions(stats);
+        const dimensions = this._getDimensions();
         const metrics = this._getMetrics(stats);
         this._analytics.event(this._category, 'rebuild', { dimensions, metrics });
     }
