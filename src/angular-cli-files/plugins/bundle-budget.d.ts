@@ -14,5 +14,4 @@ export declare class BundleBudgetPlugin {
     private options;
     constructor(options: BundleBudgetPluginOptions);
     apply(compiler: Compiler): void;
-    private runChecks;
 }

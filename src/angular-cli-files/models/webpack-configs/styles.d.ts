@@ -9,10 +9,12 @@ import * as webpack from 'webpack';
 import { WebpackConfigOptions } from '../build-options';
 export declare function getStylesConfig(wco: WebpackConfigOptions): {
     entry: {
-        [key: string]: string[];
+        [key: string]: [string, ...string[]];
     };
     module: {
         rules: webpack.RuleSetRule[];
     };
-    plugins: webpack.Plugin[];
+    plugins: {
+        apply(compiler: webpack.Compiler): void;
+    }[];
 };

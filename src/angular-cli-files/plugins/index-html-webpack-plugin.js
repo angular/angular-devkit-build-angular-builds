@@ -60,7 +60,10 @@ class IndexHtmlWebpackPlugin {
                     files.push(...entryFiles);
                 }
             }
-            const loadOutputFile = (name) => compilation.assets[name].source();
+            const loadOutputFile = async (name) => {
+                const data = compilation.assets[name].source();
+                return typeof data === 'string' ? data : data.toString();
+            };
             let indexSource = await augment_index_html_1.augmentIndexHtml({
                 input: this._options.input,
                 inputContent,

@@ -12,7 +12,7 @@ const cssNano = require("cssnano");
 const webpack_sources_1 = require("webpack-sources");
 function hook(compiler, action) {
     compiler.hooks.compilation.tap('optimize-css-webpack-plugin', (compilation) => {
-        compilation.hooks.optimizeChunkAssets.tapPromise('optimize-css-webpack-plugin', chunks => action(compilation, chunks));
+        compilation.hooks.optimizeChunkAssets.tapPromise('optimize-css-webpack-plugin', (chunks) => action(compilation, chunks));
     });
 }
 class OptimizeCssWebpackPlugin {
@@ -26,11 +26,14 @@ class OptimizeCssWebpackPlugin {
     apply(compiler) {
         hook(compiler, (compilation, chunks) => {
             const files = [...compilation.additionalChunkAssets];
-            chunks.forEach(chunk => {
-                if (chunk.files && chunk.files.length > 0) {
-                    files.push(...chunk.files);
+            for (const chunk of chunks) {
+                if (!chunk.files) {
+                    continue;
                 }
-            });
+                for (const file of chunk.files) {
+                    files.push(file);
+                }
+            }
             const actions = files
                 .filter(file => this._options.test(file))
                 .map(async (file) => {
@@ -86,7 +89,7 @@ class OptimizeCssWebpackPlugin {
                 }
                 compilation.assets[file] = newSource;
             });
-            return Promise.all(actions);
+            return Promise.all(actions).then(() => { });
         });
     }
 }

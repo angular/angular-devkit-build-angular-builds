@@ -122,16 +122,22 @@ function getCommonConfig(wco) {
             }
         }
         if (buildOptions.polyfills) {
-            entryPoints['polyfills'] = [
-                ...(entryPoints['polyfills'] || []),
-                path.resolve(root, buildOptions.polyfills),
-            ];
+            const projectPolyfills = path.resolve(root, buildOptions.polyfills);
+            if (entryPoints['polyfills']) {
+                entryPoints['polyfills'].push(projectPolyfills);
+            }
+            else {
+                entryPoints['polyfills'] = [projectPolyfills];
+            }
         }
         if (!buildOptions.aot) {
-            entryPoints['polyfills'] = [
-                ...(entryPoints['polyfills'] || []),
-                path.join(__dirname, '..', 'jit-polyfills.js'),
-            ];
+            const jitPolyfills = path.join(__dirname, '..', 'jit-polyfills.js');
+            if (entryPoints['polyfills']) {
+                entryPoints['polyfills'].push(jitPolyfills);
+            }
+            else {
+                entryPoints['polyfills'] = [jitPolyfills];
+            }
         }
     }
     if (environment_options_1.profilingEnabled) {
@@ -486,8 +492,9 @@ function getCommonConfig(wco) {
             ],
         },
         optimization: {
+            minimizer: extraMinimizers,
+            moduleIds: 'hashed',
             noEmitOnErrors: true,
-            minimizer: [new webpack_1.HashedModuleIdsPlugin(), ...extraMinimizers],
         },
         plugins: [
             // Always replace the context for the System.import in angular/core to prevent warnings.
