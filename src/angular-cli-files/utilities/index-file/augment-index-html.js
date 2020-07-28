@@ -11,6 +11,7 @@ exports.augmentIndexHtml = void 0;
 const crypto_1 = require("crypto");
 const webpack_sources_1 = require("webpack-sources");
 const parse5 = require('parse5');
+const treeAdapter = require('parse5-htmlparser2-tree-adapter');
 /*
  * Helper function used by the IndexHtmlWebpackPlugin.
  * Can also be directly used by builder, e. g. in order to generate an index.html
@@ -19,6 +20,7 @@ const parse5 = require('parse5');
  */
 // tslint:disable-next-line: no-big-function
 async function augmentIndexHtml(params) {
+    var _a, _b, _c, _d;
     const { loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints } = params;
     let { crossOrigin = 'none' } = params;
     if (params.sri && crossOrigin === 'none') {
@@ -44,49 +46,21 @@ async function augmentIndexHtml(params) {
         }
     }
     // Find the head and body elements
-    const treeAdapter = parse5.treeAdapters.default;
-    const document = parse5.parse(params.inputContent, { treeAdapter, locationInfo: true });
-    let headElement;
-    let bodyElement;
-    let htmlElement;
-    for (const docChild of document.childNodes) {
-        if (docChild.tagName === 'html') {
-            htmlElement = docChild;
-            for (const htmlChild of docChild.childNodes) {
-                if (htmlChild.tagName === 'head') {
-                    headElement = htmlChild;
-                }
-                else if (htmlChild.tagName === 'body') {
-                    bodyElement = htmlChild;
-                }
-            }
-        }
-    }
+    const document = parse5.parse(params.inputContent, {
+        treeAdapter,
+        sourceCodeLocationInfo: true,
+    });
+    // tslint:disable: no-any
+    const htmlElement = document.children.find((c) => c.name === 'html');
+    const headElement = htmlElement.children.find((c) => c.name === 'head');
+    const bodyElement = htmlElement.children.find((c) => c.name === 'body');
+    // tslint:enable: no-any
     if (!headElement || !bodyElement) {
         throw new Error('Missing head and/or body elements');
     }
-    // Determine script insertion point
-    let scriptInsertionPoint;
-    if (bodyElement.__location && bodyElement.__location.endTag) {
-        scriptInsertionPoint = bodyElement.__location.endTag.startOffset;
-    }
-    else {
-        // Less accurate fallback
-        // parse5 4.x does not provide locations if malformed html is present
-        scriptInsertionPoint = params.inputContent.indexOf('</body>');
-    }
-    let styleInsertionPoint;
-    if (headElement.__location && headElement.__location.endTag) {
-        styleInsertionPoint = headElement.__location.endTag.startOffset;
-    }
-    else {
-        // Less accurate fallback
-        // parse5 4.x does not provide locations if malformed html is present
-        styleInsertionPoint = params.inputContent.indexOf('</head>');
-    }
     // Inject into the html
     const indexSource = new webpack_sources_1.ReplaceSource(new webpack_sources_1.RawSource(params.inputContent), params.input);
-    let scriptElements = '';
+    const scriptsElements = treeAdapter.createDocumentFragment();
     for (const script of scripts) {
         const attrs = [
             { name: 'src', value: (params.deployUrl || '') + script },
@@ -104,59 +78,44 @@ async function augmentIndexHtml(params) {
             const isNoModuleType = noModuleFiles.some(scriptPredictor);
             const isModuleType = moduleFiles.some(scriptPredictor);
             if (isNoModuleType && !isModuleType) {
-                attrs.push({ name: 'nomodule', value: null }, { name: 'defer', value: null });
+                attrs.push({ name: 'nomodule', value: '' }, { name: 'defer', value: '' });
             }
             else if (isModuleType && !isNoModuleType) {
                 attrs.push({ name: 'type', value: 'module' });
             }
             else {
-                attrs.push({ name: 'defer', value: null });
+                attrs.push({ name: 'defer', value: '' });
             }
         }
         else {
-            attrs.push({ name: 'defer', value: null });
+            attrs.push({ name: 'defer', value: '' });
         }
         if (params.sri) {
             const content = await loadOutputFile(script);
-            attrs.push(..._generateSriAttributes(content));
+            attrs.push(_generateSriAttributes(content));
         }
-        const attributes = attrs
-            .map(attr => (attr.value === null ? attr.name : `${attr.name}="${attr.value}"`))
-            .join(' ');
-        scriptElements += `<script ${attributes}></script>`;
+        const baseElement = treeAdapter.createElement('script', undefined, attrs);
+        treeAdapter.setTemplateContent(scriptsElements, baseElement);
     }
-    indexSource.insert(scriptInsertionPoint, scriptElements);
+    indexSource.insert(
+    // parse5 does not provide locations if malformed html is present
+    ((_b = (_a = bodyElement.sourceCodeLocation) === null || _a === void 0 ? void 0 : _a.endTag) === null || _b === void 0 ? void 0 : _b.startOffset) || params.inputContent.indexOf('</body>'), parse5.serialize(scriptsElements, { treeAdapter }).replace(/\=""/g, ''));
     // Adjust base href if specified
     if (typeof params.baseHref == 'string') {
-        let baseElement;
-        for (const headChild of headElement.childNodes) {
-            if (headChild.tagName === 'base') {
-                baseElement = headChild;
-            }
-        }
+        // tslint:disable-next-line: no-any
+        let baseElement = headElement.children.find((t) => t.name === 'base');
         const baseFragment = treeAdapter.createDocumentFragment();
         if (!baseElement) {
             baseElement = treeAdapter.createElement('base', undefined, [
                 { name: 'href', value: params.baseHref },
             ]);
-            treeAdapter.appendChild(baseFragment, baseElement);
-            indexSource.insert(headElement.__location.startTag.endOffset, parse5.serialize(baseFragment, { treeAdapter }));
+            treeAdapter.setTemplateContent(baseFragment, baseElement);
+            indexSource.insert(headElement.sourceCodeLocation.startTag.endOffset, parse5.serialize(baseFragment, { treeAdapter }));
         }
         else {
-            let hrefAttribute;
-            for (const attribute of baseElement.attrs) {
-                if (attribute.name === 'href') {
-                    hrefAttribute = attribute;
-                }
-            }
-            if (hrefAttribute) {
-                hrefAttribute.value = params.baseHref;
-            }
-            else {
-                baseElement.attrs.push({ name: 'href', value: params.baseHref });
-            }
-            treeAdapter.appendChild(baseFragment, baseElement);
-            indexSource.replace(baseElement.__location.startOffset, baseElement.__location.endOffset, parse5.serialize(baseFragment, { treeAdapter }));
+            baseElement.attribs['href'] = params.baseHref;
+            treeAdapter.setTemplateContent(baseFragment, baseElement);
+            indexSource.replace(baseElement.sourceCodeLocation.startOffset, baseElement.sourceCodeLocation.endOffset, parse5.serialize(baseFragment, { treeAdapter }));
         }
     }
     const styleElements = treeAdapter.createDocumentFragment();
@@ -170,31 +129,22 @@ async function augmentIndexHtml(params) {
         }
         if (params.sri) {
             const content = await loadOutputFile(stylesheet);
-            attrs.push(..._generateSriAttributes(content));
+            attrs.push(_generateSriAttributes(content));
         }
         const element = treeAdapter.createElement('link', undefined, attrs);
-        treeAdapter.appendChild(styleElements, element);
+        treeAdapter.setTemplateContent(styleElements, element);
     }
-    indexSource.insert(styleInsertionPoint, parse5.serialize(styleElements, { treeAdapter }));
+    indexSource.insert(
+    // parse5 does not provide locations if malformed html is present
+    ((_d = (_c = headElement.sourceCodeLocation) === null || _c === void 0 ? void 0 : _c.endTag) === null || _d === void 0 ? void 0 : _d.startOffset) || params.inputContent.indexOf('</head>'), parse5.serialize(styleElements, { treeAdapter }));
     // Adjust document locale if specified
     if (typeof params.lang == 'string') {
         const htmlFragment = treeAdapter.createDocumentFragment();
-        let langAttribute;
-        for (const attribute of htmlElement.attrs) {
-            if (attribute.name === 'lang') {
-                langAttribute = attribute;
-            }
-        }
-        if (langAttribute) {
-            langAttribute.value = params.lang;
-        }
-        else {
-            htmlElement.attrs.push({ name: 'lang', value: params.lang });
-        }
+        htmlElement.attribs['lang'] = params.lang;
         // we want only openning tag
-        htmlElement.childNodes = [];
-        treeAdapter.appendChild(htmlFragment, htmlElement);
-        indexSource.replace(htmlElement.__location.startTag.startOffset, htmlElement.__location.startTag.endOffset - 1, parse5.serialize(htmlFragment, { treeAdapter }).replace('</html>', ''));
+        htmlElement.children = [];
+        treeAdapter.setTemplateContent(htmlFragment, htmlElement);
+        indexSource.replace(htmlElement.sourceCodeLocation.startTag.startOffset, htmlElement.sourceCodeLocation.startTag.endOffset - 1, parse5.serialize(htmlFragment, { treeAdapter }).replace('</html>', ''));
     }
     return indexSource.source();
 }
@@ -204,5 +154,5 @@ function _generateSriAttributes(content) {
     const hash = crypto_1.createHash(algo)
         .update(content, 'utf8')
         .digest('base64');
-    return [{ name: 'integrity', value: `${algo}-${hash}` }];
+    return { name: 'integrity', value: `${algo}-${hash}` };
 }
