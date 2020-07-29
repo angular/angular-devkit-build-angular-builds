@@ -29,6 +29,7 @@ const cache_path_1 = require("../utils/cache-path");
 const process_bundle_1 = require("../utils/process-bundle");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
+const webpack_diagnostics_1 = require("../utils/webpack-diagnostics");
 const open = require('open');
 const devServerBuildOverriddenKeys = [
     'watch',
@@ -256,10 +257,10 @@ async function setupLocalize(i18n, browserOptions, webpackConfig) {
                     }
                     for (const diagnostic of diagnostics.messages) {
                         if (diagnostic.type === 'error') {
-                            compilation.errors.push(diagnostic.message);
+                            webpack_diagnostics_1.addError(compilation, diagnostic.message);
                         }
                         else {
-                            compilation.warnings.push(diagnostic.message);
+                            webpack_diagnostics_1.addWarning(compilation, diagnostic.message);
                         }
                     }
                     diagnostics.messages.length = 0;

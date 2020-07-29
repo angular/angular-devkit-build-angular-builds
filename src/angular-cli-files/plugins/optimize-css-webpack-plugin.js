@@ -10,6 +10,7 @@ exports.OptimizeCssWebpackPlugin = void 0;
  */
 const cssNano = require("cssnano");
 const webpack_sources_1 = require("webpack-sources");
+const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 function hook(compiler, action) {
     compiler.hooks.compilation.tap('optimize-css-webpack-plugin', (compilation) => {
         compilation.hooks.optimizeChunkAssets.tapPromise('optimize-css-webpack-plugin', (chunks) => action(compilation, chunks));
@@ -74,9 +75,8 @@ class OptimizeCssWebpackPlugin {
                         .then(resolve)
                         .catch(reject);
                 });
-                const warnings = output.warnings();
-                if (warnings.length) {
-                    compilation.warnings.push(...warnings.map(({ text }) => text));
+                for (const { text } of output.warnings()) {
+                    webpack_diagnostics_1.addWarning(compilation, text);
                 }
                 let newSource;
                 if (output.map) {

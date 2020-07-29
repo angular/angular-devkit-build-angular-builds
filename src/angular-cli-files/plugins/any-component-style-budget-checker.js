@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AnyComponentStyleBudgetChecker = void 0;
 const path = require("path");
 const schema_1 = require("../../../src/browser/schema");
+const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const bundle_calculator_1 = require("../utilities/bundle-calculator");
 const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
 /**
@@ -47,10 +48,10 @@ class AnyComponentStyleBudgetChecker {
                     for (const { severity, message } of bundle_calculator_1.checkThresholds(thresholds[Symbol.iterator](), size, label)) {
                         switch (severity) {
                             case bundle_calculator_1.ThresholdSeverity.Warning:
-                                compilation.warnings.push(message);
+                                webpack_diagnostics_1.addWarning(compilation, message);
                                 break;
                             case bundle_calculator_1.ThresholdSeverity.Error:
-                                compilation.errors.push(message);
+                                webpack_diagnostics_1.addError(compilation, message);
                                 break;
                             default:
                                 assertNever(severity);

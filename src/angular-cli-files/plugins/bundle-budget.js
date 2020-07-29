@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BundleBudgetPlugin = void 0;
+const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const bundle_calculator_1 = require("../utilities/bundle-calculator");
 class BundleBudgetPlugin {
     constructor(options) {
@@ -19,10 +20,10 @@ class BundleBudgetPlugin {
             for (const { severity, message } of bundle_calculator_1.checkBudgets(budgets, stats, processResults)) {
                 switch (severity) {
                     case bundle_calculator_1.ThresholdSeverity.Warning:
-                        compilation.warnings.push(`budgets: ${message}`);
+                        webpack_diagnostics_1.addWarning(compilation, `budgets: ${message}`);
                         break;
                     case bundle_calculator_1.ThresholdSeverity.Error:
-                        compilation.errors.push(`budgets: ${message}`);
+                        webpack_diagnostics_1.addError(compilation, `budgets: ${message}`);
                         break;
                 }
             }

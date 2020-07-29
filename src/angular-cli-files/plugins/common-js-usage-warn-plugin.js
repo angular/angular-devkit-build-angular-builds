@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommonJsUsageWarnPlugin = void 0;
 const path_1 = require("path");
+const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 // Webpack doesn't export these so the deep imports can potentially break.
 const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
@@ -65,7 +66,7 @@ class CommonJsUsageWarnPlugin {
                                 'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
                             // Avoid showing the same warning multiple times when in 'watch' mode.
                             if (!this.shownWarnings.has(warning)) {
-                                compilation.warnings.push(warning);
+                                webpack_diagnostics_1.addWarning(compilation, warning);
                                 this.shownWarnings.add(warning);
                             }
                         }
