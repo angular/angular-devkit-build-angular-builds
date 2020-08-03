@@ -7,10 +7,10 @@
  */
 import { analytics } from '@angular-devkit/core';
 import { Compiler, Module, Stats, compilation } from 'webpack';
-import { Source } from 'webpack-sources';
+import { OriginalSource } from 'webpack-sources';
 declare const NormalModule: any;
 interface NormalModule extends Module {
-    _source?: Source | null;
+    _source?: OriginalSource | null;
     resource?: string;
 }
 /**
