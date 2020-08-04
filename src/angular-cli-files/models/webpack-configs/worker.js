@@ -10,7 +10,6 @@ exports.getWorkerConfig = void 0;
  */
 const path_1 = require("path");
 const typescript_1 = require("./typescript");
-const WorkerPlugin = require('worker-plugin');
 function getWorkerConfig(wco) {
     const { buildOptions } = wco;
     if (!buildOptions.webWorkerTsConfig) {
@@ -20,6 +19,7 @@ function getWorkerConfig(wco) {
         throw new Error('The `webWorkerTsConfig` must be a string.');
     }
     const workerTsConfigPath = path_1.resolve(wco.root, buildOptions.webWorkerTsConfig);
+    const WorkerPlugin = require('worker-plugin');
     return {
         plugins: [new WorkerPlugin({
                 globalObject: false,

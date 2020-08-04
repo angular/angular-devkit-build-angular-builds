@@ -3,19 +3,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBrowserConfig = void 0;
 const webpack_1 = require("../../plugins/webpack");
 const utils_1 = require("./utils");
-const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
-const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
 function getBrowserConfig(wco) {
     const { buildOptions } = wco;
     const { crossOrigin = 'none', subresourceIntegrity, extractLicenses, vendorChunk, commonChunk, styles, allowedCommonJsDependencies, } = buildOptions;
     const extraPlugins = [];
     const { styles: stylesSourceMap, scripts: scriptsSourceMap, hidden: hiddenSourceMap, } = buildOptions.sourceMap;
     if (subresourceIntegrity) {
+        const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
         extraPlugins.push(new SubresourceIntegrityPlugin({
             hashFuncNames: ['sha384'],
         }));
     }
     if (extractLicenses) {
+        const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
         extraPlugins.push(new LicenseWebpackPlugin({
             stats: {
                 warnings: false,

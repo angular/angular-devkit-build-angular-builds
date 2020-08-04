@@ -22,8 +22,6 @@ const environment_options_1 = require("../../../utils/environment-options");
 const webpack_2 = require("../../plugins/webpack");
 const find_up_1 = require("../../utilities/find-up");
 const utils_2 = require("./utils");
-const ProgressPlugin = require('webpack/lib/ProgressPlugin');
-const CircularDependencyPlugin = require('circular-dependency-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
 // tslint:disable-next-line:no-big-function
@@ -221,9 +219,11 @@ function getCommonConfig(wco) {
         }));
     }
     if (buildOptions.progress) {
+        const ProgressPlugin = require('webpack/lib/ProgressPlugin');
         extraPlugins.push(new ProgressPlugin({ profile: buildOptions.verbose }));
     }
     if (buildOptions.showCircularDependencies) {
+        const CircularDependencyPlugin = require('circular-dependency-plugin');
         extraPlugins.push(new CircularDependencyPlugin({
             exclude: /([\\\/]node_modules[\\\/])|(ngfactory\.js$)/,
         }));
