@@ -5,7 +5,7 @@ const webpack_1 = require("../../plugins/webpack");
 const utils_1 = require("./utils");
 function getBrowserConfig(wco) {
     const { buildOptions } = wco;
-    const { crossOrigin = 'none', subresourceIntegrity, extractLicenses, vendorChunk, commonChunk, styles, allowedCommonJsDependencies, } = buildOptions;
+    const { crossOrigin = 'none', subresourceIntegrity, extractLicenses, vendorChunk, commonChunk, allowedCommonJsDependencies, } = buildOptions;
     const extraPlugins = [];
     const { styles: stylesSourceMap, scripts: scriptsSourceMap, hidden: hiddenSourceMap, } = buildOptions.sourceMap;
     if (subresourceIntegrity) {
@@ -28,8 +28,6 @@ function getBrowserConfig(wco) {
     if (scriptsSourceMap || stylesSourceMap) {
         extraPlugins.push(utils_1.getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, wco.differentialLoadingMode ? true : hiddenSourceMap));
     }
-    const globalStylesBundleNames = utils_1.normalizeExtraEntryPoints(styles, 'styles')
-        .map(style => style.bundleName);
     let crossOriginLoading = false;
     if (subresourceIntegrity && crossOrigin === 'none') {
         crossOriginLoading = 'anonymous';
@@ -63,16 +61,11 @@ function getBrowserConfig(wco) {
                         priority: 5,
                     },
                     vendors: false,
-                    vendor: !!vendorChunk && {
+                    defaultVendors: !!vendorChunk && {
                         name: 'vendor',
-                        chunks: 'initial',
+                        chunks: (chunk) => chunk.name === 'main',
                         enforce: true,
-                        test: (module, chunks) => {
-                            const moduleName = module.nameForCondition ? module.nameForCondition() : '';
-                            return /[\\/]node_modules[\\/]/.test(moduleName)
-                                && !chunks.some(({ name }) => utils_1.isPolyfillsEntry(name)
-                                    || globalStylesBundleNames.includes(name));
-                        },
+                        test: /[\\/]node_modules[\\/]/,
                     },
                 },
             },

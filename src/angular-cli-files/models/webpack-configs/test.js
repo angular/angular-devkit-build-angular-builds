@@ -59,17 +59,14 @@ function getTestConfig(wco) {
         plugins: extraPlugins,
         optimization: {
             splitChunks: {
-                chunks: ((chunk) => !utils_1.isPolyfillsEntry(chunk.name)),
+                chunks: (chunk) => !utils_1.isPolyfillsEntry(chunk.name),
                 cacheGroups: {
                     vendors: false,
-                    vendor: {
+                    defaultVendors: {
                         name: 'vendor',
-                        chunks: 'initial',
-                        test: (module, chunks) => {
-                            const moduleName = module.nameForCondition ? module.nameForCondition() : '';
-                            return /[\\/]node_modules[\\/]/.test(moduleName)
-                                && !chunks.some(({ name }) => utils_1.isPolyfillsEntry(name));
-                        },
+                        chunks: (chunk) => chunk.name === 'main',
+                        enforce: true,
+                        test: /[\\/]node_modules[\\/]/,
                     },
                 },
             },
