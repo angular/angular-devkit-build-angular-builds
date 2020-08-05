@@ -211,15 +211,6 @@ async function setupLocalize(i18n, browserOptions, webpackConfig) {
             webpackConfig.entry['main'] = [localeDescription.dataPath, webpackConfig.entry['main']];
         }
     }
-    // Get the insertion point for the i18n babel loader rule
-    // This is currently dependent on the rule order/construction in common.ts
-    // A future refactor of the webpack configuration definition will improve this situation
-    // tslint:disable-next-line: no-non-null-assertion
-    const rules = webpackConfig.module.rules;
-    const index = rules.findIndex(r => r.enforce === 'pre');
-    if (index === -1) {
-        throw new Error('Invalid internal webpack configuration');
-    }
     const i18nRule = {
         test: /\.(?:m?js|ts)$/,
         enforce: 'post',
@@ -238,14 +229,17 @@ async function setupLocalize(i18n, browserOptions, webpackConfig) {
                         translationIntegrity: localeDescription && localeDescription.integrity,
                     }),
                     plugins,
-                    parserOpts: {
-                        plugins: ['dynamicImport'],
-                    },
                 },
             },
         ],
     };
-    rules.splice(index, 0, i18nRule);
+    if (!webpackConfig.module) {
+        webpackConfig.module = { rules: [] };
+    }
+    else if (!webpackConfig.module.rules) {
+        webpackConfig.module.rules = [];
+    }
+    webpackConfig.module.rules.push(i18nRule);
     // Add a plugin to inject the i18n diagnostics
     // tslint:disable-next-line: no-non-null-assertion
     webpackConfig.plugins.push({

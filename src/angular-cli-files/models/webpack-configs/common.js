@@ -244,15 +244,13 @@ function getCommonConfig(wco) {
         // https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_angular/src/browser/index.ts
         extraPlugins.push(new webpack_2.BundleBudgetPlugin({ budgets: buildOptions.budgets }));
     }
-    let sourceMapUseRule;
     if ((scriptsSourceMap || stylesSourceMap) && vendorSourceMap) {
-        sourceMapUseRule = {
-            use: [
-                {
-                    loader: require.resolve('source-map-loader'),
-                },
-            ],
-        };
+        extraRules.push({
+            test: /\.m?js$/,
+            exclude: /(ngfactory|ngstyle)\.js$/,
+            enforce: 'pre',
+            loader: require.resolve('source-map-loader'),
+        });
     }
     let buildOptimizerUseRule = [];
     if (buildOptions.buildOptimizer) {
@@ -480,12 +478,6 @@ function getCommonConfig(wco) {
                             ]),
                         ...buildOptimizerUseRule,
                     ],
-                },
-                {
-                    test: /\.m?js$/,
-                    exclude: /(ngfactory|ngstyle)\.js$/,
-                    enforce: 'pre',
-                    ...sourceMapUseRule,
                 },
                 ...extraRules,
             ],

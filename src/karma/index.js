@@ -59,10 +59,7 @@ function execute(options, context, transforms = {}) {
             }
         }
         // prepend special webpack loader that will transform test.ts
-        if (webpackConfig &&
-            webpackConfig.module &&
-            options.include &&
-            options.include.length > 0) {
+        if (options.include && options.include.length > 0) {
             const mainFilePath = core_1.getSystemPath(core_1.join(core_1.normalize(context.workspaceRoot), options.main));
             const files = find_tests_1.findTests(options.include, path_1.dirname(mainFilePath), context.workspaceRoot);
             // early exit, no reason to start karma
@@ -70,8 +67,14 @@ function execute(options, context, transforms = {}) {
                 subscriber.error(`Specified patterns: "${options.include.join(', ')}" did not match any spec files`);
                 return;
             }
+            if (!webpackConfig.module) {
+                webpackConfig.module = { rules: [] };
+            }
+            else if (!webpackConfig.module.rules) {
+                webpackConfig.module.rules = [];
+            }
             webpackConfig.module.rules.unshift({
-                test: path => path === mainFilePath,
+                test: mainFilePath,
                 use: {
                     // cannot be a simple path as it differs between environments
                     loader: single_test_transform_1.SingleTestTransformLoader,

@@ -12,22 +12,20 @@ const glob = require("glob");
 const path = require("path");
 const utils_1 = require("./utils");
 function getTestConfig(wco) {
-    const { root, buildOptions, sourceRoot: include } = wco;
+    const { buildOptions: { codeCoverage, codeCoverageExclude, main, sourceMap }, root, sourceRoot, } = wco;
     const extraRules = [];
     const extraPlugins = [];
-    if (buildOptions.codeCoverage) {
-        const codeCoverageExclude = buildOptions.codeCoverageExclude;
+    if (codeCoverage) {
         const exclude = [
             /\.(e2e|spec)\.tsx?$/,
             /node_modules/,
         ];
         if (codeCoverageExclude) {
-            codeCoverageExclude.forEach((excludeGlob) => {
-                const excludeFiles = glob
+            for (const excludeGlob of codeCoverageExclude) {
+                glob
                     .sync(path.join(root, excludeGlob), { nodir: true })
-                    .map(file => path.normalize(file));
-                exclude.push(...excludeFiles);
-            });
+                    .forEach((file) => exclude.push(path.normalize(file)));
+            }
         }
         extraRules.push({
             test: /\.(jsx?|tsx?)$/,
@@ -35,23 +33,20 @@ function getTestConfig(wco) {
             options: { esModules: true },
             enforce: 'post',
             exclude,
-            include,
+            include: sourceRoot,
         });
     }
-    if (wco.buildOptions.sourceMap) {
-        const { styles, scripts } = wco.buildOptions.sourceMap;
-        if (styles || scripts) {
-            extraPlugins.push(utils_1.getSourceMapDevTool(scripts, styles, false, true));
-        }
+    if (sourceMap.scripts || sourceMap.styles) {
+        extraPlugins.push(utils_1.getSourceMapDevTool(sourceMap.scripts, sourceMap.styles, false, true));
     }
     return {
         mode: 'development',
         resolve: {
             mainFields: ['es2015', 'browser', 'module', 'main'],
         },
-        devtool: buildOptions.sourceMap ? false : 'eval',
+        devtool: false,
         entry: {
-            main: path.resolve(root, buildOptions.main),
+            main: path.resolve(root, main),
         },
         module: {
             rules: extraRules,
