@@ -497,7 +497,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                     }
                 }
-                if (options.serviceWorker) {
+                if (!options.watch && options.serviceWorker) {
                     for (const [locale, outputPath] of outputPaths.entries()) {
                         let localeBaseHref;
                         if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
