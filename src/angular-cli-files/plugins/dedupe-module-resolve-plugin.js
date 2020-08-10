@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DedupeModuleResolvePlugin = void 0;
+const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 /**
  * DedupeModuleResolvePlugin is a webpack plugin which dedupes modules with the same name and versions
  * that are laid out in different parts of the node_modules tree.
@@ -22,10 +23,9 @@ class DedupeModuleResolvePlugin {
         this.options = options;
         this.modules = new Map();
     }
-    // tslint:disable-next-line: no-any
     apply(compiler) {
-        compiler.hooks.normalModuleFactory.tap('DedupeModuleResolvePlugin', nmf => {
-            nmf.hooks.afterResolve.tap('DedupeModuleResolvePlugin', (result) => {
+        compiler.hooks.compilation.tap('DedupeModuleResolvePlugin', (compilation, { normalModuleFactory }) => {
+            normalModuleFactory.hooks.afterResolve.tap('DedupeModuleResolvePlugin', (result) => {
                 var _a;
                 if (!result) {
                     return;
@@ -53,8 +53,7 @@ class DedupeModuleResolvePlugin {
                     return;
                 }
                 if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.verbose) {
-                    // tslint:disable-next-line: no-console
-                    console.warn(`[DedupeModuleResolvePlugin]: ${result.resource} -> ${prevResource}`);
+                    webpack_diagnostics_1.addWarning(compilation, `[DedupeModuleResolvePlugin]: ${result.resource} -> ${prevResource}`);
                 }
                 // Alter current request with previously resolved module.
                 result.request = prevRequest;
