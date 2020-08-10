@@ -48,7 +48,7 @@ function getServerConfig(wco) {
             ...externalDependencies,
             (context, request, callback) => {
                 // Absolute & Relative paths are not externals
-                if (request.startsWith('.') || path_1.isAbsolute(request)) {
+                if (request.startsWith('./') || path_1.isAbsolute(request)) {
                     callback();
                     return;
                 }
