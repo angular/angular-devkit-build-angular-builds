@@ -12,17 +12,19 @@ const path_1 = require("path");
 const webpack_1 = require("webpack");
 const utils_1 = require("./utils");
 /**
- * Returns a partial specific to creating a bundle for node
- * @param wco Options which are include the build options and app config
+ * Returns a partial Webpack configuration specific to creating a bundle for node
+ * @param wco Options which include the build options and app config
  */
 function getServerConfig(wco) {
     const { sourceMap, bundleDependencies, externalDependencies = [], } = wco.buildOptions;
     const extraPlugins = [];
-    if (sourceMap) {
-        const { scripts, styles, hidden } = sourceMap;
-        if (scripts || styles) {
-            extraPlugins.push(utils_1.getSourceMapDevTool(scripts, styles, hidden));
-        }
+    const { scripts, styles, hidden } = sourceMap;
+    if (scripts || styles) {
+        extraPlugins.push(utils_1.getSourceMapDevTool(scripts, styles, hidden));
+    }
+    const externals = [...externalDependencies];
+    if (!bundleDependencies) {
+        externals.push(externalizePackages);
     }
     const config = {
         resolve: {
@@ -39,30 +41,23 @@ function getServerConfig(wco) {
             ...extraPlugins,
         ],
         node: false,
+        externals,
     };
-    if (bundleDependencies) {
-        config.externals = [...externalDependencies];
-    }
-    else {
-        config.externals = [
-            ...externalDependencies,
-            (context, request, callback) => {
-                // Absolute & Relative paths are not externals
-                if (request.startsWith('./') || path_1.isAbsolute(request)) {
-                    callback();
-                    return;
-                }
-                try {
-                    require.resolve(request);
-                    callback(null, request);
-                }
-                catch (_a) {
-                    // Node couldn't find it, so it must be user-aliased
-                    callback();
-                }
-            },
-        ];
-    }
     return config;
 }
 exports.getServerConfig = getServerConfig;
+function externalizePackages(context, request, callback) {
+    // Absolute & Relative paths are not externals
+    if (request.startsWith('.') || path_1.isAbsolute(request)) {
+        callback();
+        return;
+    }
+    try {
+        require.resolve(request, { paths: [context] });
+        callback(undefined, request);
+    }
+    catch (_a) {
+        // Node couldn't find it, so it must be user-aliased
+        callback();
+    }
+}

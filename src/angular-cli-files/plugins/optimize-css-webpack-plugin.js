@@ -46,12 +46,15 @@ class OptimizeCssWebpackPlugin {
                 // tslint:disable-next-line: no-any
                 let map;
                 if (this._options.sourceMap && asset.sourceAndMap) {
-                    const sourceAndMap = asset.sourceAndMap();
+                    const sourceAndMap = asset.sourceAndMap({});
                     content = sourceAndMap.source;
                     map = sourceAndMap.map;
                 }
                 else {
                     content = asset.source();
+                }
+                if (typeof content !== 'string') {
+                    content = content.toString();
                 }
                 if (content.length === 0) {
                     return;

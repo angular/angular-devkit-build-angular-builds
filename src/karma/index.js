@@ -41,6 +41,7 @@ function execute(options, context, transforms = {}) {
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.switchMap(([karma, webpackConfig]) => new rxjs_1.Observable(subscriber => {
+        var _a;
         const karmaOptions = {};
         if (options.watch !== undefined) {
             karmaOptions.singleRun = !options.watch;
@@ -67,13 +68,15 @@ function execute(options, context, transforms = {}) {
                 subscriber.error(`Specified patterns: "${options.include.join(', ')}" did not match any spec files`);
                 return;
             }
+            // Get the rules and ensure the Webpack configuration is setup properly
+            const rules = ((_a = webpackConfig.module) === null || _a === void 0 ? void 0 : _a.rules) || [];
             if (!webpackConfig.module) {
-                webpackConfig.module = { rules: [] };
+                webpackConfig.module = { rules };
             }
             else if (!webpackConfig.module.rules) {
-                webpackConfig.module.rules = [];
+                webpackConfig.module.rules = rules;
             }
-            webpackConfig.module.rules.unshift({
+            rules.unshift({
                 test: mainFilePath,
                 use: {
                     // cannot be a simple path as it differs between environments

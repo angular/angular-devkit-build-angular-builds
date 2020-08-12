@@ -31,6 +31,9 @@ async function resolve(file, base, resolver) {
     }
 }
 exports.default = postcss.plugin('postcss-cli-resources', (options) => {
+    if (!options) {
+        throw new Error('No options were specified to "postcss-cli-resources".');
+    }
     const { deployUrl = '', baseHref = '', resourcesOutputPath = '', rebaseRootRelative = false, filename, loader, emitFile, } = options;
     const dedupeSlashes = (url) => url.replace(/\/\/+/g, '/');
     const process = async (inputUrl, context, resourceCache) => {

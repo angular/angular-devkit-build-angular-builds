@@ -195,6 +195,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
 }
 exports.serveWebpackBrowser = serveWebpackBrowser;
 async function setupLocalize(i18n, browserOptions, webpackConfig) {
+    var _a;
     const locale = [...i18n.inlineLocales][0];
     const localeDescription = i18n.locales[locale];
     const { plugins, diagnostics } = await process_bundle_1.createI18nPlugins(locale, localeDescription && localeDescription.translation, browserOptions.i18nMissingTranslation || 'ignore');
@@ -233,13 +234,15 @@ async function setupLocalize(i18n, browserOptions, webpackConfig) {
             },
         ],
     };
+    // Get the rules and ensure the Webpack configuration is setup properly
+    const rules = ((_a = webpackConfig.module) === null || _a === void 0 ? void 0 : _a.rules) || [];
     if (!webpackConfig.module) {
-        webpackConfig.module = { rules: [] };
+        webpackConfig.module = { rules };
     }
     else if (!webpackConfig.module.rules) {
-        webpackConfig.module.rules = [];
+        webpackConfig.module.rules = rules;
     }
-    webpackConfig.module.rules.push(i18nRule);
+    rules.push(i18nRule);
     // Add a plugin to inject the i18n diagnostics
     // tslint:disable-next-line: no-non-null-assertion
     webpackConfig.plugins.push({

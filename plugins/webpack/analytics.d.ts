@@ -66,7 +66,7 @@ export declare class NgBuildAnalyticsPlugin {
      * Reports a succeed module.
      * @private
      */
-    protected _succeedModule(mod: Module): void;
+    protected _succeedModule(mod: compilation.Module): void;
     protected _compilation(compiler: Compiler, compilation: compilation.Compilation): void;
     protected _done(stats: Stats): void;
     apply(compiler: Compiler): void;

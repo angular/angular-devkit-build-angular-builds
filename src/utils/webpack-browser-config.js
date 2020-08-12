@@ -66,10 +66,18 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
         if (!webpackConfig.resolve) {
             webpackConfig.resolve = {};
         }
-        if (!webpackConfig.resolve.alias) {
-            webpackConfig.resolve.alias = {};
+        if (Array.isArray(webpackConfig.resolve.alias)) {
+            webpackConfig.resolve.alias.push({
+                alias: 'zone.js/dist/zone',
+                name: 'zone.js/dist/zone-evergreen',
+            });
         }
-        webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
+        else {
+            if (!webpackConfig.resolve.alias) {
+                webpackConfig.resolve.alias = {};
+            }
+            webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
+        }
     }
     if (environment_options_1.profilingEnabled) {
         const esVersionInFileName = webpack_configs_1.getEsVersionForFileName(tsConfig.options.target, wco.buildOptions.esVersionInFileName);
@@ -92,10 +100,18 @@ async function generateI18nBrowserWebpackConfigFromContext(options, context, web
             if (!config.resolve) {
                 config.resolve = {};
             }
-            if (!config.resolve.alias) {
-                config.resolve.alias = {};
+            if (Array.isArray(config.resolve.alias)) {
+                config.resolve.alias.push({
+                    alias: '@angular/localize/init',
+                    name: require.resolve('./empty.js'),
+                });
             }
-            config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
+            else {
+                if (!config.resolve.alias) {
+                    config.resolve.alias = {};
+                }
+                config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
+            }
         }
         // Update file hashes to include translation file content
         const i18nHash = Object.values(i18n.locales).reduce((data, locale) => data + (locale.integrity || ''), '');

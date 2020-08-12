@@ -302,8 +302,7 @@ function* checkThresholds(thresholds, size, label) {
                 break;
             }
             default: {
-                assertNever(threshold.type);
-                break;
+                throw new Error(`Unexpected threshold type: ${ThresholdType[threshold.type]}`);
             }
         }
     }
@@ -334,17 +333,5 @@ function mergeDifferentialBuildSizes(buildSizes, mergeLabel) {
 }
 /** Returns whether or not all items in the list are equivalent to each other. */
 function allEquivalent(items) {
-    if (items.length === 0) {
-        return true;
-    }
-    const first = items[0];
-    for (const item of items.slice(1)) {
-        if (item !== first) {
-            return false;
-        }
-    }
-    return true;
-}
-function assertNever(input) {
-    throw new Error(`Unexpected call to assertNever() with input: ${JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
+    return new Set(items).size < 2;
 }
