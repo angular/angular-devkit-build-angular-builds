@@ -19,12 +19,13 @@ const operators_1 = require("rxjs/operators");
 const ts = require("typescript");
 const url = require("url");
 const webpack = require("webpack");
+const utils_1 = require("../angular-cli-files/models/webpack-configs/utils");
 const index_html_webpack_plugin_1 = require("../angular-cli-files/plugins/index-html-webpack-plugin");
 const check_port_1 = require("../angular-cli-files/utilities/check-port");
 const package_chunk_sort_1 = require("../angular-cli-files/utilities/package-chunk-sort");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const browser_1 = require("../browser");
-const utils_1 = require("../utils");
+const utils_2 = require("../utils");
 const cache_path_1 = require("../utils/cache-path");
 const process_bundle_1 = require("../utils/process-bundle");
 const version_1 = require("../utils/version");
@@ -110,7 +111,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         }
         // Add live reload config.
         if (options.liveReload) {
-            _addLiveReload(options, browserOptions, webpackConfig, clientAddress, context.logger);
+            _addLiveReload(root, options, browserOptions, webpackConfig, clientAddress, context.logger);
         }
         else if (options.hmr) {
             context.logger.warn('Live reload is disabled. HMR option ignored.');
@@ -132,7 +133,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
             const { options: compilerOptions } = read_tsconfig_1.readTsconfig(tsConfig, context.workspaceRoot);
             const target = compilerOptions.target || ts.ScriptTarget.ES5;
-            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, target);
+            const buildBrowserFeatures = new utils_2.BuildBrowserFeatures(projectRoot, target);
             const entrypoints = package_chunk_sort_1.generateEntryPoints({ scripts, styles });
             const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded()
                 ? package_chunk_sort_1.generateEntryPoints({ scripts: [], styles })
@@ -151,7 +152,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 lang: browserOptions.i18nLocale,
             }));
         }
-        const normalizedOptimization = utils_1.normalizeOptimization(browserOptions.optimization);
+        const normalizedOptimization = utils_2.normalizeOptimization(browserOptions.optimization);
         if (normalizedOptimization.scripts || normalizedOptimization.styles) {
             context.logger.error(core_1.tags.stripIndents `
           ****************************************************************************************
@@ -296,7 +297,7 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
       `);
     }
     const servePath = buildServePath(serverOptions, browserOptions, logger);
-    const { styles, scripts } = utils_1.normalizeOptimization(browserOptions.optimization);
+    const { styles, scripts } = utils_2.normalizeOptimization(browserOptions.optimization);
     const config = {
         host: serverOptions.host,
         port: serverOptions.port,
@@ -378,7 +379,8 @@ exports.buildServePath = buildServePath;
  * Private method to enhance a webpack config with live reload configuration.
  * @private
  */
-function _addLiveReload(options, browserOptions, webpackConfig, clientAddress, logger) {
+function _addLiveReload(root, options, browserOptions, webpackConfig, clientAddress, logger) {
+    var _a;
     if (webpackConfig.plugins === undefined) {
         webpackConfig.plugins = [];
     }
@@ -413,7 +415,7 @@ function _addLiveReload(options, browserOptions, webpackConfig, clientAddress, l
     try {
         webpackDevServerPath = require.resolve('webpack-dev-server/client');
     }
-    catch (_a) {
+    catch (_b) {
         throw new Error('The "webpack-dev-server" package could not be found.');
     }
     // If a custom path is provided the webpack dev server client drops the sockjs-node segment.
@@ -430,20 +432,22 @@ function _addLiveReload(options, browserOptions, webpackConfig, clientAddress, l
         const showWarning = options.hmrWarning;
         if (showWarning) {
             logger.info(core_1.tags.stripIndents `
-          The project will still live reload when HMR is enabled,
-          but to take advantage of HMR additional application code is required'
-          (not included in an Angular CLI project by default).'
-          See ${webpackHmrLink}
-          for information on working with HMR for Webpack.`);
+          The project will still live reload when HMR is enabled, but to take full advantage of HMR
+          additional application code which is not included by default in an Angular CLI project is required.
+
+          See ${webpackHmrLink} for information on working with HMR for Webpack.`);
             logger.warn(core_1.tags.oneLine `To disable this warning use "hmrWarning: false" under "serve"
            options in "angular.json".`);
         }
         entryPoints.push('webpack/hot/dev-server');
-        webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
-        if (browserOptions.extractCss) {
-            logger.warn(core_1.tags.oneLine `NOTICE: (HMR) does not allow for CSS hot reload
-                when used together with '--extract-css'.`);
+        if ((_a = browserOptions.styles) === null || _a === void 0 ? void 0 : _a.length) {
+            // When HMR is enabled we need to add the css paths as part of the entrypoints
+            // because otherwise no JS bundle will contain the HMR accept code.
+            const normalizedStyles = utils_1.normalizeExtraEntryPoints(browserOptions.styles, 'styles')
+                .map(style => path.resolve(root, style.input));
+            entryPoints.push(...normalizedStyles);
         }
+        webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
     }
     if (typeof webpackConfig.entry !== 'object' || Array.isArray(webpackConfig.entry)) {
         webpackConfig.entry = {};

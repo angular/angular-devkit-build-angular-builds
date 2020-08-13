@@ -191,7 +191,14 @@ function getStylesConfig(wco) {
                 include: globalStylePaths,
                 test,
                 use: [
-                    buildOptions.extractCss ? MiniCssExtractPlugin.loader : require.resolve('style-loader'),
+                    buildOptions.extractCss
+                        ? {
+                            loader: MiniCssExtractPlugin.loader,
+                            options: {
+                                hmr: buildOptions.hmr,
+                            },
+                        }
+                        : require.resolve('style-loader'),
                     {
                         loader: require.resolve('css-loader'),
                         options: {
