@@ -18,9 +18,9 @@ async function createTranslationLoader() {
         for (const [format, parser] of Object.entries(parsers)) {
             const analysis = analyze(parser, path, content);
             if (analysis.canParse) {
-                const translationBundle = parser.parse(path, content, analysis.hint);
+                const { locale, translations } = parser.parse(path, content, analysis.hint);
                 const integrity = 'sha256-' + crypto_1.createHash('sha256').update(content).digest('base64');
-                return { format, translation: translationBundle.translations, diagnostics, integrity };
+                return { format, locale, translations, diagnostics, integrity };
             }
             else {
                 unusedParsers.set(parser, analysis);
@@ -30,7 +30,8 @@ async function createTranslationLoader() {
         for (const [parser, analysis] of unusedParsers.entries()) {
             messages.push(analysis.diagnostics.formatDiagnostics(`*** ${parser.constructor.name} ***`));
         }
-        throw new Error(`Unsupported translation file format in ${path}. The following parsers were tried:\n` + messages.join('\n'));
+        throw new Error(`Unsupported translation file format in ${path}. The following parsers were tried:\n` +
+            messages.join('\n'));
     };
     // TODO: `parser.canParse()` is deprecated; remove this polyfill once we are sure all parsers provide the `parser.analyze()` method.
     // tslint:disable-next-line: no-any

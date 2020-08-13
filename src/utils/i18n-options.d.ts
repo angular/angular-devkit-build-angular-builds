@@ -13,11 +13,13 @@ export interface I18nOptions {
     inlineLocales: Set<string>;
     sourceLocale: string;
     locales: Record<string, {
-        file: string;
-        format?: string;
-        translation?: unknown;
+        files: {
+            path: string;
+            integrity?: string;
+            format?: string;
+        }[];
+        translation?: Record<string, unknown>;
         dataPath?: string;
-        integrity?: string;
         baseHref?: string;
     }>;
     flatOutput?: boolean;

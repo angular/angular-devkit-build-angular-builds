@@ -8,6 +8,22 @@ const path = require("path");
 const rimraf = require("rimraf");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const load_translations_1 = require("./load-translations");
+function normalizeTranslationFileOption(option, locale, expectObjectInError) {
+    if (typeof option === 'string') {
+        return [option];
+    }
+    if (Array.isArray(option) && option.every((element) => typeof element === 'string')) {
+        return option;
+    }
+    let errorMessage = `Project i18n locales translation field value for '${locale}' is malformed. `;
+    if (expectObjectInError) {
+        errorMessage += 'Expected a string, array of strings, or object.';
+    }
+    else {
+        errorMessage += 'Expected a string or array of strings.';
+    }
+    throw new Error(errorMessage);
+}
 function createI18nOptions(metadata, inline) {
     if (metadata.i18n !== undefined && !core_1.json.isJsonObject(metadata.i18n)) {
         throw new Error('Project i18n field is malformed. Expected an object.');
@@ -41,7 +57,7 @@ function createI18nOptions(metadata, inline) {
         i18n.sourceLocale = rawSourceLocale;
     }
     i18n.locales[i18n.sourceLocale] = {
-        file: '',
+        files: [],
         baseHref: rawSourceLocaleBaseHref,
     };
     if (metadata.locales !== undefined && !core_1.json.isJsonObject(metadata.locales)) {
@@ -49,28 +65,22 @@ function createI18nOptions(metadata, inline) {
     }
     else if (metadata.locales) {
         for (const [locale, options] of Object.entries(metadata.locales)) {
-            let translationFile;
+            let translationFiles;
             let baseHref;
             if (core_1.json.isJsonObject(options)) {
-                if (typeof options.translation !== 'string') {
-                    throw new Error(`Project i18n locales translation field value for '${locale}' is malformed. Expected a string.`);
-                }
-                translationFile = options.translation;
+                translationFiles = normalizeTranslationFileOption(options.translation, locale, false);
                 if (typeof options.baseHref === 'string') {
                     baseHref = options.baseHref;
                 }
             }
-            else if (typeof options !== 'string') {
-                throw new Error(`Project i18n locales field value for '${locale}' is malformed. Expected a string or object.`);
-            }
             else {
-                translationFile = options;
+                translationFiles = normalizeTranslationFileOption(options, locale, true);
             }
             if (locale === i18n.sourceLocale) {
                 throw new Error(`An i18n locale ('${locale}') cannot both be a source locale and provide a translation.`);
             }
             i18n.locales[locale] = {
-                file: translationFile,
+                files: translationFiles.map((file) => ({ path: file })),
                 baseHref,
             };
         }
@@ -157,26 +167,43 @@ async function configureI18nBuild(context, options) {
             else {
                 desc.dataPath = localeDataPath;
             }
-            if (!desc.file) {
+            if (!desc.files.length) {
                 continue;
             }
-            const result = loader(path.join(context.workspaceRoot, desc.file));
-            for (const diagnostics of result.diagnostics.messages) {
-                if (diagnostics.type === 'error') {
-                    throw new Error(`Error parsing translation file '${desc.file}': ${diagnostics.message}`);
+            for (const file of desc.files) {
+                const loadResult = loader(path.join(context.workspaceRoot, file.path));
+                for (const diagnostics of loadResult.diagnostics.messages) {
+                    if (diagnostics.type === 'error') {
+                        throw new Error(`Error parsing translation file '${file.path}': ${diagnostics.message}`);
+                    }
+                    else {
+                        context.logger.warn(`WARNING [${file.path}]: ${diagnostics.message}`);
+                    }
+                }
+                if (loadResult.locale !== undefined && loadResult.locale !== locale) {
+                    context.logger.warn(`WARNING [${file.path}]: File target locale ('${loadResult.locale}') does not match configured locale ('${locale}')`);
+                }
+                usedFormats.add(loadResult.format);
+                if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
+                    // This limitation is only for legacy message id support (defaults to true as of 9.0)
+                    throw new Error('Localization currently only supports using one type of translation file format for the entire application.');
+                }
+                file.format = loadResult.format;
+                file.integrity = loadResult.integrity;
+                if (desc.translation) {
+                    // Merge translations
+                    for (const [id, message] of Object.entries(loadResult.translations)) {
+                        if (desc.translation[id] !== undefined) {
+                            context.logger.warn(`WARNING [${file.path}]: Duplicate translations for message '${id}' when merging`);
+                        }
+                        desc.translation[id] = message;
+                    }
                 }
                 else {
-                    context.logger.warn(`WARNING [${desc.file}]: ${diagnostics.message}`);
+                    // First or only translation file
+                    desc.translation = loadResult.translations;
                 }
             }
-            usedFormats.add(result.format);
-            if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
-                // This limitation is only for legacy message id support (defaults to true as of 9.0)
-                throw new Error('Localization currently only supports using one type of translation file format for the entire application.');
-            }
-            desc.format = result.format;
-            desc.translation = result.translation;
-            desc.integrity = result.integrity;
         }
         // Legacy message id's require the format of the translations
         if (usedFormats.size > 0) {
@@ -186,7 +213,10 @@ async function configureI18nBuild(context, options) {
         if (!usingIvy) {
             i18n.veCompatLocale = buildOptions.i18nLocale = [...i18n.inlineLocales][0];
             if (buildOptions.i18nLocale !== i18n.sourceLocale) {
-                buildOptions.i18nFile = i18n.locales[buildOptions.i18nLocale].file;
+                if (i18n.locales[buildOptions.i18nLocale].files.length > 1) {
+                    throw new Error('Localization with View Engine only supports using a single translation file per locale.');
+                }
+                buildOptions.i18nFile = i18n.locales[buildOptions.i18nLocale].files[0].path;
             }
             // Clear inline locales to prevent any new i18n related processing
             i18n.inlineLocales.clear();
@@ -217,13 +247,13 @@ function mergeDeprecatedI18nOptions(i18n, i18nLocale, i18nFile) {
         i18n.inlineLocales.clear();
         i18n.inlineLocales.add(i18nLocale);
         if (i18nFile !== undefined) {
-            i18n.locales[i18nLocale] = { file: i18nFile, baseHref: '' };
+            i18n.locales[i18nLocale] = { files: [{ path: i18nFile }], baseHref: '' };
         }
         else {
             // If no file, treat the locale as the source locale
             // This mimics deprecated behavior
             i18n.sourceLocale = i18nLocale;
-            i18n.locales[i18nLocale] = { file: '', baseHref: '' };
+            i18n.locales[i18nLocale] = { files: [], baseHref: '' };
         }
         i18n.flatOutput = true;
     }

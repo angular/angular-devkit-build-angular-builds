@@ -1,6 +1,7 @@
 export declare type TranslationLoader = (path: string) => {
-    translation: unknown;
+    translations: Record<string, import('@angular/localize').ɵParsedTranslation>;
     format: string;
+    locale?: string;
     diagnostics: import('@angular/localize/src/tools/src/diagnostics').Diagnostics;
     integrity: string;
 };
