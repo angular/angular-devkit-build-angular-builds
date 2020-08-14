@@ -70,9 +70,9 @@ function statsToString(json, statsConfig) {
 }
 exports.statsToString = statsToString;
 // TODO(#16193): Don't emit this warning in the first place rather than just suppressing it.
-const ERRONEOUS_WARNINGS = [
+const ERRONEOUS_WARNINGS_FILTER = (warning) => ![
     /multiple assets emit different content.*3rdpartylicenses\.txt/i,
-];
+].some(msg => msg.test(warning));
 function statsWarningsToString(json, statsConfig) {
     const colors = statsConfig.colors;
     const rs = (x) => colors ? reset(x) : x;
@@ -85,7 +85,7 @@ function statsWarningsToString(json, statsConfig) {
     }
     return rs('\n' + warnings
         .map((warning) => `${warning}`)
-        .filter((warning) => !ERRONEOUS_WARNINGS.some((erroneous) => erroneous.test(warning)))
+        .filter(ERRONEOUS_WARNINGS_FILTER)
         .map((warning) => y(`WARNING in ${warning}`))
         .join('\n\n'));
 }
@@ -107,11 +107,12 @@ function statsErrorsToString(json, statsConfig) {
 exports.statsErrorsToString = statsErrorsToString;
 function statsHasErrors(json) {
     var _a;
-    return json.errors.length > 0 || !!((_a = json.children) === null || _a === void 0 ? void 0 : _a.some((c) => c.errors.length));
+    return json.errors.length || !!((_a = json.children) === null || _a === void 0 ? void 0 : _a.some((c) => c.errors.length));
 }
 exports.statsHasErrors = statsHasErrors;
 function statsHasWarnings(json) {
     var _a;
-    return json.warnings.length > 0 || !!((_a = json.children) === null || _a === void 0 ? void 0 : _a.some((c) => c.warnings.length));
+    return json.warnings.filter(ERRONEOUS_WARNINGS_FILTER).length ||
+        !!((_a = json.children) === null || _a === void 0 ? void 0 : _a.some((c) => c.warnings.filter(ERRONEOUS_WARNINGS_FILTER).length));
 }
 exports.statsHasWarnings = statsHasWarnings;

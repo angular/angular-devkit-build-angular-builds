@@ -96,10 +96,10 @@ async function execute(options, context) {
     ]);
     const logging = (stats, config) => {
         const json = stats.toJson({ errors: true, warnings: true });
-        if (stats.hasWarnings()) {
+        if (stats_1.statsHasWarnings(json)) {
             context.logger.warn(stats_1.statsWarningsToString(json, config.stats));
         }
-        if (stats.hasErrors()) {
+        if (stats_1.statsHasErrors(json)) {
             context.logger.error(stats_1.statsErrorsToString(json, config.stats));
         }
     };
