@@ -45,10 +45,10 @@ function createBrowserLoggingCallback(verbose, logger) {
         else {
             logger.info(stats_1.statsToString(json, config.stats));
         }
-        if (stats.hasWarnings()) {
+        if (stats_1.statsHasWarnings(json)) {
             logger.warn(stats_1.statsWarningsToString(json, config.stats));
         }
-        if (stats.hasErrors()) {
+        if (stats_1.statsHasErrors(json)) {
             logger.error(stats_1.statsErrorsToString(json, config.stats));
         }
     };
