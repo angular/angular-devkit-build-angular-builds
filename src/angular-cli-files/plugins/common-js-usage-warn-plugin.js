@@ -43,12 +43,12 @@ class CommonJsUsageWarnPlugin {
                          */
                         continue;
                     }
-                    if (this.hasCommonJsDependencies(dependencies, true)) {
+                    if (this.hasCommonJsDependencies(dependencies)) {
                         // Dependency is CommonsJS or AMD.
                         // Check if it's parent issuer is also a CommonJS dependency.
                         // In case it is skip as an warning will be show for the parent CommonJS dependency.
                         const parentDependencies = (_a = issuer === null || issuer === void 0 ? void 0 : issuer.issuer) === null || _a === void 0 ? void 0 : _a.dependencies;
-                        if (parentDependencies && this.hasCommonJsDependencies(parentDependencies)) {
+                        if (parentDependencies && this.hasCommonJsDependencies(parentDependencies, true)) {
                             continue;
                         }
                         // Find the main issuer (entry-point).
@@ -74,16 +74,19 @@ class CommonJsUsageWarnPlugin {
             });
         });
     }
-    hasCommonJsDependencies(dependencies, checkForStylesAndTemplatesCJS = false) {
+    hasCommonJsDependencies(dependencies, checkParentModules = false) {
         for (const dep of dependencies) {
             if (dep instanceof CommonJsRequireDependency) {
-                if (checkForStylesAndTemplatesCJS && STYLES_TEMPLATE_URL_REGEXP.test(dep.request)) {
+                if (STYLES_TEMPLATE_URL_REGEXP.test(dep.request)) {
                     // Skip in case it's a template or stylesheet
                     continue;
                 }
                 return true;
             }
             if (dep instanceof AMDDefineDependency) {
+                return true;
+            }
+            if (checkParentModules && dep.module && this.hasCommonJsDependencies(dep.module.dependencies)) {
                 return true;
             }
         }
