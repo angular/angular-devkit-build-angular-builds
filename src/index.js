@@ -34,3 +34,5 @@ var protractor_1 = require("./protractor");
 Object.defineProperty(exports, "executeProtractorBuilder", { enumerable: true, get: function () { return protractor_1.execute; } });
 var server_1 = require("./server");
 Object.defineProperty(exports, "executeServerBuilder", { enumerable: true, get: function () { return server_1.execute; } });
+var ng_packagr_1 = require("./ng-packagr");
+Object.defineProperty(exports, "executeNgPackagrBuilder", { enumerable: true, get: function () { return ng_packagr_1.execute; } });
