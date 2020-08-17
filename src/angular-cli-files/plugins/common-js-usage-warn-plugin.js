@@ -13,7 +13,6 @@ const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 // Webpack doesn't export these so the deep imports can potentially break.
 const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
-const STYLES_TEMPLATE_URL_REGEXP = /\.(html|svg|css|sass|less|styl|scss)$/;
 class CommonJsUsageWarnPlugin {
     constructor(options = {}) {
         var _a;
@@ -77,14 +76,7 @@ class CommonJsUsageWarnPlugin {
     }
     hasCommonJsDependencies(dependencies, checkParentModules = false) {
         for (const dep of dependencies) {
-            if (dep instanceof CommonJsRequireDependency) {
-                if (STYLES_TEMPLATE_URL_REGEXP.test(dep.request)) {
-                    // Skip in case it's a template or stylesheet
-                    continue;
-                }
-                return true;
-            }
-            if (dep instanceof AMDDefineDependency) {
+            if (dep instanceof CommonJsRequireDependency || dep instanceof AMDDefineDependency) {
                 return true;
             }
             if (checkParentModules && dep.module && this.hasCommonJsDependencies(dep.module.dependencies)) {
