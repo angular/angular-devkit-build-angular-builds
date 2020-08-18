@@ -10,7 +10,9 @@ exports.execute = void 0;
  */
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
+const fs = require("fs");
 const path = require("path");
+const semver_1 = require("semver");
 const webpack = require("webpack");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const stats_1 = require("../angular-cli-files/utilities/stats");
@@ -30,6 +32,25 @@ function getI18nOutfile(format) {
             return 'messages.xlf';
         default:
             throw new Error(`Unsupported format "${format}"`);
+    }
+}
+async function getSerializer(format, sourceLocale, basePath, useLegacyIds = true) {
+    switch (format) {
+        case schema_1.Format.Xmb:
+            const { XmbTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer'));
+            // tslint:disable-next-line: no-any
+            return new XmbTranslationSerializer(basePath, useLegacyIds);
+        case schema_1.Format.Xlf:
+        case schema_1.Format.Xlif:
+        case schema_1.Format.Xliff:
+            const { Xliff1TranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer'));
+            // tslint:disable-next-line: no-any
+            return new Xliff1TranslationSerializer(sourceLocale, basePath, useLegacyIds);
+        case schema_1.Format.Xlf2:
+        case schema_1.Format.Xliff2:
+            const { Xliff2TranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer'));
+            // tslint:disable-next-line: no-any
+            return new Xliff2TranslationSerializer(sourceLocale, basePath, useLegacyIds);
     }
 }
 class InMemoryOutputPlugin {
@@ -56,6 +77,9 @@ async function execute(options, context) {
         case schema_1.Format.Xliff2:
             options.format = schema_1.Format.Xlf2;
             break;
+        case undefined:
+            options.format = schema_1.Format.Xlf;
+            break;
     }
     // We need to determine the outFile name so that AngularCompiler can retrieve it.
     let outFile = options.outFile || getI18nOutfile(options.format);
@@ -63,19 +87,21 @@ async function execute(options, context) {
         // AngularCompilerPlugin doesn't support genDir so we have to adjust outFile instead.
         outFile = path.join(options.outputPath, outFile);
     }
-    const projectName = context.target && context.target.project;
-    if (!projectName) {
+    if (!context.target || !context.target.project) {
         throw new Error('The builder requires a target.');
     }
-    // target is verified in the above call
-    // tslint:disable-next-line: no-non-null-assertion
     const metadata = await context.getProjectMetadata(context.target);
     const i18n = i18n_options_1.createI18nOptions(metadata);
-    const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext({
+    let usingIvy = false;
+    const ivyMessages = [];
+    const { config, projectRoot } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext({
         ...browserOptions,
         optimization: {
             scripts: false,
             styles: false,
+        },
+        sourceMap: {
+            scripts: true,
         },
         buildOptimizer: false,
         i18nLocale: options.i18nLocale || i18n.sourceLocale,
@@ -87,13 +113,57 @@ async function execute(options, context) {
         scripts: [],
         styles: [],
         deleteOutputPath: false,
-    }, context, wco => [
-        { plugins: [new InMemoryOutputPlugin()] },
-        webpack_configs_1.getCommonConfig(wco),
-        webpack_configs_1.getAotConfig(wco, true),
-        webpack_configs_1.getStylesConfig(wco),
-        webpack_configs_1.getStatsConfig(wco),
-    ]);
+    }, context, (wco) => {
+        const isIvyApplication = wco.tsConfig.options.enableIvy !== false;
+        // Ivy-based extraction is currently opt-in
+        if (options.ivy) {
+            if (!isIvyApplication) {
+                context.logger.warn('Ivy extraction enabled but application is not Ivy enabled. Extraction may fail.');
+            }
+            usingIvy = true;
+        }
+        else if (isIvyApplication) {
+            context.logger.warn('Ivy extraction not enabled but application is Ivy enabled. ' +
+                'If the extraction fails, the `--ivy` flag will enable Ivy extraction.');
+        }
+        const partials = [
+            { plugins: [new InMemoryOutputPlugin()] },
+            webpack_configs_1.getCommonConfig(wco),
+            // Only use VE extraction if not using Ivy
+            webpack_configs_1.getAotConfig(wco, !usingIvy),
+            webpack_configs_1.getStylesConfig(wco),
+            webpack_configs_1.getStatsConfig(wco),
+        ];
+        // Add Ivy application file extractor support
+        if (usingIvy) {
+            partials.unshift({
+                module: {
+                    rules: [
+                        {
+                            test: /\.ts$/,
+                            loader: require.resolve('./ivy-extract-loader'),
+                            options: {
+                                messageHandler: (messages) => ivyMessages.push(...messages),
+                            },
+                        },
+                    ],
+                },
+            });
+        }
+        return partials;
+    });
+    if (usingIvy) {
+        let validLocalizePackage = false;
+        try {
+            const { version: localizeVersion } = require('@angular/localize/package.json');
+            validLocalizePackage = semver_1.gte(localizeVersion, '10.1.0-next.0', { includePrerelease: true });
+        }
+        catch (_a) { }
+        if (!validLocalizePackage) {
+            context.logger.error("Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.");
+            return { success: false };
+        }
+    }
     const logging = (stats, config) => {
         const json = stats.toJson({ errors: true, warnings: true });
         if (stats_1.statsHasWarnings(json)) {
@@ -103,10 +173,29 @@ async function execute(options, context) {
             context.logger.error(stats_1.statsErrorsToString(json, config.stats));
         }
     };
-    return build_webpack_1.runWebpack(config, context, {
+    const webpackResult = await build_webpack_1.runWebpack(config, context, {
         logging,
         webpackFactory: await Promise.resolve().then(() => require('webpack')),
     }).toPromise();
+    // Complete if using VE
+    if (!usingIvy) {
+        return webpackResult;
+    }
+    // Nothing to process if the Webpack build failed
+    if (!webpackResult.success) {
+        return webpackResult;
+    }
+    // Serialize all extracted messages
+    const serializer = await getSerializer(options.format, i18n.sourceLocale, config.context || projectRoot);
+    const content = serializer.serialize(ivyMessages);
+    // Ensure directory exists
+    const outputPath = path.dirname(outFile);
+    if (!fs.existsSync(outputPath)) {
+        fs.mkdirSync(outputPath, { recursive: true });
+    }
+    // Write translation file
+    fs.writeFileSync(outFile, content);
+    return webpackResult;
 }
 exports.execute = execute;
 exports.default = architect_1.createBuilder(execute);
