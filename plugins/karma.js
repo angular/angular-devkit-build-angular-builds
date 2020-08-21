@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
