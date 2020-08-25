@@ -115,7 +115,7 @@ async function augmentIndexHtml(params) {
         else {
             baseElement.attribs['href'] = params.baseHref;
             treeAdapter.setTemplateContent(baseFragment, baseElement);
-            indexSource.replace(baseElement.sourceCodeLocation.startOffset, baseElement.sourceCodeLocation.endOffset, parse5.serialize(baseFragment, { treeAdapter }));
+            indexSource.replace(baseElement.sourceCodeLocation.startOffset, baseElement.sourceCodeLocation.endOffset - 1, parse5.serialize(baseFragment, { treeAdapter }));
         }
     }
     const styleElements = treeAdapter.createDocumentFragment();
