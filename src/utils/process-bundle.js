@@ -13,6 +13,7 @@ const template_1 = require("@babel/template");
 const crypto_1 = require("crypto");
 const fs = require("fs");
 const path = require("path");
+const semver_1 = require("semver");
 const source_map_1 = require("source-map");
 const terser_1 = require("terser");
 const v8 = require("v8");
@@ -357,7 +358,6 @@ function createIifeWrapperPlugin() {
 const USE_LOCALIZE_PLUGINS = false;
 async function createI18nPlugins(locale, translation, missingTranslation, localeDataContent) {
     const plugins = [];
-    // tslint:disable-next-line: no-implicit-dependencies
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
     const es2015 = await Promise.resolve().then(() => require(
@@ -476,9 +476,7 @@ async function inlineLocalesDirect(ast, options) {
         return { file: options.filename, diagnostics: [], count: 0 };
     }
     const { default: generate } = await Promise.resolve().then(() => require('@babel/generator'));
-    // tslint:disable-next-line: no-implicit-dependencies
     const utils = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/source_file_utils'));
-    // tslint:disable-next-line: no-implicit-dependencies
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
     const positions = findLocalizePositions(ast, options, utils);
@@ -546,19 +544,19 @@ function inlineCopyOnly(options) {
     }
     return { file: options.filename, diagnostics: [], count: 0 };
 }
-function findLocalizePositions(ast, options, 
-// tslint:disable-next-line: no-implicit-dependencies
-utils) {
+function findLocalizePositions(ast, options, utils) {
     const positions = [];
+    // Workaround to ensure a path hub is present for traversal
+    const { File } = require('@babel/core');
+    const file = new File({}, { code: options.code, ast });
     if (options.es5) {
-        core_1.traverse(ast, {
+        core_1.traverse(file.ast, {
             CallExpression(path) {
                 const callee = path.get('callee');
                 if (callee.isIdentifier() &&
                     callee.node.name === localizeName &&
                     utils.isGlobalIdentifier(callee)) {
-                    const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
-                    const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
+                    const [messageParts, expressions] = unwrapLocalizeCall(path, utils);
                     positions.push({
                         // tslint:disable-next-line: no-non-null-assertion
                         start: path.node.start,
@@ -572,24 +570,58 @@ utils) {
         });
     }
     else {
-        const traverseFast = core_1.types.traverseFast;
-        traverseFast(ast, node => {
-            if (node.type === 'TaggedTemplateExpression' &&
-                core_1.types.isIdentifier(node.tag) &&
-                node.tag.name === localizeName) {
-                const messageParts = utils.unwrapMessagePartsFromTemplateLiteral(node.quasi.quasis);
-                positions.push({
-                    // tslint:disable-next-line: no-non-null-assertion
-                    start: node.start,
-                    // tslint:disable-next-line: no-non-null-assertion
-                    end: node.end,
-                    messageParts,
-                    expressions: node.quasi.expressions,
-                });
-            }
+        core_1.traverse(file.ast, {
+            TaggedTemplateExpression(path) {
+                if (core_1.types.isIdentifier(path.node.tag) && path.node.tag.name === localizeName) {
+                    const [messageParts, expressions] = unwrapTemplateLiteral(path, utils);
+                    positions.push({
+                        // tslint:disable-next-line: no-non-null-assertion
+                        start: path.node.start,
+                        // tslint:disable-next-line: no-non-null-assertion
+                        end: path.node.end,
+                        messageParts,
+                        expressions,
+                    });
+                }
+            },
         });
     }
     return positions;
+}
+// TODO: Remove this for v11.
+// This check allows the CLI to support both FW 10.0 and 10.1
+let localizeOld;
+function unwrapTemplateLiteral(path, utils) {
+    if (localizeOld === undefined) {
+        const { version: localizeVersion } = require('@angular/localize/package.json');
+        localizeOld = semver_1.lt(localizeVersion, '10.1.0-rc.0', { includePrerelease: true });
+    }
+    if (localizeOld) {
+        // tslint:disable-next-line: no-any
+        const messageParts = utils.unwrapMessagePartsFromTemplateLiteral(path.node.quasi.quasis);
+        return [messageParts, path.node.quasi.expressions];
+    }
+    const [messageParts] = utils.unwrapMessagePartsFromTemplateLiteral(path.get('quasi').get('quasis'));
+    const [expressions] = utils.unwrapExpressionsFromTemplateLiteral(path.get('quasi'));
+    return [messageParts, expressions];
+}
+function unwrapLocalizeCall(path, utils) {
+    if (localizeOld === undefined) {
+        const { version: localizeVersion } = require('@angular/localize/package.json');
+        localizeOld = semver_1.lt(localizeVersion, '10.1.0-rc.0', { includePrerelease: true });
+    }
+    if (localizeOld) {
+        const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
+        // tslint:disable-next-line: no-any
+        const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
+        return [
+            messageParts,
+            expressions,
+        ];
+    }
+    const [messageParts] = utils.unwrapMessagePartsFromLocalizeCall(path);
+    const [expressions] = utils.unwrapSubstitutionsFromLocalizeCall(path);
+    return [messageParts, expressions];
 }
 async function loadLocaleData(path, optimize, es5) {
     // The path is validated during option processing before the build starts
