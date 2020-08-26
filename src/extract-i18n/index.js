@@ -59,7 +59,8 @@ class InMemoryOutputPlugin {
         compiler.outputFileSystem = new webpack.MemoryOutputFileSystem();
     }
 }
-async function execute(options, context) {
+async function execute(options, context, transforms) {
+    var _a;
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
@@ -158,7 +159,7 @@ async function execute(options, context) {
             const { version: localizeVersion } = require('@angular/localize/package.json');
             validLocalizePackage = semver_1.gte(localizeVersion, '10.1.0-next.0', { includePrerelease: true });
         }
-        catch (_a) { }
+        catch (_b) { }
         if (!validLocalizePackage) {
             context.logger.error("Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.");
             return { success: false };
@@ -173,7 +174,7 @@ async function execute(options, context) {
             context.logger.error(stats_1.statsErrorsToString(json, config.stats));
         }
     };
-    const webpackResult = await build_webpack_1.runWebpack(config, context, {
+    const webpackResult = await build_webpack_1.runWebpack((await ((_a = transforms === null || transforms === void 0 ? void 0 : transforms.webpackConfiguration) === null || _a === void 0 ? void 0 : _a.call(transforms, config))) || config, context, {
         logging,
         webpackFactory: await Promise.resolve().then(() => require('webpack')),
     }).toPromise();

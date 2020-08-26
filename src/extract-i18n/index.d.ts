@@ -8,8 +8,12 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuildResult } from '@angular-devkit/build-webpack';
 import { JsonObject } from '@angular-devkit/core';
+import * as webpack from 'webpack';
+import { ExecutionTransformer } from '../transforms';
 import { Schema } from './schema';
 export declare type ExtractI18nBuilderOptions = Schema & JsonObject;
-export declare function execute(options: ExtractI18nBuilderOptions, context: BuilderContext): Promise<BuildResult>;
+export declare function execute(options: ExtractI18nBuilderOptions, context: BuilderContext, transforms?: {
+    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
+}): Promise<BuildResult>;
 declare const _default: import("@angular-devkit/architect/src/internal").Builder<JsonObject & Schema>;
 export default _default;
