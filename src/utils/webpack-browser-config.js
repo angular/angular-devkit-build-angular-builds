@@ -4,7 +4,6 @@ exports.getIndexInputFile = exports.getIndexOutputFile = exports.generateBrowser
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const path = require("path");
-const webpack_merge_1 = require("webpack-merge");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const utils_1 = require("../utils");
@@ -12,6 +11,7 @@ const build_browser_features_1 = require("./build-browser-features");
 const environment_options_1 = require("./environment-options");
 const i18n_options_1 = require("./i18n-options");
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
+const webpackMerge = require('webpack-merge');
 async function generateWebpackConfig(context, workspaceRoot, projectRoot, sourceRoot, options, webpackPartialGenerator, logger) {
     // Ensure Build Optimizer is only used with AOT.
     if (options.buildOptimizer && !options.aot) {
@@ -60,7 +60,8 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
         differentialLoadingMode: differentialLoading,
     };
     wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
-    const webpackConfig = webpack_merge_1.merge(webpackPartialGenerator(wco));
+    const partials = webpackPartialGenerator(wco);
+    const webpackConfig = webpackMerge(partials);
     if (supportES2015) {
         if (!webpackConfig.resolve) {
             webpackConfig.resolve = {};

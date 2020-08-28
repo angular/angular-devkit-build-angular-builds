@@ -8,40 +8,33 @@ exports.checkPort = void 0;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const inquirer_1 = require("inquirer");
 const net = require("net");
-const tty_1 = require("./tty");
-function createInUseError(port) {
-    return new Error(`Port ${port} is already in use. Use '--port' to specify a different port.`);
-}
-async function checkPort(port, host) {
-    if (port === 0) {
-        return 0;
-    }
+function checkPort(port, host, basePort = 49152) {
     return new Promise((resolve, reject) => {
-        const server = net.createServer();
-        server
-            .once('error', (err) => {
-            if (err.code !== 'EADDRINUSE') {
-                reject(err);
-                return;
+        function _getPort(portNumber) {
+            if (portNumber > 65535) {
+                reject(new Error(`There is no port available.`));
             }
-            if (!tty_1.isTTY) {
-                reject(createInUseError(port));
-                return;
-            }
-            inquirer_1.prompt({
-                type: 'confirm',
-                name: 'useDifferent',
-                message: `Port ${port} is already in use.\nWould you like to use a different port?`,
-                default: true,
-            }).then((answers) => answers.useDifferent ? resolve(0) : reject(createInUseError(port)), () => reject(createInUseError(port)));
-        })
-            .once('listening', () => {
-            server.close();
-            resolve(port);
-        })
-            .listen(port, host);
+            const server = net.createServer();
+            server.once('error', (err) => {
+                if (err.code !== 'EADDRINUSE') {
+                    reject(err);
+                }
+                else if (port === 0) {
+                    _getPort(portNumber + 1);
+                }
+                else {
+                    // If the port isn't available and we weren't looking for any port, throw error.
+                    reject(new Error(`Port ${port} is already in use. Use '--port' to specify a different port.`));
+                }
+            })
+                .once('listening', () => {
+                server.close();
+                resolve(portNumber);
+            })
+                .listen(portNumber, host);
+        }
+        _getPort(port || basePort);
     });
 }
 exports.checkPort = checkPort;
