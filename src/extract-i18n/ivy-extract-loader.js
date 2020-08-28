@@ -35,34 +35,29 @@ map) {
             loaderContext.emitError(args.join(''));
         },
     };
-    let filename = loaderContext.resourcePath;
-    if (map === null || map === void 0 ? void 0 : map.file) {
-        // The extractor's internal sourcemap handling expects the filenames to match
-        filename = nodePath.posix.join(loaderContext.context, map.file);
-    }
     // Setup a virtual file system instance for the extractor
     // * MessageExtractor itself uses readFile and resolve
     // * Internal SourceFileLoader (sourcemap support) uses dirname, exists, readFile, and resolve
     const filesystem = {
         readFile(path) {
-            if (path === filename) {
+            if (path === loaderContext.resourcePath) {
                 return content;
             }
-            else if (path === filename + '.map') {
+            else if (path === loaderContext.resourcePath + '.map') {
                 return typeof map === 'string' ? map : JSON.stringify(map);
             }
             else {
-                throw new Error('Unknown file requested: ' + path);
+                throw new Error('Unknown file requested.');
             }
         },
         resolve(...paths) {
-            return nodePath.posix.resolve(...paths);
+            return nodePath.resolve(...paths);
         },
         exists(path) {
-            return path === filename || path === filename + '.map';
+            return path === loaderContext.resourcePath || path === loaderContext.resourcePath + '.map';
         },
         dirname(path) {
-            return nodePath.posix.dirname(path);
+            return nodePath.dirname(path);
         },
     };
     // tslint:disable-next-line: no-any
@@ -71,7 +66,7 @@ map) {
         basePath: this.rootContext,
         useSourceMaps: !!map,
     });
-    const messages = extractor.extractMessages(filename);
+    const messages = extractor.extractMessages(loaderContext.resourcePath);
     if (messages.length > 0) {
         options === null || options === void 0 ? void 0 : options.messageHandler(messages);
     }
