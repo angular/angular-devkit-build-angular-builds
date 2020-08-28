@@ -1,1 +1,1 @@
-export declare function checkPort(port: number, host: string, basePort?: number): Promise<number>;
+export declare function checkPort(port: number, host: string): Promise<number>;

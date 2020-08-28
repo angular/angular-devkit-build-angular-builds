@@ -62,6 +62,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     const host = new node_1.NodeJsSyncHost();
     const loggingFn = transforms.logging || browser_1.createBrowserLoggingCallback(!!options.verbose, context.logger);
     async function setup() {
+        var _a;
         // Get the browser configuration from the target name.
         const rawBrowserOptions = await context.getTargetOptions(browserTarget);
         // Override options we need to override, if defined.
@@ -84,7 +85,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             }
             await setupLocalize(i18n, browserOptions, webpackConfig);
         }
-        const port = await check_port_1.checkPort(options.port || 0, options.host || 'localhost', 4200);
+        options.port = await check_port_1.checkPort((_a = options.port) !== null && _a !== void 0 ? _a : 4200, options.host || 'localhost');
         const webpackDevServerConfig = (webpackConfig.devServer = buildServerConfig(root, options, browserOptions, context.logger));
         if (transforms.webpackConfiguration) {
             webpackConfig = await transforms.webpackConfiguration(webpackConfig);
@@ -93,12 +94,10 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             browserOptions,
             webpackConfig,
             webpackDevServerConfig,
-            port,
             projectRoot,
         };
     }
-    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, projectRoot }) => {
-        options.port = port;
+    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, projectRoot }) => {
         // Resolve public host and client address.
         let clientAddress = url.parse(`${options.ssl ? 'https' : 'http'}://0.0.0.0:0`);
         if (options.publicHost) {
