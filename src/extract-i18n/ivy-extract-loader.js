@@ -38,7 +38,7 @@ map) {
     let filename = loaderContext.resourcePath;
     if (map === null || map === void 0 ? void 0 : map.file) {
         // The extractor's internal sourcemap handling expects the filenames to match
-        filename = nodePath.posix.join(loaderContext.context, map.file);
+        filename = nodePath.join(loaderContext.context, map.file);
     }
     // Setup a virtual file system instance for the extractor
     // * MessageExtractor itself uses readFile and resolve
@@ -56,13 +56,13 @@ map) {
             }
         },
         resolve(...paths) {
-            return nodePath.posix.resolve(...paths);
+            return nodePath.resolve(...paths);
         },
         exists(path) {
             return path === filename || path === filename + '.map';
         },
         dirname(path) {
-            return nodePath.posix.dirname(path);
+            return nodePath.dirname(path);
         },
     };
     // tslint:disable-next-line: no-any
