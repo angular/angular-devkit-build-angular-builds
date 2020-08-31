@@ -35,27 +35,22 @@ function getOutputHashFormat(option, length = 20) {
 exports.getOutputHashFormat = getOutputHashFormat;
 function normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName) {
     return extraEntryPoints.map(entry => {
-        let normalizedEntry;
         if (typeof entry === 'string') {
-            normalizedEntry = { input: entry, inject: true, bundleName: defaultBundleName };
+            return { input: entry, inject: true, bundleName: defaultBundleName };
+        }
+        const { inject = true, ...newEntry } = entry;
+        let bundleName;
+        if (entry.bundleName) {
+            bundleName = entry.bundleName;
+        }
+        else if (!inject) {
+            // Lazy entry points use the file name as bundle name.
+            bundleName = core_1.basename(core_1.normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')));
         }
         else {
-            const { lazy, inject = true, ...newEntry } = entry;
-            const injectNormalized = entry.lazy !== undefined ? !entry.lazy : inject;
-            let bundleName;
-            if (entry.bundleName) {
-                bundleName = entry.bundleName;
-            }
-            else if (!injectNormalized) {
-                // Lazy entry points use the file name as bundle name.
-                bundleName = core_1.basename(core_1.normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')));
-            }
-            else {
-                bundleName = defaultBundleName;
-            }
-            normalizedEntry = { ...newEntry, inject: injectNormalized, bundleName };
+            bundleName = defaultBundleName;
         }
-        return normalizedEntry;
+        return { ...newEntry, inject, bundleName };
     });
 }
 exports.normalizeExtraEntryPoints = normalizeExtraEntryPoints;

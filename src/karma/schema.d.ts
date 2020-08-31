@@ -133,10 +133,6 @@ export interface ExtraEntryPointClass {
      * The file to include.
      */
     input: string;
-    /**
-     * If the bundle will be lazy loaded.
-     */
-    lazy?: boolean;
 }
 /**
  * Output sourcemaps.

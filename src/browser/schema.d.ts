@@ -48,7 +48,9 @@ export interface Schema {
      */
     experimentalRollupPass?: boolean;
     /**
-     * Extract css from global styles into css files instead of js ones.
+     * Extract CSS from global styles into '.css' files instead of '.js'.
+     * @deprecated Deprecated since version 11.0. No longer required to disable CSS extraction
+     * for HMR.
      */
     extractCss?: boolean;
     /**
@@ -346,10 +348,6 @@ export interface ExtraEntryPointClass {
      * The file to include.
      */
     input: string;
-    /**
-     * If the bundle will be lazy loaded.
-     */
-    lazy?: boolean;
 }
 /**
  * Output sourcemaps.
