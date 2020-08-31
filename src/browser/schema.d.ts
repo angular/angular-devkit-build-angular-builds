@@ -56,7 +56,7 @@ export interface Schema {
      */
     extractLicenses?: boolean;
     /**
-     * Replace files with other files in the build.
+     * Replace compilation source files with other compilation source files in the build.
      */
     fileReplacements?: FileReplacement[];
     /**
