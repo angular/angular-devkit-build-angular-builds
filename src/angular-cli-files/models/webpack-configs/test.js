@@ -36,8 +36,11 @@ function getTestConfig(wco) {
             include: sourceRoot,
         });
     }
-    if (sourceMap.scripts || sourceMap.styles) {
-        extraPlugins.push(utils_1.getSourceMapDevTool(sourceMap.scripts, sourceMap.styles, false, true));
+    if (sourceMap) {
+        const { styles, scripts, vendor } = sourceMap;
+        if (styles || scripts) {
+            extraPlugins.push(utils_1.getSourceMapDevTool(scripts, styles, false, true, vendor));
+        }
     }
     return {
         mode: 'development',

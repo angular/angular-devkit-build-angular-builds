@@ -18,9 +18,9 @@ const utils_1 = require("./utils");
 function getServerConfig(wco) {
     const { sourceMap, bundleDependencies, externalDependencies = [], } = wco.buildOptions;
     const extraPlugins = [];
-    const { scripts, styles, hidden } = sourceMap;
+    const { scripts, styles, hidden, vendor } = sourceMap;
     if (scripts || styles) {
-        extraPlugins.push(utils_1.getSourceMapDevTool(scripts, styles, hidden));
+        extraPlugins.push(utils_1.getSourceMapDevTool(scripts, styles, hidden, false, vendor));
     }
     const externals = [...externalDependencies];
     if (!bundleDependencies) {
