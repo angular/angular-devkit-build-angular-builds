@@ -133,6 +133,8 @@ class NgBuildAnalyticsPlugin {
             this._stats.numberOfComponents += countOccurrences(module._source.source(), 'Component({');
             // For Ivy we just count ɵcmp.
             this._stats.numberOfComponents += countOccurrences(module._source.source(), '.ɵcmp', true);
+            // for ascii_only true
+            this._stats.numberOfComponents += countOccurrences(module._source.source(), '.\u0275cmp', true);
         }
     }
     _checkNgFactoryNormalModule(module) {
@@ -142,6 +144,8 @@ class NgBuildAnalyticsPlugin {
             // Count the number of `.ɵccf(` strings (case sensitive). They're calls to components
             // factories.
             this._stats.numberOfComponents += countOccurrences(module._source.source(), '.ɵccf(');
+            // for ascii_only true
+            this._stats.numberOfComponents += countOccurrences(module._source.source(), '.\u0275ccf(');
         }
     }
     _collectErrors(stats) {
