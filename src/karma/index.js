@@ -103,7 +103,10 @@ function execute(options, context, transforms = {}) {
             logger: context.logger,
         };
         // Complete the observable once the Karma server returns.
-        const karmaServer = new karma.Server(transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, () => subscriber.complete());
+        const karmaServer = new karma.Server(transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, (exitCode) => {
+            subscriber.next({ success: exitCode === 0 });
+            subscriber.complete();
+        });
         // karma typings incorrectly define start's return value as void
         // tslint:disable-next-line:no-use-of-empty-return-value
         const karmaStart = karmaServer.start();
