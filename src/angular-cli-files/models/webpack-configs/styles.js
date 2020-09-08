@@ -11,11 +11,11 @@ exports.getStylesConfig = void 0;
 const path = require("path");
 const webpack_1 = require("../../plugins/webpack");
 const utils_1 = require("./utils");
-const autoprefixer = require('autoprefixer');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const postcssImports = require('postcss-import');
 // tslint:disable-next-line:no-big-function
 function getStylesConfig(wco) {
+    const autoprefixer = require('autoprefixer');
+    const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+    const postcssImports = require('postcss-import');
     const { root, buildOptions } = wco;
     const entryPoints = {};
     const globalStylePaths = [];
