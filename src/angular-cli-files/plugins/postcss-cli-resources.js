@@ -34,7 +34,7 @@ exports.default = postcss.plugin('postcss-cli-resources', (options) => {
     if (!options) {
         throw new Error('No options were specified to "postcss-cli-resources".');
     }
-    const { deployUrl = '', baseHref = '', resourcesOutputPath = '', rebaseRootRelative = false, filename, loader, emitFile, } = options;
+    const { deployUrl = '', baseHref = '', resourcesOutputPath = '', rebaseRootRelative = false, filename, loader, emitFile, extracted, } = options;
     const dedupeSlashes = (url) => url.replace(/\/\/+/g, '/');
     const process = async (inputUrl, context, resourceCache) => {
         // If root-relative, absolute or protocol relative url, leave as is
@@ -103,7 +103,7 @@ exports.default = postcss.plugin('postcss-cli-resources', (options) => {
                 if (hash || search) {
                     outputUrl = url.format({ pathname: outputUrl, hash, search });
                 }
-                if (deployUrl && loader.loaders[loader.loaderIndex].options.ident !== 'extracted') {
+                if (deployUrl && !extracted) {
                     outputUrl = url.resolve(deployUrl, outputUrl);
                 }
                 resourceCache.set(cacheKey, outputUrl);

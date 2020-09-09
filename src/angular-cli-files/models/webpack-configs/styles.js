@@ -24,35 +24,6 @@ function getStylesConfig(wco) {
     const cssSourceMap = buildOptions.sourceMap.styles;
     // Determine hashing format.
     const hashFormat = utils_1.getOutputHashFormat(buildOptions.outputHashing);
-    const postcssPluginCreator = function (loader) {
-        return [
-            postcssImports({
-                resolve: (url) => (url.startsWith('~') ? url.substr(1) : url),
-                load: (filename) => {
-                    return new Promise((resolve, reject) => {
-                        loader.fs.readFile(filename, (err, data) => {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
-                            const content = data.toString();
-                            resolve(content);
-                        });
-                    });
-                },
-            }),
-            webpack_1.PostcssCliResources({
-                baseHref: buildOptions.baseHref,
-                deployUrl: buildOptions.deployUrl,
-                resourcesOutputPath: buildOptions.resourcesOutputPath,
-                loader,
-                rebaseRootRelative: buildOptions.rebaseRootRelativeCssUrls,
-                filename: `[name]${hashFormat.file}.[ext]`,
-                emitFile: buildOptions.platform !== 'server',
-            }),
-            autoprefixer(),
-        ];
-    };
     // use includePaths from appConfig
     const includePaths = [];
     let lessPathOptions = {};
@@ -161,7 +132,50 @@ function getStylesConfig(wco) {
             ],
         },
     ];
+    const postcssOptionsCreator = (sourceMap, extracted) => {
+        return (loader) => ({
+            map: sourceMap && {
+                inline: true,
+                annotation: false,
+            },
+            plugins: [
+                postcssImports({
+                    resolve: (url) => url.startsWith('~') ? url.substr(1) : url,
+                    load: (filename) => {
+                        return new Promise((resolve, reject) => {
+                            loader.fs.readFile(filename, (err, data) => {
+                                if (err) {
+                                    reject(err);
+                                    return;
+                                }
+                                const content = data.toString();
+                                resolve(content);
+                            });
+                        });
+                    },
+                }),
+                webpack_1.PostcssCliResources({
+                    baseHref: buildOptions.baseHref,
+                    deployUrl: buildOptions.deployUrl,
+                    resourcesOutputPath: buildOptions.resourcesOutputPath,
+                    loader,
+                    rebaseRootRelative: buildOptions.rebaseRootRelativeCssUrls,
+                    filename: `[name]${hashFormat.file}.[ext]`,
+                    emitFile: buildOptions.platform !== 'server',
+                    extracted,
+                }),
+                autoprefixer(),
+            ],
+        });
+    };
     // load component css as raw strings
+    const componentsSourceMap = !!(cssSourceMap
+        // Never use component css sourcemap when style optimizations are on.
+        // It will just increase bundle size without offering good debug experience.
+        && !buildOptions.optimization.styles
+        // Inline all sourcemap types except hidden ones, which are the same as no sourcemaps
+        // for component css.
+        && !buildOptions.sourceMap.hidden);
     const rules = baseRules.map(({ test, use }) => ({
         exclude: globalStylePaths,
         test,
@@ -170,15 +184,7 @@ function getStylesConfig(wco) {
             {
                 loader: require.resolve('postcss-loader'),
                 options: {
-                    ident: 'embedded',
-                    plugins: postcssPluginCreator,
-                    sourceMap: cssSourceMap
-                        // Never use component css sourcemap when style optimizations are on.
-                        // It will just increase bundle size without offering good debug experience.
-                        && !buildOptions.optimization.styles
-                        // Inline all sourcemap types except hidden ones, which are the same as no sourcemaps
-                        // for component css.
-                        && !buildOptions.sourceMap.hidden ? 'inline' : false,
+                    postcssOptions: postcssOptionsCreator(componentsSourceMap, false),
                 },
             },
             ...use,
@@ -186,6 +192,7 @@ function getStylesConfig(wco) {
     }));
     // load global css as css files
     if (globalStylePaths.length > 0) {
+        const globalSourceMap = !!(cssSourceMap && !buildOptions.extractCss && !buildOptions.sourceMap.hidden);
         rules.push(...baseRules.map(({ test, use }) => {
             return {
                 include: globalStylePaths,
@@ -203,17 +210,13 @@ function getStylesConfig(wco) {
                         loader: require.resolve('css-loader'),
                         options: {
                             url: false,
-                            sourceMap: cssSourceMap,
+                            sourceMap: globalSourceMap,
                         },
                     },
                     {
                         loader: require.resolve('postcss-loader'),
                         options: {
-                            ident: buildOptions.extractCss ? 'extracted' : 'embedded',
-                            plugins: postcssPluginCreator,
-                            sourceMap: cssSourceMap && !buildOptions.extractCss && !buildOptions.sourceMap.hidden
-                                ? 'inline'
-                                : cssSourceMap,
+                            postcssOptions: postcssOptionsCreator(globalSourceMap, buildOptions.extractCss),
                         },
                     },
                     ...use,
