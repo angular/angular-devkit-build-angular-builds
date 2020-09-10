@@ -12,7 +12,7 @@ exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsH
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 const core_1 = require("@angular-devkit/core");
 const path = require("path");
-const { bold, green, red, reset, white, yellow } = core_1.terminal;
+const color_1 = require("../../utils/color");
 function formatSize(size) {
     if (size <= 0) {
         return '0 bytes';
@@ -23,8 +23,8 @@ function formatSize(size) {
 }
 exports.formatSize = formatSize;
 function generateBundleStats(info, colors) {
-    const g = (x) => (colors ? bold(green(x)) : x);
-    const y = (x) => (colors ? bold(yellow(x)) : x);
+    const g = (x) => (colors ? color_1.colors.bold.green(x) : x);
+    const y = (x) => (colors ? color_1.colors.bold.yellow(x) : x);
     const id = info.id ? y(info.id.toString()) : '';
     const size = typeof info.size === 'number' ? ` ${formatSize(info.size)}` : '';
     const files = info.files.map(f => path.basename(f)).join(', ');
@@ -37,14 +37,14 @@ function generateBundleStats(info, colors) {
 }
 exports.generateBundleStats = generateBundleStats;
 function generateBuildStats(hash, time, colors) {
-    const w = (x) => colors ? bold(white(x)) : x;
+    const w = (x) => colors ? color_1.colors.bold.white(x) : x;
     return `Date: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
 exports.generateBuildStats = generateBuildStats;
 function statsToString(json, statsConfig) {
     const colors = statsConfig.colors;
-    const rs = (x) => colors ? reset(x) : x;
-    const w = (x) => colors ? bold(white(x)) : x;
+    const rs = (x) => colors ? color_1.colors.reset(x) : x;
+    const w = (x) => colors ? color_1.colors.bold.white(x) : x;
     const changedChunksStats = json.chunks
         .filter((chunk) => chunk.rendered)
         .map((chunk) => {
@@ -78,8 +78,8 @@ const ERRONEOUS_WARNINGS_FILTER = (warning) => ![
 ].some(msg => msg.test(warning));
 function statsWarningsToString(json, statsConfig) {
     const colors = statsConfig.colors;
-    const rs = (x) => colors ? reset(x) : x;
-    const y = (x) => colors ? bold(yellow(x)) : x;
+    const rs = (x) => colors ? color_1.colors.reset(x) : x;
+    const y = (x) => colors ? color_1.colors.bold.yellow(x) : x;
     const warnings = [...json.warnings];
     if (json.children) {
         warnings.push(...json.children
@@ -95,8 +95,8 @@ function statsWarningsToString(json, statsConfig) {
 exports.statsWarningsToString = statsWarningsToString;
 function statsErrorsToString(json, statsConfig) {
     const colors = statsConfig.colors;
-    const rs = (x) => colors ? reset(x) : x;
-    const r = (x) => colors ? bold(red(x)) : x;
+    const rs = (x) => colors ? color_1.colors.reset(x) : x;
+    const r = (x) => colors ? color_1.colors.bold.red(x) : x;
     const errors = [...json.errors];
     if (json.children) {
         errors.push(...json.children
