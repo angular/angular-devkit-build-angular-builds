@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildWebpackBrowser = exports.buildBrowserWebpackConfigFromContext = exports.createBrowserLoggingCallback = void 0;
+exports.buildWebpackBrowser = exports.buildBrowserWebpackConfigFromContext = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -35,25 +35,6 @@ const output_paths_1 = require("../utils/output-paths");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const cacheDownlevelPath = environment_options_1.cachingDisabled ? undefined : cache_path_1.findCachePath('angular-build-dl');
-function createBrowserLoggingCallback(verbose, logger) {
-    return (stats, config) => {
-        // config.stats contains our own stats settings, added during buildWebpackConfig().
-        const json = stats.toJson(config.stats);
-        if (verbose) {
-            logger.info(stats.toString(config.stats));
-        }
-        else {
-            logger.info(stats_1.statsToString(json, config.stats));
-        }
-        if (stats_1.statsHasWarnings(json)) {
-            logger.warn(stats_1.statsWarningsToString(json, config.stats));
-        }
-        if (stats_1.statsHasErrors(json)) {
-            logger.error(stats_1.statsErrorsToString(json, config.stats));
-        }
-    };
-}
-exports.createBrowserLoggingCallback = createBrowserLoggingCallback;
 async function buildBrowserWebpackConfigFromContext(options, context, host = new node_1.NodeJsSyncHost(), i18n = false) {
     const webpackPartialGenerator = (wco) => [
         webpack_configs_1.getCommonConfig(wco),
@@ -144,7 +125,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             logging: transforms.logging ||
                 (useBundleDownleveling
                     ? () => { }
-                    : createBrowserLoggingCallback(!!options.verbose, context.logger)),
+                    : stats_1.createWebpackLoggingCallback(!!options.verbose, context.logger)),
         }).pipe(
         // tslint:disable-next-line: no-big-function
         operators_1.concatMap(async (buildEvent) => {

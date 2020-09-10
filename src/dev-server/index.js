@@ -24,6 +24,7 @@ const index_html_webpack_plugin_1 = require("../angular-cli-files/plugins/index-
 const check_port_1 = require("../angular-cli-files/utilities/check-port");
 const package_chunk_sort_1 = require("../angular-cli-files/utilities/package-chunk-sort");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
+const stats_1 = require("../angular-cli-files/utilities/stats");
 const browser_1 = require("../browser");
 const utils_2 = require("../utils");
 const cache_path_1 = require("../utils/cache-path");
@@ -60,7 +61,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     const root = context.workspaceRoot;
     let first = true;
     const host = new node_1.NodeJsSyncHost();
-    const loggingFn = transforms.logging || browser_1.createBrowserLoggingCallback(!!options.verbose, context.logger);
+    const loggingFn = transforms.logging || stats_1.createWebpackLoggingCallback(!!options.verbose, context.logger);
     async function setup() {
         var _a;
         // Get the browser configuration from the target name.

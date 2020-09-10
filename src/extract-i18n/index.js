@@ -165,17 +165,8 @@ async function execute(options, context, transforms) {
             return { success: false };
         }
     }
-    const logging = (stats, config) => {
-        const json = stats.toJson({ errors: true, warnings: true });
-        if (stats_1.statsHasWarnings(json)) {
-            context.logger.warn(stats_1.statsWarningsToString(json, config.stats));
-        }
-        if (stats_1.statsHasErrors(json)) {
-            context.logger.error(stats_1.statsErrorsToString(json, config.stats));
-        }
-    };
     const webpackResult = await build_webpack_1.runWebpack((await ((_a = transforms === null || transforms === void 0 ? void 0 : transforms.webpackConfiguration) === null || _a === void 0 ? void 0 : _a.call(transforms, config))) || config, context, {
-        logging,
+        logging: stats_1.createWebpackLoggingCallback(false, context.logger),
         webpackFactory: await Promise.resolve().then(() => require('webpack')),
     }).toPromise();
     // Complete if using VE

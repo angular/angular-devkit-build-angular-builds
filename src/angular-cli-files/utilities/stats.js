@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.statsToString = exports.generateBuildStats = exports.generateBundleStats = exports.formatSize = void 0;
+exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.statsToString = exports.generateBuildStats = exports.generateBundleStats = exports.formatSize = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -119,3 +119,22 @@ function statsHasWarnings(json) {
         !!((_a = json.children) === null || _a === void 0 ? void 0 : _a.some((c) => c.warnings.filter(ERRONEOUS_WARNINGS_FILTER).length));
 }
 exports.statsHasWarnings = statsHasWarnings;
+function createWebpackLoggingCallback(verbose, logger) {
+    return (stats, config) => {
+        // config.stats contains our own stats settings, added during buildWebpackConfig().
+        const json = stats.toJson(config.stats);
+        if (verbose) {
+            logger.info(stats.toString(config.stats));
+        }
+        else {
+            logger.info(statsToString(json, config.stats));
+        }
+        if (statsHasWarnings(json)) {
+            logger.warn(statsWarningsToString(json, config.stats));
+        }
+        if (statsHasErrors(json)) {
+            logger.error(statsErrorsToString(json, config.stats));
+        }
+    };
+}
+exports.createWebpackLoggingCallback = createWebpackLoggingCallback;

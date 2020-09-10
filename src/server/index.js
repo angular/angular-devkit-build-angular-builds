@@ -17,6 +17,7 @@ const operators_1 = require("rxjs/operators");
 const typescript_1 = require("typescript");
 const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
 const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
+const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
 const i18n_inlining_1 = require("../utils/i18n-inlining");
 const output_paths_1 = require("../utils/output-paths");
@@ -50,6 +51,7 @@ function execute(options, context, transforms = {}) {
     return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.concatMap(({ config, i18n }) => {
         return build_webpack_1.runWebpack(config, context, {
             webpackFactory: require('webpack'),
+            logging: stats_1.createWebpackLoggingCallback(!!options.verbose, context.logger),
         }).pipe(operators_1.concatMap(async (output) => {
             const { emittedFiles = [], webpackStats } = output;
             if (!output.success || !i18n.shouldInline) {

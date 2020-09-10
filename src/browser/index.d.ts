@@ -8,7 +8,7 @@
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
-import { json, logging, virtualFs } from '@angular-devkit/core';
+import { json, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
@@ -24,7 +24,6 @@ export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
      */
     outputPath: string;
 };
-export declare function createBrowserLoggingCallback(verbose: boolean, logger: logging.LoggerApi): WebpackLoggingCallback;
 interface ConfigFromContextReturn {
     config: webpack.Configuration;
     projectRoot: string;
