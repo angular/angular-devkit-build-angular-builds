@@ -45,12 +45,12 @@ async function getSerializer(format, sourceLocale, basePath, useLegacyIds = true
         case schema_1.Format.Xliff:
             const { Xliff1TranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer'));
             // tslint:disable-next-line: no-any
-            return new Xliff1TranslationSerializer(sourceLocale, basePath, useLegacyIds);
+            return new Xliff1TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
         case schema_1.Format.Xlf2:
         case schema_1.Format.Xliff2:
             const { Xliff2TranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer'));
             // tslint:disable-next-line: no-any
-            return new Xliff2TranslationSerializer(sourceLocale, basePath, useLegacyIds);
+            return new Xliff2TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
     }
 }
 class InMemoryOutputPlugin {
