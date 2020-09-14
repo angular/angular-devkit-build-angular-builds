@@ -78,34 +78,82 @@ const ERRONEOUS_WARNINGS_FILTER = (warning) => ![
 ].some(msg => msg.test(warning));
 function statsWarningsToString(json, statsConfig) {
     const colors = statsConfig.colors;
-    const rs = (x) => colors ? color_1.colors.reset(x) : x;
-    const y = (x) => colors ? color_1.colors.bold.yellow(x) : x;
+    const c = (x) => colors ? color_1.colors.reset.cyan(x) : x;
+    const y = (x) => colors ? color_1.colors.reset.yellow(x) : x;
+    const yb = (x) => colors ? color_1.colors.reset.yellowBright(x) : x;
     const warnings = [...json.warnings];
     if (json.children) {
         warnings.push(...json.children
             .map((c) => c.warnings)
             .reduce((a, b) => [...a, ...b], []));
     }
-    return rs('\n' + warnings
-        .map((warning) => `${warning}`)
-        .filter(ERRONEOUS_WARNINGS_FILTER)
-        .map((warning) => y(`WARNING in ${warning}`))
-        .join('\n\n'));
+    let output = '';
+    for (const warning of warnings) {
+        if (typeof warning === 'string') {
+            if (!ERRONEOUS_WARNINGS_FILTER(warning)) {
+                continue;
+            }
+            output += yb(`WARNING in ${warning}\n\n`);
+        }
+        else {
+            if (!ERRONEOUS_WARNINGS_FILTER(warning.message)) {
+                continue;
+            }
+            const file = warning.file || warning.moduleName;
+            if (file) {
+                output += c(file);
+                if (warning.loc) {
+                    output += ':' + yb(warning.loc);
+                }
+                output += ' - ';
+            }
+            if (!/^warning/i.test(warning.message)) {
+                output += y('Warning: ');
+            }
+            output += `${warning.message}\n\n`;
+        }
+    }
+    if (output) {
+        return '\n' + output;
+    }
+    return '';
 }
 exports.statsWarningsToString = statsWarningsToString;
 function statsErrorsToString(json, statsConfig) {
     const colors = statsConfig.colors;
-    const rs = (x) => colors ? color_1.colors.reset(x) : x;
-    const r = (x) => colors ? color_1.colors.bold.red(x) : x;
+    const c = (x) => colors ? color_1.colors.reset.cyan(x) : x;
+    const yb = (x) => colors ? color_1.colors.reset.yellowBright(x) : x;
+    const r = (x) => colors ? color_1.colors.reset.redBright(x) : x;
     const errors = [...json.errors];
     if (json.children) {
         errors.push(...json.children
             .map((c) => c.errors)
             .reduce((a, b) => [...a, ...b], []));
     }
-    return rs('\n' + errors
-        .map((error) => r(`ERROR in ${error}`))
-        .join('\n\n'));
+    let output = '';
+    for (const error of errors) {
+        if (typeof error === 'string') {
+            output += r(`ERROR in ${error}\n\n`);
+        }
+        else {
+            const file = error.file || error.moduleName;
+            if (file) {
+                output += c(file);
+                if (error.loc) {
+                    output += ':' + yb(error.loc);
+                }
+                output += ' - ';
+            }
+            if (!/^error/i.test(error.message)) {
+                output += r('Error: ');
+            }
+            output += `${error.message}\n\n`;
+        }
+    }
+    if (output) {
+        return '\n' + output;
+    }
+    return '';
 }
 exports.statsErrorsToString = statsErrorsToString;
 function statsHasErrors(json) {
