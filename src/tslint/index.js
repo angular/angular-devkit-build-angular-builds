@@ -12,7 +12,7 @@ const fs_1 = require("fs");
 const glob = require("glob");
 const minimatch_1 = require("minimatch");
 const path = require("path");
-const strip_bom_1 = require("../angular-cli-files/utilities/strip-bom");
+const strip_bom_1 = require("../utils/strip-bom");
 async function _loadTslint() {
     let tslint;
     try {

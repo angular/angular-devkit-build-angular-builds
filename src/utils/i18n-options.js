@@ -6,7 +6,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const rimraf = require("rimraf");
-const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
+const read_tsconfig_1 = require("../utils/read-tsconfig");
 const load_translations_1 = require("./load-translations");
 function normalizeTranslationFileOption(option, locale, expectObjectInError) {
     if (typeof option === 'string') {

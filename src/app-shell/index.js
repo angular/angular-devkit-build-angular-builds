@@ -12,7 +12,7 @@ const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const fs = require("fs");
 const path = require("path");
-const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
+const service_worker_1 = require("../utils/service-worker");
 async function _renderUniversal(options, context, browserResult, serverResult) {
     // Get browser target options.
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);

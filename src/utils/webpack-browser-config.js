@@ -5,9 +5,9 @@ const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const path = require("path");
 const webpack_merge_1 = require("webpack-merge");
-const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
-const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const utils_1 = require("../utils");
+const read_tsconfig_1 = require("../utils/read-tsconfig");
+const helpers_1 = require("../webpack/utils/helpers");
 const build_browser_features_1 = require("./build-browser-features");
 const environment_options_1 = require("./environment-options");
 const i18n_options_1 = require("./i18n-options");
@@ -79,7 +79,7 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
         }
     }
     if (environment_options_1.profilingEnabled) {
-        const esVersionInFileName = webpack_configs_1.getEsVersionForFileName(tsConfig.options.target, wco.buildOptions.esVersionInFileName);
+        const esVersionInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, wco.buildOptions.esVersionInFileName);
         const smp = new SpeedMeasurePlugin({
             outputFormat: 'json',
             outputTarget: path.resolve(workspaceRoot, `speed-measure-plugin${esVersionInFileName}.json`),

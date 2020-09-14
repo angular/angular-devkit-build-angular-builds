@@ -14,11 +14,11 @@ const fs = require("fs");
 const path = require("path");
 const semver_1 = require("semver");
 const webpack = require("webpack");
-const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
-const stats_1 = require("../angular-cli-files/utilities/stats");
 const i18n_options_1 = require("../utils/i18n-options");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
+const configs_1 = require("../webpack/configs");
+const stats_1 = require("../webpack/utils/stats");
 const schema_1 = require("./schema");
 function getI18nOutfile(format) {
     switch (format) {
@@ -129,11 +129,11 @@ async function execute(options, context, transforms) {
         }
         const partials = [
             { plugins: [new InMemoryOutputPlugin()] },
-            webpack_configs_1.getCommonConfig(wco),
+            configs_1.getCommonConfig(wco),
             // Only use VE extraction if not using Ivy
-            webpack_configs_1.getAotConfig(wco, !usingIvy),
-            webpack_configs_1.getStylesConfig(wco),
-            webpack_configs_1.getStatsConfig(wco),
+            configs_1.getAotConfig(wco, !usingIvy),
+            configs_1.getStylesConfig(wco),
+            configs_1.getStatsConfig(wco),
         ];
         // Add Ivy application file extractor support
         if (usingIvy) {

@@ -17,33 +17,33 @@ const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const typescript_1 = require("typescript");
-const analytics_1 = require("../../plugins/webpack/analytics");
-const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
-const async_chunks_1 = require("../angular-cli-files/utilities/async-chunks");
-const bundle_calculator_1 = require("../angular-cli-files/utilities/bundle-calculator");
-const write_index_html_1 = require("../angular-cli-files/utilities/index-file/write-index-html");
-const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
-const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
-const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
 const action_executor_1 = require("../utils/action-executor");
+const bundle_calculator_1 = require("../utils/bundle-calculator");
 const cache_path_1 = require("../utils/cache-path");
 const copy_assets_1 = require("../utils/copy-assets");
 const environment_options_1 = require("../utils/environment-options");
 const i18n_inlining_1 = require("../utils/i18n-inlining");
+const write_index_html_1 = require("../utils/index-file/write-index-html");
 const output_paths_1 = require("../utils/output-paths");
+const read_tsconfig_1 = require("../utils/read-tsconfig");
+const service_worker_1 = require("../utils/service-worker");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
+const configs_1 = require("../webpack/configs");
+const analytics_1 = require("../webpack/plugins/analytics");
+const async_chunks_1 = require("../webpack/utils/async-chunks");
+const stats_1 = require("../webpack/utils/stats");
 const cacheDownlevelPath = environment_options_1.cachingDisabled ? undefined : cache_path_1.findCachePath('angular-build-dl');
 async function buildBrowserWebpackConfigFromContext(options, context, host = new node_1.NodeJsSyncHost(), i18n = false) {
     const webpackPartialGenerator = (wco) => [
-        webpack_configs_1.getCommonConfig(wco),
-        webpack_configs_1.getBrowserConfig(wco),
-        webpack_configs_1.getStylesConfig(wco),
-        webpack_configs_1.getStatsConfig(wco),
+        configs_1.getCommonConfig(wco),
+        configs_1.getBrowserConfig(wco),
+        configs_1.getStylesConfig(wco),
+        configs_1.getStatsConfig(wco),
         getAnalyticsConfig(wco, context),
         getCompilerConfig(wco),
-        wco.buildOptions.webWorkerTsConfig ? webpack_configs_1.getWorkerConfig(wco) : {},
+        wco.buildOptions.webWorkerTsConfig ? configs_1.getWorkerConfig(wco) : {},
     ];
     if (i18n) {
         return webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host);
@@ -69,7 +69,7 @@ function getAnalyticsConfig(wco, context) {
 }
 function getCompilerConfig(wco) {
     if (wco.buildOptions.main || wco.buildOptions.polyfills) {
-        return wco.buildOptions.aot ? webpack_configs_1.getAotConfig(wco) : webpack_configs_1.getNonAotConfig(wco);
+        return wco.buildOptions.aot ? configs_1.getAotConfig(wco) : configs_1.getNonAotConfig(wco);
     }
     return {};
 }
@@ -135,8 +135,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 throw new Error('Webpack stats build result is required.');
             }
             // Fix incorrectly set `initial` value on chunks.
-            const extraEntryPoints = webpack_configs_1.normalizeExtraEntryPoints(options.styles || [], 'styles')
-                .concat(webpack_configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts'));
+            const extraEntryPoints = configs_1.normalizeExtraEntryPoints(options.styles || [], 'styles')
+                .concat(configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts'));
             const webpackStats = {
                 ...webpackRawStats,
                 chunks: async_chunks_1.markAsyncChunksNonInitial(webpackRawStats, extraEntryPoints),
@@ -157,7 +157,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 let noModuleFiles;
                 let moduleFiles;
                 let files;
-                const scriptsEntryPointName = webpack_configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map(x => x.bundleName);
+                const scriptsEntryPointName = configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map(x => x.bundleName);
                 if (isDifferentialLoadingNeeded && options.watch) {
                     moduleFiles = emittedFiles;
                     files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));

@@ -12,9 +12,9 @@ import { json, virtualFs } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
-import { IndexHtmlTransform } from '../angular-cli-files/utilities/index-file/write-index-html';
 import { ExecutionTransformer } from '../transforms';
 import { I18nOptions } from '../utils/i18n-options';
+import { IndexHtmlTransform } from '../utils/index-file/write-index-html';
 import { Schema as BrowserBuilderSchema } from './schema';
 export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
     baseOutputPath: string;

@@ -19,19 +19,19 @@ const operators_1 = require("rxjs/operators");
 const ts = require("typescript");
 const url = require("url");
 const webpack = require("webpack");
-const utils_1 = require("../angular-cli-files/models/webpack-configs/utils");
-const index_html_webpack_plugin_1 = require("../angular-cli-files/plugins/index-html-webpack-plugin");
-const check_port_1 = require("../angular-cli-files/utilities/check-port");
-const package_chunk_sort_1 = require("../angular-cli-files/utilities/package-chunk-sort");
-const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
-const stats_1 = require("../angular-cli-files/utilities/stats");
 const browser_1 = require("../browser");
-const utils_2 = require("../utils");
+const utils_1 = require("../utils");
 const cache_path_1 = require("../utils/cache-path");
+const check_port_1 = require("../utils/check-port");
+const package_chunk_sort_1 = require("../utils/package-chunk-sort");
 const process_bundle_1 = require("../utils/process-bundle");
+const read_tsconfig_1 = require("../utils/read-tsconfig");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const webpack_diagnostics_1 = require("../utils/webpack-diagnostics");
+const configs_1 = require("../webpack/configs");
+const index_html_webpack_plugin_1 = require("../webpack/plugins/index-html-webpack-plugin");
+const stats_1 = require("../webpack/utils/stats");
 const open = require('open');
 const devServerBuildOverriddenKeys = [
     'watch',
@@ -61,7 +61,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     const root = context.workspaceRoot;
     let first = true;
     const host = new node_1.NodeJsSyncHost();
-    const loggingFn = transforms.logging || stats_1.createWebpackLoggingCallback(!!options.verbose, context.logger);
     async function setup() {
         var _a;
         // Get the browser configuration from the target name.
@@ -133,7 +132,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
             const { options: compilerOptions } = read_tsconfig_1.readTsconfig(tsConfig, context.workspaceRoot);
             const target = compilerOptions.target || ts.ScriptTarget.ES5;
-            const buildBrowserFeatures = new utils_2.BuildBrowserFeatures(projectRoot, target);
+            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, target);
             const entrypoints = package_chunk_sort_1.generateEntryPoints({ scripts, styles });
             const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded()
                 ? package_chunk_sort_1.generateEntryPoints({ scripts: [], styles })
@@ -152,7 +151,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 lang: browserOptions.i18nLocale,
             }));
         }
-        const normalizedOptimization = utils_2.normalizeOptimization(browserOptions.optimization);
+        const normalizedOptimization = utils_1.normalizeOptimization(browserOptions.optimization);
         if (normalizedOptimization.scripts || normalizedOptimization.styles) {
             context.logger.error(core_1.tags.stripIndents `
           ****************************************************************************************
@@ -164,7 +163,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         `);
         }
         return build_webpack_1.runWebpackDevServer(webpackConfig, context, {
-            logging: loggingFn,
+            logging: transforms.logging || stats_1.createWebpackLoggingCallback(!!options.verbose, context.logger),
             webpackFactory: require('webpack'),
             webpackDevServerFactory: require('webpack-dev-server'),
         }).pipe(operators_1.map(buildEvent => {
@@ -297,7 +296,7 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
       `);
     }
     const servePath = buildServePath(serverOptions, browserOptions, logger);
-    const { styles, scripts } = utils_2.normalizeOptimization(browserOptions.optimization);
+    const { styles, scripts } = utils_1.normalizeOptimization(browserOptions.optimization);
     const config = {
         host: serverOptions.host,
         port: serverOptions.port,
@@ -450,7 +449,7 @@ function _addLiveReload(root, options, browserOptions, webpackConfig, clientAddr
         if ((_a = browserOptions.styles) === null || _a === void 0 ? void 0 : _a.length) {
             // When HMR is enabled we need to add the css paths as part of the entrypoints
             // because otherwise no JS bundle will contain the HMR accept code.
-            const normalizedStyles = utils_1.normalizeExtraEntryPoints(browserOptions.styles, 'styles')
+            const normalizedStyles = configs_1.normalizeExtraEntryPoints(browserOptions.styles, 'styles')
                 .map(style => path.resolve(root, style.input));
             entryPoints.push(...normalizedStyles);
         }
