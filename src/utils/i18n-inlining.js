@@ -2,8 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.i18nInlineEmittedFiles = void 0;
 const fs = require("fs");
+const ora = require("ora");
 const path = require("path");
 const action_executor_1 = require("./action-executor");
+const color_1 = require("./color");
 const copy_assets_1 = require("./copy-assets");
 function emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emittedPath, outputPath, es5, missingTranslation) {
     const options = [];
@@ -41,10 +43,12 @@ function emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emitte
 async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, scriptsEntryPointName, emittedPath, es5, missingTranslation) {
     const executor = new action_executor_1.BundleActionExecutor({ i18n });
     let hasErrors = false;
+    const spinner = ora('Generating localized bundles...').start();
     try {
         const { options, originalFiles: processedFiles } = emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emittedPath, baseOutputPath, es5, missingTranslation);
         for await (const result of executor.inlineAll(options)) {
             for (const diagnostic of result.diagnostics) {
+                spinner.stop();
                 if (diagnostic.type === 'error') {
                     hasErrors = true;
                     context.logger.error(diagnostic.message);
@@ -52,6 +56,7 @@ async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPat
                 else {
                     context.logger.warn(diagnostic.message);
                 }
+                spinner.start();
             }
         }
         // Copy any non-processed files into the output locations
@@ -65,17 +70,17 @@ async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPat
         ], outputPaths, '');
     }
     catch (err) {
-        context.logger.error('Localized bundle generation failed: ' + err.message);
+        spinner.fail(color_1.colors.redBright('Localized bundle generation failed: ' + err.message));
         return false;
     }
     finally {
         executor.stop();
     }
     if (hasErrors) {
-        context.logger.error('Localized bundle generation failed.');
+        spinner.fail(color_1.colors.redBright('Localized bundle generation failed.'));
     }
     else {
-        context.logger.info('Localized bundle generation complete.');
+        spinner.succeed('Localized bundle generation complete.');
     }
     return !hasErrors;
 }

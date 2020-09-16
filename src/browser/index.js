@@ -13,6 +13,7 @@ const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const fs = require("fs");
+const ora = require("ora");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
@@ -21,6 +22,7 @@ const utils_1 = require("../utils");
 const action_executor_1 = require("../utils/action-executor");
 const bundle_calculator_1 = require("../utils/bundle-calculator");
 const cache_path_1 = require("../utils/cache-path");
+const color_1 = require("../utils/color");
 const copy_assets_1 = require("../utils/copy-assets");
 const environment_options_1 = require("../utils/environment-options");
 const i18n_inlining_1 = require("../utils/i18n-inlining");
@@ -286,7 +288,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     const executor = new action_executor_1.BundleActionExecutor({ cachePath: cacheDownlevelPath, i18n }, options.subresourceIntegrity ? 'sha384' : undefined);
                     // Execute the bundle processing actions
                     try {
-                        context.logger.info('Generating ES5 bundles for differential loading...');
+                        const dlSpinner = ora('Generating ES5 bundles for differential loading...').start();
                         for await (const result of executor.processAll(processActions)) {
                             processResults.push(result);
                         }
@@ -299,9 +301,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             };
                             processResults.push(await Promise.resolve().then(() => require('../utils/process-bundle')).then(m => m.process(runtimeOptions)));
                         }
-                        context.logger.info('ES5 bundle generation complete.');
+                        dlSpinner.succeed('ES5 bundle generation complete.');
                         if (i18n.shouldInline) {
-                            context.logger.info('Generating localized bundles...');
+                            const spinner = ora('Generating localized bundles...').start();
                             const inlineActions = [];
                             const processedFiles = new Set();
                             for (const result of processResults) {
@@ -345,6 +347,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                         context.logger.info(`Localized "${result.file}" [${result.count} translation(s)].`);
                                     }
                                     for (const diagnostic of result.diagnostics) {
+                                        spinner.stop();
                                         if (diagnostic.type === 'error') {
                                             hasErrors = true;
                                             context.logger.error(diagnostic.message);
@@ -352,6 +355,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                         else {
                                             context.logger.warn(diagnostic.message);
                                         }
+                                        spinner.start();
                                     }
                                 }
                                 // Copy any non-processed files into the output locations
@@ -368,10 +372,15 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 ], Array.from(outputPaths.values()), '');
                             }
                             catch (err) {
-                                context.logger.error('Localized bundle generation failed: ' + err.message);
+                                spinner.fail(color_1.colors.redBright('Localized bundle generation failed: ' + err.message));
                                 return { success: false };
                             }
-                            context.logger.info(`Localized bundle generation ${hasErrors ? 'failed' : 'complete'}.`);
+                            if (hasErrors) {
+                                spinner.fail(color_1.colors.redBright('Localized bundle generation failed.'));
+                            }
+                            else {
+                                spinner.succeed('Localized bundle generation complete.');
+                            }
                             if (hasErrors) {
                                 return { success: false };
                             }
