@@ -8,7 +8,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStylesConfig = void 0;
-const core_1 = require("@angular-devkit/core");
 const path = require("path");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
@@ -64,8 +63,6 @@ function getStylesConfig(wco) {
     try {
         // tslint:disable-next-line:no-implicit-dependencies
         sassImplementation = require('node-sass');
-        wco.logger.warn(core_1.tags.oneLine `'node-sass' usage is deprecated and will be removed in a future major version.
-      To opt-out of the deprecated behaviour and start using 'sass' uninstall 'node-sass'.`);
     }
     catch (_a) {
         sassImplementation = require('sass');
