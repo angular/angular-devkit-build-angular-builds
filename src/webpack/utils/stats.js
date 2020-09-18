@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.statsToString = exports.generateBuildStats = exports.generateBundleStats = exports.formatSize = void 0;
+exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.statsToString = exports.generateBuildStats = exports.generateBuildStatsTable = exports.generateBundleStats = exports.formatSize = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -12,6 +12,7 @@ exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsH
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 const core_1 = require("@angular-devkit/core");
 const path = require("path");
+const textTable = require("text-table");
 const color_1 = require("../../utils/color");
 function formatSize(size) {
     if (size <= 0) {
@@ -22,49 +23,86 @@ function formatSize(size) {
     return `${+(size / Math.pow(1024, index)).toPrecision(3)} ${abbreviations[index]}`;
 }
 exports.formatSize = formatSize;
+;
 function generateBundleStats(info, colors) {
-    const g = (x) => (colors ? color_1.colors.bold.green(x) : x);
-    const y = (x) => (colors ? color_1.colors.bold.yellow(x) : x);
-    const id = info.id ? y(info.id.toString()) : '';
-    const size = typeof info.size === 'number' ? ` ${formatSize(info.size)}` : '';
-    const files = info.files.map(f => path.basename(f)).join(', ');
-    const names = info.names ? ` (${info.names.join(', ')})` : '';
-    const initial = y(info.entry ? '[entry]' : info.initial ? '[initial]' : '');
-    const flags = ['rendered', 'recorded']
-        .map(f => (f && info[f] ? g(` [${f}]`) : ''))
-        .join('');
-    return `chunk {${id}} ${g(files)}${names}${size} ${initial}${flags}`;
+    var _a;
+    const g = (x) => (colors ? color_1.colors.greenBright(x) : x);
+    const c = (x) => (colors ? color_1.colors.cyanBright(x) : x);
+    const size = typeof info.size === 'number' ? formatSize(info.size) : '-';
+    const files = info.files.filter(f => !f.endsWith('.map')).map(f => path.basename(f)).join(', ');
+    const names = ((_a = info.names) === null || _a === void 0 ? void 0 : _a.length) ? info.names.join(', ') : '-';
+    const initial = !!(info.entry || info.initial);
+    return {
+        initial,
+        stats: [g(files), names, c(size)],
+    };
 }
 exports.generateBundleStats = generateBundleStats;
+function generateBuildStatsTable(data, colors) {
+    const changedEntryChunksStats = [];
+    const changedLazyChunksStats = [];
+    for (const { initial, stats } of data) {
+        if (initial) {
+            changedEntryChunksStats.push(stats);
+        }
+        else {
+            changedLazyChunksStats.push(stats);
+        }
+    }
+    const bundleInfo = [];
+    const bold = (x) => colors ? color_1.colors.bold(x) : x;
+    const dim = (x) => colors ? color_1.colors.dim(x) : x;
+    // Entry chunks
+    if (changedEntryChunksStats.length) {
+        bundleInfo.push(['Initial Chunk Files', 'Names', 'Size'].map(bold), ...changedEntryChunksStats);
+    }
+    // Seperator
+    if (changedEntryChunksStats.length && changedLazyChunksStats.length) {
+        bundleInfo.push([]);
+    }
+    // Lazy chunks
+    if (changedLazyChunksStats.length) {
+        bundleInfo.push(['Lazy Chunk Files', 'Names', 'Size'].map(bold), ...changedLazyChunksStats);
+    }
+    return textTable(bundleInfo, {
+        hsep: dim(' | '),
+        stringLength: s => color_1.removeColor(s).length,
+    });
+}
+exports.generateBuildStatsTable = generateBuildStatsTable;
 function generateBuildStats(hash, time, colors) {
     const w = (x) => colors ? color_1.colors.bold.white(x) : x;
-    return `Date: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
+    return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
 exports.generateBuildStats = generateBuildStats;
 function statsToString(json, statsConfig) {
     const colors = statsConfig.colors;
     const rs = (x) => colors ? color_1.colors.reset(x) : x;
-    const w = (x) => colors ? color_1.colors.bold.white(x) : x;
-    const changedChunksStats = json.chunks
-        .filter((chunk) => chunk.rendered)
-        .map((chunk) => {
-        const assets = json.assets.filter((asset) => chunk.files.indexOf(asset.name) != -1);
+    const changedChunksStats = [];
+    for (const chunk of json.chunks) {
+        if (!chunk.rendered) {
+            continue;
+        }
+        const assets = json.assets.filter((asset) => chunk.files.includes(asset.name));
         const summedSize = assets.filter((asset) => !asset.name.endsWith(".map")).reduce((total, asset) => { return total + asset.size; }, 0);
-        return generateBundleStats({ ...chunk, size: summedSize }, colors);
-    });
+        changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }, colors));
+    }
     const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
+    const statsTable = generateBuildStatsTable(changedChunksStats, colors);
     if (unchangedChunkNumber > 0) {
         return '\n' + rs(core_1.tags.stripIndents `
-      Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)}
+      ${statsTable}
+
       ${unchangedChunkNumber} unchanged chunks
-      ${changedChunksStats.join('\n')}
-      Time: ${w('' + json.time)}ms
+
+      ${generateBuildStats(json.hash, json.time, colors)}
       `);
     }
     else {
         return '\n' + rs(core_1.tags.stripIndents `
-      ${changedChunksStats.join('\n')}
-      Date: ${w(new Date().toISOString())} - Hash: ${w(json.hash)} - Time: ${w('' + json.time)}ms
+      ${statsTable}
+
+      ${generateBuildStats(json.hash, json.time, colors)}
       `);
     }
 }
