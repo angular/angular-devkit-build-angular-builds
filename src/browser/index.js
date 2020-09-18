@@ -389,8 +389,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     finally {
                         executor.stop();
                     }
-                    function generateBundleInfoStats(bundle, chunk) {
+                    function generateBundleInfoStats(id, bundle, chunk) {
                         return stats_1.generateBundleStats({
+                            id,
                             size: bundle.size,
                             files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
                             names: chunk && chunk.names,
@@ -399,15 +400,17 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             rendered: true,
                         }, true);
                     }
-                    const bundleInfoStats = [];
+                    let bundleInfoText = '';
                     for (const result of processResults) {
                         const chunk = webpackStats.chunks
                             && webpackStats.chunks.find((chunk) => chunk.id.toString() === result.name);
                         if (result.original) {
-                            bundleInfoStats.push(generateBundleInfoStats(result.original, chunk));
+                            bundleInfoText +=
+                                '\n' + generateBundleInfoStats(result.name, result.original, chunk);
                         }
                         if (result.downlevel) {
-                            bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk));
+                            bundleInfoText +=
+                                '\n' + generateBundleInfoStats(result.name, result.downlevel, chunk);
                         }
                     }
                     const unprocessedChunks = webpackStats.chunks && webpackStats.chunks
@@ -415,12 +418,13 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         .find((result) => chunk.id.toString() === result.name)) || [];
                     for (const chunk of unprocessedChunks) {
                         const asset = webpackStats.assets && webpackStats.assets.find(a => a.name === chunk.files[0]);
-                        bundleInfoStats.push(stats_1.generateBundleStats({ ...chunk, size: asset && asset.size }, true));
+                        bundleInfoText +=
+                            '\n' + stats_1.generateBundleStats({ ...chunk, size: asset && asset.size }, true);
                     }
-                    context.logger.info('\n' +
-                        stats_1.generateBuildStatsTable(bundleInfoStats, color_1.colors.enabled) +
-                        '\n\n' +
-                        stats_1.generateBuildStats((webpackStats && webpackStats.hash) || '<unknown>', Date.now() - startTime, true));
+                    bundleInfoText +=
+                        '\n' +
+                            stats_1.generateBuildStats((webpackStats && webpackStats.hash) || '<unknown>', Date.now() - startTime, true);
+                    context.logger.info(bundleInfoText);
                     // Check for budget errors and display them to the user.
                     const budgets = options.budgets || [];
                     const budgetFailures = bundle_calculator_1.checkBudgets(budgets, webpackStats, processResults);
