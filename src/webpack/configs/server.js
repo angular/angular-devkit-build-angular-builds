@@ -10,6 +10,7 @@ exports.getServerConfig = void 0;
  */
 const path_1 = require("path");
 const webpack_1 = require("webpack");
+const webpack_version_1 = require("../../utils/webpack-version");
 const helpers_1 = require("../utils/helpers");
 /**
  * Returns a partial Webpack configuration specific to creating a bundle for node
@@ -24,7 +25,13 @@ function getServerConfig(wco) {
     }
     const externals = [...externalDependencies];
     if (!bundleDependencies) {
-        externals.push(externalizePackages);
+        if (webpack_version_1.isWebpackFiveOrHigher()) {
+            const hook = ({ context, request }, callback) => externalizePackages(request, context, callback);
+            externals.push(hook);
+        }
+        else {
+            externals.push(externalizePackages);
+        }
     }
     const config = {
         resolve: {

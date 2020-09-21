@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBrowserConfig = void 0;
+const webpack_version_1 = require("../../utils/webpack-version");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
 function getBrowserConfig(wco) {
@@ -14,7 +15,12 @@ function getBrowserConfig(wco) {
             hashFuncNames: ['sha384'],
         }));
     }
-    if (extractLicenses) {
+    // TODO_WEBPACK_5: Investigate build/serve issues with the `license-webpack-plugin` package
+    if (extractLicenses && webpack_version_1.isWebpackFiveOrHigher()) {
+        wco.logger.warn('WARNING: License extraction is currently disabled when using Webpack 5. ' +
+            'This is temporary and will be corrected in a future update.');
+    }
+    else if (extractLicenses) {
         const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
         extraPlugins.push(new LicenseWebpackPlugin({
             stats: {
@@ -40,6 +46,7 @@ function getBrowserConfig(wco) {
         resolve: {
             mainFields: ['es2015', 'browser', 'module', 'main'],
         },
+        ...webpack_version_1.withWebpackFourOrFive({}, { target: ['web', 'es5'] }),
         output: {
             crossOriginLoading,
         },

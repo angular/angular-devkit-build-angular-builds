@@ -19,6 +19,7 @@ const terser_1 = require("terser");
 const v8 = require("v8");
 const webpack_sources_1 = require("webpack-sources");
 const environment_options_1 = require("./environment-options");
+const webpack_version_1 = require("./webpack-version");
 const cacache = require('cacache');
 const deserialize = v8.deserialize;
 // If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
@@ -132,13 +133,16 @@ async function process(options) {
 }
 exports.process = process;
 async function mergeSourceMaps(inputCode, inputSourceMap, resultCode, resultSourceMap, filename, fast = false) {
-    if (fast) {
+    // Webpack 5 terser sourcemaps currently fail merging with the high-quality method
+    // TODO_WEBPACK_5: Investigate high-quality sourcemap merge failures
+    if (fast || webpack_version_1.isWebpackFiveOrHigher()) {
         return mergeSourceMapsFast(inputSourceMap, resultSourceMap);
     }
     // SourceMapSource produces high-quality sourcemaps
-    // The last argument is not yet in the typings
-    // tslint:disable-next-line: no-any
-    return new webpack_sources_1.SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
+    // Final sourcemap will always be available when providing the input sourcemaps
+    // tslint:disable-next-line: no-non-null-assertion
+    const finalSourceMap = new webpack_sources_1.SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
+    return finalSourceMap;
 }
 async function mergeSourceMapsFast(first, second) {
     const sourceRoot = first.sourceRoot;

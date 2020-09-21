@@ -20,6 +20,7 @@ const utils_1 = require("../../utils");
 const cache_path_1 = require("../../utils/cache-path");
 const environment_options_1 = require("../../utils/environment-options");
 const find_up_1 = require("../../utils/find-up");
+const webpack_version_1 = require("../../utils/webpack-version");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
 const TerserPlugin = require('terser-webpack-plugin');
@@ -236,7 +237,7 @@ function getCommonConfig(wco) {
             }
         })());
     }
-    if (buildOptions.namedChunks) {
+    if (buildOptions.namedChunks && !webpack_version_1.isWebpackFiveOrHigher()) {
         extraPlugins.push(new plugins_1.NamedLazyChunksPlugin());
     }
     if (!differentialLoadingMode) {
@@ -375,9 +376,7 @@ function getCommonConfig(wco) {
             extensions: ['.ts', '.tsx', '.mjs', '.js'],
             symlinks: !buildOptions.preserveSymlinks,
             modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
-            plugins: [
-                PnpWebpackPlugin,
-            ],
+            plugins: webpack_version_1.isWebpackFiveOrHigher() ? [] : [PnpWebpackPlugin],
         },
         resolveLoader: {
             symlinks: !buildOptions.preserveSymlinks,
@@ -388,12 +387,12 @@ function getCommonConfig(wco) {
                 'node_modules',
                 ...find_up_1.findAllNodeModules(__dirname, projectRoot),
             ],
-            plugins: [PnpWebpackPlugin.moduleLoader(module)],
+            plugins: webpack_version_1.isWebpackFiveOrHigher() ? [] : [PnpWebpackPlugin.moduleLoader(module)],
         },
         context: root,
         entry: entryPoints,
         output: {
-            futureEmitAssets: true,
+            ...webpack_version_1.withWebpackFourOrFive({ futureEmitAssets: true }, {}),
             path: path.resolve(root, buildOptions.outputPath),
             publicPath: buildOptions.deployUrl,
             filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
@@ -401,7 +400,9 @@ function getCommonConfig(wco) {
         watch: buildOptions.watch,
         watchOptions: {
             poll: buildOptions.poll,
-            ignored: buildOptions.poll === undefined ? undefined : /[\\\/]node_modules[\\\/]/,
+            ignored: buildOptions.poll === undefined
+                ? undefined
+                : webpack_version_1.withWebpackFourOrFive(/[\\\/]node_modules[\\\/]/, 'node_modules/**'),
         },
         performance: {
             hints: false,
@@ -484,9 +485,12 @@ function getCommonConfig(wco) {
         },
         optimization: {
             minimizer: extraMinimizers,
-            moduleIds: 'hashed',
-            noEmitOnErrors: true,
+            moduleIds: webpack_version_1.withWebpackFourOrFive('hashed', 'deterministic'),
+            ...webpack_version_1.withWebpackFourOrFive({}, buildOptions.namedChunks ? { chunkIds: 'named' } : {}),
+            ...webpack_version_1.withWebpackFourOrFive({ noEmitOnErrors: true }, { emitOnErrors: false }),
         },
+        // TODO_WEBPACK_5: Investigate non-working cache in development builds
+        ...webpack_version_1.withWebpackFourOrFive({}, { cache: false }),
         plugins: [
             // Always replace the context for the System.import in angular/core to prevent warnings.
             // https://github.com/angular/angular/issues/11580
