@@ -3,7 +3,7 @@
  */
 export interface Schema {
     /**
-     * Whitelist of hosts that are allowed to access the dev server.
+     * List of hosts that are allowed to access the dev server.
      */
     allowedHosts?: string[];
     /**
