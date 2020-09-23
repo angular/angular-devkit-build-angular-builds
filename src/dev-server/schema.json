@@ -57,7 +57,7 @@
     },
     "allowedHosts": {
       "type": "array",
-      "description": "List of hosts that are allowed to access the dev server.",
+      "description": "Whitelist of hosts that are allowed to access the dev server.",
       "default": [],
       "items": {
         "type": "string"
