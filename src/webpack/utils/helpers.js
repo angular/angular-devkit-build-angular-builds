@@ -77,14 +77,14 @@ exports.getSourceMapDevTool = getSourceMapDevTool;
 /**
  * Returns an ES version file suffix to differentiate between various builds.
  */
-function getEsVersionForFileName(scriptTarget, esVersionInFileName = false) {
-    if (!esVersionInFileName || scriptTarget === undefined) {
+function getEsVersionForFileName(scriptTargetOverride, esVersionInFileName = false) {
+    if (!esVersionInFileName || scriptTargetOverride === undefined) {
         return '';
     }
-    if (scriptTarget === typescript_1.ScriptTarget.ESNext) {
+    if (scriptTargetOverride === typescript_1.ScriptTarget.ESNext) {
         return '-esnext';
     }
-    return '-' + typescript_1.ScriptTarget[scriptTarget].toLowerCase();
+    return '-' + typescript_1.ScriptTarget[scriptTargetOverride].toLowerCase();
 }
 exports.getEsVersionForFileName = getEsVersionForFileName;
 function isPolyfillsEntry(name) {

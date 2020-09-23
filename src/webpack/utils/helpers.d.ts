@@ -21,5 +21,5 @@ export declare function getSourceMapDevTool(scriptsSourceMap: boolean | undefine
 /**
  * Returns an ES version file suffix to differentiate between various builds.
  */
-export declare function getEsVersionForFileName(scriptTarget: ScriptTarget | undefined, esVersionInFileName?: boolean): string;
+export declare function getEsVersionForFileName(scriptTargetOverride: ScriptTarget | undefined, esVersionInFileName?: boolean): string;
 export declare function isPolyfillsEntry(name: string): boolean;

@@ -8,13 +8,15 @@
 import * as ts from 'typescript';
 export declare class BuildBrowserFeatures {
     private projectRoot;
+    private scriptTarget;
+    private readonly _es6TargetOrLater;
     readonly supportedBrowsers: string[];
-    constructor(projectRoot: string);
+    constructor(projectRoot: string, scriptTarget: ts.ScriptTarget);
     /**
      * True, when one or more browsers requires ES5
      * support and the scirpt target is ES2015 or greater.
      */
-    isDifferentialLoadingNeeded(scriptTarget: ts.ScriptTarget): boolean;
+    isDifferentialLoadingNeeded(): boolean;
     /**
      * True, when one or more browsers requires ES5 support
      */
