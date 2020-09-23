@@ -28,11 +28,9 @@ interface ConfigFromContextReturn {
     config: webpack.Configuration;
     projectRoot: string;
     projectSourceRoot?: string;
-}
-export declare function buildBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, host: virtualFs.Host<fs.Stats>, i18n: boolean): Promise<ConfigFromContextReturn & {
     i18n: I18nOptions;
-}>;
-export declare function buildBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, host?: virtualFs.Host<fs.Stats>): Promise<ConfigFromContextReturn>;
+}
+export declare function buildBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, host?: virtualFs.Host<fs.Stats>, differentialLoadingMode?: boolean): Promise<ConfigFromContextReturn>;
 export declare function buildWebpackBrowser(options: BrowserBuilderSchema, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
     logging?: WebpackLoggingCallback;

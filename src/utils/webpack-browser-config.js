@@ -8,11 +8,9 @@ const webpack_merge_1 = require("webpack-merge");
 const utils_1 = require("../utils");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
 const helpers_1 = require("../webpack/utils/helpers");
-const build_browser_features_1 = require("./build-browser-features");
 const environment_options_1 = require("./environment-options");
 const i18n_options_1 = require("./i18n-options");
-const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
-async function generateWebpackConfig(context, workspaceRoot, projectRoot, sourceRoot, options, webpackPartialGenerator, logger) {
+async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, options, webpackPartialGenerator, logger, differentialLoadingMode) {
     // Ensure Build Optimizer is only used with AOT.
     if (options.buildOptimizer && !options.aot) {
         throw new Error(`The 'buildOptimizer' option cannot be used without 'aot'.`);
@@ -31,23 +29,9 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
     const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
     // tslint:disable-next-line:no-implicit-dependencies
     const ts = await Promise.resolve().then(() => require('typescript'));
-    // At the moment, only the browser builder supports differential loading
-    // However this config generation is used by multiple builders such as dev-server
     const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES5;
-    const buildBrowserFeatures = new build_browser_features_1.BuildBrowserFeatures(projectRoot, scriptTarget);
-    const differentialLoading = context.builder.builderName === 'browser' &&
-        !options.watch &&
-        buildBrowserFeatures.isDifferentialLoadingNeeded();
-    let buildOptions = { ...options };
-    if (differentialLoading) {
-        buildOptions = {
-            ...options,
-            // Under downlevel differential loading we copy the assets outside of webpack.
-            assets: [],
-            esVersionInFileName: true,
-        };
-    }
     const supportES2015 = scriptTarget !== ts.ScriptTarget.JSON && scriptTarget > ts.ScriptTarget.ES5;
+    const buildOptions = { ...options };
     const wco = {
         root: workspaceRoot,
         logger: logger.createChild('webpackConfigOptions'),
@@ -57,7 +41,7 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
         tsConfig,
         tsConfigPath,
         supportES2015,
-        differentialLoadingMode: differentialLoading,
+        differentialLoadingMode,
     };
     wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
     const webpackConfig = webpack_merge_1.merge(webpackPartialGenerator(wco));
@@ -79,7 +63,8 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
         }
     }
     if (environment_options_1.profilingEnabled) {
-        const esVersionInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, wco.buildOptions.esVersionInFileName);
+        const esVersionInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, wco.differentialLoadingMode);
+        const SpeedMeasurePlugin = await Promise.resolve().then(() => require('speed-measure-webpack-plugin'));
         const smp = new SpeedMeasurePlugin({
             outputFormat: 'json',
             outputTarget: path.resolve(workspaceRoot, `speed-measure-plugin${esVersionInFileName}.json`),
@@ -89,9 +74,9 @@ async function generateWebpackConfig(context, workspaceRoot, projectRoot, source
     return webpackConfig;
 }
 exports.generateWebpackConfig = generateWebpackConfig;
-async function generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost()) {
+async function generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost(), differentialLoadingMode = false) {
     const { buildOptions, i18n } = await i18n_options_1.configureI18nBuild(context, options);
-    const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, webpackPartialGenerator, host);
+    const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, webpackPartialGenerator, host, differentialLoadingMode);
     const config = result.config;
     if (i18n.shouldInline) {
         // Remove localize "polyfill" if in AOT mode
@@ -137,7 +122,7 @@ async function generateI18nBrowserWebpackConfigFromContext(options, context, web
     return { ...result, i18n };
 }
 exports.generateI18nBrowserWebpackConfigFromContext = generateI18nBrowserWebpackConfigFromContext;
-async function generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost()) {
+async function generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost(), differentialLoadingMode = false) {
     const projectName = context.target && context.target.project;
     if (!projectName) {
         throw new Error('The builder requires a target.');
@@ -150,7 +135,7 @@ async function generateBrowserWebpackConfigFromContext(options, context, webpack
         ? core_1.resolve(workspaceRoot, core_1.normalize(projectSourceRoot))
         : undefined;
     const normalizedOptions = utils_1.normalizeBrowserSchema(host, workspaceRoot, projectRoot, sourceRoot, options);
-    const config = await generateWebpackConfig(context, core_1.getSystemPath(workspaceRoot), core_1.getSystemPath(projectRoot), sourceRoot && core_1.getSystemPath(sourceRoot), normalizedOptions, webpackPartialGenerator, context.logger);
+    const config = await generateWebpackConfig(core_1.getSystemPath(workspaceRoot), core_1.getSystemPath(projectRoot), sourceRoot && core_1.getSystemPath(sourceRoot), normalizedOptions, webpackPartialGenerator, context.logger, differentialLoadingMode);
     return {
         config,
         projectRoot: core_1.getSystemPath(projectRoot),
