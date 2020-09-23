@@ -76,7 +76,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         overrides.budgets = undefined;
         const browserName = await context.getBuilderNameForTarget(browserTarget);
         const browserOptions = await context.validateOptions({ ...rawBrowserOptions, ...overrides }, browserName);
-        const { config, projectRoot, i18n } = await browser_1.buildBrowserWebpackConfigFromContext(browserOptions, context, host, true);
+        const { config, projectRoot, i18n } = await browser_1.buildBrowserWebpackConfigFromContext(browserOptions, context, host);
         let webpackConfig = config;
         const tsConfig = read_tsconfig_1.readTsconfig(browserOptions.tsConfig, context.workspaceRoot);
         if (i18n.shouldInline && tsConfig.options.enableIvy !== false) {
@@ -132,9 +132,9 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
             const { options: compilerOptions } = read_tsconfig_1.readTsconfig(tsConfig, context.workspaceRoot);
             const target = compilerOptions.target || ts.ScriptTarget.ES5;
-            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, target);
+            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);
             const entrypoints = package_chunk_sort_1.generateEntryPoints({ scripts, styles });
-            const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded()
+            const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded(target)
                 ? package_chunk_sort_1.generateEntryPoints({ scripts: [], styles })
                 : [];
             webpackConfig.plugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({

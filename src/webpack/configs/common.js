@@ -35,7 +35,7 @@ function getCommonConfig(wco) {
     const entryPoints = {};
     // determine hashing format
     const hashFormat = helpers_1.getOutputHashFormat(buildOptions.outputHashing || 'none');
-    const targetInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, buildOptions.esVersionInFileName);
+    const targetInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, wco.differentialLoadingMode);
     if (buildOptions.main) {
         const mainPath = path.resolve(root, buildOptions.main);
         entryPoints['main'] = [mainPath];
@@ -81,7 +81,7 @@ function getCommonConfig(wco) {
     const differentialLoadingMode = !!wco.differentialLoadingMode;
     if (wco.buildOptions.platform !== 'server') {
         if (differentialLoadingMode || tsConfig.options.target === typescript_1.ScriptTarget.ES5) {
-            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, tsConfig.options.target || typescript_1.ScriptTarget.ES5);
+            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);
             if (buildBrowserFeatures.isEs5SupportNeeded()) {
                 const polyfillsChunkName = 'polyfills-es5';
                 entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
