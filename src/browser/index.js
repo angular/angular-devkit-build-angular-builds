@@ -124,6 +124,15 @@ function buildWebpackBrowser(options, context, transforms = {}) {
           referenced with script[type="module"] but they may not support ES2016+ syntax.
         `);
         }
+        const hasIE9 = buildBrowserFeatures.supportedBrowsers.includes('ie 9');
+        const hasIE10 = buildBrowserFeatures.supportedBrowsers.includes('ie 10');
+        if (hasIE9 || hasIE10) {
+            const browsers = (hasIE9 ? 'IE 9' + (hasIE10 ? ' & ' : '') : '') + (hasIE10 ? 'IE 10' : '');
+            context.logger.warn(`WARNING: Support was requested for ${browsers} in the project's browserslist configuration. ` +
+                (hasIE9 && hasIE10 ? 'These browsers are' : 'This browser is') +
+                ' no longer officially supported with Angular v11 and higher.' +
+                '\nFor additional information: https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile');
+        }
         return {
             ...(await initialize(options, context, host, differentialLoadingMode, transforms.webpackConfiguration)),
             buildBrowserFeatures,
