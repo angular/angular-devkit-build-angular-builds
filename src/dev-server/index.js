@@ -433,24 +433,23 @@ function _addLiveReload(root, options, browserOptions, webpackConfig, clientAddr
     }
     const entryPoints = [`${webpackDevServerPath}?${url.format(clientAddress)}${sockjsPath}`];
     if (options.hmr) {
-        const webpackHmrLink = 'https://webpack.js.org/guides/hot-module-replacement';
-        logger.warn(core_1.tags.oneLine `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.`);
-        const showWarning = options.hmrWarning;
-        if (showWarning) {
-            logger.info(core_1.tags.stripIndents `
-          The project will still live reload when HMR is enabled, but to take full advantage of HMR
-          additional application code which is not included by default in an Angular CLI project is required.
-
-          See ${webpackHmrLink} for information on working with HMR for Webpack.`);
-            logger.warn(core_1.tags.oneLine `To disable this warning use "hmrWarning: false" under "serve"
-           options in "angular.json".`);
-        }
-        entryPoints.push('webpack/hot/dev-server');
+        logger.warn(core_1.tags.stripIndents `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
+      See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
+        entryPoints.push('webpack/hot/dev-server', path.join(__dirname, '../webpack/hmr.js'));
         if ((_a = browserOptions.styles) === null || _a === void 0 ? void 0 : _a.length) {
             // When HMR is enabled we need to add the css paths as part of the entrypoints
             // because otherwise no JS bundle will contain the HMR accept code.
             const normalizedStyles = configs_1.normalizeExtraEntryPoints(browserOptions.styles, 'styles')
-                .map(style => path.resolve(root, style.input));
+                .map(style => {
+                let resolvedPath = path.resolve(root, style.input);
+                if (!fs_1.existsSync(resolvedPath)) {
+                    try {
+                        resolvedPath = require.resolve(style.input, { paths: [root] });
+                    }
+                    catch (_a) { }
+                }
+                return resolvedPath;
+            });
             entryPoints.push(...normalizedStyles);
         }
         webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
