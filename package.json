@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "0.1100.0-next.3+29.1873f2d",
+  "version": "0.1100.0-next.3+25.0bacb6b",
   "description": "Angular Webpack Build Facade",
   "experimental": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#1873f2d28",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#1873f2d28",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#1873f2d28",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#1873f2d28",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#0bacb6b1e",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#0bacb6b1e",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#0bacb6b1e",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#0bacb6b1e",
     "@babel/core": "7.11.6",
     "@babel/generator": "7.11.6",
     "@babel/plugin-transform-runtime": "7.11.5",
@@ -18,7 +18,7 @@
     "@babel/runtime": "7.11.2",
     "@babel/template": "7.10.4",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#1873f2d28",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#0bacb6b1e",
     "ansi-colors": "4.1.1",
     "autoprefixer": "9.8.6",
     "babel-loader": "8.1.0",
@@ -81,26 +81,14 @@
   "peerDependencies": {
     "@angular/compiler-cli": "^11.0.0 || ^11.0.0-next",
     "@angular/localize": "^11.0.0 || ^11.0.0-next",
-    "karma": "^5.2.0",
     "ng-packagr": "^10.0.0",
-    "protractor": "^7.0.0",
-    "tslint": "^6.1.0",
     "typescript": ">=3.9 < 4.1"
   },
   "peerDependenciesMeta": {
     "@angular/localize": {
       "optional": true
     },
-    "karma": {
-      "optional": true
-    },
     "ng-packagr": {
-      "optional": true
-    },
-    "protractor": {
-      "optional": true
-    },
-    "tslint": {
       "optional": true
     }
   },

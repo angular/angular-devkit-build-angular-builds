@@ -365,7 +365,7 @@ async function createI18nPlugins(locale, translation, missingTranslation, locale
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
     const es2015 = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
     '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'));
     plugins.push(
     // tslint:disable-next-line: no-any
@@ -373,7 +373,7 @@ async function createI18nPlugins(locale, translation, missingTranslation, locale
         missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
     }));
     const es5 = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
     '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
     plugins.push(
     // tslint:disable-next-line: no-any
@@ -381,7 +381,7 @@ async function createI18nPlugins(locale, translation, missingTranslation, locale
         missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
     }));
     const inlineLocale = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
     '@angular/localize/src/tools/src/translate/source_files/locale_plugin'));
     plugins.push(inlineLocale.makeLocalePlugin(locale));
     if (localeDataContent) {
