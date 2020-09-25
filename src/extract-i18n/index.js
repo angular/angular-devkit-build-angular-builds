@@ -103,6 +103,8 @@ async function execute(options, context, transforms) {
         },
         sourceMap: {
             scripts: true,
+            styles: false,
+            vendor: true,
         },
         buildOptimizer: false,
         i18nLocale: options.i18nLocale || i18n.sourceLocale,
@@ -141,7 +143,7 @@ async function execute(options, context, transforms) {
                 module: {
                     rules: [
                         {
-                            test: /\.ts$/,
+                            test: /\.[t|j]s$/,
                             loader: require.resolve('./ivy-extract-loader'),
                             options: {
                                 messageHandler: (messages) => ivyMessages.push(...messages),
