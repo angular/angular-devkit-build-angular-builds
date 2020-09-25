@@ -9,7 +9,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStylesConfig = void 0;
 const core_1 = require("@angular-devkit/core");
-const fs = require("fs");
 const path = require("path");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
@@ -41,13 +40,7 @@ function getStylesConfig(wco) {
     if (buildOptions.styles.length > 0) {
         const chunkNames = [];
         helpers_1.normalizeExtraEntryPoints(buildOptions.styles, 'styles').forEach(style => {
-            let resolvedPath = path.resolve(root, style.input);
-            if (!fs.existsSync(resolvedPath)) {
-                try {
-                    resolvedPath = require.resolve(style.input, { paths: [root] });
-                }
-                catch (_a) { }
-            }
+            const resolvedPath = path.resolve(root, style.input);
             // Add style entry points.
             if (entryPoints[style.bundleName]) {
                 entryPoints[style.bundleName].push(resolvedPath);

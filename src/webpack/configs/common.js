@@ -147,14 +147,9 @@ function getCommonConfig(wco) {
     // process global scripts
     const globalScriptsByBundleName = helpers_1.normalizeExtraEntryPoints(buildOptions.scripts, 'scripts').reduce((prev, curr) => {
         const { bundleName, inject, input } = curr;
-        let resolvedPath = path.resolve(root, input);
+        const resolvedPath = path.resolve(root, input);
         if (!fs_1.existsSync(resolvedPath)) {
-            try {
-                resolvedPath = require.resolve(input, { paths: [root] });
-            }
-            catch (_a) {
-                throw new Error(`Script file ${input} does not exist.`);
-            }
+            throw new Error(`Script file ${input} does not exist.`);
         }
         const existingEntry = prev.find(el => el.bundleName === bundleName);
         if (existingEntry) {
