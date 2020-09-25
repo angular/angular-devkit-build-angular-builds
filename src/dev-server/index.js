@@ -440,7 +440,16 @@ function _addLiveReload(root, options, browserOptions, webpackConfig, clientAddr
             // When HMR is enabled we need to add the css paths as part of the entrypoints
             // because otherwise no JS bundle will contain the HMR accept code.
             const normalizedStyles = configs_1.normalizeExtraEntryPoints(browserOptions.styles, 'styles')
-                .map(style => path.resolve(root, style.input));
+                .map(style => {
+                let resolvedPath = path.resolve(root, style.input);
+                if (!fs_1.existsSync(resolvedPath)) {
+                    try {
+                        resolvedPath = require.resolve(style.input, { paths: [root] });
+                    }
+                    catch (_a) { }
+                }
+                return resolvedPath;
+            });
             entryPoints.push(...normalizedStyles);
         }
         webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
