@@ -16,7 +16,7 @@ const strip_bom_1 = require("../utils/strip-bom");
 async function _loadTslint() {
     let tslint;
     try {
-        tslint = await Promise.resolve().then(() => require('tslint')); // tslint:disable-line:no-implicit-dependencies
+        tslint = await Promise.resolve().then(() => require('tslint'));
     }
     catch (_a) {
         throw new Error('Unable to find TSLint. Ensure TSLint is installed.');
