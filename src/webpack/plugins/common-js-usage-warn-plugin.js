@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommonJsUsageWarnPlugin = void 0;
 const path_1 = require("path");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
+const webpack_version_1 = require("../../utils/webpack-version");
 // Webpack doesn't export these so the deep imports can potentially break.
 const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
@@ -18,11 +19,11 @@ class CommonJsUsageWarnPlugin {
         var _a;
         this.options = options;
         this.shownWarnings = new Set();
-        // Allow the below depedency for HMR
+        // Allow the below dependency for HMR
         // tslint:disable-next-line: max-line-length
         // https://github.com/angular/angular-cli/blob/1e258317b1f6ec1e957ee3559cc3b28ba602f3ba/packages/angular_devkit/build_angular/src/dev-server/index.ts#L605-L638
-        this.allowedDepedencies = new Set(['webpack/hot/dev-server']);
-        (_a = this.options.allowedDepedencies) === null || _a === void 0 ? void 0 : _a.forEach(d => this.allowedDepedencies.add(d));
+        this.allowedDependencies = new Set(['webpack/hot/dev-server']);
+        (_a = this.options.allowedDependencies) === null || _a === void 0 ? void 0 : _a.forEach(d => this.allowedDependencies.add(d));
     }
     apply(compiler) {
         compiler.hooks.compilation.tap('CommonJsUsageWarnPlugin', compilation => {
@@ -32,8 +33,8 @@ class CommonJsUsageWarnPlugin {
                     if (!rawRequest ||
                         rawRequest.startsWith('.') ||
                         path_1.isAbsolute(rawRequest) ||
-                        this.allowedDepedencies.has(rawRequest) ||
-                        this.allowedDepedencies.has(this.rawRequestToPackageName(rawRequest)) ||
+                        this.allowedDependencies.has(rawRequest) ||
+                        this.allowedDependencies.has(this.rawRequestToPackageName(rawRequest)) ||
                         rawRequest.startsWith('@angular/common/locales/')) {
                         /**
                          * Skip when:
@@ -43,12 +44,12 @@ class CommonJsUsageWarnPlugin {
                          */
                         continue;
                     }
-                    if (this.hasCommonJsDependencies(dependencies)) {
+                    if (this.hasCommonJsDependencies(compilation, dependencies)) {
                         // Dependency is CommonsJS or AMD.
                         // Check if it's parent issuer is also a CommonJS dependency.
                         // In case it is skip as an warning will be show for the parent CommonJS dependency.
                         const parentDependencies = (_a = issuer === null || issuer === void 0 ? void 0 : issuer.issuer) === null || _a === void 0 ? void 0 : _a.dependencies;
-                        if (parentDependencies && this.hasCommonJsDependencies(parentDependencies, true)) {
+                        if (parentDependencies && this.hasCommonJsDependencies(compilation, parentDependencies, true)) {
                             continue;
                         }
                         // Find the main issuer (entry-point).
@@ -74,13 +75,16 @@ class CommonJsUsageWarnPlugin {
             });
         });
     }
-    hasCommonJsDependencies(dependencies, checkParentModules = false) {
+    hasCommonJsDependencies(compilation, dependencies, checkParentModules = false) {
         for (const dep of dependencies) {
             if (dep instanceof CommonJsRequireDependency || dep instanceof AMDDefineDependency) {
                 return true;
             }
-            if (checkParentModules && dep.module && this.hasCommonJsDependencies(dep.module.dependencies)) {
-                return true;
+            if (checkParentModules) {
+                const module = getWebpackModule(compilation, dep);
+                if (module && this.hasCommonJsDependencies(compilation, module.dependencies)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -94,3 +98,10 @@ class CommonJsUsageWarnPlugin {
     }
 }
 exports.CommonJsUsageWarnPlugin = CommonJsUsageWarnPlugin;
+function getWebpackModule(compilation, dependency) {
+    if (!webpack_version_1.isWebpackFiveOrHigher()) {
+        return dependency.module;
+    }
+    return compilation
+        .moduleGraph.getModule(dependency);
+}

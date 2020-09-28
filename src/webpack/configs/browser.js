@@ -79,7 +79,7 @@ function getBrowserConfig(wco) {
         },
         plugins: [
             new plugins_1.CommonJsUsageWarnPlugin({
-                allowedDepedencies: allowedCommonJsDependencies,
+                allowedDependencies: allowedCommonJsDependencies,
             }),
             ...extraPlugins,
         ],

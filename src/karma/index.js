@@ -30,7 +30,6 @@ async function initialize(options, context, webpackConfigurationTransformer) {
         configs_1.getTestConfig(wco),
         configs_1.getWorkerConfig(wco),
     ]);
-    // tslint:disable-next-line:no-implicit-dependencies
     const karma = await Promise.resolve().then(() => require('karma'));
     return [
         karma,
