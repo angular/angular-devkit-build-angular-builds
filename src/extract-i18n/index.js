@@ -163,8 +163,10 @@ async function execute(options, context, transforms) {
         }
         catch (_b) { }
         if (!validLocalizePackage) {
-            context.logger.error("Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.");
-            return { success: false };
+            return {
+                success: false,
+                error: `Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.`,
+            };
         }
     }
     const webpackResult = await build_webpack_1.runWebpack((await ((_a = transforms === null || transforms === void 0 ? void 0 : transforms.webpackConfiguration) === null || _a === void 0 ? void 0 : _a.call(transforms, config))) || config, context, {
