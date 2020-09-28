@@ -88,7 +88,6 @@ async function execute(options, context, transforms) {
         // AngularCompilerPlugin doesn't support genDir so we have to adjust outFile instead.
         outFile = path.join(options.outputPath, outFile);
     }
-    outFile = path.resolve(context.workspaceRoot, outFile);
     if (!context.target || !context.target.project) {
         throw new Error('The builder requires a target.');
     }
@@ -119,12 +118,12 @@ async function execute(options, context, transforms) {
         deleteOutputPath: false,
     }, context, (wco) => {
         const isIvyApplication = wco.tsConfig.options.enableIvy !== false;
-        // Ivy extraction is the default for Ivy applications.
-        usingIvy = (isIvyApplication && options.ivy === undefined) || !!options.ivy;
-        if (usingIvy) {
+        // Ivy-based extraction is currently opt-in
+        if (options.ivy) {
             if (!isIvyApplication) {
                 context.logger.warn('Ivy extraction enabled but application is not Ivy enabled. Extraction may fail.');
             }
+            usingIvy = true;
         }
         else if (isIvyApplication) {
             context.logger.warn('Ivy extraction not enabled but application is Ivy enabled. ' +
