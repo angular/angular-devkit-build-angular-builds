@@ -29,7 +29,8 @@ class CommonJsUsageWarnPlugin {
         compiler.hooks.compilation.tap('CommonJsUsageWarnPlugin', compilation => {
             compilation.hooks.finishModules.tap('CommonJsUsageWarnPlugin', modules => {
                 var _a, _b;
-                for (const { dependencies, rawRequest, issuer } of modules) {
+                for (const module of modules) {
+                    const { dependencies, rawRequest } = module;
                     if (!rawRequest ||
                         rawRequest.startsWith('.') ||
                         path_1.isAbsolute(rawRequest) ||
@@ -46,16 +47,19 @@ class CommonJsUsageWarnPlugin {
                     }
                     if (this.hasCommonJsDependencies(compilation, dependencies)) {
                         // Dependency is CommonsJS or AMD.
+                        const issuer = getIssuer(compilation, module);
                         // Check if it's parent issuer is also a CommonJS dependency.
                         // In case it is skip as an warning will be show for the parent CommonJS dependency.
-                        const parentDependencies = (_a = issuer === null || issuer === void 0 ? void 0 : issuer.issuer) === null || _a === void 0 ? void 0 : _a.dependencies;
+                        const parentDependencies = (_a = getIssuer(compilation, issuer)) === null || _a === void 0 ? void 0 : _a.dependencies;
                         if (parentDependencies && this.hasCommonJsDependencies(compilation, parentDependencies, true)) {
                             continue;
                         }
                         // Find the main issuer (entry-point).
                         let mainIssuer = issuer;
-                        while (mainIssuer === null || mainIssuer === void 0 ? void 0 : mainIssuer.issuer) {
-                            mainIssuer = mainIssuer.issuer;
+                        let nextIssuer = getIssuer(compilation, mainIssuer);
+                        while (nextIssuer) {
+                            mainIssuer = nextIssuer;
+                            nextIssuer = getIssuer(compilation, mainIssuer);
                         }
                         // Only show warnings for modules from main entrypoint.
                         // And if the issuer request is not from 'webpack-dev-server', as 'webpack-dev-server'
@@ -98,6 +102,16 @@ class CommonJsUsageWarnPlugin {
     }
 }
 exports.CommonJsUsageWarnPlugin = CommonJsUsageWarnPlugin;
+function getIssuer(compilation, module) {
+    if (!module) {
+        return null;
+    }
+    if (!webpack_version_1.isWebpackFiveOrHigher()) {
+        return module === null || module === void 0 ? void 0 : module.issuer;
+    }
+    return compilation
+        .moduleGraph.getIssuer(module);
+}
 function getWebpackModule(compilation, dependency) {
     if (!webpack_version_1.isWebpackFiveOrHigher()) {
         return dependency.module;
