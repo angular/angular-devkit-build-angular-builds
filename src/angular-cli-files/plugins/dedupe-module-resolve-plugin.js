@@ -33,7 +33,7 @@ class DedupeModuleResolvePlugin {
                 const { resource, request, resourceResolveData } = result;
                 const { descriptionFileData, relativePath } = resourceResolveData;
                 // Empty name or versions are no valid primary  entrypoints of a library
-                if (!descriptionFileData.name || !descriptionFileData.version) {
+                if (!(descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.name) || !(descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.version)) {
                     return;
                 }
                 const moduleId = descriptionFileData.name + '@' + descriptionFileData.version + ':' + relativePath;
