@@ -21,7 +21,7 @@ export interface Schema {
      */
     i18nLocale?: string;
     /**
-     * Use Ivy compiler to extract translations.
+     * Use Ivy compiler to extract translations. The default for Ivy applications.
      */
     ivy?: boolean;
     /**
