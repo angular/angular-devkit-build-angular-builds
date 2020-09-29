@@ -4,12 +4,13 @@ exports.DedupeModuleResolvePlugin = void 0;
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 // tslint:disable-next-line: no-any
 function getResourceData(resolveData) {
+    var _a, _b;
     if (resolveData.createData) {
         // Webpack 5+
         const { descriptionFileData, relativePath, resource, } = resolveData.createData.resourceResolveData;
         return {
-            packageName: descriptionFileData.name,
-            packageVersion: descriptionFileData.version,
+            packageName: descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.name,
+            packageVersion: descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.version,
             relativePath,
             resource,
         };
@@ -18,8 +19,8 @@ function getResourceData(resolveData) {
         // Webpack 4
         const { resource, resourceResolveData } = resolveData;
         return {
-            packageName: resourceResolveData.descriptionFileData.name,
-            packageVersion: resourceResolveData.descriptionFileData.version,
+            packageName: (_a = resourceResolveData.descriptionFileData) === null || _a === void 0 ? void 0 : _a.name,
+            packageVersion: (_b = resourceResolveData.descriptionFileData) === null || _b === void 0 ? void 0 : _b.version,
             relativePath: resourceResolveData.relativePath,
             resource: resource,
         };

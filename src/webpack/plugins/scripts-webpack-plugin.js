@@ -13,6 +13,7 @@ exports.ScriptsWebpackPlugin = void 0;
 const webpack_sources_1 = require("webpack-sources");
 const loader_utils_1 = require("loader-utils");
 const path = require("path");
+const webpack_version_1 = require("../../utils/webpack-version");
 const Chunk = require('webpack/lib/Chunk');
 const EntryPoint = require('webpack/lib/Entrypoint');
 function addDependencies(compilation, scripts) {
@@ -48,7 +49,12 @@ class ScriptsWebpackPlugin {
         chunk.rendered = !cached;
         chunk.id = this.options.name;
         chunk.ids = [chunk.id];
-        chunk.files.push(filename);
+        if (webpack_version_1.isWebpackFiveOrHigher()) {
+            chunk.files.add(filename);
+        }
+        else {
+            chunk.files.push(filename);
+        }
         const entrypoint = new EntryPoint(this.options.name);
         entrypoint.pushChunk(chunk);
         chunk.addGroup(entrypoint);
