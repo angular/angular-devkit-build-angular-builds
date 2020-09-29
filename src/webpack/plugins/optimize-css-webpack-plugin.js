@@ -11,9 +11,36 @@ exports.OptimizeCssWebpackPlugin = void 0;
 const cssNano = require("cssnano");
 const webpack_sources_1 = require("webpack-sources");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
+const webpack_version_1 = require("../../utils/webpack-version");
+const PLUGIN_NAME = 'optimize-css-webpack-plugin';
 function hook(compiler, action) {
-    compiler.hooks.compilation.tap('optimize-css-webpack-plugin', (compilation) => {
-        compilation.hooks.optimizeChunkAssets.tapPromise('optimize-css-webpack-plugin', (chunks) => action(compilation, chunks));
+    compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
+        if (webpack_version_1.isWebpackFiveOrHigher()) {
+            // webpack 5 migration "guide"
+            // https://github.com/webpack/webpack/blob/07fc554bef5930f8577f91c91a8b81791fc29746/lib/Compilation.js#L527-L532
+            // TODO_WEBPACK_5 const stage = Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE;
+            const stage = 100;
+            // tslint:disable-next-line: no-any
+            compilation.hooks
+                .processAssets.tapPromise({ name: PLUGIN_NAME, stage }, (assets) => {
+                return action(compilation, Object.keys(assets));
+            });
+        }
+        else {
+            compilation.hooks.optimizeChunkAssets
+                .tapPromise(PLUGIN_NAME, (chunks) => {
+                const files = [];
+                for (const chunk of chunks) {
+                    if (!chunk.files) {
+                        continue;
+                    }
+                    for (const file of chunk.files) {
+                        files.push(file);
+                    }
+                }
+                return action(compilation, files);
+            });
+        }
     });
 }
 class OptimizeCssWebpackPlugin {
@@ -25,16 +52,8 @@ class OptimizeCssWebpackPlugin {
         };
     }
     apply(compiler) {
-        hook(compiler, (compilation, chunks) => {
-            const files = [...compilation.additionalChunkAssets];
-            for (const chunk of chunks) {
-                if (!chunk.files) {
-                    continue;
-                }
-                for (const file of chunk.files) {
-                    files.push(file);
-                }
-            }
+        hook(compiler, (compilation, assetsURI) => {
+            const files = [...compilation.additionalChunkAssets, ...assetsURI];
             const actions = files
                 .filter(file => this._options.test(file))
                 .map(async (file) => {
