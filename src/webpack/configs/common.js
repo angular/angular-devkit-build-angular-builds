@@ -94,21 +94,16 @@ function getCommonConfig(wco) {
                     extraPlugins.push({
                         apply(compiler) {
                             compiler.hooks.compilation.tap('build-angular', compilation => {
-                                const assetPath = (filename, data) => {
-                                    var _a;
+                                // Webpack typings do not contain MainTemplate assetPath hook
+                                // The webpack.Compilation assetPath hook is a noop in 4.x so the template must be used
+                                // tslint:disable-next-line: no-any
+                                compilation.mainTemplate.hooks.assetPath.tap('build-angular', (filename, data) => {
                                     const assetName = typeof filename === 'function' ? filename(data) : filename;
-                                    const isMap = assetName === null || assetName === void 0 ? void 0 : assetName.endsWith('.map');
-                                    return ((_a = data.chunk) === null || _a === void 0 ? void 0 : _a.name) === 'polyfills-es5'
+                                    const isMap = assetName && assetName.endsWith('.map');
+                                    return data.chunk && data.chunk.name === 'polyfills-es5'
                                         ? `polyfills-es5${hashFormat.chunk}.js${isMap ? '.map' : ''}`
                                         : assetName;
-                                };
-                                if (webpack_version_1.isWebpackFiveOrHigher()) {
-                                    compilation.hooks.assetPath.tap('remove-hash-plugin', assetPath);
-                                }
-                                else {
-                                    const mainTemplate = compilation.mainTemplate;
-                                    mainTemplate.hooks.assetPath.tap('build-angular', assetPath);
-                                }
+                                });
                             });
                         },
                     });
