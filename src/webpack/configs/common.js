@@ -372,7 +372,7 @@ function getCommonConfig(wco) {
     if (wco.tsConfig.options.target !== undefined &&
         wco.tsConfig.options.target >= typescript_1.ScriptTarget.ES2017) {
         wco.logger.warn(core_1.tags.stripIndent `
-      WARNING: Zone.js does not support native async/await in ES2017.
+      Warning: Zone.js does not support native async/await in ES2017.
       These blocks are not intercepted by zone.js and will not triggering change detection.
       See: https://github.com/angular/zone.js/pull/1140 for more information.
     `);

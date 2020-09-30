@@ -17,7 +17,7 @@ function getBrowserConfig(wco) {
     }
     // TODO_WEBPACK_5: Investigate build/serve issues with the `license-webpack-plugin` package
     if (extractLicenses && webpack_version_1.isWebpackFiveOrHigher()) {
-        wco.logger.warn('WARNING: License extraction is currently disabled when using Webpack 5. ' +
+        wco.logger.warn('Warning: License extraction is currently disabled when using Webpack 5. ' +
             'This is temporary and will be corrected in a future update.');
     }
     else if (extractLicenses) {

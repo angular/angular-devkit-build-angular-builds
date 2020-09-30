@@ -42,7 +42,7 @@ function execute(options, context, transforms = {}) {
             !__processed_by_ivy_ngcc__.main ||
             main.includes('__ivy_ngcc__')) {
             context.logger.warn(core_1.tags.stripIndent `
-      WARNING: Turning off 'bundleDependencies' with Ivy may result in undefined behaviour
+      Warning: Turning off 'bundleDependencies' with Ivy may result in undefined behaviour
       unless 'node_modules' are transformed using the standalone Angular compatibility compiler (NGCC).
       See: http://v9.angular.io/guide/ivy#ivy-and-universal-app-shell
     `);

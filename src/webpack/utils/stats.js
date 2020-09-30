@@ -131,7 +131,7 @@ function statsWarningsToString(json, statsConfig) {
             if (!ERRONEOUS_WARNINGS_FILTER(warning)) {
                 continue;
             }
-            output += yb(`WARNING in ${warning}\n\n`);
+            output += yb(`Warning: ${warning}\n\n`);
         }
         else {
             if (!ERRONEOUS_WARNINGS_FILTER(warning.message)) {
@@ -171,7 +171,7 @@ function statsErrorsToString(json, statsConfig) {
     let output = '';
     for (const error of errors) {
         if (typeof error === 'string') {
-            output += r(`ERROR in ${error}\n\n`);
+            output += r(`Error: ${error}\n\n`);
         }
         else {
             const file = error.file || error.moduleName;

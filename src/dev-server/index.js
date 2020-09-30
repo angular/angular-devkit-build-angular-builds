@@ -279,7 +279,7 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
         && !/^127\.\d+\.\d+\.\d+/g.test(serverOptions.host)
         && serverOptions.host !== 'localhost') {
         logger.warn(core_1.tags.stripIndent `
-        WARNING: This is a simple server for use in testing or debugging Angular applications
+        Warning: This is a simple server for use in testing or debugging Angular applications
         locally. It hasn't been reviewed for security issues.
 
         Binding this server to an open connection can result in compromising your application or
@@ -290,7 +290,7 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
     }
     if (serverOptions.disableHostCheck) {
         logger.warn(core_1.tags.oneLine `
-        WARNING: Running a server with --disable-host-check is a security risk.
+        Warning: Running a server with --disable-host-check is a security risk.
         See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a
         for more information.
       `);
@@ -359,7 +359,7 @@ function buildServePath(serverOptions, browserOptions, logger) {
         const showWarning = serverOptions.servePathDefaultWarning;
         if (defaultPath == null && showWarning) {
             logger.warn(core_1.tags.oneLine `
-        WARNING: --deploy-url and/or --base-href contain unsupported values for ng serve. Default
+        Warning: --deploy-url and/or --base-href contain unsupported values for ng serve. Default
         serve path of '/' used. Use --serve-path to override.
       `);
         }
