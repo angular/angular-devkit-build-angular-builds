@@ -19,11 +19,6 @@ export interface Schema {
      */
     codeCoverageExclude?: string[];
     /**
-     * Defines the build environment.
-     * @deprecated This option has no effect.
-     */
-    environment?: string;
-    /**
      * Replace compilation source files with other compilation source files in the build.
      */
     fileReplacements?: FileReplacement[];
