@@ -135,7 +135,6 @@ async function execute(options, context, transforms) {
             configs_1.getCommonConfig(wco),
             // Only use VE extraction if not using Ivy
             configs_1.getAotConfig(wco, !usingIvy),
-            configs_1.getStylesConfig(wco),
             configs_1.getStatsConfig(wco),
         ];
         // Add Ivy application file extractor support
@@ -154,6 +153,12 @@ async function execute(options, context, transforms) {
                 },
             });
         }
+        // Replace all stylesheets with an empty default export
+        partials.push({
+            plugins: [
+                new webpack.NormalModuleReplacementPlugin(/\.(css|scss|sass|styl|less)$/, path.join(__dirname, 'empty-export-default.js')),
+            ],
+        });
         return partials;
     });
     if (usingIvy) {
@@ -172,7 +177,7 @@ async function execute(options, context, transforms) {
     }
     const webpackResult = await build_webpack_1.runWebpack((await ((_a = transforms === null || transforms === void 0 ? void 0 : transforms.webpackConfiguration) === null || _a === void 0 ? void 0 : _a.call(transforms, config))) || config, context, {
         logging: stats_1.createWebpackLoggingCallback(false, context.logger),
-        webpackFactory: await Promise.resolve().then(() => require('webpack')),
+        webpackFactory: webpack,
     }).toPromise();
     // Complete if using VE
     if (!usingIvy) {
