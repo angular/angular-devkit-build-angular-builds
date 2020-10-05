@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "0.1100.0-next.4+22.2f2690b",
+  "version": "0.1100.0-next.4+26.df49fd6",
   "description": "Angular Webpack Build Facade",
   "experimental": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#2f2690bb8",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#2f2690bb8",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#2f2690bb8",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#2f2690bb8",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#df49fd6ad",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#df49fd6ad",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#df49fd6ad",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#df49fd6ad",
     "@babel/core": "7.11.6",
     "@babel/generator": "7.11.6",
     "@babel/plugin-transform-runtime": "7.11.5",
@@ -18,7 +18,7 @@
     "@babel/runtime": "7.11.2",
     "@babel/template": "7.10.4",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#2f2690bb8",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#df49fd6ad",
     "ansi-colors": "4.1.1",
     "autoprefixer": "9.8.6",
     "babel-loader": "8.1.0",
@@ -44,8 +44,7 @@
     "minimatch": "3.0.4",
     "open": "7.3.0",
     "ora": "5.1.0",
-    "parse5": "6.0.1",
-    "parse5-htmlparser2-tree-adapter": "6.0.1",
+    "parse5-html-rewriting-stream": "6.0.1",
     "pnp-webpack-plugin": "1.6.4",
     "postcss": "7.0.32",
     "postcss-import": "12.0.1",
@@ -128,7 +127,8 @@
   "homepage": "https://github.com/angular/angular-cli",
   "husky": {
     "hooks": {
-      "pre-push": "node ./bin/devkit-admin hooks/pre-push"
+      "commit-msg": "yarn -s ng-dev commit-message pre-commit-validate --file-env-variable HUSKY_GIT_PARAMS",
+      "prepare-commit-msg": "yarn -s ng-dev commit-message restore-commit-message-draft --file-env-variable HUSKY_GIT_PARAMS"
     }
   }
 }

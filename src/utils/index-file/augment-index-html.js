@@ -9,21 +9,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.augmentIndexHtml = void 0;
 const crypto_1 = require("crypto");
-const webpack_sources_1 = require("webpack-sources");
-const parse5 = require('parse5');
-const treeAdapter = require('parse5-htmlparser2-tree-adapter');
+const html_rewriting_stream_1 = require("./html-rewriting-stream");
 /*
  * Helper function used by the IndexHtmlWebpackPlugin.
  * Can also be directly used by builder, e. g. in order to generate an index.html
  * after processing several configurations in order to build different sets of
  * bundles for differential serving.
  */
-// tslint:disable-next-line: no-big-function
 async function augmentIndexHtml(params) {
-    var _a, _b, _c, _d;
-    const { loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints } = params;
+    const { loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints, sri, deployUrl = '', lang, baseHref, inputContent, } = params;
     let { crossOrigin = 'none' } = params;
-    if (params.sri && crossOrigin === 'none') {
+    if (sri && crossOrigin === 'none') {
         crossOrigin = 'anonymous';
     }
     const stylesheets = new Set();
@@ -45,28 +41,11 @@ async function augmentIndexHtml(params) {
             }
         }
     }
-    // Find the head and body elements
-    const document = parse5.parse(params.inputContent, {
-        treeAdapter,
-        sourceCodeLocationInfo: true,
-    });
-    // tslint:disable: no-any
-    const htmlElement = document.children.find((c) => c.name === 'html');
-    const headElement = htmlElement.children.find((c) => c.name === 'head');
-    const bodyElement = htmlElement.children.find((c) => c.name === 'body');
-    // tslint:enable: no-any
-    if (!headElement || !bodyElement) {
-        throw new Error('Missing head and/or body elements');
-    }
-    // Inject into the html
-    const indexSource = new webpack_sources_1.ReplaceSource(new webpack_sources_1.RawSource(params.inputContent), params.input);
-    const scriptsElements = treeAdapter.createDocumentFragment();
+    const scriptTags = [];
     for (const script of scripts) {
-        const attrs = [
-            { name: 'src', value: (params.deployUrl || '') + script },
-        ];
+        const attrs = [`src="${deployUrl}${script}"`];
         if (crossOrigin !== 'none') {
-            attrs.push({ name: 'crossorigin', value: crossOrigin });
+            attrs.push(`crossorigin="${crossOrigin}"`);
         }
         // We want to include nomodule or module when a file is not common amongs all
         // such as runtime.js
@@ -78,81 +57,103 @@ async function augmentIndexHtml(params) {
             const isNoModuleType = noModuleFiles.some(scriptPredictor);
             const isModuleType = moduleFiles.some(scriptPredictor);
             if (isNoModuleType && !isModuleType) {
-                attrs.push({ name: 'nomodule', value: '' }, { name: 'defer', value: '' });
+                attrs.push('nomodule', 'defer');
             }
             else if (isModuleType && !isNoModuleType) {
-                attrs.push({ name: 'type', value: 'module' });
+                attrs.push('type="module"');
             }
             else {
-                attrs.push({ name: 'defer', value: '' });
+                attrs.push('defer');
             }
         }
         else {
-            attrs.push({ name: 'defer', value: '' });
+            attrs.push('defer');
         }
-        if (params.sri) {
+        if (sri) {
             const content = await loadOutputFile(script);
-            attrs.push(_generateSriAttributes(content));
+            attrs.push(generateSriAttributes(content));
         }
-        const baseElement = treeAdapter.createElement('script', undefined, attrs);
-        treeAdapter.setTemplateContent(scriptsElements, baseElement);
+        scriptTags.push(`<script ${attrs.join(' ')}></script>`);
     }
-    indexSource.insert(
-    // parse5 does not provide locations if malformed html is present
-    ((_b = (_a = bodyElement.sourceCodeLocation) === null || _a === void 0 ? void 0 : _a.endTag) === null || _b === void 0 ? void 0 : _b.startOffset) || params.inputContent.indexOf('</body>'), parse5.serialize(scriptsElements, { treeAdapter }).replace(/\=""/g, ''));
-    // Adjust base href if specified
-    if (typeof params.baseHref == 'string') {
-        // tslint:disable-next-line: no-any
-        let baseElement = headElement.children.find((t) => t.name === 'base');
-        const baseFragment = treeAdapter.createDocumentFragment();
-        if (!baseElement) {
-            baseElement = treeAdapter.createElement('base', undefined, [
-                { name: 'href', value: params.baseHref },
-            ]);
-            treeAdapter.setTemplateContent(baseFragment, baseElement);
-            indexSource.insert(headElement.sourceCodeLocation.startTag.endOffset, parse5.serialize(baseFragment, { treeAdapter }));
-        }
-        else {
-            baseElement.attribs['href'] = params.baseHref;
-            treeAdapter.setTemplateContent(baseFragment, baseElement);
-            indexSource.replace(baseElement.sourceCodeLocation.startOffset, baseElement.sourceCodeLocation.endOffset - 1, parse5.serialize(baseFragment, { treeAdapter }));
-        }
-    }
-    const styleElements = treeAdapter.createDocumentFragment();
+    const linkTags = [];
     for (const stylesheet of stylesheets) {
         const attrs = [
-            { name: 'rel', value: 'stylesheet' },
-            { name: 'href', value: (params.deployUrl || '') + stylesheet },
+            `rel="stylesheet"`,
+            `href="${deployUrl}${stylesheet}"`,
         ];
         if (crossOrigin !== 'none') {
-            attrs.push({ name: 'crossorigin', value: crossOrigin });
+            attrs.push(`crossorigin="${crossOrigin}"`);
         }
-        if (params.sri) {
+        if (sri) {
             const content = await loadOutputFile(stylesheet);
-            attrs.push(_generateSriAttributes(content));
+            attrs.push(generateSriAttributes(content));
         }
-        const element = treeAdapter.createElement('link', undefined, attrs);
-        treeAdapter.setTemplateContent(styleElements, element);
+        linkTags.push(`<link ${attrs.join(' ')}>`);
     }
-    indexSource.insert(
-    // parse5 does not provide locations if malformed html is present
-    ((_d = (_c = headElement.sourceCodeLocation) === null || _c === void 0 ? void 0 : _c.endTag) === null || _d === void 0 ? void 0 : _d.startOffset) || params.inputContent.indexOf('</head>'), parse5.serialize(styleElements, { treeAdapter }));
-    // Adjust document locale if specified
-    if (typeof params.lang == 'string') {
-        const htmlFragment = treeAdapter.createDocumentFragment();
-        htmlElement.attribs['lang'] = params.lang;
-        // we want only openning tag
-        htmlElement.children = [];
-        treeAdapter.setTemplateContent(htmlFragment, htmlElement);
-        indexSource.replace(htmlElement.sourceCodeLocation.startTag.startOffset, htmlElement.sourceCodeLocation.startTag.endOffset - 1, parse5.serialize(htmlFragment, { treeAdapter }).replace('</html>', ''));
-    }
-    return indexSource.source();
+    const { rewriter, transformedContent } = await html_rewriting_stream_1.htmlRewritingStream(inputContent);
+    const baseTagExists = inputContent.includes('<base');
+    rewriter
+        .on('startTag', tag => {
+        switch (tag.tagName) {
+            case 'html':
+                // Adjust document locale if specified
+                if (isString(lang)) {
+                    updateAttribute(tag, 'lang', lang);
+                }
+                break;
+            case 'head':
+                // Base href should be added before any link, meta tags
+                if (!baseTagExists && isString(baseHref)) {
+                    rewriter.emitStartTag(tag);
+                    rewriter.emitRaw(`<base href="${baseHref}">`);
+                    return;
+                }
+                break;
+            case 'base':
+                // Adjust base href if specified
+                if (isString(baseHref)) {
+                    updateAttribute(tag, 'href', baseHref);
+                }
+                break;
+        }
+        rewriter.emitStartTag(tag);
+    })
+        .on('endTag', tag => {
+        switch (tag.tagName) {
+            case 'head':
+                for (const linkTag of linkTags) {
+                    rewriter.emitRaw(linkTag);
+                }
+                break;
+            case 'body':
+                // Add script tags
+                for (const scriptTag of scriptTags) {
+                    rewriter.emitRaw(scriptTag);
+                }
+                break;
+        }
+        rewriter.emitEndTag(tag);
+    });
+    return transformedContent;
 }
 exports.augmentIndexHtml = augmentIndexHtml;
-function _generateSriAttributes(content) {
+function generateSriAttributes(content) {
     const algo = 'sha384';
     const hash = crypto_1.createHash(algo)
         .update(content, 'utf8')
         .digest('base64');
-    return { name: 'integrity', value: `${algo}-${hash}` };
+    return `integrity="${algo}-${hash}"`;
+}
+function updateAttribute(tag, name, value) {
+    const index = tag.attrs.findIndex(a => a.name === name);
+    const newValue = { name, value };
+    if (index === -1) {
+        tag.attrs.push(newValue);
+    }
+    else {
+        tag.attrs[index] = newValue;
+    }
+}
+function isString(value) {
+    return typeof value === 'string';
 }
