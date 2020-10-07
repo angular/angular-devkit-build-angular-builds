@@ -15,6 +15,7 @@ const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
 // tslint:disable-next-line:no-big-function
 function getStylesConfig(wco) {
+    var _a, _b, _c;
     const autoprefixer = require('autoprefixer');
     const MiniCssExtractPlugin = require('mini-css-extract-plugin');
     const postcssImports = require('postcss-import');
@@ -27,16 +28,7 @@ function getStylesConfig(wco) {
     // Determine hashing format.
     const hashFormat = helpers_1.getOutputHashFormat(buildOptions.outputHashing);
     // use includePaths from appConfig
-    const includePaths = [];
-    let lessPathOptions = {};
-    if (buildOptions.stylePreprocessorOptions &&
-        buildOptions.stylePreprocessorOptions.includePaths &&
-        buildOptions.stylePreprocessorOptions.includePaths.length > 0) {
-        buildOptions.stylePreprocessorOptions.includePaths.forEach((includePath) => includePaths.push(path.resolve(root, includePath)));
-        lessPathOptions = {
-            paths: includePaths,
-        };
-    }
+    const includePaths = (_c = (_b = (_a = buildOptions.stylePreprocessorOptions) === null || _a === void 0 ? void 0 : _a.includePaths) === null || _b === void 0 ? void 0 : _b.map(p => path.resolve(root, p))) !== null && _c !== void 0 ? _c : [];
     // Process global styles.
     if (buildOptions.styles.length > 0) {
         const chunkNames = [];
@@ -74,7 +66,7 @@ function getStylesConfig(wco) {
         wco.logger.warn(core_1.tags.oneLine `'node-sass' usage is deprecated and will be removed in a future major version.
       To opt-out of the deprecated behaviour and start using 'sass' uninstall 'node-sass'.`);
     }
-    catch (_a) {
+    catch (_d) {
         sassImplementation = require('sass');
     }
     // set base rules to derive final rules from
@@ -117,7 +109,7 @@ function getStylesConfig(wco) {
                         sourceMap: cssSourceMap,
                         lessOptions: {
                             javascriptEnabled: true,
-                            ...lessPathOptions,
+                            paths: includePaths,
                         },
                     },
                 },
@@ -135,8 +127,13 @@ function getStylesConfig(wco) {
                 {
                     loader: require.resolve('stylus-loader'),
                     options: {
-                        sourceMap: { comment: false },
-                        paths: includePaths,
+                        sourceMap: cssSourceMap,
+                        webpackImporter: false,
+                        stylusOptions: {
+                            compress: false,
+                            sourceMap: { comment: false },
+                            paths: includePaths,
+                        },
                     },
                 },
             ],
