@@ -13,7 +13,6 @@ const template_1 = require("@babel/template");
 const crypto_1 = require("crypto");
 const fs = require("fs");
 const path = require("path");
-const semver_1 = require("semver");
 const source_map_1 = require("source-map");
 const terser_1 = require("terser");
 const v8 = require("v8");
@@ -592,37 +591,12 @@ function findLocalizePositions(ast, options, utils) {
     }
     return positions;
 }
-// TODO: Remove this for v11.
-// This check allows the CLI to support both FW 10.0 and 10.1
-let localizeOld;
 function unwrapTemplateLiteral(path, utils) {
-    if (localizeOld === undefined) {
-        const { version: localizeVersion } = require('@angular/localize/package.json');
-        localizeOld = semver_1.lt(localizeVersion, '10.1.0-rc.0', { includePrerelease: true });
-    }
-    if (localizeOld) {
-        // tslint:disable-next-line: no-any
-        const messageParts = utils.unwrapMessagePartsFromTemplateLiteral(path.node.quasi.quasis);
-        return [messageParts, path.node.quasi.expressions];
-    }
     const [messageParts] = utils.unwrapMessagePartsFromTemplateLiteral(path.get('quasi').get('quasis'));
     const [expressions] = utils.unwrapExpressionsFromTemplateLiteral(path.get('quasi'));
     return [messageParts, expressions];
 }
 function unwrapLocalizeCall(path, utils) {
-    if (localizeOld === undefined) {
-        const { version: localizeVersion } = require('@angular/localize/package.json');
-        localizeOld = semver_1.lt(localizeVersion, '10.1.0-rc.0', { includePrerelease: true });
-    }
-    if (localizeOld) {
-        const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
-        // tslint:disable-next-line: no-any
-        const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
-        return [
-            messageParts,
-            expressions,
-        ];
-    }
     const [messageParts] = utils.unwrapMessagePartsFromLocalizeCall(path);
     const [expressions] = utils.unwrapSubstitutionsFromLocalizeCall(path);
     return [messageParts, expressions];

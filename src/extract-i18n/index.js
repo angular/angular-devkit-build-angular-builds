@@ -12,7 +12,6 @@ const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const fs = require("fs");
 const path = require("path");
-const semver_1 = require("semver");
 const webpack = require("webpack");
 const i18n_options_1 = require("../utils/i18n-options");
 const version_1 = require("../utils/version");
@@ -162,16 +161,13 @@ async function execute(options, context, transforms) {
         return partials;
     });
     if (usingIvy) {
-        let validLocalizePackage = false;
         try {
-            const { version: localizeVersion } = require('@angular/localize/package.json');
-            validLocalizePackage = semver_1.gte(localizeVersion, '10.1.0-next.0', { includePrerelease: true });
+            require.resolve('@angular/localize');
         }
-        catch (_b) { }
-        if (!validLocalizePackage) {
+        catch (_b) {
             return {
                 success: false,
-                error: `Ivy extraction requires the '@angular/localize' package version 10.1.0 or higher.`,
+                error: `Ivy extraction requires the '@angular/localize' package.`,
             };
         }
     }
