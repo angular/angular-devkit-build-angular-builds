@@ -8,10 +8,12 @@ export interface Schema {
     allowedHosts?: string[];
     /**
      * Build using Ahead of Time compilation.
+     * @deprecated Use the "aot" option in the browser builder instead.
      */
     aot?: boolean;
     /**
      * Base url for the application being built.
+     * @deprecated Use the "baseHref" option in the browser builder instead.
      */
     baseHref?: string;
     /**
@@ -20,10 +22,12 @@ export interface Schema {
     browserTarget: string;
     /**
      * Use a separate bundle containing code used across multiple bundles.
+     * @deprecated Use the "commonChunk" option in the browser builder instead.
      */
     commonChunk?: boolean;
     /**
      * URL where files will be deployed.
+     * @deprecated Use the "deployUrl" option in the browser builder instead.
      */
     deployUrl?: string;
     /**
@@ -36,6 +40,7 @@ export interface Schema {
     hmr?: boolean;
     /**
      * Show a warning when the --hmr option is enabled.
+     * @deprecated No longer has an effect.
      */
     hmrWarning?: boolean;
     /**
@@ -52,6 +57,7 @@ export interface Schema {
     open?: boolean;
     /**
      * Enables optimization of the build output.
+     * @deprecated Use the "optimization" option in the browser builder instead.
      */
     optimization?: OptimizationUnion;
     /**
@@ -64,6 +70,7 @@ export interface Schema {
     port?: number;
     /**
      * Log progress to the console while building.
+     * @deprecated Use the "progress" option in the browser builder instead.
      */
     progress?: boolean;
     /**
@@ -82,10 +89,12 @@ export interface Schema {
     servePath?: string;
     /**
      * Show a warning when deploy-url/base-href use unsupported serve path values.
+     * @deprecated No longer has an effect.
      */
     servePathDefaultWarning?: boolean;
     /**
      * Output sourcemaps.
+     * @deprecated Use the "sourceMap" option in the browser builder instead.
      */
     sourceMap?: SourceMapUnion;
     /**
@@ -102,6 +111,7 @@ export interface Schema {
     sslKey?: string;
     /**
      * Use a separate bundle containing only vendor libraries.
+     * @deprecated Use the "vendorChunk" option in the browser builder instead.
      */
     vendorChunk?: boolean;
     /**
@@ -115,6 +125,7 @@ export interface Schema {
 }
 /**
  * Enables optimization of the build output.
+ * @deprecated Use the "optimization" option in the browser builder instead.
  */
 export declare type OptimizationUnion = boolean | OptimizationClass;
 export interface OptimizationClass {
@@ -129,6 +140,7 @@ export interface OptimizationClass {
 }
 /**
  * Output sourcemaps.
+ * @deprecated Use the "sourceMap" option in the browser builder instead.
  */
 export declare type SourceMapUnion = boolean | SourceMapClass;
 export interface SourceMapClass {
