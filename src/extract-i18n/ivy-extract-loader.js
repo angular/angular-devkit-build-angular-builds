@@ -41,7 +41,7 @@ map) {
         filename = nodePath.join(loaderContext.context, map.file);
     }
     // Setup a virtual file system instance for the extractor
-    // * MessageExtractor itself uses readFile and resolve
+    // * MessageExtractor itself uses readFile, relative and resolve
     // * Internal SourceFileLoader (sourcemap support) uses dirname, exists, readFile, and resolve
     const filesystem = {
         readFile(path) {
@@ -54,6 +54,9 @@ map) {
             else {
                 throw new Error('Unknown file requested: ' + path);
             }
+        },
+        relative(from, to) {
+            return nodePath.relative(from, to);
         },
         resolve(...paths) {
             return nodePath.resolve(...paths);
