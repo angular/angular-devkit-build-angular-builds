@@ -9,31 +9,30 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.writeIndexHtml = void 0;
 const core_1 = require("@angular-devkit/core");
-const rxjs_1 = require("rxjs");
-const operators_1 = require("rxjs/operators");
+const path_1 = require("path");
 const package_chunk_sort_1 = require("../package-chunk-sort");
 const strip_bom_1 = require("../strip-bom");
 const augment_index_html_1 = require("./augment-index-html");
-function writeIndexHtml({ host, outputPath, indexPath, files = [], noModuleFiles = [], moduleFiles = [], baseHref, deployUrl, sri = false, scripts = [], styles = [], postTransform, crossOrigin, lang, }) {
-    return host.read(indexPath).pipe(operators_1.map(content => strip_bom_1.stripBom(core_1.virtualFs.fileBufferToString(content))), operators_1.switchMap(content => augment_index_html_1.augmentIndexHtml({
-        input: core_1.getSystemPath(outputPath),
-        inputContent: content,
+async function writeIndexHtml({ host, outputPath, indexPath, files = [], noModuleFiles = [], moduleFiles = [], baseHref, deployUrl, sri = false, scripts = [], styles = [], postTransform, crossOrigin, lang, }) {
+    const readFile = async (filePath) => core_1.virtualFs.fileBufferToString(await host.read(core_1.normalize(filePath)).toPromise());
+    let content = await augment_index_html_1.augmentIndexHtml({
+        input: outputPath,
+        inputContent: strip_bom_1.stripBom(await readFile(indexPath)),
         baseHref,
         deployUrl,
         crossOrigin,
         sri,
+        lang,
         entrypoints: package_chunk_sort_1.generateEntryPoints({ scripts, styles }),
         files: filterAndMapBuildFiles(files, ['.js', '.css']),
         noModuleFiles: filterAndMapBuildFiles(noModuleFiles, '.js'),
         moduleFiles: filterAndMapBuildFiles(moduleFiles, '.js'),
-        loadOutputFile: async (filePath) => {
-            return host
-                .read(core_1.join(core_1.dirname(outputPath), filePath))
-                .pipe(operators_1.map(data => core_1.virtualFs.fileBufferToString(data)))
-                .toPromise();
-        },
-        lang: lang,
-    })), operators_1.switchMap(content => (postTransform ? postTransform(content) : rxjs_1.of(content))), operators_1.map(content => core_1.virtualFs.stringToFileBuffer(content)), operators_1.switchMap(content => host.write(outputPath, content)));
+        loadOutputFile: filePath => readFile(path_1.join(path_1.dirname(outputPath), filePath)),
+    });
+    if (postTransform) {
+        content = await postTransform(content);
+    }
+    await host.write(core_1.normalize(outputPath), core_1.virtualFs.stringToFileBuffer(content)).toPromise();
 }
 exports.writeIndexHtml = writeIndexHtml;
 function filterAndMapBuildFiles(files, extensionFilter) {
