@@ -492,23 +492,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     }
                     try {
                         if (options.index) {
-                            await write_index_html_1.writeIndexHtml({
-                                host,
-                                outputPath: path.join(outputPath, webpack_browser_config_1.getIndexOutputFile(options)),
-                                indexPath: path.join(context.workspaceRoot, webpack_browser_config_1.getIndexInputFile(options)),
-                                files,
-                                noModuleFiles,
-                                moduleFiles,
-                                baseHref: localeBaseHref || options.baseHref,
-                                deployUrl: options.deployUrl,
-                                sri: options.subresourceIntegrity,
-                                scripts: options.scripts,
-                                styles: options.styles,
-                                postTransform: transforms.indexHtml,
-                                crossOrigin: options.crossOrigin,
-                                // i18nLocale is used when Ivy is disabled
-                                lang: locale || options.i18nLocale,
-                            });
+                            await generateIndex(outputPath, options, root, files, noModuleFiles, moduleFiles, transforms.indexHtml, 
+                            // i18nLocale is used when Ivy is disabled
+                            locale || options.i18nLocale, localeBaseHref || options.baseHref);
                         }
                         if (options.serviceWorker) {
                             await service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(outputPath), localeBaseHref || options.baseHref || '/', options.ngswConfigPath);
@@ -529,6 +515,25 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     }));
 }
 exports.buildWebpackBrowser = buildWebpackBrowser;
+function generateIndex(baseOutputPath, options, root, files, noModuleFiles, moduleFiles, transformer, locale, baseHref) {
+    const host = new node_1.NodeJsSyncHost();
+    return write_index_html_1.writeIndexHtml({
+        host,
+        outputPath: core_1.join(core_1.normalize(baseOutputPath), webpack_browser_config_1.getIndexOutputFile(options)),
+        indexPath: core_1.join(core_1.normalize(root), webpack_browser_config_1.getIndexInputFile(options)),
+        files,
+        noModuleFiles,
+        moduleFiles,
+        baseHref,
+        deployUrl: options.deployUrl,
+        sri: options.subresourceIntegrity,
+        scripts: options.scripts,
+        styles: options.styles,
+        postTransform: transformer,
+        crossOrigin: options.crossOrigin,
+        lang: locale,
+    }).toPromise();
+}
 function mapErrorToMessage(error) {
     if (error instanceof Error) {
         return error.message;
