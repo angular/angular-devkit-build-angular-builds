@@ -617,8 +617,8 @@ async function loadLocaleData(path, optimize, es5) {
                 require.resolve('@babel/preset-env'),
                 {
                     bugfixes: true,
-                    // IE 9 is the oldest supported browser
-                    targets: es5 ? { ie: '9' } : { esmodules: true },
+                    // IE 11 is the oldest supported browser
+                    targets: es5 ? { ie: '11' } : { esmodules: true },
                 },
             ],
         ],
