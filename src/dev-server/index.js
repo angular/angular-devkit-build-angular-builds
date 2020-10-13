@@ -300,7 +300,10 @@ function buildServerConfig(workspaceRoot, serverOptions, browserOptions, logger)
     const config = {
         host: serverOptions.host,
         port: serverOptions.port,
-        headers: { 'Access-Control-Allow-Origin': '*' },
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            ...serverOptions.headers,
+        },
         historyApiFallback: !!browserOptions.index && {
             index: `${servePath}/${webpack_browser_config_1.getIndexOutputFile(browserOptions)}`,
             disableDotRule: true,

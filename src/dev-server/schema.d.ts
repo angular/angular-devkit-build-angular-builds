@@ -35,6 +35,12 @@ export interface Schema {
      */
     disableHostCheck?: boolean;
     /**
+     * Custom HTTP headers to serve.
+     */
+    headers?: {
+        [key: string]: string;
+    };
+    /**
      * Enable hot module replacement.
      */
     hmr?: boolean;
