@@ -15,7 +15,12 @@ function getBrowserConfig(wco) {
             hashFuncNames: ['sha384'],
         }));
     }
-    if (extractLicenses) {
+    // TODO_WEBPACK_5: Investigate build/serve issues with the `license-webpack-plugin` package
+    if (extractLicenses && webpack_version_1.isWebpackFiveOrHigher()) {
+        wco.logger.warn('Warning: License extraction is currently disabled when using Webpack 5. ' +
+            'This is temporary and will be corrected in a future update.');
+    }
+    else if (extractLicenses) {
         const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
         extraPlugins.push(new LicenseWebpackPlugin({
             stats: {
