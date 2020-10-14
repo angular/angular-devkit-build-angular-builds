@@ -1,4 +1,3 @@
-/// <reference types="packages/angular_devkit/build_angular/src/typings" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
