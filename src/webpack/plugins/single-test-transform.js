@@ -11,7 +11,7 @@ exports.SingleTestTransformLoader = void 0;
 const core_1 = require("@angular-devkit/core");
 const loader_utils_1 = require("loader-utils");
 const path_1 = require("path");
-exports.SingleTestTransformLoader = require.resolve(path_1.join(__dirname, 'single-test-transform'));
+exports.SingleTestTransformLoader = __filename;
 /**
  * This loader transforms the default test file to only run tests
  * for some specs instead of all specs.

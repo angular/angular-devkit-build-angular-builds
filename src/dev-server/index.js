@@ -30,7 +30,6 @@ const read_tsconfig_1 = require("../utils/read-tsconfig");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const webpack_diagnostics_1 = require("../utils/webpack-diagnostics");
-const configs_1 = require("../webpack/configs");
 const index_html_webpack_plugin_1 = require("../webpack/plugins/index-html-webpack-plugin");
 const stats_1 = require("../webpack/utils/stats");
 const devServerBuildOverriddenKeys = [
@@ -76,7 +75,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         overrides.budgets = undefined;
         const browserName = await context.getBuilderNameForTarget(browserTarget);
         const browserOptions = await context.validateOptions({ ...rawBrowserOptions, ...overrides }, browserName);
-        const { config, projectRoot, i18n } = await browser_1.buildBrowserWebpackConfigFromContext(browserOptions, context, host);
+        const { config, projectRoot, i18n } = await browser_1.buildBrowserWebpackConfigFromContext(browserOptions, context, host, { hmr: options.hmr });
         let webpackConfig = config;
         const tsConfig = read_tsconfig_1.readTsconfig(browserOptions.tsConfig, context.workspaceRoot);
         if (i18n.shouldInline && tsConfig.options.enableIvy !== false) {
@@ -382,7 +381,6 @@ exports.buildServePath = buildServePath;
  * @private
  */
 function _addLiveReload(root, options, browserOptions, webpackConfig, clientAddress, logger) {
-    var _a;
     if (webpackConfig.plugins === undefined) {
         webpackConfig.plugins = [];
     }
@@ -394,7 +392,7 @@ function _addLiveReload(root, options, browserOptions, webpackConfig, clientAddr
         const webpackPath = path.dirname(require.resolve('webpack/package.json'));
         nodeLibsBrowserPath = require.resolve('node-libs-browser', { paths: [webpackPath] });
     }
-    catch (_b) { }
+    catch (_a) { }
     if (nodeLibsBrowserPath) {
         const nodeLibsBrowser = require(nodeLibsBrowserPath);
         webpackConfig.plugins.push(new webpack.NormalModuleReplacementPlugin(/^events|url|querystring$/, (resource) => {
@@ -424,7 +422,7 @@ function _addLiveReload(root, options, browserOptions, webpackConfig, clientAddr
     try {
         webpackDevServerPath = require.resolve('webpack-dev-server/client');
     }
-    catch (_c) {
+    catch (_b) {
         throw new Error('The "webpack-dev-server" package could not be found.');
     }
     // If a custom path is provided the webpack dev server client drops the sockjs-node segment.
@@ -438,24 +436,7 @@ function _addLiveReload(root, options, browserOptions, webpackConfig, clientAddr
     if (options.hmr) {
         logger.warn(core_1.tags.stripIndents `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
       See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
-        entryPoints.push('webpack/hot/dev-server', path.join(__dirname, '../webpack/hmr.js'));
-        if ((_a = browserOptions.styles) === null || _a === void 0 ? void 0 : _a.length) {
-            // When HMR is enabled we need to add the css paths as part of the entrypoints
-            // because otherwise no JS bundle will contain the HMR accept code.
-            const normalizedStyles = configs_1.normalizeExtraEntryPoints(browserOptions.styles, 'styles')
-                .map(style => {
-                let resolvedPath = path.resolve(root, style.input);
-                if (!fs_1.existsSync(resolvedPath)) {
-                    try {
-                        resolvedPath = require.resolve(style.input, { paths: [root] });
-                    }
-                    catch (_a) { }
-                }
-                return resolvedPath;
-            });
-            entryPoints.push(...normalizedStyles);
-        }
-        webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
+        entryPoints.push('webpack/hot/dev-server');
     }
     if (typeof webpackConfig.entry !== 'object' || Array.isArray(webpackConfig.entry)) {
         webpackConfig.entry = {};

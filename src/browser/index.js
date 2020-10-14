@@ -39,7 +39,7 @@ const analytics_1 = require("../webpack/plugins/analytics");
 const async_chunks_1 = require("../webpack/utils/async-chunks");
 const stats_1 = require("../webpack/utils/stats");
 const cacheDownlevelPath = environment_options_1.cachingDisabled ? undefined : cache_path_1.findCachePath('angular-build-dl');
-async function buildBrowserWebpackConfigFromContext(options, context, host = new node_1.NodeJsSyncHost(), differentialLoadingMode = false) {
+async function buildBrowserWebpackConfigFromContext(options, context, host = new node_1.NodeJsSyncHost(), extraBuildOptions = {}) {
     const webpackPartialGenerator = (wco) => [
         configs_1.getCommonConfig(wco),
         configs_1.getBrowserConfig(wco),
@@ -49,7 +49,7 @@ async function buildBrowserWebpackConfigFromContext(options, context, host = new
         getCompilerConfig(wco),
         wco.buildOptions.webWorkerTsConfig ? configs_1.getWorkerConfig(wco) : {},
     ];
-    return webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host, differentialLoadingMode);
+    return webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host, extraBuildOptions);
 }
 exports.buildBrowserWebpackConfigFromContext = buildBrowserWebpackConfigFromContext;
 function getAnalyticsConfig(wco, context) {
@@ -85,7 +85,7 @@ async function initialize(options, context, host, differentialLoadingMode, webpa
         context.logger.warn('Warning: License extraction is currently disabled when using Webpack 5. ' +
             'This is temporary and will be corrected in a future update.');
     }
-    const { config, projectRoot, projectSourceRoot, i18n, } = await buildBrowserWebpackConfigFromContext(adjustedOptions, context, host, differentialLoadingMode);
+    const { config, projectRoot, projectSourceRoot, i18n, } = await buildBrowserWebpackConfigFromContext(adjustedOptions, context, host, { differentialLoadingMode });
     // Validate asset option values if processed directly
     if (((_a = options.assets) === null || _a === void 0 ? void 0 : _a.length) && !((_b = adjustedOptions.assets) === null || _b === void 0 ? void 0 : _b.length)) {
         utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), core_1.normalize(context.workspaceRoot), core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)).forEach(({ output }) => {

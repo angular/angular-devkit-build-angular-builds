@@ -15,14 +15,14 @@ import { NormalizedBrowserBuilderSchema } from '../utils';
 import { WebpackConfigOptions } from '../utils/build-options';
 import { I18nOptions } from './i18n-options';
 export declare type BrowserWebpackConfigOptions = WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
-export declare function generateWebpackConfig(workspaceRoot: string, projectRoot: string, sourceRoot: string | undefined, options: NormalizedBrowserBuilderSchema, webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[], logger: logging.LoggerApi, differentialLoadingMode: boolean): Promise<webpack.Configuration>;
-export declare function generateI18nBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[], host?: virtualFs.Host<fs.Stats>, differentialLoadingMode?: boolean): Promise<{
+export declare function generateWebpackConfig(workspaceRoot: string, projectRoot: string, sourceRoot: string | undefined, options: NormalizedBrowserBuilderSchema, webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[], logger: logging.LoggerApi, extraBuildOptions: Partial<NormalizedBrowserBuilderSchema>): Promise<webpack.Configuration>;
+export declare function generateI18nBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[], host?: virtualFs.Host<fs.Stats>, extraBuildOptions?: Partial<NormalizedBrowserBuilderSchema>): Promise<{
     config: webpack.Configuration;
     projectRoot: string;
     projectSourceRoot?: string;
     i18n: I18nOptions;
 }>;
-export declare function generateBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[], host?: virtualFs.Host<fs.Stats>, differentialLoadingMode?: boolean): Promise<{
+export declare function generateBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, webpackPartialGenerator: (wco: BrowserWebpackConfigOptions) => webpack.Configuration[], host?: virtualFs.Host<fs.Stats>, extraBuildOptions?: Partial<NormalizedBrowserBuilderSchema>): Promise<{
     config: webpack.Configuration;
     projectRoot: string;
     projectSourceRoot?: string;

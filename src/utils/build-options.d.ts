@@ -35,7 +35,6 @@ export interface BuildOptions {
     bundleDependencies?: boolean;
     externalDependencies?: string[];
     watch?: boolean;
-    hmr?: boolean;
     outputHashing?: string;
     poll?: number;
     deleteOutputPath?: boolean;
@@ -50,6 +49,7 @@ export interface BuildOptions {
     webWorkerTsConfig?: string;
     statsJson: boolean;
     forkTypeChecker: boolean;
+    hmr?: boolean;
     main: string;
     polyfills?: string;
     budgets: Budget[];
@@ -67,6 +67,7 @@ export interface BuildOptions {
     rebaseRootRelativeCssUrls?: boolean;
     experimentalRollupPass?: boolean;
     allowedCommonJsDependencies?: string[];
+    differentialLoadingMode?: boolean;
 }
 export interface WebpackTestOptions extends BuildOptions {
     codeCoverage?: boolean;
@@ -81,5 +82,4 @@ export interface WebpackConfigOptions<T = BuildOptions> {
     tsConfig: ParsedConfiguration;
     tsConfigPath: string;
     supportES2015: boolean;
-    differentialLoadingMode?: boolean;
 }

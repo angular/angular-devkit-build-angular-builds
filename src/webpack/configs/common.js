@@ -35,7 +35,7 @@ function getCommonConfig(wco) {
     const entryPoints = {};
     // determine hashing format
     const hashFormat = helpers_1.getOutputHashFormat(buildOptions.outputHashing || 'none');
-    const targetInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, wco.differentialLoadingMode);
+    const targetInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, buildOptions.differentialLoadingMode);
     if (buildOptions.main) {
         const mainPath = path.resolve(root, buildOptions.main);
         entryPoints['main'] = [mainPath];
@@ -78,7 +78,7 @@ function getCommonConfig(wco) {
             });
         }
     }
-    const differentialLoadingMode = !!wco.differentialLoadingMode;
+    const differentialLoadingMode = buildOptions.differentialLoadingMode;
     if (wco.buildOptions.platform !== 'server') {
         if (differentialLoadingMode || tsConfig.options.target === typescript_1.ScriptTarget.ES5) {
             const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);

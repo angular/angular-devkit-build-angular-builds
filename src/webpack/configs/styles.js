@@ -208,9 +208,6 @@ function getStylesConfig(wco) {
                     buildOptions.extractCss
                         ? {
                             loader: MiniCssExtractPlugin.loader,
-                            options: {
-                                hmr: buildOptions.hmr,
-                            },
                         }
                         : require.resolve('style-loader'),
                     {
@@ -232,11 +229,13 @@ function getStylesConfig(wco) {
         }));
     }
     if (buildOptions.extractCss) {
-        extraPlugins.push(
-        // extract global css from js files into own css file
-        new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }), 
-        // suppress empty .js files in css only entry points
-        new plugins_1.SuppressExtractedTextChunksWebpackPlugin());
+        // extract global css from js files into own css file.
+        extraPlugins.push(new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }));
+        if (!buildOptions.hmr) {
+            // don't remove `.js` files for `.css` when we are using HMR these contain HMR accept codes.
+            // suppress empty .js files in css only entry points.
+            extraPlugins.push(new plugins_1.SuppressExtractedTextChunksWebpackPlugin());
+        }
     }
     return {
         entry: entryPoints,

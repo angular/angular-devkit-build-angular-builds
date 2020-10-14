@@ -54,7 +54,10 @@ class SuppressExtractedTextChunksWebpackPlugin {
                             const name = dependency.constructor.name;
                             return (name === 'CssDependency' ||
                                 name === 'SingleEntryDependency' ||
-                                name === 'MultiEntryDependency');
+                                name === 'MultiEntryDependency' ||
+                                name === 'HarmonyCompatibilityDependency' ||
+                                name === 'HarmonyExportHeaderDependency' ||
+                                name === 'HarmonyInitDependency');
                         });
                         if (!cssOnly) {
                             break;
