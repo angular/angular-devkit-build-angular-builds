@@ -26,6 +26,7 @@ const color_1 = require("../utils/color");
 const copy_assets_1 = require("../utils/copy-assets");
 const environment_options_1 = require("../utils/environment-options");
 const i18n_inlining_1 = require("../utils/i18n-inlining");
+const transforms_1 = require("../utils/index-file/transforms");
 const write_index_html_1 = require("../utils/index-file/write-index-html");
 const output_paths_1 = require("../utils/output-paths");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
@@ -151,6 +152,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     operators_1.switchMap(({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target }) => {
         const useBundleDownleveling = isDifferentialLoadingNeeded && !options.watch;
         const startTime = Date.now();
+        const normalizedOptimization = utils_1.normalizeOptimization(options.optimization);
+        const indexTransforms = transforms_1.getHtmlTransforms(normalizedOptimization, buildBrowserFeatures, transforms.indexHtml);
         return build_webpack_1.runWebpack(config, context, {
             webpackFactory: require('webpack'),
             logging: transforms.logging ||
@@ -207,7 +210,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     // Common options for all bundle process actions
                     const sourceMapOptions = utils_1.normalizeSourceMaps(options.sourceMap || false);
                     const actionOptions = {
-                        optimize: utils_1.normalizeOptimization(options.optimization).scripts,
+                        optimize: normalizedOptimization.scripts,
                         sourceMaps: sourceMapOptions.scripts,
                         hiddenSourceMaps: sourceMapOptions.hidden,
                         vendorSourceMaps: sourceMapOptions.vendor,
@@ -511,7 +514,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 sri: options.subresourceIntegrity,
                                 scripts: options.scripts,
                                 styles: options.styles,
-                                postTransform: transforms.indexHtml,
+                                postTransforms: indexTransforms,
                                 crossOrigin: options.crossOrigin,
                                 // i18nLocale is used when Ivy is disabled
                                 lang: locale || options.i18nLocale,

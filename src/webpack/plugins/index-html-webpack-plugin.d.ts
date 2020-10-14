@@ -10,7 +10,7 @@ export interface IndexHtmlWebpackPluginOptions {
     sri: boolean;
     noModuleEntrypoints: string[];
     moduleEntrypoints: string[];
-    postTransform?: IndexHtmlTransform;
+    postTransforms: IndexHtmlTransform[];
     crossOrigin?: CrossOriginValue;
     lang?: string;
 }

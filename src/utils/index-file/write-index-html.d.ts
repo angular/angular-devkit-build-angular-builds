@@ -21,9 +21,9 @@ export interface WriteIndexHtmlOptions {
     sri?: boolean;
     scripts?: ExtraEntryPoint[];
     styles?: ExtraEntryPoint[];
-    postTransform?: IndexHtmlTransform;
+    postTransforms: IndexHtmlTransform[];
     crossOrigin?: CrossOriginValue;
     lang?: string;
 }
 export declare type IndexHtmlTransform = (content: string) => Promise<string>;
-export declare function writeIndexHtml({ host, outputPath, indexPath, files, noModuleFiles, moduleFiles, baseHref, deployUrl, sri, scripts, styles, postTransform, crossOrigin, lang, }: WriteIndexHtmlOptions): Promise<void>;
+export declare function writeIndexHtml({ host, outputPath, indexPath, files, noModuleFiles, moduleFiles, baseHref, deployUrl, sri, scripts, styles, postTransforms, crossOrigin, lang, }: WriteIndexHtmlOptions): Promise<void>;

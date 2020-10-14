@@ -317,6 +317,10 @@ export declare type Localize = string[] | boolean;
 export declare type OptimizationUnion = boolean | OptimizationClass;
 export interface OptimizationClass {
     /**
+     * Enables optimization for fonts. This requires internet access.
+     */
+    fonts?: FontsUnion;
+    /**
      * Enables optimization of the scripts output.
      */
     scripts?: boolean;
@@ -324,6 +328,17 @@ export interface OptimizationClass {
      * Enables optimization of the styles output.
      */
     styles?: boolean;
+}
+/**
+ * Enables optimization for fonts. This requires internet access.
+ */
+export declare type FontsUnion = boolean | FontsClass;
+export interface FontsClass {
+    /**
+     * Reduce render blocking requests by inlining external fonts in the application's HTML
+     * index file. This requires internet access.
+     */
+    inline?: boolean;
 }
 /**
  * Define the output filename cache-busting hashing mode.

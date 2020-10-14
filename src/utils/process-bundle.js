@@ -10,6 +10,7 @@ exports.inlineLocales = exports.createI18nPlugins = exports.process = exports.se
  */
 const core_1 = require("@babel/core");
 const template_1 = require("@babel/template");
+const cacache = require("cacache");
 const crypto_1 = require("crypto");
 const fs = require("fs");
 const path = require("path");
@@ -19,7 +20,6 @@ const v8 = require("v8");
 const webpack_sources_1 = require("webpack-sources");
 const environment_options_1 = require("./environment-options");
 const webpack_version_1 = require("./webpack-version");
-const cacache = require('cacache');
 const deserialize = v8.deserialize;
 // If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
 const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
@@ -35,7 +35,7 @@ function setup(data) {
 exports.setup = setup;
 async function cachePut(content, key, integrity) {
     if (cachePath && key) {
-        await cacache.put(cachePath, key || null, content, {
+        await cacache.put(cachePath, key, content, {
             metadata: { integrity },
         });
     }

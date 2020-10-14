@@ -32,6 +32,7 @@ class IndexHtmlWebpackPlugin {
             noModuleEntrypoints: [],
             moduleEntrypoints: [],
             sri: false,
+            postTransforms: [],
             ...options,
         };
     }
@@ -78,8 +79,8 @@ class IndexHtmlWebpackPlugin {
                 entrypoints: this._options.entrypoints,
                 lang: this._options.lang,
             });
-            if (this._options.postTransform) {
-                indexSource = await this._options.postTransform(indexSource);
+            for (const transform of this._options.postTransforms) {
+                indexSource = await transform(indexSource);
             }
             // Add to compilation assets
             compilation.assets[this._options.output] = new webpack_sources_1.RawSource(indexSource);

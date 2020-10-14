@@ -13,7 +13,7 @@ const path_1 = require("path");
 const package_chunk_sort_1 = require("../package-chunk-sort");
 const strip_bom_1 = require("../strip-bom");
 const augment_index_html_1 = require("./augment-index-html");
-async function writeIndexHtml({ host, outputPath, indexPath, files = [], noModuleFiles = [], moduleFiles = [], baseHref, deployUrl, sri = false, scripts = [], styles = [], postTransform, crossOrigin, lang, }) {
+async function writeIndexHtml({ host, outputPath, indexPath, files = [], noModuleFiles = [], moduleFiles = [], baseHref, deployUrl, sri = false, scripts = [], styles = [], postTransforms, crossOrigin, lang, }) {
     const readFile = async (filePath) => core_1.virtualFs.fileBufferToString(await host.read(core_1.normalize(filePath)).toPromise());
     let content = await augment_index_html_1.augmentIndexHtml({
         input: outputPath,
@@ -29,8 +29,8 @@ async function writeIndexHtml({ host, outputPath, indexPath, files = [], noModul
         moduleFiles: filterAndMapBuildFiles(moduleFiles, '.js'),
         loadOutputFile: filePath => readFile(path_1.join(path_1.dirname(outputPath), filePath)),
     });
-    if (postTransform) {
-        content = await postTransform(content);
+    for (const transform of postTransforms) {
+        content = await transform(content);
     }
     await host.write(core_1.normalize(outputPath), core_1.virtualFs.stringToFileBuffer(content)).toPromise();
 }

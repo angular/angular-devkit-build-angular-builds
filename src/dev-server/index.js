@@ -23,6 +23,7 @@ const browser_1 = require("../browser");
 const utils_1 = require("../utils");
 const cache_path_1 = require("../utils/cache-path");
 const check_port_1 = require("../utils/check-port");
+const transforms_1 = require("../utils/index-file/transforms");
 const package_chunk_sort_1 = require("../utils/package-chunk-sort");
 const process_bundle_1 = require("../utils/process-bundle");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
@@ -32,7 +33,6 @@ const webpack_diagnostics_1 = require("../utils/webpack-diagnostics");
 const configs_1 = require("../webpack/configs");
 const index_html_webpack_plugin_1 = require("../webpack/plugins/index-html-webpack-plugin");
 const stats_1 = require("../webpack/utils/stats");
-const open = require('open');
 const devServerBuildOverriddenKeys = [
     'watch',
     'optimization',
@@ -128,6 +128,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 },
             });
         }
+        const normalizedOptimization = utils_1.normalizeOptimization(browserOptions.optimization);
         if (browserOptions.index) {
             const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
             const { options: compilerOptions } = read_tsconfig_1.readTsconfig(tsConfig, context.workspaceRoot);
@@ -146,12 +147,11 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 deployUrl: browserOptions.deployUrl,
                 sri: browserOptions.subresourceIntegrity,
                 noModuleEntrypoints: ['polyfills-es5'],
-                postTransform: transforms.indexHtml,
+                postTransforms: transforms_1.getHtmlTransforms(normalizedOptimization, buildBrowserFeatures, transforms.indexHtml),
                 crossOrigin: browserOptions.crossOrigin,
                 lang: browserOptions.i18nLocale,
             }));
         }
-        const normalizedOptimization = utils_1.normalizeOptimization(browserOptions.optimization);
         if (normalizedOptimization.scripts || normalizedOptimization.styles) {
             context.logger.error(core_1.tags.stripIndents `
           ****************************************************************************************
@@ -183,6 +183,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
               **
             `);
                 if (options.open) {
+                    const open = require('open');
                     open(serverAddress);
                 }
             }
