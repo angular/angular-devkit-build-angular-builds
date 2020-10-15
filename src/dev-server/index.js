@@ -95,9 +95,10 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             webpackDevServerConfig,
             port,
             projectRoot,
+            locale: browserOptions.i18nLocale || (i18n.shouldInline ? [...i18n.inlineLocales][0] : undefined),
         };
     }
-    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, projectRoot }) => {
+    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, port, projectRoot, locale }) => {
         options.port = port;
         // Resolve public host and client address.
         let clientAddress = url.parse(`${options.ssl ? 'https' : 'http'}://0.0.0.0:0`);
@@ -149,7 +150,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 noModuleEntrypoints: ['polyfills-es5'],
                 postTransform: transforms.indexHtml,
                 crossOrigin: browserOptions.crossOrigin,
-                lang: browserOptions.i18nLocale,
+                lang: locale,
             }));
         }
         const normalizedOptimization = utils_2.normalizeOptimization(browserOptions.optimization);
