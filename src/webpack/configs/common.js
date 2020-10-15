@@ -209,6 +209,7 @@ function getCommonConfig(wco) {
                 to: output.replace(/^\//, ''),
                 from: glob,
                 noErrorOnMissing: true,
+                force: true,
                 globOptions: {
                     dot: true,
                     ignore: [
