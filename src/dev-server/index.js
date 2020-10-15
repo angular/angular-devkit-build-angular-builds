@@ -94,9 +94,10 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             webpackConfig,
             webpackDevServerConfig,
             projectRoot,
+            locale: browserOptions.i18nLocale || (i18n.shouldInline ? [...i18n.inlineLocales][0] : undefined),
         };
     }
-    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, projectRoot }) => {
+    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, webpackDevServerConfig, projectRoot, locale }) => {
         // Resolve public host and client address.
         let clientAddress = url.parse(`${options.ssl ? 'https' : 'http'}://0.0.0.0:0`);
         if (options.publicHost) {
@@ -148,7 +149,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 noModuleEntrypoints: ['polyfills-es5'],
                 postTransforms: transforms_1.getHtmlTransforms(normalizedOptimization, buildBrowserFeatures, transforms.indexHtml),
                 crossOrigin: browserOptions.crossOrigin,
-                lang: browserOptions.i18nLocale,
+                lang: locale,
             }));
         }
         if (normalizedOptimization.scripts || normalizedOptimization.styles) {
