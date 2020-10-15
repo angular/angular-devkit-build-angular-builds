@@ -35,7 +35,7 @@ export interface Schema {
      */
     disableHostCheck?: boolean;
     /**
-     * Custom HTTP headers to serve.
+     * Custom HTTP headers to be added to all responses.
      */
     headers?: {
         [key: string]: string;
