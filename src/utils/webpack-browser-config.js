@@ -142,21 +142,21 @@ async function generateBrowserWebpackConfigFromContext(options, context, webpack
     };
 }
 exports.generateBrowserWebpackConfigFromContext = generateBrowserWebpackConfigFromContext;
-function getIndexOutputFile(options) {
-    if (typeof options.index === 'string') {
-        return path.basename(options.index);
+function getIndexOutputFile(index) {
+    if (typeof index === 'string') {
+        return path.basename(index);
     }
     else {
-        return options.index.output || 'index.html';
+        return index.output || 'index.html';
     }
 }
 exports.getIndexOutputFile = getIndexOutputFile;
-function getIndexInputFile(options) {
-    if (typeof options.index === 'string') {
-        return options.index;
+function getIndexInputFile(index) {
+    if (typeof index === 'string') {
+        return index;
     }
     else {
-        return options.index.input;
+        return index.input;
     }
 }
 exports.getIndexInputFile = getIndexInputFile;

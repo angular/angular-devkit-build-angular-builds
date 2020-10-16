@@ -24,6 +24,7 @@ class CommonJsUsageWarnPlugin {
         // https://github.com/angular/angular-cli/blob/1e258317b1f6ec1e957ee3559cc3b28ba602f3ba/packages/angular_devkit/build_angular/src/dev-server/index.ts#L605-L638
         this.allowedDependencies = new Set([
             'webpack/hot/dev-server',
+            'webpack/hot/only-dev-server',
             '@angular-devkit/build-angular',
         ]);
         (_a = this.options.allowedDependencies) === null || _a === void 0 ? void 0 : _a.forEach(d => this.allowedDependencies.add(d));

@@ -7,7 +7,8 @@
  */
 import { logging } from '@angular-devkit/core';
 import { ParsedConfiguration } from '@angular/compiler-cli';
-import { AssetPatternClass, Budget, CrossOrigin, ExtraEntryPoint, I18NMissingTranslation, Localize, OptimizationClass, SourceMapClass } from '../browser/schema';
+import { AssetPatternClass, Budget, CrossOrigin, ExtraEntryPoint, I18NMissingTranslation, IndexUnion, Localize, OptimizationClass, SourceMapClass } from '../browser/schema';
+import { Schema as DevServerSchema } from '../dev-server/schema';
 import { NormalizedFileReplacement } from './normalize-file-replacements';
 export interface BuildOptions {
     optimization: OptimizationClass;
@@ -37,6 +38,7 @@ export interface BuildOptions {
     watch?: boolean;
     outputHashing?: string;
     poll?: number;
+    index?: IndexUnion;
     deleteOutputPath?: boolean;
     preserveSymlinks?: boolean;
     extractLicenses?: boolean;
@@ -72,6 +74,8 @@ export interface BuildOptions {
 export interface WebpackTestOptions extends BuildOptions {
     codeCoverage?: boolean;
     codeCoverageExclude?: string[];
+}
+export interface WebpackDevServerOptions extends BuildOptions, Omit<DevServerSchema, 'optimization' | 'sourceMap' | 'browserTarget'> {
 }
 export interface WebpackConfigOptions<T = BuildOptions> {
     root: string;

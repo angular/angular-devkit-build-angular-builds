@@ -105,7 +105,6 @@ const init = (config, emitter, customFileHandlers) => {
         // Hide webpack output because its noisy.
         logLevel: 'error',
         stats: false,
-        watchOptions: { poll: options.poll },
         publicPath: '/_karma_webpack_/',
     };
     const compilationErrorCb = (error, errors) => {
