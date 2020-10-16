@@ -1,4 +1,3 @@
-/// <reference types="node" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -8,13 +7,11 @@
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
-import { json, virtualFs } from '@angular-devkit/core';
-import * as fs from 'fs';
+import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
-import { NormalizedBrowserBuilderSchema } from '../utils';
-import { I18nOptions } from '../utils/i18n-options';
+import { WebpackConfigOptions } from '../utils/build-options';
 import { IndexHtmlTransform } from '../utils/index-file/write-index-html';
 import { Schema as BrowserBuilderSchema } from './schema';
 export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
@@ -25,13 +22,8 @@ export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
      */
     outputPath: string;
 };
-interface ConfigFromContextReturn {
-    config: webpack.Configuration;
-    projectRoot: string;
-    projectSourceRoot?: string;
-    i18n: I18nOptions;
-}
-export declare function buildBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, host?: virtualFs.Host<fs.Stats>, extraBuildOptions?: Partial<NormalizedBrowserBuilderSchema>): Promise<ConfigFromContextReturn>;
+export declare function getAnalyticsConfig(wco: WebpackConfigOptions, context: BuilderContext): webpack.Configuration;
+export declare function getCompilerConfig(wco: WebpackConfigOptions): webpack.Configuration;
 export declare function buildWebpackBrowser(options: BrowserBuilderSchema, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
     logging?: WebpackLoggingCallback;

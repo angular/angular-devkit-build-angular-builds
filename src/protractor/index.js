@@ -74,7 +74,10 @@ async function execute(options, context) {
     if (options.devServerTarget) {
         const target = architect_1.targetFromTargetString(options.devServerTarget);
         const serverOptions = await context.getTargetOptions(target);
-        const overrides = { watch: false };
+        const overrides = {
+            watch: false,
+            liveReload: false,
+        };
         if (options.host !== undefined) {
             overrides.host = options.host;
         }

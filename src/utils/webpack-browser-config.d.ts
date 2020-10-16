@@ -27,5 +27,5 @@ export declare function generateBrowserWebpackConfigFromContext(options: Browser
     projectRoot: string;
     projectSourceRoot?: string;
 }>;
-export declare function getIndexOutputFile(options: BrowserBuilderSchema): string;
-export declare function getIndexInputFile(options: BrowserBuilderSchema): string;
+export declare function getIndexOutputFile(index: BrowserBuilderSchema['index']): string;
+export declare function getIndexInputFile(index: BrowserBuilderSchema['index']): string;

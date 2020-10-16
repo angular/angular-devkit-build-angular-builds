@@ -7,10 +7,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isPolyfillsEntry = exports.getEsVersionForFileName = exports.getSourceMapDevTool = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
+exports.getWatchOptions = exports.isPolyfillsEntry = exports.getEsVersionForFileName = exports.getSourceMapDevTool = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
 const core_1 = require("@angular-devkit/core");
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
+const webpack_version_1 = require("../../utils/webpack-version");
 function getOutputHashFormat(option, length = 20) {
     const hashFormats = {
         none: { chunk: '', extract: '', file: '', script: '' },
@@ -91,3 +92,10 @@ function isPolyfillsEntry(name) {
     return name === 'polyfills' || name === 'polyfills-es5';
 }
 exports.isPolyfillsEntry = isPolyfillsEntry;
+function getWatchOptions(poll) {
+    return {
+        poll,
+        ignored: poll === undefined ? undefined : webpack_version_1.withWebpackFourOrFive(/[\\\/]node_modules[\\\/]/, 'node_modules/**'),
+    };
+}
+exports.getWatchOptions = getWatchOptions;

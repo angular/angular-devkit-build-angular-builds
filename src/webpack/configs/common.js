@@ -393,12 +393,7 @@ function getCommonConfig(wco) {
             filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
         },
         watch: buildOptions.watch,
-        watchOptions: {
-            poll: buildOptions.poll,
-            ignored: buildOptions.poll === undefined
-                ? undefined
-                : webpack_version_1.withWebpackFourOrFive(/[\\\/]node_modules[\\\/]/, 'node_modules/**'),
-        },
+        watchOptions: helpers_1.getWatchOptions(buildOptions.poll),
         performance: {
             hints: false,
         },
