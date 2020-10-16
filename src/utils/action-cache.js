@@ -27,15 +27,19 @@ class BundleActionCache {
             fs.chmodSync(dest, 0o644);
         }
     }
-    generateBaseCacheKey(content) {
-        // Create base cache key with elements:
-        // * package version - different build-angular versions cause different final outputs
-        // * code length/hash - ensure cached version matches the same input code
+    generateIntegrityValue(content) {
         const algorithm = this.integrityAlgorithm || 'sha1';
         const codeHash = crypto_1.createHash(algorithm)
             .update(content)
             .digest('base64');
-        let baseCacheKey = `${packageVersion}|${content.length}|${algorithm}-${codeHash}`;
+        return `${algorithm}-${codeHash}`;
+    }
+    generateBaseCacheKey(content) {
+        // Create base cache key with elements:
+        // * package version - different build-angular versions cause different final outputs
+        // * code length/hash - ensure cached version matches the same input code
+        const integrity = this.generateIntegrityValue(content);
+        let baseCacheKey = `${packageVersion}|${content.length}|${integrity}`;
         if (!environment_options_1.allowMangle) {
             baseCacheKey += '|MD';
         }
@@ -96,7 +100,10 @@ class BundleActionCache {
         if (!entries) {
             return null;
         }
-        const result = { name: action.name };
+        const result = {
+            name: action.name,
+            integrity: this.generateIntegrityValue(action.code),
+        };
         let cacheEntry = entries[0 /* OriginalCode */];
         if (cacheEntry) {
             result.original = {
