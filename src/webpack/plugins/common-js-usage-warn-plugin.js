@@ -16,23 +16,14 @@ const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequ
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
 class CommonJsUsageWarnPlugin {
     constructor(options = {}) {
-        var _a;
         this.options = options;
         this.shownWarnings = new Set();
-        // Allow the below dependency for HMR
-        // tslint:disable-next-line: max-line-length
-        // https://github.com/angular/angular-cli/blob/1e258317b1f6ec1e957ee3559cc3b28ba602f3ba/packages/angular_devkit/build_angular/src/dev-server/index.ts#L605-L638
-        this.allowedDependencies = new Set([
-            'webpack/hot/dev-server',
-            'webpack/hot/only-dev-server',
-            '@angular-devkit/build-angular',
-        ]);
-        (_a = this.options.allowedDependencies) === null || _a === void 0 ? void 0 : _a.forEach(d => this.allowedDependencies.add(d));
+        this.allowedDependencies = new Set(this.options.allowedDependencies);
     }
     apply(compiler) {
         compiler.hooks.compilation.tap('CommonJsUsageWarnPlugin', compilation => {
             compilation.hooks.finishModules.tap('CommonJsUsageWarnPlugin', modules => {
-                var _a, _b;
+                var _a;
                 for (const module of modules) {
                     const { dependencies, rawRequest } = module;
                     if (!rawRequest ||
@@ -68,7 +59,7 @@ class CommonJsUsageWarnPlugin {
                         // Only show warnings for modules from main entrypoint.
                         // And if the issuer request is not from 'webpack-dev-server', as 'webpack-dev-server'
                         // will require CommonJS libraries for live reloading such as 'sockjs-node'.
-                        if ((mainIssuer === null || mainIssuer === void 0 ? void 0 : mainIssuer.name) === 'main' && !((_b = issuer === null || issuer === void 0 ? void 0 : issuer.userRequest) === null || _b === void 0 ? void 0 : _b.includes('webpack-dev-server'))) {
+                        if ((mainIssuer === null || mainIssuer === void 0 ? void 0 : mainIssuer.name) === 'main') {
                             const warning = `${issuer === null || issuer === void 0 ? void 0 : issuer.userRequest} depends on '${rawRequest}'. ` +
                                 'CommonJS or AMD dependencies can cause optimization bailouts.\n' +
                                 'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
