@@ -166,7 +166,6 @@ function getStylesConfig(wco) {
                     deployUrl: buildOptions.deployUrl,
                     resourcesOutputPath: buildOptions.resourcesOutputPath,
                     loader,
-                    rebaseRootRelative: buildOptions.rebaseRootRelativeCssUrls,
                     filename: `[name]${hashFormat.file}.[ext]`,
                     emitFile: buildOptions.platform !== 'server',
                     extracted,
