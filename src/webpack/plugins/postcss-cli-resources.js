@@ -34,14 +34,13 @@ exports.default = postcss.plugin('postcss-cli-resources', (options) => {
     if (!options) {
         throw new Error('No options were specified to "postcss-cli-resources".');
     }
-    const { deployUrl = '', baseHref = '', resourcesOutputPath = '', rebaseRootRelative = false, filename, loader, emitFile, extracted, } = options;
-    const dedupeSlashes = (url) => url.replace(/\/\/+/g, '/');
+    const { deployUrl = '', baseHref = '', resourcesOutputPath = '', filename, loader, emitFile, extracted, } = options;
     const process = async (inputUrl, context, resourceCache) => {
         // If root-relative, absolute or protocol relative url, leave as is
         if (/^((?:\w+:)?\/\/|data:|chrome:|#)/.test(inputUrl)) {
             return inputUrl;
         }
-        if (!rebaseRootRelative && /^\//.test(inputUrl)) {
+        if (/^\//.test(inputUrl)) {
             return inputUrl;
         }
         // If starts with a caret, remove and return remainder
@@ -53,23 +52,6 @@ exports.default = postcss.plugin('postcss-cli-resources', (options) => {
         const cachedUrl = resourceCache.get(cacheKey);
         if (cachedUrl) {
             return cachedUrl;
-        }
-        if (rebaseRootRelative && inputUrl.startsWith('/')) {
-            let outputUrl = '';
-            if (deployUrl.match(/:\/\//) || deployUrl.startsWith('/')) {
-                // If deployUrl is absolute or root relative, ignore baseHref & use deployUrl as is.
-                outputUrl = `${deployUrl.replace(/\/$/, '')}${inputUrl}`;
-            }
-            else if (baseHref.match(/:\/\//)) {
-                // If baseHref contains a scheme, include it as is.
-                outputUrl = baseHref.replace(/\/$/, '') + dedupeSlashes(`/${deployUrl}/${inputUrl}`);
-            }
-            else {
-                // Join together base-href, deploy-url and the original URL.
-                outputUrl = dedupeSlashes(`/${baseHref}/${deployUrl}/${inputUrl}`);
-            }
-            resourceCache.set(cacheKey, outputUrl);
-            return outputUrl;
         }
         if (inputUrl.startsWith('~')) {
             inputUrl = inputUrl.substr(1);

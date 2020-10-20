@@ -140,13 +140,6 @@ export interface Schema {
      */
     progress?: boolean;
     /**
-     * Change root relative URLs in stylesheets to include base HREF and deploy URL. Use only
-     * for compatibility and transition. The behavior of this option is non-standard and will be
-     * removed in the next major release.
-     * @deprecated
-     */
-    rebaseRootRelativeCssUrls?: boolean;
-    /**
      * The path where style resources will be placed, relative to outputPath.
      */
     resourcesOutputPath?: string;
