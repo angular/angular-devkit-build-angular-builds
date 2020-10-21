@@ -200,6 +200,11 @@ export interface Schema {
 export declare type AssetPattern = AssetPatternClass | string;
 export interface AssetPatternClass {
     /**
+     * Allow glob patterns to follow symlink directories. This allows subdirectories of the
+     * symlink to be searched.
+     */
+    followSymlinks?: boolean;
+    /**
      * The pattern to match.
      */
     glob: string;
