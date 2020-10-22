@@ -19,6 +19,11 @@ export interface Schema {
      */
     codeCoverageExclude?: string[];
     /**
+     * Defines the build environment.
+     * @deprecated This option has no effect.
+     */
+    environment?: string;
+    /**
      * Replace compilation source files with other compilation source files in the build.
      */
     fileReplacements?: FileReplacement[];
@@ -128,6 +133,10 @@ export interface ExtraEntryPointClass {
      * The file to include.
      */
     input: string;
+    /**
+     * If the bundle will be lazy loaded.
+     */
+    lazy?: boolean;
 }
 /**
  * Output sourcemaps.

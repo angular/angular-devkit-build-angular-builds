@@ -73,26 +73,6 @@
               "type": "boolean",
               "description": "Enables optimization of the styles output.",
               "default": true
-            },
-            "fonts": {
-              "description": "Enables optimization for fonts. This requires internet access.",
-              "default": true,
-              "oneOf": [
-                {
-                  "type": "object",
-                  "properties": {
-                    "inline": {
-                      "type": "boolean",
-                      "description": "Reduce render blocking requests by inlining external fonts in the application's HTML index file. This requires internet access.",
-                      "default": true
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                {
-                  "type": "boolean"
-                }
-              ]
             }
           },
           "additionalProperties": false
@@ -227,9 +207,8 @@
     },
     "extractCss": {
       "type": "boolean",
-      "description": "Extract CSS from global styles into '.css' files instead of '.js'.",
-      "default": true,
-      "x-deprecated": "Deprecated since version 11.0. No longer required to disable CSS extraction for HMR."
+      "description": "Extract css from global styles into css files instead of js ones.",
+      "default": false
     },
     "watch": {
       "type": "boolean",
@@ -348,6 +327,12 @@
       },
       "default": []
     },
+    "rebaseRootRelativeCssUrls": {
+      "description": "Change root relative URLs in stylesheets to include base HREF and deploy URL. Use only for compatibility and transition. The behavior of this option is non-standard and will be removed in the next major release.",
+      "type": "boolean",
+      "default": false,
+      "x-deprecated": true
+    },
     "webWorkerTsConfig": {
       "type": "string",
       "description": "TypeScript configuration for Web Worker modules."
@@ -389,11 +374,6 @@
         {
           "type": "object",
           "properties": {
-            "followSymlinks": {
-              "type": "boolean",
-              "default": false,
-              "description": "Allow glob patterns to follow symlink directories. This allows subdirectories of the symlink to be searched."
-            },
             "glob": {
               "type": "string",
               "description": "The pattern to match."
@@ -474,6 +454,12 @@
             "bundleName": {
               "type": "string",
               "description": "The bundle name for this extra entry point."
+            },
+            "lazy": {
+              "type": "boolean",
+              "description": "If the bundle will be lazy loaded.",
+              "default": false,
+              "x-deprecated": "Use 'inject' option with 'false' value instead."
             },
             "inject": {
               "type": "boolean",

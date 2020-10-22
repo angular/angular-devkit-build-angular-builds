@@ -8,11 +8,11 @@ exports.BundleActionCache = void 0;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const cacache = require("cacache");
 const crypto_1 = require("crypto");
 const fs = require("fs");
 const copy_file_1 = require("./copy-file");
 const environment_options_1 = require("./environment-options");
+const cacache = require('cacache');
 const packageVersion = require('../../package.json').version;
 class BundleActionCache {
     constructor(cachePath, integrityAlgorithm) {
@@ -85,7 +85,6 @@ class BundleActionCache {
                 }
                 cacheEntries.push({
                     path: entry.path,
-                    // tslint:disable-next-line: no-any
                     size: entry.size,
                     integrity: entry.metadata && entry.metadata.integrity,
                 });

@@ -15,14 +15,13 @@ const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const typescript_1 = require("typescript");
+const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
+const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
 const utils_1 = require("../utils");
 const i18n_inlining_1 = require("../utils/i18n-inlining");
 const output_paths_1 = require("../utils/output-paths");
-const read_tsconfig_1 = require("../utils/read-tsconfig");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
-const configs_1 = require("../webpack/configs");
-const stats_1 = require("../webpack/utils/stats");
 function execute(options, context, transforms = {}) {
     const root = context.workspaceRoot;
     // Check Angular version.
@@ -42,7 +41,7 @@ function execute(options, context, transforms = {}) {
             !__processed_by_ivy_ngcc__.main ||
             main.includes('__ivy_ngcc__')) {
             context.logger.warn(core_1.tags.stripIndent `
-      Warning: Turning off 'bundleDependencies' with Ivy may result in undefined behaviour
+      WARNING: Turning off 'bundleDependencies' with Ivy may result in undefined behaviour
       unless 'node_modules' are transformed using the standalone Angular compatibility compiler (NGCC).
       See: http://v9.angular.io/guide/ivy#ivy-and-universal-app-shell
     `);
@@ -51,7 +50,6 @@ function execute(options, context, transforms = {}) {
     return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.concatMap(({ config, i18n }) => {
         return build_webpack_1.runWebpack(config, context, {
             webpackFactory: require('webpack'),
-            logging: stats_1.createWebpackLoggingCallback(!!options.verbose, context.logger),
         }).pipe(operators_1.concatMap(async (output) => {
             const { emittedFiles = [], webpackStats } = output;
             if (!output.success || !i18n.shouldInline) {
@@ -88,11 +86,11 @@ async function initialize(options, context, webpackConfigurationTransform) {
         aot: true,
         platform: 'server',
     }, context, wco => [
-        configs_1.getCommonConfig(wco),
-        configs_1.getServerConfig(wco),
-        configs_1.getStylesConfig(wco),
-        configs_1.getStatsConfig(wco),
-        configs_1.getAotConfig(wco),
+        webpack_configs_1.getCommonConfig(wco),
+        webpack_configs_1.getServerConfig(wco),
+        webpack_configs_1.getStylesConfig(wco),
+        webpack_configs_1.getStatsConfig(wco),
+        webpack_configs_1.getAotConfig(wco),
     ]);
     let transformedConfig;
     if (webpackConfigurationTransform) {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildWebpackBrowser = exports.getCompilerConfig = exports.getAnalyticsConfig = void 0;
+exports.buildWebpackBrowser = exports.buildBrowserWebpackConfigFromContext = exports.createBrowserLoggingCallback = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -13,32 +13,63 @@ const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const node_1 = require("@angular-devkit/core/node");
 const fs = require("fs");
-const ora = require("ora");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const typescript_1 = require("typescript");
+const analytics_1 = require("../../plugins/webpack/analytics");
+const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
+const async_chunks_1 = require("../angular-cli-files/utilities/async-chunks");
+const bundle_calculator_1 = require("../angular-cli-files/utilities/bundle-calculator");
+const write_index_html_1 = require("../angular-cli-files/utilities/index-file/write-index-html");
+const read_tsconfig_1 = require("../angular-cli-files/utilities/read-tsconfig");
+const service_worker_1 = require("../angular-cli-files/utilities/service-worker");
+const stats_1 = require("../angular-cli-files/utilities/stats");
 const utils_1 = require("../utils");
 const action_executor_1 = require("../utils/action-executor");
-const bundle_calculator_1 = require("../utils/bundle-calculator");
 const cache_path_1 = require("../utils/cache-path");
-const color_1 = require("../utils/color");
 const copy_assets_1 = require("../utils/copy-assets");
 const environment_options_1 = require("../utils/environment-options");
 const i18n_inlining_1 = require("../utils/i18n-inlining");
-const transforms_1 = require("../utils/index-file/transforms");
-const write_index_html_1 = require("../utils/index-file/write-index-html");
 const output_paths_1 = require("../utils/output-paths");
-const read_tsconfig_1 = require("../utils/read-tsconfig");
-const service_worker_1 = require("../utils/service-worker");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
-const webpack_version_1 = require("../utils/webpack-version");
-const configs_1 = require("../webpack/configs");
-const analytics_1 = require("../webpack/plugins/analytics");
-const async_chunks_1 = require("../webpack/utils/async-chunks");
-const stats_1 = require("../webpack/utils/stats");
 const cacheDownlevelPath = environment_options_1.cachingDisabled ? undefined : cache_path_1.findCachePath('angular-build-dl');
+function createBrowserLoggingCallback(verbose, logger) {
+    return (stats, config) => {
+        // config.stats contains our own stats settings, added during buildWebpackConfig().
+        const json = stats.toJson(config.stats);
+        if (verbose) {
+            logger.info(stats.toString(config.stats));
+        }
+        else {
+            logger.info(stats_1.statsToString(json, config.stats));
+        }
+        if (stats_1.statsHasWarnings(json)) {
+            logger.warn(stats_1.statsWarningsToString(json, config.stats));
+        }
+        if (stats_1.statsHasErrors(json)) {
+            logger.error(stats_1.statsErrorsToString(json, config.stats));
+        }
+    };
+}
+exports.createBrowserLoggingCallback = createBrowserLoggingCallback;
+async function buildBrowserWebpackConfigFromContext(options, context, host = new node_1.NodeJsSyncHost(), i18n = false) {
+    const webpackPartialGenerator = (wco) => [
+        webpack_configs_1.getCommonConfig(wco),
+        webpack_configs_1.getBrowserConfig(wco),
+        webpack_configs_1.getStylesConfig(wco),
+        webpack_configs_1.getStatsConfig(wco),
+        getAnalyticsConfig(wco, context),
+        getCompilerConfig(wco),
+        wco.buildOptions.webWorkerTsConfig ? webpack_configs_1.getWorkerConfig(wco) : {},
+    ];
+    if (i18n) {
+        return webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host);
+    }
+    return webpack_browser_config_1.generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host);
+}
+exports.buildBrowserWebpackConfigFromContext = buildBrowserWebpackConfigFromContext;
 function getAnalyticsConfig(wco, context) {
     if (context.analytics) {
         // If there's analytics, add our plugin. Otherwise no need to slow down the build.
@@ -55,34 +86,18 @@ function getAnalyticsConfig(wco, context) {
     }
     return {};
 }
-exports.getAnalyticsConfig = getAnalyticsConfig;
 function getCompilerConfig(wco) {
     if (wco.buildOptions.main || wco.buildOptions.polyfills) {
-        return wco.buildOptions.aot ? configs_1.getAotConfig(wco) : configs_1.getNonAotConfig(wco);
+        return wco.buildOptions.aot ? webpack_configs_1.getAotConfig(wco) : webpack_configs_1.getNonAotConfig(wco);
     }
     return {};
 }
-exports.getCompilerConfig = getCompilerConfig;
-async function initialize(options, context, host, differentialLoadingMode, webpackConfigurationTransform) {
+async function initialize(options, context, host, webpackConfigurationTransform) {
     var _a, _b;
     const originalOutputPath = options.outputPath;
     // Assets are processed directly by the builder except when watching
     const adjustedOptions = options.watch ? options : { ...options, assets: [] };
-    // TODO_WEBPACK_5: Investigate build/serve issues with the `license-webpack-plugin` package
-    if (adjustedOptions.extractLicenses && webpack_version_1.isWebpackFiveOrHigher()) {
-        adjustedOptions.extractLicenses = false;
-        context.logger.warn('Warning: License extraction is currently disabled when using Webpack 5. ' +
-            'This is temporary and will be corrected in a future update.');
-    }
-    const { config, projectRoot, projectSourceRoot, i18n, } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, wco => [
-        configs_1.getCommonConfig(wco),
-        configs_1.getBrowserConfig(wco),
-        configs_1.getStylesConfig(wco),
-        configs_1.getStatsConfig(wco),
-        getAnalyticsConfig(wco, context),
-        getCompilerConfig(wco),
-        wco.buildOptions.webWorkerTsConfig ? configs_1.getWorkerConfig(wco) : {},
-    ], host, { differentialLoadingMode });
+    const { config, projectRoot, projectSourceRoot, i18n, } = await buildBrowserWebpackConfigFromContext(adjustedOptions, context, host, true);
     // Validate asset option values if processed directly
     if (((_a = options.assets) === null || _a === void 0 ? void 0 : _a.length) && !((_b = adjustedOptions.assets) === null || _b === void 0 ? void 0 : _b.length)) {
         utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), core_1.normalize(context.workspaceRoot), core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)).forEach(({ output }) => {
@@ -102,72 +117,45 @@ async function initialize(options, context, host, differentialLoadingMode, webpa
 }
 // tslint:disable-next-line: no-big-function
 function buildWebpackBrowser(options, context, transforms = {}) {
-    var _a;
     const host = new node_1.NodeJsSyncHost();
     const root = core_1.normalize(context.workspaceRoot);
-    const projectName = (_a = context.target) === null || _a === void 0 ? void 0 : _a.project;
-    if (!projectName) {
-        throw new Error('The builder requires a target.');
-    }
     const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
     let outputPaths;
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
-    return rxjs_1.from(context.getProjectMetadata(projectName))
-        .pipe(operators_1.switchMap(async (projectMetadata) => {
-        var _a;
-        const sysProjectRoot = core_1.getSystemPath(core_1.resolve(core_1.normalize(context.workspaceRoot), core_1.normalize((_a = projectMetadata.root) !== null && _a !== void 0 ? _a : '')));
-        const { options: compilerOptions } = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
-        const target = compilerOptions.target || typescript_1.ScriptTarget.ES5;
-        const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(sysProjectRoot);
-        const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded(target);
-        const differentialLoadingMode = !options.watch && isDifferentialLoadingNeeded;
+    return rxjs_1.from(initialize(options, context, host, transforms.webpackConfiguration)).pipe(
+    // tslint:disable-next-line: no-big-function
+    operators_1.switchMap(({ config, projectRoot, projectSourceRoot, i18n }) => {
+        const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
+        const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
+        const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot, target);
+        const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded();
         if (target > typescript_1.ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
             context.logger.warn(core_1.tags.stripIndent `
-          Warning: Using differential loading with targets ES5 and ES2016 or higher may
+          WARNING: Using differential loading with targets ES5 and ES2016 or higher may
           cause problems. Browsers with support for ES2015 will load the ES2016+ scripts
           referenced with script[type="module"] but they may not support ES2016+ syntax.
         `);
         }
-        const hasIE9 = buildBrowserFeatures.supportedBrowsers.includes('ie 9');
-        const hasIE10 = buildBrowserFeatures.supportedBrowsers.includes('ie 10');
-        if (hasIE9 || hasIE10) {
-            const browsers = (hasIE9 ? 'IE 9' + (hasIE10 ? ' & ' : '') : '') + (hasIE10 ? 'IE 10' : '');
-            context.logger.warn(`Warning: Support was requested for ${browsers} in the project's browserslist configuration. ` +
-                (hasIE9 && hasIE10 ? 'These browsers are' : 'This browser is') +
-                ' no longer officially supported with Angular v11 and higher.' +
-                '\nFor additional information: https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile');
-        }
-        return {
-            ...(await initialize(options, context, host, differentialLoadingMode, transforms.webpackConfiguration)),
-            buildBrowserFeatures,
-            isDifferentialLoadingNeeded,
-            target,
-        };
-    }), 
-    // tslint:disable-next-line: no-big-function
-    operators_1.switchMap(({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target }) => {
         const useBundleDownleveling = isDifferentialLoadingNeeded && !options.watch;
         const startTime = Date.now();
-        const normalizedOptimization = utils_1.normalizeOptimization(options.optimization);
-        const indexTransforms = transforms_1.getHtmlTransforms(normalizedOptimization, buildBrowserFeatures, transforms.indexHtml);
         return build_webpack_1.runWebpack(config, context, {
             webpackFactory: require('webpack'),
             logging: transforms.logging ||
                 (useBundleDownleveling
                     ? () => { }
-                    : stats_1.createWebpackLoggingCallback(!!options.verbose, context.logger)),
+                    : createBrowserLoggingCallback(!!options.verbose, context.logger)),
         }).pipe(
         // tslint:disable-next-line: no-big-function
         operators_1.concatMap(async (buildEvent) => {
-            var _a, _b, _c, _d, _e;
+            var _a, _b;
             const { webpackStats: webpackRawStats, success, emittedFiles = [] } = buildEvent;
             if (!webpackRawStats) {
                 throw new Error('Webpack stats build result is required.');
             }
             // Fix incorrectly set `initial` value on chunks.
-            const extraEntryPoints = configs_1.normalizeExtraEntryPoints(options.styles || [], 'styles')
-                .concat(configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts'));
+            const extraEntryPoints = webpack_configs_1.normalizeExtraEntryPoints(options.styles || [], 'styles')
+                .concat(webpack_configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts'));
             const webpackStats = {
                 ...webpackRawStats,
                 chunks: async_chunks_1.markAsyncChunksNonInitial(webpackRawStats, extraEntryPoints),
@@ -188,7 +176,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 let noModuleFiles;
                 let moduleFiles;
                 let files;
-                const scriptsEntryPointName = configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map(x => x.bundleName);
+                const scriptsEntryPointName = webpack_configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map(x => x.bundleName);
                 if (isDifferentialLoadingNeeded && options.watch) {
                     moduleFiles = emittedFiles;
                     files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
@@ -207,7 +195,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     // Common options for all bundle process actions
                     const sourceMapOptions = utils_1.normalizeSourceMaps(options.sourceMap || false);
                     const actionOptions = {
-                        optimize: normalizedOptimization.scripts,
+                        optimize: utils_1.normalizeOptimization(options.optimization).scripts,
                         sourceMaps: sourceMapOptions.scripts,
                         hiddenSourceMaps: sourceMapOptions.hidden,
                         vendorSourceMaps: sourceMapOptions.vendor,
@@ -270,7 +258,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                     fs.unlinkSync(filename + '.map');
                                 }
                             }
-                            catch (_f) { }
+                            catch (_c) { }
                         }
                         if (es5Polyfills) {
                             fs.unlinkSync(filename);
@@ -317,7 +305,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     const executor = new action_executor_1.BundleActionExecutor({ cachePath: cacheDownlevelPath, i18n }, options.subresourceIntegrity ? 'sha384' : undefined);
                     // Execute the bundle processing actions
                     try {
-                        const dlSpinner = ora('Generating ES5 bundles for differential loading...').start();
+                        context.logger.info('Generating ES5 bundles for differential loading...');
                         for await (const result of executor.processAll(processActions)) {
                             processResults.push(result);
                         }
@@ -330,9 +318,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             };
                             processResults.push(await Promise.resolve().then(() => require('../utils/process-bundle')).then(m => m.process(runtimeOptions)));
                         }
-                        dlSpinner.succeed('ES5 bundle generation complete.');
+                        context.logger.info('ES5 bundle generation complete.');
                         if (i18n.shouldInline) {
-                            const spinner = ora('Generating localized bundles...').start();
+                            context.logger.info('Generating localized bundles...');
                             const inlineActions = [];
                             const processedFiles = new Set();
                             for (const result of processResults) {
@@ -376,7 +364,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                         context.logger.info(`Localized "${result.file}" [${result.count} translation(s)].`);
                                     }
                                     for (const diagnostic of result.diagnostics) {
-                                        spinner.stop();
                                         if (diagnostic.type === 'error') {
                                             hasErrors = true;
                                             context.logger.error(diagnostic.message);
@@ -384,7 +371,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                         else {
                                             context.logger.warn(diagnostic.message);
                                         }
-                                        spinner.start();
                                     }
                                 }
                                 // Copy any non-processed files into the output locations
@@ -401,15 +387,10 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 ], Array.from(outputPaths.values()), '');
                             }
                             catch (err) {
-                                spinner.fail(color_1.colors.redBright('Localized bundle generation failed.'));
-                                return { success: false, error: mapErrorToMessage(err) };
+                                context.logger.error('Localized bundle generation failed: ' + err.message);
+                                return { success: false };
                             }
-                            if (hasErrors) {
-                                spinner.fail(color_1.colors.redBright('Localized bundle generation failed.'));
-                            }
-                            else {
-                                spinner.succeed('Localized bundle generation complete.');
-                            }
+                            context.logger.info(`Localized bundle generation ${hasErrors ? 'failed' : 'complete'}.`);
                             if (hasErrors) {
                                 return { success: false };
                             }
@@ -418,46 +399,53 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     finally {
                         executor.stop();
                     }
-                    function generateBundleInfoStats(bundle, chunk) {
+                    function generateBundleInfoStats(id, bundle, chunk) {
                         return stats_1.generateBundleStats({
+                            id,
                             size: bundle.size,
                             files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
-                            names: chunk === null || chunk === void 0 ? void 0 : chunk.names,
-                            entry: !!(chunk === null || chunk === void 0 ? void 0 : chunk.names.includes('runtime')),
-                            initial: !!(chunk === null || chunk === void 0 ? void 0 : chunk.initial),
+                            names: chunk && chunk.names,
+                            entry: !!chunk && chunk.names.includes('runtime'),
+                            initial: !!chunk && chunk.initial,
                             rendered: true,
                         }, true);
                     }
-                    const bundleInfoStats = [];
+                    let bundleInfoText = '';
                     for (const result of processResults) {
-                        const chunk = (_a = webpackStats.chunks) === null || _a === void 0 ? void 0 : _a.find((chunk) => chunk.id.toString() === result.name);
+                        const chunk = webpackStats.chunks
+                            && webpackStats.chunks.find((chunk) => chunk.id.toString() === result.name);
                         if (result.original) {
-                            bundleInfoStats.push(generateBundleInfoStats(result.original, chunk));
+                            bundleInfoText +=
+                                '\n' + generateBundleInfoStats(result.name, result.original, chunk);
                         }
                         if (result.downlevel) {
-                            bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk));
+                            bundleInfoText +=
+                                '\n' + generateBundleInfoStats(result.name, result.downlevel, chunk);
                         }
                     }
-                    const unprocessedChunks = ((_b = webpackStats.chunks) === null || _b === void 0 ? void 0 : _b.filter((chunk) => !processResults
-                        .find((result) => chunk.id.toString() === result.name))) || [];
+                    const unprocessedChunks = webpackStats.chunks && webpackStats.chunks
+                        .filter((chunk) => !processResults
+                        .find((result) => chunk.id.toString() === result.name)) || [];
                     for (const chunk of unprocessedChunks) {
-                        const asset = (_c = webpackStats.assets) === null || _c === void 0 ? void 0 : _c.find(a => a.name === chunk.files[0]);
-                        bundleInfoStats.push(stats_1.generateBundleStats({ ...chunk, size: asset === null || asset === void 0 ? void 0 : asset.size }, true));
+                        const asset = webpackStats.assets && webpackStats.assets.find(a => a.name === chunk.files[0]);
+                        bundleInfoText +=
+                            '\n' + stats_1.generateBundleStats({ ...chunk, size: asset && asset.size }, true);
                     }
-                    context.logger.info('\n' +
-                        stats_1.generateBuildStatsTable(bundleInfoStats, color_1.colors.enabled) +
-                        '\n\n' +
-                        stats_1.generateBuildStats((webpackStats === null || webpackStats === void 0 ? void 0 : webpackStats.hash) || '<unknown>', Date.now() - startTime, true));
+                    bundleInfoText +=
+                        '\n' +
+                            stats_1.generateBuildStats((webpackStats && webpackStats.hash) || '<unknown>', Date.now() - startTime, true);
+                    context.logger.info(bundleInfoText);
                     // Check for budget errors and display them to the user.
                     const budgets = options.budgets || [];
                     const budgetFailures = bundle_calculator_1.checkBudgets(budgets, webpackStats, processResults);
                     for (const { severity, message } of budgetFailures) {
+                        const msg = `budgets: ${message}`;
                         switch (severity) {
                             case bundle_calculator_1.ThresholdSeverity.Warning:
-                                webpackStats.warnings.push(message);
+                                webpackStats.warnings.push(msg);
                                 break;
                             case bundle_calculator_1.ThresholdSeverity.Error:
-                                webpackStats.errors.push(message);
+                                webpackStats.errors.push(msg);
                                 break;
                             default:
                                 assertNever(severity);
@@ -484,45 +472,43 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     }
                 }
                 // Copy assets
-                if (!options.watch && ((_d = options.assets) === null || _d === void 0 ? void 0 : _d.length)) {
+                if (!options.watch && options.assets) {
                     try {
                         await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), Array.from(outputPaths.values()), context.workspaceRoot);
                     }
                     catch (err) {
-                        return { success: false, error: 'Unable to copy assets: ' + err.message };
+                        context.logger.error('Unable to copy assets: ' + err.message);
+                        return { success: false };
                     }
                 }
-                for (const [locale, outputPath] of outputPaths.entries()) {
-                    let localeBaseHref;
-                    if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
-                        localeBaseHref = utils_1.urlJoin(options.baseHref || '', (_e = i18n.locales[locale].baseHref) !== null && _e !== void 0 ? _e : `/${locale}/`);
-                    }
-                    try {
-                        if (options.index) {
-                            await write_index_html_1.writeIndexHtml({
-                                host,
-                                outputPath: path.join(outputPath, webpack_browser_config_1.getIndexOutputFile(options.index)),
-                                indexPath: path.join(context.workspaceRoot, webpack_browser_config_1.getIndexInputFile(options.index)),
-                                files,
-                                noModuleFiles,
-                                moduleFiles,
-                                baseHref: localeBaseHref || options.baseHref,
-                                deployUrl: options.deployUrl,
-                                sri: options.subresourceIntegrity,
-                                scripts: options.scripts,
-                                styles: options.styles,
-                                postTransforms: indexTransforms,
-                                crossOrigin: options.crossOrigin,
-                                // i18nLocale is used when Ivy is disabled
-                                lang: locale || options.i18nLocale,
-                            });
+                if (options.index) {
+                    for (const [locale, outputPath] of outputPaths.entries()) {
+                        let localeBaseHref;
+                        if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
+                            localeBaseHref = utils_1.urlJoin(options.baseHref || '', (_a = i18n.locales[locale].baseHref) !== null && _a !== void 0 ? _a : `/${locale}/`);
                         }
-                        if (options.serviceWorker) {
+                        try {
+                            await generateIndex(outputPath, options, root, files, noModuleFiles, moduleFiles, transforms.indexHtml, 
+                            // i18nLocale is used when Ivy is disabled
+                            locale || options.i18nLocale, localeBaseHref || options.baseHref);
+                        }
+                        catch (err) {
+                            return { success: false, error: mapErrorToMessage(err) };
+                        }
+                    }
+                }
+                if (options.serviceWorker) {
+                    for (const [locale, outputPath] of outputPaths.entries()) {
+                        let localeBaseHref;
+                        if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
+                            localeBaseHref = utils_1.urlJoin(options.baseHref || '', (_b = i18n.locales[locale].baseHref) !== null && _b !== void 0 ? _b : `/${locale}/`);
+                        }
+                        try {
                             await service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(outputPath), localeBaseHref || options.baseHref || '/', options.ngswConfigPath);
                         }
-                    }
-                    catch (err) {
-                        return { success: false, error: mapErrorToMessage(err) };
+                        catch (err) {
+                            return { success: false, error: mapErrorToMessage(err) };
+                        }
                     }
                 }
             }
@@ -536,6 +522,25 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     }));
 }
 exports.buildWebpackBrowser = buildWebpackBrowser;
+function generateIndex(baseOutputPath, options, root, files, noModuleFiles, moduleFiles, transformer, locale, baseHref) {
+    const host = new node_1.NodeJsSyncHost();
+    return write_index_html_1.writeIndexHtml({
+        host,
+        outputPath: core_1.join(core_1.normalize(baseOutputPath), webpack_browser_config_1.getIndexOutputFile(options)),
+        indexPath: core_1.join(core_1.normalize(root), webpack_browser_config_1.getIndexInputFile(options)),
+        files,
+        noModuleFiles,
+        moduleFiles,
+        baseHref,
+        deployUrl: options.deployUrl,
+        sri: options.subresourceIntegrity,
+        scripts: options.scripts,
+        styles: options.styles,
+        postTransform: transformer,
+        crossOrigin: options.crossOrigin,
+        lang: locale,
+    }).toPromise();
+}
 function mapErrorToMessage(error) {
     if (error instanceof Error) {
         return error.message;

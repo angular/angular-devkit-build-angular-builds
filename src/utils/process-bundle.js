@@ -10,16 +10,16 @@ exports.inlineLocales = exports.createI18nPlugins = exports.process = exports.se
  */
 const core_1 = require("@babel/core");
 const template_1 = require("@babel/template");
-const cacache = require("cacache");
 const crypto_1 = require("crypto");
 const fs = require("fs");
 const path = require("path");
+const semver_1 = require("semver");
 const source_map_1 = require("source-map");
 const terser_1 = require("terser");
 const v8 = require("v8");
 const webpack_sources_1 = require("webpack-sources");
 const environment_options_1 = require("./environment-options");
-const webpack_version_1 = require("./webpack-version");
+const cacache = require('cacache');
 const deserialize = v8.deserialize;
 // If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
 const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
@@ -35,7 +35,7 @@ function setup(data) {
 exports.setup = setup;
 async function cachePut(content, key, integrity) {
     if (cachePath && key) {
-        await cacache.put(cachePath, key, content, {
+        await cacache.put(cachePath, key || null, content, {
             metadata: { integrity },
         });
     }
@@ -132,16 +132,13 @@ async function process(options) {
 }
 exports.process = process;
 async function mergeSourceMaps(inputCode, inputSourceMap, resultCode, resultSourceMap, filename, fast = false) {
-    // Webpack 5 terser sourcemaps currently fail merging with the high-quality method
-    // TODO_WEBPACK_5: Investigate high-quality sourcemap merge failures
-    if (fast || webpack_version_1.isWebpackFiveOrHigher()) {
+    if (fast) {
         return mergeSourceMapsFast(inputSourceMap, resultSourceMap);
     }
     // SourceMapSource produces high-quality sourcemaps
-    // Final sourcemap will always be available when providing the input sourcemaps
-    // tslint:disable-next-line: no-non-null-assertion
-    const finalSourceMap = new webpack_sources_1.SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
-    return finalSourceMap;
+    // The last argument is not yet in the typings
+    // tslint:disable-next-line: no-any
+    return new webpack_sources_1.SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
 }
 async function mergeSourceMapsFast(first, second) {
     const sourceRoot = first.sourceRoot;
@@ -364,7 +361,7 @@ async function createI18nPlugins(locale, translation, missingTranslation, locale
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
     const es2015 = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
     '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'));
     plugins.push(
     // tslint:disable-next-line: no-any
@@ -372,7 +369,7 @@ async function createI18nPlugins(locale, translation, missingTranslation, locale
         missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
     }));
     const es5 = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
     '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
     plugins.push(
     // tslint:disable-next-line: no-any
@@ -380,7 +377,7 @@ async function createI18nPlugins(locale, translation, missingTranslation, locale
         missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
     }));
     const inlineLocale = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
+    // tslint:disable-next-line: trailing-comma no-implicit-dependencies
     '@angular/localize/src/tools/src/translate/source_files/locale_plugin'));
     plugins.push(inlineLocale.makeLocalePlugin(locale));
     if (localeDataContent) {
@@ -591,12 +588,37 @@ function findLocalizePositions(ast, options, utils) {
     }
     return positions;
 }
+// TODO: Remove this for v11.
+// This check allows the CLI to support both FW 10.0 and 10.1
+let localizeOld;
 function unwrapTemplateLiteral(path, utils) {
+    if (localizeOld === undefined) {
+        const { version: localizeVersion } = require('@angular/localize/package.json');
+        localizeOld = semver_1.lt(localizeVersion, '10.1.0-rc.0', { includePrerelease: true });
+    }
+    if (localizeOld) {
+        // tslint:disable-next-line: no-any
+        const messageParts = utils.unwrapMessagePartsFromTemplateLiteral(path.node.quasi.quasis);
+        return [messageParts, path.node.quasi.expressions];
+    }
     const [messageParts] = utils.unwrapMessagePartsFromTemplateLiteral(path.get('quasi').get('quasis'));
     const [expressions] = utils.unwrapExpressionsFromTemplateLiteral(path.get('quasi'));
     return [messageParts, expressions];
 }
 function unwrapLocalizeCall(path, utils) {
+    if (localizeOld === undefined) {
+        const { version: localizeVersion } = require('@angular/localize/package.json');
+        localizeOld = semver_1.lt(localizeVersion, '10.1.0-rc.0', { includePrerelease: true });
+    }
+    if (localizeOld) {
+        const messageParts = utils.unwrapMessagePartsFromLocalizeCall(path);
+        // tslint:disable-next-line: no-any
+        const expressions = utils.unwrapSubstitutionsFromLocalizeCall(path.node);
+        return [
+            messageParts,
+            expressions,
+        ];
+    }
     const [messageParts] = utils.unwrapMessagePartsFromLocalizeCall(path);
     const [expressions] = utils.unwrapSubstitutionsFromLocalizeCall(path);
     return [messageParts, expressions];
@@ -617,8 +639,8 @@ async function loadLocaleData(path, optimize, es5) {
                 require.resolve('@babel/preset-env'),
                 {
                     bugfixes: true,
-                    // IE 11 is the oldest supported browser
-                    targets: es5 ? { ie: '11' } : { esmodules: true },
+                    // IE 9 is the oldest supported browser
+                    targets: es5 ? { ie: '9' } : { esmodules: true },
                 },
             ],
         ],

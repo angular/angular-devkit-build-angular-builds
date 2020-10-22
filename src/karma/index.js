@@ -13,23 +13,24 @@ const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
+const webpack_configs_1 = require("../angular-cli-files/models/webpack-configs");
+const single_test_transform_1 = require("../angular-cli-files/plugins/single-test-transform");
+const find_tests_1 = require("../angular-cli-files/utilities/find-tests");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
-const configs_1 = require("../webpack/configs");
-const single_test_transform_1 = require("../webpack/plugins/single-test-transform");
-const find_tests_1 = require("./find-tests");
 async function initialize(options, context, webpackConfigurationTransformer) {
     const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(
     // only two properties are missing:
     // * `outputPath` which is fixed for tests
     // * `budgets` which might be incorrect due to extra dev libs
     { ...options, outputPath: '', budgets: undefined }, context, wco => [
-        configs_1.getCommonConfig(wco),
-        configs_1.getStylesConfig(wco),
-        configs_1.getNonAotConfig(wco),
-        configs_1.getTestConfig(wco),
-        configs_1.getWorkerConfig(wco),
+        webpack_configs_1.getCommonConfig(wco),
+        webpack_configs_1.getStylesConfig(wco),
+        webpack_configs_1.getNonAotConfig(wco),
+        webpack_configs_1.getTestConfig(wco),
+        webpack_configs_1.getWorkerConfig(wco),
     ]);
+    // tslint:disable-next-line:no-implicit-dependencies
     const karma = await Promise.resolve().then(() => require('karma'));
     return [
         karma,
@@ -102,10 +103,7 @@ function execute(options, context, transforms = {}) {
             logger: context.logger,
         };
         // Complete the observable once the Karma server returns.
-        const karmaServer = new karma.Server(transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, (exitCode) => {
-            subscriber.next({ success: exitCode === 0 });
-            subscriber.complete();
-        });
+        const karmaServer = new karma.Server(transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, () => subscriber.complete());
         // karma typings incorrectly define start's return value as void
         // tslint:disable-next-line:no-use-of-empty-return-value
         const karmaStart = karmaServer.start();

@@ -36,16 +36,6 @@
       "type": "string",
       "description": "SSL certificate to use for serving HTTPS."
     },
-    "headers": {
-      "type": "object",
-      "description": "Custom HTTP headers to be added to all responses.",
-      "propertyNames": {
-        "pattern": "^[-_A-Za-z0-9]+$"
-      },
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
     "open": {
       "type": "boolean",
       "description": "Opens the url in default browser.",
@@ -95,14 +85,12 @@
     "hmrWarning": {
       "type": "boolean",
       "description": "Show a warning when the --hmr option is enabled.",
-      "default": true,
-      "x-deprecated": "No longer has an effect."
+      "default": true
     },
     "servePathDefaultWarning": {
       "type": "boolean",
       "description": "Show a warning when deploy-url/base-href use unsupported serve path values.",
-      "default": true,
-      "x-deprecated": "No longer has an effect."
+      "default": true
     },
     "optimization": {
       "description": "Enables optimization of the build output.",
@@ -127,14 +115,12 @@
         {
           "type": "boolean"
         }
-      ],
-      "x-deprecated": "Use the \"optimization\" option in the browser builder instead."
+      ]
     },
     "aot": {
       "type": "boolean",
       "description": "Build using Ahead of Time compilation.",
-      "x-user-analytics": 13,
-      "x-deprecated": "Use the \"aot\" option in the browser builder instead."
+      "x-user-analytics": 13
     },
     "sourceMap": {
       "description": "Output sourcemaps.",
@@ -168,33 +154,27 @@
         {
           "type": "boolean"
         }
-      ],
-      "x-deprecated": "Use the \"sourceMap\" option in the browser builder instead."
+      ]
     },
     "vendorChunk": {
       "type": "boolean",
-      "description": "Use a separate bundle containing only vendor libraries.",
-      "x-deprecated": "Use the \"vendorChunk\" option in the browser builder instead."
+      "description": "Use a separate bundle containing only vendor libraries."
     },
     "commonChunk": {
       "type": "boolean",
-      "description": "Use a separate bundle containing code used across multiple bundles.",
-      "x-deprecated": "Use the \"commonChunk\" option in the browser builder instead."
+      "description": "Use a separate bundle containing code used across multiple bundles."
     },
     "baseHref": {
       "type": "string",
-      "description": "Base url for the application being built.",
-      "x-deprecated": "Use the \"baseHref\" option in the browser builder instead."
+      "description": "Base url for the application being built."
     },
     "deployUrl": {
       "type": "string",
-      "description": "URL where files will be deployed.",
-      "x-deprecated": "Use the \"deployUrl\" option in the browser builder instead."
+      "description": "URL where files will be deployed."
     },
     "progress": {
       "type": "boolean",
-      "description": "Log progress to the console while building.",
-      "x-deprecated": "Use the \"progress\" option in the browser builder instead."
+      "description": "Log progress to the console while building."
     },
     "poll": {
       "type": "number",

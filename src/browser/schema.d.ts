@@ -48,9 +48,7 @@ export interface Schema {
      */
     experimentalRollupPass?: boolean;
     /**
-     * Extract CSS from global styles into '.css' files instead of '.js'.
-     * @deprecated Deprecated since version 11.0. No longer required to disable CSS extraction
-     * for HMR.
+     * Extract css from global styles into css files instead of js ones.
      */
     extractCss?: boolean;
     /**
@@ -140,6 +138,13 @@ export interface Schema {
      */
     progress?: boolean;
     /**
+     * Change root relative URLs in stylesheets to include base HREF and deploy URL. Use only
+     * for compatibility and transition. The behavior of this option is non-standard and will be
+     * removed in the next major release.
+     * @deprecated
+     */
+    rebaseRootRelativeCssUrls?: boolean;
+    /**
      * The path where style resources will be placed, relative to outputPath.
      */
     resourcesOutputPath?: string;
@@ -199,11 +204,6 @@ export interface Schema {
 }
 export declare type AssetPattern = AssetPatternClass | string;
 export interface AssetPatternClass {
-    /**
-     * Allow glob patterns to follow symlink directories. This allows subdirectories of the
-     * symlink to be searched.
-     */
-    followSymlinks?: boolean;
     /**
      * The pattern to match.
      */
@@ -315,10 +315,6 @@ export declare type Localize = string[] | boolean;
 export declare type OptimizationUnion = boolean | OptimizationClass;
 export interface OptimizationClass {
     /**
-     * Enables optimization for fonts. This requires internet access.
-     */
-    fonts?: FontsUnion;
-    /**
      * Enables optimization of the scripts output.
      */
     scripts?: boolean;
@@ -326,17 +322,6 @@ export interface OptimizationClass {
      * Enables optimization of the styles output.
      */
     styles?: boolean;
-}
-/**
- * Enables optimization for fonts. This requires internet access.
- */
-export declare type FontsUnion = boolean | FontsClass;
-export interface FontsClass {
-    /**
-     * Reduce render blocking requests by inlining external fonts in the application's HTML
-     * index file. This requires internet access.
-     */
-    inline?: boolean;
 }
 /**
  * Define the output filename cache-busting hashing mode.
@@ -361,6 +346,10 @@ export interface ExtraEntryPointClass {
      * The file to include.
      */
     input: string;
+    /**
+     * If the bundle will be lazy loaded.
+     */
+    lazy?: boolean;
 }
 /**
  * Output sourcemaps.

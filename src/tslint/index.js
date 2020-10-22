@@ -12,10 +12,25 @@ const fs_1 = require("fs");
 const glob = require("glob");
 const minimatch_1 = require("minimatch");
 const path = require("path");
-const strip_bom_1 = require("../utils/strip-bom");
+const strip_bom_1 = require("../angular-cli-files/utilities/strip-bom");
+async function _loadTslint() {
+    let tslint;
+    try {
+        tslint = await Promise.resolve().then(() => require('tslint')); // tslint:disable-line:no-implicit-dependencies
+    }
+    catch (_a) {
+        throw new Error('Unable to find TSLint. Ensure TSLint is installed.');
+    }
+    const version = tslint.Linter.VERSION && tslint.Linter.VERSION.split('.');
+    if (!version || version.length < 2
+        || (Number(version[0]) === 5 && Number(version[1]) < 5) // 5.5+
+        || Number(version[0]) < 5 // 6.0+
+    ) {
+        throw new Error('TSLint must be version 5.5 or higher.');
+    }
+    return tslint;
+}
 async function _run(options, context) {
-    context.logger.warn(`TSLint's support is discontinued and we're deprecating its support in Angular CLI.\n` +
-        'To opt-in using the community driven ESLint builder, see: https://github.com/angular-eslint/angular-eslint#migrating-from-codelyzer-and-tslint.');
     const systemRoot = context.workspaceRoot;
     process.chdir(context.currentDirectory);
     const projectName = (context.target && context.target.project) || '<???>';
@@ -28,17 +43,11 @@ async function _run(options, context) {
     if (!options.tsConfig && options.typeCheck) {
         throw new Error('A "project" must be specified to enable type checking.');
     }
-    let tslint;
-    try {
-        tslint = await Promise.resolve().then(() => require('tslint'));
-    }
-    catch (_a) {
-        throw new Error('Unable to find TSLint. Ensure TSLint is installed.');
-    }
+    const projectTslint = await _loadTslint();
     const tslintConfigPath = options.tslintConfig
         ? path.resolve(systemRoot, options.tslintConfig)
         : null;
-    const Linter = tslint.Linter;
+    const Linter = projectTslint.Linter;
     let result = undefined;
     if (options.tsConfig) {
         const tsConfigs = Array.isArray(options.tsConfig) ? options.tsConfig : [options.tsConfig];
@@ -48,7 +57,7 @@ async function _run(options, context) {
         });
         let i = 0;
         for (const program of allPrograms) {
-            const partial = await _lint(tslint, systemRoot, tslintConfigPath, options, program, allPrograms);
+            const partial = await _lint(projectTslint, systemRoot, tslintConfigPath, options, program, allPrograms);
             if (result === undefined) {
                 result = partial;
             }
@@ -71,13 +80,13 @@ async function _run(options, context) {
         }
     }
     else {
-        result = await _lint(tslint, systemRoot, tslintConfigPath, options);
+        result = await _lint(projectTslint, systemRoot, tslintConfigPath, options);
     }
     if (result == undefined) {
         throw new Error('Invalid lint configuration. Nothing to lint.');
     }
     if (!options.silent) {
-        const Formatter = tslint.findFormatter(options.format || '');
+        const Formatter = projectTslint.findFormatter(options.format || '');
         if (!Formatter) {
             throw new Error(`Invalid lint format "${options.format}".`);
         }
@@ -100,7 +109,6 @@ async function _run(options, context) {
         success: options.force || result.errorCount === 0,
     };
 }
-/** @deprecated since version 11 as part of the TSLint deprecation. */
 exports.default = architect_1.createBuilder(_run);
 async function _lint(projectTslint, systemRoot, tslintConfigPath, options, program, allPrograms) {
     const Linter = projectTslint.Linter;

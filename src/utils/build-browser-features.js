@@ -12,17 +12,18 @@ const browserslist = require("browserslist");
 const caniuse_lite_1 = require("caniuse-lite");
 const ts = require("typescript");
 class BuildBrowserFeatures {
-    constructor(projectRoot) {
+    constructor(projectRoot, scriptTarget) {
         this.projectRoot = projectRoot;
+        this.scriptTarget = scriptTarget;
         this.supportedBrowsers = browserslist(undefined, { path: this.projectRoot });
+        this._es6TargetOrLater = this.scriptTarget > ts.ScriptTarget.ES5;
     }
     /**
      * True, when one or more browsers requires ES5
      * support and the scirpt target is ES2015 or greater.
      */
-    isDifferentialLoadingNeeded(scriptTarget) {
-        const es6TargetOrLater = scriptTarget > ts.ScriptTarget.ES5;
-        return es6TargetOrLater && this.isEs5SupportNeeded();
+    isDifferentialLoadingNeeded() {
+        return this._es6TargetOrLater && this.isEs5SupportNeeded();
     }
     /**
      * True, when one or more browsers requires ES5 support

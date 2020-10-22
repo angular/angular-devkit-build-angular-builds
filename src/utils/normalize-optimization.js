@@ -9,21 +9,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeOptimization = void 0;
 function normalizeOptimization(optimization = false) {
-    if (typeof optimization === 'object') {
-        return {
-            scripts: !!optimization.scripts,
-            styles: !!optimization.styles,
-            fonts: typeof optimization.fonts === 'object' ? optimization.fonts : {
-                inline: !!optimization.fonts,
-            },
-        };
-    }
     return {
-        scripts: optimization,
-        styles: optimization,
-        fonts: {
-            inline: optimization,
-        },
+        scripts: typeof optimization === 'object' ? !!optimization.scripts : optimization,
+        styles: typeof optimization === 'object' ? !!optimization.styles : optimization,
     };
 }
 exports.normalizeOptimization = normalizeOptimization;

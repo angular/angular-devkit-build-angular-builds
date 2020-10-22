@@ -1,10 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addError = exports.addWarning = void 0;
-const webpack_version_1 = require("./webpack-version");
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+const webpack = require("webpack");
 const WebpackError = require('webpack/lib/WebpackError');
+const isWebpackFiveOrHigher = (() => {
+    if (typeof webpack.version === 'string') {
+        const versionParts = webpack.version.split('.');
+        if (versionParts[0] && Number(versionParts[0]) >= 5) {
+            return true;
+        }
+    }
+    return false;
+})();
 function addWarning(compilation, message) {
-    if (webpack_version_1.isWebpackFiveOrHigher()) {
+    if (isWebpackFiveOrHigher) {
         compilation.warnings.push(new WebpackError(message));
     }
     else {
@@ -15,7 +31,7 @@ function addWarning(compilation, message) {
 }
 exports.addWarning = addWarning;
 function addError(compilation, message) {
-    if (webpack_version_1.isWebpackFiveOrHigher()) {
+    if (isWebpackFiveOrHigher) {
         compilation.errors.push(new WebpackError(message));
     }
     else {
