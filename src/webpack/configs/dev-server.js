@@ -22,7 +22,6 @@ function getDevServerConfig(wco) {
     const { styles: stylesOptimization, scripts: scriptsOptimization } = utils_1.normalizeOptimization(optimization);
     const extraPlugins = [];
     // Resolve public host and client address.
-    let sockPath;
     let publicHost = wco.buildOptions.publicHost;
     if (publicHost) {
         if (!/^\w+:\/\//.test(publicHost)) {
@@ -30,9 +29,6 @@ function getDevServerConfig(wco) {
         }
         const parsedHost = url.parse(publicHost);
         publicHost = parsedHost.host;
-        if (parsedHost.pathname) {
-            sockPath = path_1.posix.join(parsedHost.pathname, 'sockjs-node');
-        }
     }
     if (!watch) {
         // There's no option to turn off file watching in webpack-dev-server, but
@@ -76,7 +72,7 @@ function getDevServerConfig(wco) {
                     },
                 ],
             },
-            sockPath,
+            sockPath: path_1.posix.join(servePath, 'sockjs-node'),
             stats: false,
             compress: stylesOptimization || scriptsOptimization,
             watchOptions: helpers_1.getWatchOptions(poll),
