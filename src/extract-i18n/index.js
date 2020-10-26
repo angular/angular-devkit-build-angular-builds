@@ -52,9 +52,10 @@ async function getSerializer(format, sourceLocale, basePath, useLegacyIds = true
             return new Xliff2TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
     }
 }
-class NoEmitPlugin {
+class InMemoryOutputPlugin {
     apply(compiler) {
-        compiler.hooks.shouldEmit.tap('angular-no-emit', () => false);
+        // tslint:disable-next-line:no-any
+        compiler.outputFileSystem = new webpack.MemoryOutputFileSystem();
     }
 }
 async function execute(options, context, transforms) {
@@ -129,7 +130,7 @@ async function execute(options, context, transforms) {
                 'If the extraction fails, the `--ivy` flag will enable Ivy extraction.');
         }
         const partials = [
-            { plugins: [new NoEmitPlugin()] },
+            { plugins: [new InMemoryOutputPlugin()] },
             configs_1.getCommonConfig(wco),
             // Only use VE extraction if not using Ivy
             configs_1.getAotConfig(wco, !usingIvy),
