@@ -255,6 +255,7 @@ async function terserMangle(code, options = {}) {
             ascii_only: true,
             webkit: true,
             beautify: environment_options_1.shouldBeautify,
+            wrap_func_args: false,
         },
         sourceMap: !!options.map &&
             {
