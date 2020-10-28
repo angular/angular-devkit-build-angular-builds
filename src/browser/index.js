@@ -500,7 +500,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     try {
                         if (options.index) {
                             await write_index_html_1.writeIndexHtml({
-                                host,
                                 outputPath: path.join(outputPath, webpack_browser_config_1.getIndexOutputFile(options.index)),
                                 indexPath: path.join(context.workspaceRoot, webpack_browser_config_1.getIndexInputFile(options.index)),
                                 files,

@@ -8,16 +8,15 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.writeIndexHtml = void 0;
-const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
+const fs_1 = require("../fs");
 const package_chunk_sort_1 = require("../package-chunk-sort");
 const strip_bom_1 = require("../strip-bom");
 const augment_index_html_1 = require("./augment-index-html");
-async function writeIndexHtml({ host, outputPath, indexPath, files = [], noModuleFiles = [], moduleFiles = [], baseHref, deployUrl, sri = false, scripts = [], styles = [], postTransforms, crossOrigin, lang, }) {
-    const readFile = async (filePath) => core_1.virtualFs.fileBufferToString(await host.read(core_1.normalize(filePath)).toPromise());
+async function writeIndexHtml({ outputPath, indexPath, files = [], noModuleFiles = [], moduleFiles = [], baseHref, deployUrl, sri = false, scripts = [], styles = [], postTransforms, crossOrigin, lang, }) {
     let content = await augment_index_html_1.augmentIndexHtml({
         input: outputPath,
-        inputContent: strip_bom_1.stripBom(await readFile(indexPath)),
+        inputContent: strip_bom_1.stripBom(await fs_1.readFile(indexPath, 'utf-8')),
         baseHref,
         deployUrl,
         crossOrigin,
@@ -27,12 +26,13 @@ async function writeIndexHtml({ host, outputPath, indexPath, files = [], noModul
         files: filterAndMapBuildFiles(files, ['.js', '.css']),
         noModuleFiles: filterAndMapBuildFiles(noModuleFiles, '.js'),
         moduleFiles: filterAndMapBuildFiles(moduleFiles, '.js'),
-        loadOutputFile: filePath => readFile(path_1.join(path_1.dirname(outputPath), filePath)),
+        loadOutputFile: filePath => fs_1.readFile(path_1.join(path_1.dirname(outputPath), filePath), 'utf-8'),
     });
     for (const transform of postTransforms) {
         content = await transform(content);
     }
-    await host.write(core_1.normalize(outputPath), core_1.virtualFs.stringToFileBuffer(content)).toPromise();
+    await fs_1.mkdir(path_1.dirname(outputPath), { recursive: true });
+    await fs_1.writeFile(outputPath, content);
 }
 exports.writeIndexHtml = writeIndexHtml;
 function filterAndMapBuildFiles(files, extensionFilter) {

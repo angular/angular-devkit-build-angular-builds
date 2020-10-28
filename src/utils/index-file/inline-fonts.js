@@ -9,16 +9,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InlineFontsProcessor = void 0;
 const cacache = require("cacache");
-const fs_1 = require("fs");
 const https = require("https");
 const url_1 = require("url");
-const util_1 = require("util");
 const cache_path_1 = require("../cache-path");
 const environment_options_1 = require("../environment-options");
+const fs_1 = require("../fs");
 const html_rewriting_stream_1 = require("./html-rewriting-stream");
 const cacheFontsPath = environment_options_1.cachingDisabled ? undefined : cache_path_1.findCachePath('angular-build-fonts');
 const packageVersion = require('../../../package.json').version;
-const readFile = util_1.promisify(fs_1.readFile);
 const SUPPORTED_PROVIDERS = [
     'fonts.googleapis.com',
 ];
@@ -75,7 +73,7 @@ class InlineFontsProcessor {
         if (cacheFontsPath) {
             const entry = await cacache.get.info(cacheFontsPath, key);
             if (entry) {
-                return readFile(entry.path, 'utf8');
+                return fs_1.readFile(entry.path, 'utf8');
             }
         }
         const data = await new Promise((resolve, reject) => {

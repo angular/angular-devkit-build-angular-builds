@@ -6,11 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { EmittedFiles } from '@angular-devkit/build-webpack';
-import { virtualFs } from '@angular-devkit/core';
 import { ExtraEntryPoint } from '../../browser/schema';
 import { CrossOriginValue } from './augment-index-html';
 export interface WriteIndexHtmlOptions {
-    host: virtualFs.Host;
     outputPath: string;
     indexPath: string;
     files?: EmittedFiles[];
@@ -26,4 +24,4 @@ export interface WriteIndexHtmlOptions {
     lang?: string;
 }
 export declare type IndexHtmlTransform = (content: string) => Promise<string>;
-export declare function writeIndexHtml({ host, outputPath, indexPath, files, noModuleFiles, moduleFiles, baseHref, deployUrl, sri, scripts, styles, postTransforms, crossOrigin, lang, }: WriteIndexHtmlOptions): Promise<void>;
+export declare function writeIndexHtml({ outputPath, indexPath, files, noModuleFiles, moduleFiles, baseHref, deployUrl, sri, scripts, styles, postTransforms, crossOrigin, lang, }: WriteIndexHtmlOptions): Promise<void>;
