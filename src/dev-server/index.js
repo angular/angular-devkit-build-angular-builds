@@ -144,13 +144,30 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         for more information.
       `);
         }
+        let locale;
+        if (browserOptions.i18nLocale) {
+            // Deprecated VE option
+            locale = browserOptions.i18nLocale;
+        }
+        else if (i18n.shouldInline) {
+            // Dev-server only supports one locale
+            locale = [...i18n.inlineLocales][0];
+        }
+        else if (i18n.hasDefinedSourceLocale) {
+            // use source locale if not localizing
+            locale = i18n.sourceLocale;
+        }
         let webpackConfig = config;
-        const tsConfig = read_tsconfig_1.readTsconfig(browserOptions.tsConfig, workspaceRoot);
-        if (i18n.shouldInline && tsConfig.options.enableIvy !== false) {
-            if (i18n.inlineLocales.size > 1) {
-                throw new Error('The development server only supports localizing a single locale per build.');
+        // If a locale is defined, setup localization
+        if (locale) {
+            // Only supported with Ivy
+            const tsConfig = read_tsconfig_1.readTsconfig(browserOptions.tsConfig, workspaceRoot);
+            if (tsConfig.options.enableIvy !== false) {
+                if (i18n.inlineLocales.size > 1) {
+                    throw new Error('The development server only supports localizing a single locale per build.');
+                }
+                await setupLocalize(locale, i18n, browserOptions, webpackConfig);
             }
-            await setupLocalize(i18n, browserOptions, webpackConfig);
         }
         if (transforms.webpackConfiguration) {
             webpackConfig = await transforms.webpackConfiguration(webpackConfig);
@@ -159,7 +176,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             browserOptions,
             webpackConfig,
             projectRoot,
-            locale: browserOptions.i18nLocale || (i18n.shouldInline ? [...i18n.inlineLocales][0] : undefined),
+            locale,
         };
     }
     return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, projectRoot, locale }) => {
@@ -231,11 +248,10 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     }));
 }
 exports.serveWebpackBrowser = serveWebpackBrowser;
-async function setupLocalize(i18n, browserOptions, webpackConfig) {
+async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
     var _a;
-    const locale = [...i18n.inlineLocales][0];
     const localeDescription = i18n.locales[locale];
-    const { plugins, diagnostics } = await process_bundle_1.createI18nPlugins(locale, localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.translation, browserOptions.i18nMissingTranslation || 'ignore');
+    const { plugins, diagnostics } = await process_bundle_1.createI18nPlugins(locale, localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.translation, browserOptions.i18nMissingTranslation || 'ignore', i18n.shouldInline);
     // Modify main entrypoint to include locale data
     if ((localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.dataPath) &&
         typeof webpackConfig.entry === 'object' &&

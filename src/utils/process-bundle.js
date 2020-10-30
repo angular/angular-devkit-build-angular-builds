@@ -360,26 +360,28 @@ function createIifeWrapperPlugin() {
     };
 }
 const USE_LOCALIZE_PLUGINS = false;
-async function createI18nPlugins(locale, translation, missingTranslation, localeDataContent) {
+async function createI18nPlugins(locale, translation, missingTranslation, shouldInline, localeDataContent) {
     const plugins = [];
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
-    const es2015 = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
-    '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'));
-    plugins.push(
-    // tslint:disable-next-line: no-any
-    es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}), {
-        missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }));
-    const es5 = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
-    '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
-    plugins.push(
-    // tslint:disable-next-line: no-any
-    es5.makeEs5TranslatePlugin(diagnostics, (translation || {}), {
-        missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }));
+    if (shouldInline) {
+        const es2015 = await Promise.resolve().then(() => require(
+        // tslint:disable-next-line: trailing-comma
+        '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'));
+        plugins.push(
+        // tslint:disable-next-line: no-any
+        es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}), {
+            missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
+        }));
+        const es5 = await Promise.resolve().then(() => require(
+        // tslint:disable-next-line: trailing-comma
+        '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
+        plugins.push(
+        // tslint:disable-next-line: no-any
+        es5.makeEs5TranslatePlugin(diagnostics, (translation || {}), {
+            missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
+        }));
+    }
     const inlineLocale = await Promise.resolve().then(() => require(
     // tslint:disable-next-line: trailing-comma
     '@angular/localize/src/tools/src/translate/source_files/locale_plugin'));
@@ -448,7 +450,7 @@ async function inlineLocales(options) {
                 localeDataContent = await loadLocaleData(localeDataPath, true, options.es5);
             }
         }
-        const { diagnostics: localeDiagnostics, plugins } = await createI18nPlugins(locale, translations, isSourceLocale ? 'ignore' : options.missingTranslation || 'warning', localeDataContent);
+        const { diagnostics: localeDiagnostics, plugins } = await createI18nPlugins(locale, translations, isSourceLocale ? 'ignore' : options.missingTranslation || 'warning', true, localeDataContent);
         const transformResult = await core_1.transformFromAstSync(ast, options.code, {
             filename: options.filename,
             // using false ensures that babel will NOT search and process sourcemap comments (large memory usage)
