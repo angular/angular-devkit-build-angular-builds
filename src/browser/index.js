@@ -33,7 +33,6 @@ const read_tsconfig_1 = require("../utils/read-tsconfig");
 const service_worker_1 = require("../utils/service-worker");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
-const webpack_version_1 = require("../utils/webpack-version");
 const configs_1 = require("../webpack/configs");
 const analytics_1 = require("../webpack/plugins/analytics");
 const async_chunks_1 = require("../webpack/utils/async-chunks");
@@ -68,12 +67,6 @@ async function initialize(options, context, host, differentialLoadingMode, webpa
     const originalOutputPath = options.outputPath;
     // Assets are processed directly by the builder except when watching
     const adjustedOptions = options.watch ? options : { ...options, assets: [] };
-    // TODO_WEBPACK_5: Investigate build/serve issues with the `license-webpack-plugin` package
-    if (adjustedOptions.extractLicenses && webpack_version_1.isWebpackFiveOrHigher()) {
-        adjustedOptions.extractLicenses = false;
-        context.logger.warn('Warning: License extraction is currently disabled when using Webpack 5. ' +
-            'This is temporary and will be corrected in a future update.');
-    }
     const { config, projectRoot, projectSourceRoot, i18n, } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, wco => [
         configs_1.getCommonConfig(wco),
         configs_1.getBrowserConfig(wco),

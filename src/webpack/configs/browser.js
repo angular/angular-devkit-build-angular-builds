@@ -24,6 +24,7 @@ function getBrowserConfig(wco) {
             },
             perChunkOutput: false,
             outputFilename: '3rdpartylicenses.txt',
+            skipChildCompilers: true,
         }));
     }
     if (scriptsSourceMap || stylesSourceMap) {
