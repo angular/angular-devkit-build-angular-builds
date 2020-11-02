@@ -9,7 +9,6 @@ exports.getCommonConfig = void 0;
  * found in the LICENSE file at https://angular.io/license
  */
 const build_optimizer_1 = require("@angular-devkit/build-optimizer");
-const core_1 = require("@angular-devkit/core");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const fs_1 = require("fs");
 const path = require("path");
@@ -354,14 +353,6 @@ function getCommonConfig(wco) {
                 mangle: environment_options_1.allowMangle && buildOptions.platform !== 'server',
             },
         }));
-    }
-    if (wco.tsConfig.options.target !== undefined &&
-        wco.tsConfig.options.target >= typescript_1.ScriptTarget.ES2017) {
-        wco.logger.warn(core_1.tags.stripIndent `
-      Warning: Zone.js does not support native async/await in ES2017.
-      These blocks are not intercepted by zone.js and will not triggering change detection.
-      See: https://github.com/angular/zone.js/pull/1140 for more information.
-    `);
     }
     return {
         mode: scriptsOptimization || stylesOptimization ? 'production' : 'development',
