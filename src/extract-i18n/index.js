@@ -33,7 +33,7 @@ function getI18nOutfile(format) {
             throw new Error(`Unsupported format "${format}"`);
     }
 }
-async function getSerializer(format, sourceLocale, basePath, useLegacyIds = true) {
+async function getSerializer(format, sourceLocale, basePath, useLegacyIds) {
     switch (format) {
         case schema_1.Format.Xmb:
             const { XmbTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer'));
@@ -52,6 +52,30 @@ async function getSerializer(format, sourceLocale, basePath, useLegacyIds = true
             return new Xliff2TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
     }
 }
+function normalizeFormatOption(options) {
+    let format;
+    if (options.i18nFormat !== schema_1.Format.Xlf) {
+        format = options.i18nFormat;
+    }
+    else {
+        format = options.format;
+    }
+    switch (format) {
+        case schema_1.Format.Xlf:
+        case schema_1.Format.Xlif:
+        case schema_1.Format.Xliff:
+            format = schema_1.Format.Xlf;
+            break;
+        case schema_1.Format.Xlf2:
+        case schema_1.Format.Xliff2:
+            format = schema_1.Format.Xlf2;
+            break;
+        case undefined:
+            format = schema_1.Format.Xlf;
+            break;
+    }
+    return format;
+}
 class NoEmitPlugin {
     apply(compiler) {
         compiler.hooks.shouldEmit.tap('angular-no-emit', () => false);
@@ -63,23 +87,7 @@ async function execute(options, context, transforms) {
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
     const browserOptions = await context.validateOptions(await context.getTargetOptions(browserTarget), await context.getBuilderNameForTarget(browserTarget));
-    if (options.i18nFormat !== schema_1.Format.Xlf) {
-        options.format = options.i18nFormat;
-    }
-    switch (options.format) {
-        case schema_1.Format.Xlf:
-        case schema_1.Format.Xlif:
-        case schema_1.Format.Xliff:
-            options.format = schema_1.Format.Xlf;
-            break;
-        case schema_1.Format.Xlf2:
-        case schema_1.Format.Xliff2:
-            options.format = schema_1.Format.Xlf2;
-            break;
-        case undefined:
-            options.format = schema_1.Format.Xlf;
-            break;
-    }
+    const format = normalizeFormatOption(options);
     // We need to determine the outFile name so that AngularCompiler can retrieve it.
     let outFile = options.outFile || getI18nOutfile(options.format);
     if (options.outputPath) {
@@ -93,6 +101,7 @@ async function execute(options, context, transforms) {
     const metadata = await context.getProjectMetadata(context.target);
     const i18n = i18n_options_1.createI18nOptions(metadata);
     let usingIvy = false;
+    let useLegacyIds = true;
     const ivyMessages = [];
     const { config, projectRoot } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext({
         ...browserOptions,
@@ -107,7 +116,7 @@ async function execute(options, context, transforms) {
         },
         buildOptimizer: false,
         i18nLocale: options.i18nLocale || i18n.sourceLocale,
-        i18nFormat: options.format,
+        i18nFormat: format,
         i18nFile: outFile,
         aot: true,
         progress: options.progress,
@@ -116,7 +125,10 @@ async function execute(options, context, transforms) {
         styles: [],
         deleteOutputPath: false,
     }, context, (wco) => {
+        var _a;
         const isIvyApplication = wco.tsConfig.options.enableIvy !== false;
+        // Default value for legacy message ids is currently true
+        useLegacyIds = (_a = wco.tsConfig.options.enableI18nLegacyMessageIdFormat) !== null && _a !== void 0 ? _a : true;
         // Ivy extraction is the default for Ivy applications.
         usingIvy = (isIvyApplication && options.ivy === undefined) || !!options.ivy;
         if (usingIvy) {
@@ -182,8 +194,27 @@ async function execute(options, context, transforms) {
     if (!webpackResult.success) {
         return webpackResult;
     }
+    const basePath = config.context || projectRoot;
+    const { checkDuplicateMessages } = await Promise.resolve().then(() => require(
+    // tslint:disable-next-line: trailing-comma
+    '@angular/localize/src/tools/src/extract/duplicates'));
+    // The filesystem is used to create a relative path for each file
+    // from the basePath.  This relative path is then used in the error message.
+    const checkFileSystem = {
+        relative(from, to) {
+            return path.relative(from, to);
+        },
+    };
+    const diagnostics = checkDuplicateMessages(
+    // tslint:disable-next-line: no-any
+    checkFileSystem, ivyMessages, 'warning', 
+    // tslint:disable-next-line: no-any
+    basePath);
+    if (diagnostics.messages.length > 0) {
+        context.logger.warn(diagnostics.formatDiagnostics(''));
+    }
     // Serialize all extracted messages
-    const serializer = await getSerializer(options.format, i18n.sourceLocale, config.context || projectRoot);
+    const serializer = await getSerializer(format, i18n.sourceLocale, basePath, useLegacyIds);
     const content = serializer.serialize(ivyMessages);
     // Ensure directory exists
     const outputPath = path.dirname(outFile);

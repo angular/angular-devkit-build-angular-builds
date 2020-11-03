@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.statsToString = exports.generateBuildStats = exports.generateBuildStatsTable = exports.generateBundleStats = exports.formatSize = void 0;
+exports.webpackStatsLogger = exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.generateBundleStats = exports.formatSize = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -69,44 +69,48 @@ function generateBuildStatsTable(data, colors) {
         stringLength: s => color_1.removeColor(s).length,
     });
 }
-exports.generateBuildStatsTable = generateBuildStatsTable;
 function generateBuildStats(hash, time, colors) {
     const w = (x) => colors ? color_1.colors.bold.white(x) : x;
     return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
-exports.generateBuildStats = generateBuildStats;
-function statsToString(json, statsConfig) {
+function statsToString(json, statsConfig, bundleState) {
     const colors = statsConfig.colors;
     const rs = (x) => colors ? color_1.colors.reset(x) : x;
-    const changedChunksStats = [];
-    for (const chunk of json.chunks) {
-        if (!chunk.rendered) {
-            continue;
+    const changedChunksStats = bundleState !== null && bundleState !== void 0 ? bundleState : [];
+    let unchangedChunkNumber = 0;
+    if (!(bundleState === null || bundleState === void 0 ? void 0 : bundleState.length)) {
+        for (const chunk of json.chunks) {
+            if (!chunk.rendered) {
+                continue;
+            }
+            const assets = json.assets.filter((asset) => chunk.files.includes(asset.name));
+            const summedSize = assets.filter((asset) => !asset.name.endsWith(".map")).reduce((total, asset) => { return total + asset.size; }, 0);
+            changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }, colors));
         }
-        const assets = json.assets.filter((asset) => chunk.files.includes(asset.name));
-        const summedSize = assets.filter((asset) => !asset.name.endsWith(".map")).reduce((total, asset) => { return total + asset.size; }, 0);
-        changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }, colors));
+        unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
     }
-    const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
     const statsTable = generateBuildStatsTable(changedChunksStats, colors);
+    // In some cases we do things outside of webpack context 
+    // Such us index generation, service worker augmentation etc...
+    // This will correct the time and include these.
+    const time = (Date.now() - json.builtAt) + json.time;
     if (unchangedChunkNumber > 0) {
         return '\n' + rs(core_1.tags.stripIndents `
       ${statsTable}
 
       ${unchangedChunkNumber} unchanged chunks
 
-      ${generateBuildStats(json.hash, json.time, colors)}
+      ${generateBuildStats(json.hash, time, colors)}
       `);
     }
     else {
         return '\n' + rs(core_1.tags.stripIndents `
       ${statsTable}
 
-      ${generateBuildStats(json.hash, json.time, colors)}
+      ${generateBuildStats(json.hash, time, colors)}
       `);
     }
 }
-exports.statsToString = statsToString;
 const ERRONEOUS_WARNINGS_FILTER = (warning) => ![
     // Webpack 5+ has no facility to disable this warning.
     // System.import is used in @angular/core for deprecated string-form lazy routes
@@ -205,20 +209,21 @@ function statsHasWarnings(json) {
 exports.statsHasWarnings = statsHasWarnings;
 function createWebpackLoggingCallback(verbose, logger) {
     return (stats, config) => {
-        // config.stats contains our own stats settings, added during buildWebpackConfig().
-        const json = stats.toJson(config.stats);
         if (verbose) {
             logger.info(stats.toString(config.stats));
         }
-        else {
-            logger.info(statsToString(json, config.stats));
-        }
-        if (statsHasWarnings(json)) {
-            logger.warn(statsWarningsToString(json, config.stats));
-        }
-        if (statsHasErrors(json)) {
-            logger.error(statsErrorsToString(json, config.stats));
-        }
+        webpackStatsLogger(logger, stats.toJson(config.stats), config);
     };
 }
 exports.createWebpackLoggingCallback = createWebpackLoggingCallback;
+function webpackStatsLogger(logger, json, config, bundleStats) {
+    logger.info(statsToString(json, config.stats, bundleStats));
+    if (statsHasWarnings(json)) {
+        logger.warn(statsWarningsToString(json, config.stats));
+    }
+    if (statsHasErrors(json)) {
+        logger.error(statsErrorsToString(json, config.stats));
+    }
+}
+exports.webpackStatsLogger = webpackStatsLogger;
+;

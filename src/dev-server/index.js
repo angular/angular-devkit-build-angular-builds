@@ -22,6 +22,7 @@ const browser_1 = require("../browser");
 const utils_1 = require("../utils");
 const cache_path_1 = require("../utils/cache-path");
 const check_port_1 = require("../utils/check-port");
+const color_1 = require("../utils/color");
 const transforms_1 = require("../utils/index-file/transforms");
 const package_chunk_sort_1 = require("../utils/package-chunk-sort");
 const process_bundle_1 = require("../utils/process-bundle");
@@ -241,7 +242,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 }
             }
             if (buildEvent.success) {
-                logger.info(': Compiled successfully.');
+                logger.info(`${color_1.colors.greenBright(color_1.colors.symbols.check)} Compiled successfully.`);
             }
             return rxjs_1.of({ ...buildEvent, baseUrl: serverAddress });
         }));
