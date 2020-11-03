@@ -51,25 +51,20 @@ function execute(options, context, transforms = {}) {
     return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.concatMap(({ config, i18n }) => {
         return build_webpack_1.runWebpack(config, context, {
             webpackFactory: require('webpack'),
-            logging: (stats, config) => {
-                if (options.verbose) {
-                    context.logger.info(stats.toString(config.stats));
-                }
-            },
+            logging: stats_1.createWebpackLoggingCallback(!!options.verbose, context.logger),
         }).pipe(operators_1.concatMap(async (output) => {
             const { emittedFiles = [], webpackStats } = output;
+            if (!output.success || !i18n.shouldInline) {
+                return output;
+            }
             if (!webpackStats) {
                 throw new Error('Webpack stats build result is required.');
             }
-            let success = output.success;
-            if (success && i18n.shouldInline) {
-                outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
-                success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), [], 
-                // tslint:disable-next-line: no-non-null-assertion
-                webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
-            }
-            stats_1.webpackStatsLogger(context.logger, webpackStats, config);
-            return { ...output, success };
+            outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
+            const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), [], 
+            // tslint:disable-next-line: no-non-null-assertion
+            webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
+            return { output, success };
         }));
     }), operators_1.map(output => {
         if (!output.success) {

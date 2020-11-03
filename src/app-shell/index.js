@@ -13,7 +13,6 @@ const node_1 = require("@angular-devkit/core/node");
 const fs = require("fs");
 const path = require("path");
 const service_worker_1 = require("../utils/service-worker");
-const spinner_1 = require("../utils/spinner");
 async function _renderUniversal(options, context, browserResult, serverResult) {
     // Get browser target options.
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
@@ -95,7 +94,6 @@ async function _appShellBuilder(options, context) {
     const serverTargetRun = await context.scheduleTarget(serverTarget, {
         watch: false,
     });
-    let spinner;
     try {
         const [browserResult, serverResult] = await Promise.all([
             browserTargetRun.result,
@@ -107,14 +105,9 @@ async function _appShellBuilder(options, context) {
         else if (serverResult.success === false) {
             return serverResult;
         }
-        spinner = new spinner_1.Spinner();
-        spinner.start('Generating application shell...');
-        const result = await _renderUniversal(options, context, browserResult, serverResult);
-        spinner.succeed('Application shell generation complete.');
-        return result;
+        return await _renderUniversal(options, context, browserResult, serverResult);
     }
     catch (err) {
-        spinner === null || spinner === void 0 ? void 0 : spinner.fail('Application shell generation failed.');
         return { success: false, error: err.message };
     }
     finally {

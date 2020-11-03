@@ -60,7 +60,7 @@ class InlineFontsProcessor {
             if (hrefAttr) {
                 const href = hrefAttr.value;
                 const cssContent = hrefsContent.get(href);
-                rewriter.emitRaw(`<style type="text/css">${cssContent}</style>`);
+                rewriter.emitRaw(`<style type="text/css" title="${href}">${cssContent}</style>`);
             }
             else {
                 rewriter.emitStartTag(tag);
@@ -87,8 +87,7 @@ class InlineFontsProcessor {
                     .on('data', chunk => rawResponse += chunk)
                     .on('end', () => resolve(rawResponse));
             })
-                .on('error', e => reject(new Error(`Inlining of fonts failed. An error has occurred while retrieving ${url} over the internet.\n` +
-                e.message)));
+                .on('error', e => reject(e));
         });
         if (cacheFontsPath) {
             await cacache.put(cacheFontsPath, key, data);
