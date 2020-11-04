@@ -9,7 +9,7 @@ import { logging } from '@angular-devkit/core';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { Configuration, Stats } from 'webpack';
 export declare function formatSize(size: number): string;
-export declare type BundleStatsData = [files: string, names: string, size: string];
+export declare type BundleStatsData = [files: string, names: string, size: number | string];
 export interface BundleStats {
     initial: boolean;
     stats: BundleStatsData;

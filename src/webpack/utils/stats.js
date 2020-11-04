@@ -20,41 +20,58 @@ function formatSize(size) {
     }
     const abbreviations = ['bytes', 'kB', 'MB', 'GB'];
     const index = Math.floor(Math.log(size) / Math.log(1024));
-    return `${+(size / Math.pow(1024, index)).toPrecision(3)} ${abbreviations[index]}`;
+    const roundedSize = size / Math.pow(1024, index);
+    // bytes don't have a fraction
+    const fractionDigits = index === 0 ? 0 : 2;
+    return `${roundedSize.toFixed(fractionDigits)} ${abbreviations[index]}`;
 }
 exports.formatSize = formatSize;
 ;
 function generateBundleStats(info, colors) {
     var _a;
-    const g = (x) => (colors ? color_1.colors.greenBright(x) : x);
-    const c = (x) => (colors ? color_1.colors.cyanBright(x) : x);
-    const size = typeof info.size === 'number' ? formatSize(info.size) : '-';
+    const size = typeof info.size === 'number' ? info.size : '-';
     const files = info.files.filter(f => !f.endsWith('.map')).map(f => path.basename(f)).join(', ');
     const names = ((_a = info.names) === null || _a === void 0 ? void 0 : _a.length) ? info.names.join(', ') : '-';
     const initial = !!(info.entry || info.initial);
     return {
         initial,
-        stats: [g(files), names, c(size)],
+        stats: [files, names, size],
     };
 }
 exports.generateBundleStats = generateBundleStats;
-function generateBuildStatsTable(data, colors) {
+function generateBuildStatsTable(data, colors, showTotalSize) {
+    const g = (x) => colors ? color_1.colors.greenBright(x) : x;
+    const c = (x) => colors ? color_1.colors.cyanBright(x) : x;
+    const bold = (x) => colors ? color_1.colors.bold(x) : x;
+    const dim = (x) => colors ? color_1.colors.dim(x) : x;
     const changedEntryChunksStats = [];
     const changedLazyChunksStats = [];
+    let initialTotalSize = 0;
     for (const { initial, stats } of data) {
+        const [files, names, size] = stats;
+        const data = [
+            g(files),
+            names,
+            c(typeof size === 'number' ? formatSize(size) : size),
+        ];
         if (initial) {
-            changedEntryChunksStats.push(stats);
+            changedEntryChunksStats.push(data);
+            if (typeof size === 'number') {
+                initialTotalSize += size;
+            }
         }
         else {
-            changedLazyChunksStats.push(stats);
+            changedLazyChunksStats.push(data);
         }
     }
     const bundleInfo = [];
-    const bold = (x) => colors ? color_1.colors.bold(x) : x;
-    const dim = (x) => colors ? color_1.colors.dim(x) : x;
     // Entry chunks
     if (changedEntryChunksStats.length) {
         bundleInfo.push(['Initial Chunk Files', 'Names', 'Size'].map(bold), ...changedEntryChunksStats);
+        if (showTotalSize) {
+            bundleInfo.push([]);
+            bundleInfo.push([' ', 'Initial Total', formatSize(initialTotalSize)].map(bold));
+        }
     }
     // Seperator
     if (changedEntryChunksStats.length && changedLazyChunksStats.length) {
@@ -67,6 +84,7 @@ function generateBuildStatsTable(data, colors) {
     return textTable(bundleInfo, {
         hsep: dim(' | '),
         stringLength: s => color_1.removeColor(s).length,
+        align: ['l', 'l', 'r'],
     });
 }
 function generateBuildStats(hash, time, colors) {
@@ -89,7 +107,17 @@ function statsToString(json, statsConfig, bundleState) {
         }
         unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
     }
-    const statsTable = generateBuildStatsTable(changedChunksStats, colors);
+    // Sort chunks by size in descending order
+    changedChunksStats.sort((a, b) => {
+        if (a.stats[2] > b.stats[2]) {
+            return -1;
+        }
+        if (a.stats[2] < b.stats[2]) {
+            return 1;
+        }
+        return 0;
+    });
+    const statsTable = generateBuildStatsTable(changedChunksStats, colors, unchangedChunkNumber === 0);
     // In some cases we do things outside of webpack context 
     // Such us index generation, service worker augmentation etc...
     // This will correct the time and include these.

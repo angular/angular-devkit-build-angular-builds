@@ -8,7 +8,7 @@ function getBrowserConfig(wco) {
     const { buildOptions } = wco;
     const { crossOrigin = 'none', subresourceIntegrity, extractLicenses, vendorChunk, commonChunk, allowedCommonJsDependencies, } = buildOptions;
     const extraPlugins = [];
-    const { styles: stylesSourceMap, scripts: scriptsSourceMap, hidden: hiddenSourceMap, vendor: vendorSourceMap, } = buildOptions.sourceMap;
+    const { styles: stylesSourceMap, scripts: scriptsSourceMap, hidden: hiddenSourceMap, } = buildOptions.sourceMap;
     if (subresourceIntegrity) {
         const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
         extraPlugins.push(new SubresourceIntegrityPlugin({
@@ -28,7 +28,7 @@ function getBrowserConfig(wco) {
         }));
     }
     if (scriptsSourceMap || stylesSourceMap) {
-        extraPlugins.push(helpers_1.getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, buildOptions.differentialLoadingMode ? true : hiddenSourceMap, false, vendorSourceMap));
+        extraPlugins.push(helpers_1.getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, buildOptions.differentialLoadingMode ? true : hiddenSourceMap, false));
     }
     let crossOriginLoading = false;
     if (subresourceIntegrity && crossOrigin === 'none') {
