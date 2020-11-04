@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.statsToString = exports.generateBuildStats = exports.generateBuildStatsTable = exports.generateBundleStats = exports.formatSize = void 0;
+exports.webpackStatsLogger = exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.generateBundleStats = exports.formatSize = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -20,41 +20,58 @@ function formatSize(size) {
     }
     const abbreviations = ['bytes', 'kB', 'MB', 'GB'];
     const index = Math.floor(Math.log(size) / Math.log(1024));
-    return `${+(size / Math.pow(1024, index)).toPrecision(3)} ${abbreviations[index]}`;
+    const roundedSize = size / Math.pow(1024, index);
+    // bytes don't have a fraction
+    const fractionDigits = index === 0 ? 0 : 2;
+    return `${roundedSize.toFixed(fractionDigits)} ${abbreviations[index]}`;
 }
 exports.formatSize = formatSize;
 ;
 function generateBundleStats(info, colors) {
     var _a;
-    const g = (x) => (colors ? color_1.colors.greenBright(x) : x);
-    const c = (x) => (colors ? color_1.colors.cyanBright(x) : x);
-    const size = typeof info.size === 'number' ? formatSize(info.size) : '-';
+    const size = typeof info.size === 'number' ? info.size : '-';
     const files = info.files.filter(f => !f.endsWith('.map')).map(f => path.basename(f)).join(', ');
     const names = ((_a = info.names) === null || _a === void 0 ? void 0 : _a.length) ? info.names.join(', ') : '-';
     const initial = !!(info.entry || info.initial);
     return {
         initial,
-        stats: [g(files), names, c(size)],
+        stats: [files, names, size],
     };
 }
 exports.generateBundleStats = generateBundleStats;
-function generateBuildStatsTable(data, colors) {
+function generateBuildStatsTable(data, colors, showTotalSize) {
+    const g = (x) => colors ? color_1.colors.greenBright(x) : x;
+    const c = (x) => colors ? color_1.colors.cyanBright(x) : x;
+    const bold = (x) => colors ? color_1.colors.bold(x) : x;
+    const dim = (x) => colors ? color_1.colors.dim(x) : x;
     const changedEntryChunksStats = [];
     const changedLazyChunksStats = [];
+    let initialTotalSize = 0;
     for (const { initial, stats } of data) {
+        const [files, names, size] = stats;
+        const data = [
+            g(files),
+            names,
+            c(typeof size === 'number' ? formatSize(size) : size),
+        ];
         if (initial) {
-            changedEntryChunksStats.push(stats);
+            changedEntryChunksStats.push(data);
+            if (typeof size === 'number') {
+                initialTotalSize += size;
+            }
         }
         else {
-            changedLazyChunksStats.push(stats);
+            changedLazyChunksStats.push(data);
         }
     }
     const bundleInfo = [];
-    const bold = (x) => colors ? color_1.colors.bold(x) : x;
-    const dim = (x) => colors ? color_1.colors.dim(x) : x;
     // Entry chunks
     if (changedEntryChunksStats.length) {
         bundleInfo.push(['Initial Chunk Files', 'Names', 'Size'].map(bold), ...changedEntryChunksStats);
+        if (showTotalSize) {
+            bundleInfo.push([]);
+            bundleInfo.push([' ', 'Initial Total', formatSize(initialTotalSize)].map(bold));
+        }
     }
     // Seperator
     if (changedEntryChunksStats.length && changedLazyChunksStats.length) {
@@ -67,46 +84,61 @@ function generateBuildStatsTable(data, colors) {
     return textTable(bundleInfo, {
         hsep: dim(' | '),
         stringLength: s => color_1.removeColor(s).length,
+        align: ['l', 'l', 'r'],
     });
 }
-exports.generateBuildStatsTable = generateBuildStatsTable;
 function generateBuildStats(hash, time, colors) {
     const w = (x) => colors ? color_1.colors.bold.white(x) : x;
     return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
-exports.generateBuildStats = generateBuildStats;
-function statsToString(json, statsConfig) {
+function statsToString(json, statsConfig, bundleState) {
     const colors = statsConfig.colors;
     const rs = (x) => colors ? color_1.colors.reset(x) : x;
-    const changedChunksStats = [];
-    for (const chunk of json.chunks) {
-        if (!chunk.rendered) {
-            continue;
+    const changedChunksStats = bundleState !== null && bundleState !== void 0 ? bundleState : [];
+    let unchangedChunkNumber = 0;
+    if (!(bundleState === null || bundleState === void 0 ? void 0 : bundleState.length)) {
+        for (const chunk of json.chunks) {
+            if (!chunk.rendered) {
+                continue;
+            }
+            const assets = json.assets.filter((asset) => chunk.files.includes(asset.name));
+            const summedSize = assets.filter((asset) => !asset.name.endsWith(".map")).reduce((total, asset) => { return total + asset.size; }, 0);
+            changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }, colors));
         }
-        const assets = json.assets.filter((asset) => chunk.files.includes(asset.name));
-        const summedSize = assets.filter((asset) => !asset.name.endsWith(".map")).reduce((total, asset) => { return total + asset.size; }, 0);
-        changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }, colors));
+        unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
     }
-    const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
-    const statsTable = generateBuildStatsTable(changedChunksStats, colors);
+    // Sort chunks by size in descending order
+    changedChunksStats.sort((a, b) => {
+        if (a.stats[2] > b.stats[2]) {
+            return -1;
+        }
+        if (a.stats[2] < b.stats[2]) {
+            return 1;
+        }
+        return 0;
+    });
+    const statsTable = generateBuildStatsTable(changedChunksStats, colors, unchangedChunkNumber === 0);
+    // In some cases we do things outside of webpack context 
+    // Such us index generation, service worker augmentation etc...
+    // This will correct the time and include these.
+    const time = (Date.now() - json.builtAt) + json.time;
     if (unchangedChunkNumber > 0) {
         return '\n' + rs(core_1.tags.stripIndents `
       ${statsTable}
 
       ${unchangedChunkNumber} unchanged chunks
 
-      ${generateBuildStats(json.hash, json.time, colors)}
+      ${generateBuildStats(json.hash, time, colors)}
       `);
     }
     else {
         return '\n' + rs(core_1.tags.stripIndents `
       ${statsTable}
 
-      ${generateBuildStats(json.hash, json.time, colors)}
+      ${generateBuildStats(json.hash, time, colors)}
       `);
     }
 }
-exports.statsToString = statsToString;
 const ERRONEOUS_WARNINGS_FILTER = (warning) => ![
     // TODO(#16193): Don't emit this warning in the first place rather than just suppressing it.
     /multiple assets emit different content.*3rdpartylicenses\.txt/i,
@@ -207,20 +239,21 @@ function statsHasWarnings(json) {
 exports.statsHasWarnings = statsHasWarnings;
 function createWebpackLoggingCallback(verbose, logger) {
     return (stats, config) => {
-        // config.stats contains our own stats settings, added during buildWebpackConfig().
-        const json = stats.toJson(config.stats);
         if (verbose) {
             logger.info(stats.toString(config.stats));
         }
-        else {
-            logger.info(statsToString(json, config.stats));
-        }
-        if (statsHasWarnings(json)) {
-            logger.warn(statsWarningsToString(json, config.stats));
-        }
-        if (statsHasErrors(json)) {
-            logger.error(statsErrorsToString(json, config.stats));
-        }
+        webpackStatsLogger(logger, stats.toJson(config.stats), config);
     };
 }
 exports.createWebpackLoggingCallback = createWebpackLoggingCallback;
+function webpackStatsLogger(logger, json, config, bundleStats) {
+    logger.info(statsToString(json, config.stats, bundleStats));
+    if (statsHasWarnings(json)) {
+        logger.warn(statsWarningsToString(json, config.stats));
+    }
+    if (statsHasErrors(json)) {
+        logger.error(statsErrorsToString(json, config.stats));
+    }
+}
+exports.webpackStatsLogger = webpackStatsLogger;
+;

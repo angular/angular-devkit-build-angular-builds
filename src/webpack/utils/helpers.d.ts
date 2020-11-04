@@ -17,7 +17,7 @@ export interface HashFormat {
 export declare function getOutputHashFormat(option: string, length?: number): HashFormat;
 export declare type NormalizedEntryPoint = Required<ExtraEntryPointClass>;
 export declare function normalizeExtraEntryPoints(extraEntryPoints: ExtraEntryPoint[], defaultBundleName: string): NormalizedEntryPoint[];
-export declare function getSourceMapDevTool(scriptsSourceMap: boolean | undefined, stylesSourceMap: boolean | undefined, hiddenSourceMap?: boolean, inlineSourceMap?: boolean, vendorSourceMap?: boolean): SourceMapDevToolPlugin;
+export declare function getSourceMapDevTool(scriptsSourceMap: boolean | undefined, stylesSourceMap: boolean | undefined, hiddenSourceMap?: boolean, inlineSourceMap?: boolean): SourceMapDevToolPlugin;
 /**
  * Returns an ES version file suffix to differentiate between various builds.
  */

@@ -53,7 +53,7 @@ function normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName) {
     });
 }
 exports.normalizeExtraEntryPoints = normalizeExtraEntryPoints;
-function getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, hiddenSourceMap = false, inlineSourceMap = false, vendorSourceMap = false) {
+function getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, hiddenSourceMap = false, inlineSourceMap = false) {
     const include = [];
     if (scriptsSourceMap) {
         include.push(/js$/);
@@ -71,7 +71,6 @@ function getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, hiddenSourceMap 
         sourceRoot: 'webpack:///',
         moduleFilenameTemplate: '[resource-path]',
         append: hiddenSourceMap ? false : undefined,
-        exclude: vendorSourceMap ? undefined : /vendor.*\.js/,
     });
 }
 exports.getSourceMapDevTool = getSourceMapDevTool;
