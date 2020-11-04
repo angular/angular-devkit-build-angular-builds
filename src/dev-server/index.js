@@ -22,9 +22,9 @@ const browser_1 = require("../browser");
 const utils_1 = require("../utils");
 const cache_path_1 = require("../utils/cache-path");
 const check_port_1 = require("../utils/check-port");
+const color_1 = require("../utils/color");
 const transforms_1 = require("../utils/index-file/transforms");
 const package_chunk_sort_1 = require("../utils/package-chunk-sort");
-const process_bundle_1 = require("../utils/process-bundle");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
@@ -241,7 +241,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 }
             }
             if (buildEvent.success) {
-                logger.info(': Compiled successfully.');
+                logger.info(`${color_1.colors.greenBright(color_1.colors.symbols.check)} Compiled successfully.`);
             }
             return rxjs_1.of({ ...buildEvent, baseUrl: serverAddress });
         }));
@@ -251,7 +251,7 @@ exports.serveWebpackBrowser = serveWebpackBrowser;
 async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
     var _a;
     const localeDescription = i18n.locales[locale];
-    const { plugins, diagnostics } = await process_bundle_1.createI18nPlugins(locale, localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.translation, browserOptions.i18nMissingTranslation || 'ignore', i18n.shouldInline);
+    const i18nDiagnostics = [];
     // Modify main entrypoint to include locale data
     if ((localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.dataPath) &&
         typeof webpackConfig.entry === 'object' &&
@@ -263,6 +263,12 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
         else {
             webpackConfig.entry['main'] = [localeDescription.dataPath, webpackConfig.entry['main']];
         }
+    }
+    let missingTranslationBehavior = browserOptions.i18nMissingTranslation || 'ignore';
+    let translation = (localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.translation) || {};
+    if (locale === i18n.sourceLocale) {
+        missingTranslationBehavior = 'ignore';
+        translation = {};
     }
     const i18nRule = {
         test: /\.(?:m?js|ts)$/,
@@ -281,7 +287,20 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
                         locale,
                         translationIntegrity: localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.files.map((file) => file.integrity),
                     }),
-                    plugins,
+                    sourceType: 'unambiguous',
+                    presets: [
+                        [
+                            require.resolve('../babel/presets/application'),
+                            {
+                                i18n: {
+                                    locale,
+                                    translation: i18n.shouldInline ? translation : undefined,
+                                    missingTranslationBehavior,
+                                },
+                                diagnosticReporter: (type, message) => i18nDiagnostics.push({ type, message }),
+                            },
+                        ],
+                    ],
                 },
             },
         ],
@@ -301,10 +320,7 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
         apply: (compiler) => {
             compiler.hooks.thisCompilation.tap('build-angular', compilation => {
                 compilation.hooks.finishModules.tap('build-angular', () => {
-                    if (!diagnostics) {
-                        return;
-                    }
-                    for (const diagnostic of diagnostics.messages) {
+                    for (const diagnostic of i18nDiagnostics) {
                         if (diagnostic.type === 'error') {
                             webpack_diagnostics_1.addError(compilation, diagnostic.message);
                         }
@@ -312,7 +328,7 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
                             webpack_diagnostics_1.addWarning(compilation, diagnostic.message);
                         }
                     }
-                    diagnostics.messages.length = 0;
+                    i18nDiagnostics.length = 0;
                 });
             });
         },

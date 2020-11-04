@@ -2,11 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.i18nInlineEmittedFiles = void 0;
 const fs = require("fs");
-const ora = require("ora");
 const path = require("path");
 const action_executor_1 = require("./action-executor");
-const color_1 = require("./color");
 const copy_assets_1 = require("./copy-assets");
+const spinner_1 = require("./spinner");
 function emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emittedPath, outputPath, es5, missingTranslation) {
     const options = [];
     const originalFiles = [];
@@ -43,7 +42,8 @@ function emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emitte
 async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, outputPaths, scriptsEntryPointName, emittedPath, es5, missingTranslation) {
     const executor = new action_executor_1.BundleActionExecutor({ i18n });
     let hasErrors = false;
-    const spinner = ora('Generating localized bundles...').start();
+    const spinner = new spinner_1.Spinner();
+    spinner.start('Generating localized bundles...');
     try {
         const { options, originalFiles: processedFiles } = emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emittedPath, baseOutputPath, es5, missingTranslation);
         for await (const result of executor.inlineAll(options)) {
@@ -70,14 +70,14 @@ async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPat
         ], outputPaths, '');
     }
     catch (err) {
-        spinner.fail(color_1.colors.redBright('Localized bundle generation failed: ' + err.message));
+        spinner.fail('Localized bundle generation failed: ' + err.message);
         return false;
     }
     finally {
         executor.stop();
     }
     if (hasErrors) {
-        spinner.fail(color_1.colors.redBright('Localized bundle generation failed.'));
+        spinner.fail('Localized bundle generation failed.');
     }
     else {
         spinner.succeed('Localized bundle generation complete.');
