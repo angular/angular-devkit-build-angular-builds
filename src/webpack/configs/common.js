@@ -265,8 +265,6 @@ function getCommonConfig(wco) {
     }
     if (buildOptions.namedChunks && !webpack_version_1.isWebpackFiveOrHigher()) {
         extraPlugins.push(new plugins_1.NamedLazyChunksPlugin());
-        // Provide full names for lazy routes that use the deprecated string format
-        extraPlugins.push(new webpack_1.ContextReplacementPlugin(/\@angular[\\\/]core[\\\/]/, (data) => (data.chunkName = '[request]')));
     }
     if (!differentialLoadingMode) {
         // Budgets are computed after differential builds, not via a plugin.
