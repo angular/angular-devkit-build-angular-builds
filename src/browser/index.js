@@ -154,7 +154,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         operators_1.concatMap(async (buildEvent) => {
             var _a, _b, _c, _d;
             const spinner = new spinner_1.Spinner();
-            spinner.enabled = !!options.progress;
+            spinner.enabled = options.progress !== false;
             const { webpackStats: webpackRawStats, success, emittedFiles = [] } = buildEvent;
             if (!webpackRawStats) {
                 throw new Error('Webpack stats build result is required.');
