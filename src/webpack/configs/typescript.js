@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTypescriptWorkerPlugin = exports.getAotConfig = exports.getNonAotConfig = void 0;
 const build_optimizer_1 = require("@angular-devkit/build-optimizer");
+const core_1 = require("@angular-devkit/core");
 const webpack_1 = require("@ngtools/webpack");
 const path = require("path");
 const environment_options_1 = require("../../utils/environment-options");
@@ -38,7 +39,7 @@ function createIvyPlugin(wco, aot, tsconfig) {
     const fileReplacements = {};
     if (buildOptions.fileReplacements) {
         for (const replacement of buildOptions.fileReplacements) {
-            fileReplacements[replacement.replace] = replacement.with;
+            fileReplacements[core_1.getSystemPath(replacement.replace)] = core_1.getSystemPath(replacement.with);
         }
     }
     return new webpack_1.ivy.AngularWebpackPlugin({
