@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "0.1100.0-next.7+199.88a3794",
+  "version": "0.1100.0-next.7+201.91bb4b8",
   "description": "Angular Webpack Build Facade",
   "experimental": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#88a379452",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#88a379452",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#88a379452",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#88a379452",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#91bb4b860",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#91bb4b860",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#91bb4b860",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#91bb4b860",
     "@babel/core": "7.12.3",
     "@babel/generator": "7.12.1",
     "@babel/plugin-transform-runtime": "7.12.1",
@@ -18,7 +18,7 @@
     "@babel/runtime": "7.12.1",
     "@babel/template": "7.10.4",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#88a379452",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#91bb4b860",
     "ansi-colors": "4.1.1",
     "autoprefixer": "9.8.6",
     "babel-loader": "8.2.1",
@@ -101,6 +101,11 @@
     },
     "tslint": {
       "optional": true
+    }
+  },
+  "ng-update": {
+    "packageGroup": {
+      "codelyzer": "^6.0.0"
     }
   },
   "keywords": [
