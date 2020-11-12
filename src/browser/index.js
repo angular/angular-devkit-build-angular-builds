@@ -423,17 +423,17 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     for (const result of processResults) {
                         const chunk = (_a = webpackStats.chunks) === null || _a === void 0 ? void 0 : _a.find((chunk) => chunk.id.toString() === result.name);
                         if (result.original) {
-                            bundleInfoStats.push(generateBundleInfoStats(result.original, chunk));
+                            bundleInfoStats.push(generateBundleInfoStats(result.original, chunk, 'modern'));
                         }
                         if (result.downlevel) {
-                            bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk));
+                            bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk, 'legacy'));
                         }
                     }
                     const unprocessedChunks = ((_b = webpackStats.chunks) === null || _b === void 0 ? void 0 : _b.filter((chunk) => !processResults
                         .find((result) => chunk.id.toString() === result.name))) || [];
                     for (const chunk of unprocessedChunks) {
                         const asset = (_c = webpackStats.assets) === null || _c === void 0 ? void 0 : _c.find(a => a.name === chunk.files[0]);
-                        bundleInfoStats.push(stats_1.generateBundleStats({ ...chunk, size: asset === null || asset === void 0 ? void 0 : asset.size }, true));
+                        bundleInfoStats.push(stats_1.generateBundleStats({ ...chunk, size: asset === null || asset === void 0 ? void 0 : asset.size }));
                     }
                     // Check for budget errors and display them to the user.
                     const budgets = options.budgets || [];
@@ -550,7 +550,7 @@ function mapErrorToMessage(error) {
 function assertNever(input) {
     throw new Error(`Unexpected call to assertNever() with input: ${JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
 }
-function generateBundleInfoStats(bundle, chunk) {
+function generateBundleInfoStats(bundle, chunk, chunkType) {
     return stats_1.generateBundleStats({
         size: bundle.size,
         files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
@@ -558,6 +558,7 @@ function generateBundleInfoStats(bundle, chunk) {
         entry: !!(chunk === null || chunk === void 0 ? void 0 : chunk.names.includes('runtime')),
         initial: !!(chunk === null || chunk === void 0 ? void 0 : chunk.initial),
         rendered: true,
-    }, true);
+        chunkType,
+    });
 }
 exports.default = architect_1.createBuilder(buildWebpackBrowser);
