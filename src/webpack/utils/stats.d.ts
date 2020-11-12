@@ -10,9 +10,11 @@ import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { Configuration, Stats } from 'webpack';
 export declare function formatSize(size: number): string;
 export declare type BundleStatsData = [files: string, names: string, size: number | string];
+export declare type ChunkType = 'modern' | 'legacy' | 'unknown';
 export interface BundleStats {
     initial: boolean;
     stats: BundleStatsData;
+    chunkType: ChunkType;
 }
 export declare function generateBundleStats(info: {
     size?: number;
@@ -21,7 +23,8 @@ export declare function generateBundleStats(info: {
     entry: boolean;
     initial: boolean;
     rendered?: boolean;
-}, colors: boolean): BundleStats;
+    chunkType?: ChunkType;
+}): BundleStats;
 export declare function statsWarningsToString(json: any, statsConfig: any): string;
 export declare function statsErrorsToString(json: any, statsConfig: any): string;
 export declare function statsHasErrors(json: any): boolean;
