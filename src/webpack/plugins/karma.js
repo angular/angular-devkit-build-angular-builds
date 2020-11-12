@@ -90,8 +90,8 @@ const init = (config, emitter, customFileHandlers) => {
             // coverage-istanbul is deprecated in favor of karma-coverage
             reporters.push('coverage-istanbul');
         }
-        else {
-            throw new Error('karma-coverage must be installed in order to run code coverage');
+        else if (!hasCoveragePlugin && !hasIstanbulPlugin) {
+            throw new Error('karma-coverage must be installed in order to run code coverage.');
         }
         if (hasIstanbulPlugin) {
             logger.warn(`'karma-coverage-istanbul-reporter' usage has been deprecated since version 11.\n` +
