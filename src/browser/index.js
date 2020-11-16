@@ -24,10 +24,11 @@ const cache_path_1 = require("../utils/cache-path");
 const color_1 = require("../utils/color");
 const copy_assets_1 = require("../utils/copy-assets");
 const environment_options_1 = require("../utils/environment-options");
+const fs_1 = require("../utils/fs");
 const i18n_inlining_1 = require("../utils/i18n-inlining");
-const transforms_1 = require("../utils/index-file/transforms");
-const write_index_html_1 = require("../utils/index-file/write-index-html");
+const index_html_generator_1 = require("../utils/index-file/index-html-generator");
 const output_paths_1 = require("../utils/output-paths");
+const package_chunk_sort_1 = require("../utils/package-chunk-sort");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
 const service_worker_1 = require("../utils/service-worker");
 const spinner_1 = require("../utils/spinner");
@@ -141,7 +142,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     // tslint:disable-next-line: no-big-function
     operators_1.switchMap(({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target }) => {
         const normalizedOptimization = utils_1.normalizeOptimization(options.optimization);
-        const indexTransforms = transforms_1.getHtmlTransforms(normalizedOptimization, buildBrowserFeatures, transforms.indexHtml);
         return build_webpack_1.runWebpack(config, context, {
             webpackFactory: require('webpack'),
             logging: transforms.logging || ((stats, config) => {
@@ -152,7 +152,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         }).pipe(
         // tslint:disable-next-line: no-big-function
         operators_1.concatMap(async (buildEvent) => {
-            var _a, _b, _c, _d;
+            var _a, _b, _c, _d, _e, _f;
             const spinner = new spinner_1.Spinner();
             spinner.enabled = options.progress !== false;
             const { webpackStats: webpackRawStats, success, emittedFiles = [] } = buildEvent;
@@ -265,7 +265,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                     fs.unlinkSync(filename + '.map');
                                 }
                             }
-                            catch (_e) { }
+                            catch (_g) { }
                         }
                         if (es5Polyfills) {
                             fs.unlinkSync(filename);
@@ -471,24 +471,35 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 if (success) {
                     if (options.index) {
                         spinner.start('Generating index html...');
+                        const WOFFSupportNeeded = !buildBrowserFeatures.isFeatureSupported('woff2');
+                        const entrypoints = package_chunk_sort_1.generateEntryPoints({
+                            scripts: (_e = options.scripts) !== null && _e !== void 0 ? _e : [],
+                            styles: (_f = options.styles) !== null && _f !== void 0 ? _f : [],
+                        });
+                        const indexHtmlGenerator = new index_html_generator_1.IndexHtmlGenerator({
+                            indexPath: path.join(context.workspaceRoot, webpack_browser_config_1.getIndexInputFile(options.index)),
+                            entrypoints,
+                            deployUrl: options.deployUrl,
+                            sri: options.subresourceIntegrity,
+                            WOFFSupportNeeded,
+                            optimization: normalizedOptimization,
+                            crossOrigin: options.crossOrigin,
+                            postTransform: transforms.indexHtml,
+                        });
                         for (const [locale, outputPath] of outputPaths.entries()) {
                             try {
-                                await write_index_html_1.writeIndexHtml({
-                                    outputPath: path.join(outputPath, webpack_browser_config_1.getIndexOutputFile(options.index)),
-                                    indexPath: path.join(context.workspaceRoot, webpack_browser_config_1.getIndexInputFile(options.index)),
-                                    files,
-                                    noModuleFiles,
-                                    moduleFiles,
+                                const content = await indexHtmlGenerator.process({
                                     baseHref: getLocaleBaseHref(i18n, locale) || options.baseHref,
-                                    deployUrl: options.deployUrl,
-                                    sri: options.subresourceIntegrity,
-                                    scripts: options.scripts,
-                                    styles: options.styles,
-                                    postTransforms: indexTransforms,
-                                    crossOrigin: options.crossOrigin,
                                     // i18nLocale is used when Ivy is disabled
                                     lang: locale || options.i18nLocale,
+                                    outputPath,
+                                    files: mapEmittedFilesToFileInfo(files),
+                                    noModuleFiles: mapEmittedFilesToFileInfo(noModuleFiles),
+                                    moduleFiles: mapEmittedFilesToFileInfo(moduleFiles),
                                 });
+                                const indexOutput = path.join(outputPath, webpack_browser_config_1.getIndexOutputFile(options.index));
+                                await fs_1.mkdir(path.dirname(indexOutput), { recursive: true });
+                                await fs_1.writeFile(indexOutput, content);
                             }
                             catch (error) {
                                 spinner.fail('Index html generation failed.');
@@ -552,5 +563,14 @@ function generateBundleInfoStats(bundle, chunk, chunkType) {
         rendered: true,
         chunkType,
     });
+}
+function mapEmittedFilesToFileInfo(files = []) {
+    const filteredFiles = [];
+    for (const { file, name, extension, initial } of files) {
+        if (name && initial) {
+            filteredFiles.push({ file, extension, name });
+        }
+    }
+    return filteredFiles;
 }
 exports.default = architect_1.createBuilder(buildWebpackBrowser);

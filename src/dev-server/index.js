@@ -23,7 +23,6 @@ const utils_1 = require("../utils");
 const cache_path_1 = require("../utils/cache-path");
 const check_port_1 = require("../utils/check-port");
 const color_1 = require("../utils/color");
-const transforms_1 = require("../utils/index-file/transforms");
 const package_chunk_sort_1 = require("../utils/package-chunk-sort");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
 const version_1 = require("../utils/version");
@@ -192,15 +191,17 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 : [];
             webpackConfig.plugins = [...(webpackConfig.plugins || [])];
             webpackConfig.plugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({
-                input: path.resolve(workspaceRoot, webpack_browser_config_1.getIndexInputFile(browserOptions.index)),
-                output: webpack_browser_config_1.getIndexOutputFile(browserOptions.index),
+                indexPath: path.resolve(workspaceRoot, webpack_browser_config_1.getIndexInputFile(browserOptions.index)),
+                outputPath: webpack_browser_config_1.getIndexOutputFile(browserOptions.index),
                 baseHref,
-                moduleEntrypoints,
                 entrypoints,
+                moduleEntrypoints,
+                noModuleEntrypoints: ['polyfills-es5'],
                 deployUrl: browserOptions.deployUrl,
                 sri: browserOptions.subresourceIntegrity,
-                noModuleEntrypoints: ['polyfills-es5'],
-                postTransforms: transforms_1.getHtmlTransforms(normalizedOptimization, buildBrowserFeatures, transforms.indexHtml),
+                postTransform: transforms.indexHtml,
+                optimization: normalizedOptimization,
+                WOFFSupportNeeded: !buildBrowserFeatures.isFeatureSupported('woff2'),
                 crossOrigin: browserOptions.crossOrigin,
                 lang: locale,
             }));

@@ -8,8 +8,7 @@
 export declare type LoadOutputFileFunctionType = (file: string) => Promise<string>;
 export declare type CrossOriginValue = 'none' | 'anonymous' | 'use-credentials';
 export interface AugmentIndexHtmlOptions {
-    input: string;
-    inputContent: string;
+    html: string;
     baseHref?: string;
     deployUrl?: string;
     sri: boolean;

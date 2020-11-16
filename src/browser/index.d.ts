@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import { WebpackConfigOptions } from '../utils/build-options';
-import { IndexHtmlTransform } from '../utils/index-file/write-index-html';
+import { IndexHtmlTransform } from '../utils/index-file/index-html-generator';
 import { Schema as BrowserBuilderSchema } from './schema';
 export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
     baseOutputPath: string;
