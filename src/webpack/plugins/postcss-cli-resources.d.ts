@@ -1,4 +1,4 @@
-import { Plugin } from 'postcss';
+import * as postcss from 'postcss';
 import * as webpack from 'webpack';
 export interface PostcssCliResourcesOptions {
     baseHref?: string;
@@ -11,5 +11,5 @@ export interface PostcssCliResourcesOptions {
     loader: webpack.loader.LoaderContext;
     emitFile: boolean;
 }
-export declare const postcss = true;
-export default function (options?: PostcssCliResourcesOptions): Plugin;
+declare const _default: postcss.Plugin<PostcssCliResourcesOptions>;
+export default _default;

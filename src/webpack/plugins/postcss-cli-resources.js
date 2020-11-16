@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postcss = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -10,6 +9,7 @@ exports.postcss = void 0;
  */
 const loader_utils_1 = require("loader-utils");
 const path = require("path");
+const postcss = require("postcss");
 const url = require("url");
 function wrapUrl(url) {
     let wrappedUrl;
@@ -30,12 +30,11 @@ async function resolve(file, base, resolver) {
         return resolver(file, base);
     }
 }
-exports.postcss = true;
-function default_1(options) {
+exports.default = postcss.plugin('postcss-cli-resources', (options) => {
     if (!options) {
         throw new Error('No options were specified to "postcss-cli-resources".');
     }
-    const { deployUrl = '', resourcesOutputPath = '', filename, loader, emitFile, extracted, } = options;
+    const { deployUrl = '', baseHref = '', resourcesOutputPath = '', filename, loader, emitFile, extracted, } = options;
     const process = async (inputUrl, context, resourceCache) => {
         // If root-relative, absolute or protocol relative url, leave as is
         if (/^((?:\w+:)?\/\/|data:|chrome:|#)/.test(inputUrl)) {
@@ -94,14 +93,18 @@ function default_1(options) {
             });
         });
     };
-    const resourceCache = new Map();
-    const processed = Symbol('postcss-cli-resources');
-    return {
-        postcssPlugin: 'postcss-cli-resources',
-        async Declaration(decl) {
-            if (!decl.value.includes('url') || processed in decl) {
-                return;
+    return (root) => {
+        const urlDeclarations = [];
+        root.walkDecls(decl => {
+            if (decl.value && decl.value.includes('url')) {
+                urlDeclarations.push(decl);
             }
+        });
+        if (urlDeclarations.length === 0) {
+            return;
+        }
+        const resourceCache = new Map();
+        return Promise.all(urlDeclarations.map(async (decl) => {
             const value = decl.value;
             const urlRegex = /url\(\s*(?:"([^"]+)"|'([^']+)'|(.+?))\s*\)/g;
             const segments = [];
@@ -140,8 +143,6 @@ function default_1(options) {
             if (modified) {
                 decl.value = segments.join('');
             }
-            decl[processed] = true;
-        },
+        }));
     };
-}
-exports.default = default_1;
+});
