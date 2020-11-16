@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.postcss = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -9,7 +10,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const loader_utils_1 = require("loader-utils");
 const path = require("path");
-const postcss = require("postcss");
 const url = require("url");
 function wrapUrl(url) {
     let wrappedUrl;
@@ -30,11 +30,12 @@ async function resolve(file, base, resolver) {
         return resolver(file, base);
     }
 }
-exports.default = postcss.plugin('postcss-cli-resources', (options) => {
+exports.postcss = true;
+function default_1(options) {
     if (!options) {
         throw new Error('No options were specified to "postcss-cli-resources".');
     }
-    const { deployUrl = '', baseHref = '', resourcesOutputPath = '', filename, loader, emitFile, extracted, } = options;
+    const { deployUrl = '', resourcesOutputPath = '', filename, loader, emitFile, extracted, } = options;
     const process = async (inputUrl, context, resourceCache) => {
         // If root-relative, absolute or protocol relative url, leave as is
         if (/^((?:\w+:)?\/\/|data:|chrome:|#)/.test(inputUrl)) {
@@ -93,18 +94,14 @@ exports.default = postcss.plugin('postcss-cli-resources', (options) => {
             });
         });
     };
-    return (root) => {
-        const urlDeclarations = [];
-        root.walkDecls(decl => {
-            if (decl.value && decl.value.includes('url')) {
-                urlDeclarations.push(decl);
+    const resourceCache = new Map();
+    const processed = Symbol('postcss-cli-resources');
+    return {
+        postcssPlugin: 'postcss-cli-resources',
+        async Declaration(decl) {
+            if (!decl.value.includes('url') || processed in decl) {
+                return;
             }
-        });
-        if (urlDeclarations.length === 0) {
-            return;
-        }
-        const resourceCache = new Map();
-        return Promise.all(urlDeclarations.map(async (decl) => {
             const value = decl.value;
             const urlRegex = /url\(\s*(?:"([^"]+)"|'([^']+)'|(.+?))\s*\)/g;
             const segments = [];
@@ -143,6 +140,8 @@ exports.default = postcss.plugin('postcss-cli-resources', (options) => {
             if (modified) {
                 decl.value = segments.join('');
             }
-        }));
+            decl[processed] = true;
+        },
     };
-});
+}
+exports.default = default_1;
