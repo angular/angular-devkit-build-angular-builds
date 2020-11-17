@@ -30,6 +30,9 @@ function getDevServerConfig(wco) {
         const parsedHost = url.parse(publicHost);
         publicHost = parsedHost.host;
     }
+    else {
+        publicHost = '0.0.0.0:0';
+    }
     if (!watch) {
         // There's no option to turn off file watching in webpack-dev-server, but
         // we can override the file watcher instead.
