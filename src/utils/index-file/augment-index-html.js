@@ -41,7 +41,7 @@ async function augmentIndexHtml(params) {
             }
         }
     }
-    const scriptTags = [];
+    let scriptTags = [];
     for (const script of scripts) {
         const attrs = [`src="${deployUrl}${script}"`];
         if (crossOrigin !== 'none') {
@@ -75,7 +75,7 @@ async function augmentIndexHtml(params) {
         }
         scriptTags.push(`<script ${attrs.join(' ')}></script>`);
     }
-    const linkTags = [];
+    let linkTags = [];
     for (const stylesheet of stylesheets) {
         const attrs = [
             `rel="stylesheet"`,
@@ -124,17 +124,24 @@ async function augmentIndexHtml(params) {
                 for (const linkTag of linkTags) {
                     rewriter.emitRaw(linkTag);
                 }
+                linkTags = [];
                 break;
             case 'body':
                 // Add script tags
                 for (const scriptTag of scriptTags) {
                     rewriter.emitRaw(scriptTag);
                 }
+                scriptTags = [];
                 break;
         }
         rewriter.emitEndTag(tag);
     });
-    return transformedContent;
+    const content = await transformedContent;
+    if (linkTags.length || scriptTags.length) {
+        // In case no body/head tags are not present (dotnet partial templates)
+        return linkTags.join('') + scriptTags.join('') + content;
+    }
+    return content;
 }
 exports.augmentIndexHtml = augmentIndexHtml;
 function generateSriAttributes(content) {

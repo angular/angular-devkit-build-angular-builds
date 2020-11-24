@@ -19,6 +19,7 @@ const ts = require("typescript");
 const url = require("url");
 const webpackDevServer = require("webpack-dev-server");
 const browser_1 = require("../browser");
+const schema_1 = require("../browser/schema");
 const utils_1 = require("../utils");
 const cache_path_1 = require("../utils/cache-path");
 const check_port_1 = require("../utils/check-port");
@@ -64,7 +65,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     async function setup() {
         var _a;
         // Get the browser configuration from the target name.
-        const rawBrowserOptions = await context.getTargetOptions(browserTarget);
+        const rawBrowserOptions = (await context.getTargetOptions(browserTarget));
         options.port = await check_port_1.checkPort((_a = options.port) !== null && _a !== void 0 ? _a : 4200, options.host || 'localhost');
         // Override options we need to override, if defined.
         const overrides = Object.keys(options)
@@ -82,6 +83,12 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         }), {});
         // In dev server we should not have budgets because of extra libs such as socks-js
         overrides.budgets = undefined;
+        if (rawBrowserOptions.outputHashing && rawBrowserOptions.outputHashing !== schema_1.OutputHashing.None) {
+            // Disable output hashing for dev build as this can cause memory leaks
+            // See: https://github.com/webpack/webpack-dev-server/issues/377#issuecomment-241258405
+            overrides.outputHashing = schema_1.OutputHashing.None;
+            logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
+        }
         const browserName = await context.getBuilderNameForTarget(browserTarget);
         const browserOptions = await context.validateOptions({ ...rawBrowserOptions, ...overrides }, browserName);
         const { config, projectRoot, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(browserOptions, context, wco => [
