@@ -7,7 +7,9 @@ export interface Schema {
      */
     baseUrl?: string;
     /**
-     * Dev server target to run tests against.
+     * A dev-server builder target to run tests against in the format of
+     * `project:target[:configuration]`. You can also pass in more than one configuration name
+     * as a comma-separated list. Example: `project:target:production,staging`.
      */
     devServerTarget?: string;
     /**
