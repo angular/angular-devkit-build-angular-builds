@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "0.1100.2+12.9db916c",
+  "version": "0.1100.2+14.6e32253",
   "description": "Angular Webpack Build Facade",
   "experimental": true,
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#9db916cdd",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#9db916cdd",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#9db916cdd",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#9db916cdd",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#6e3225388",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#6e3225388",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#6e3225388",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#6e3225388",
     "@babel/core": "7.12.3",
     "@babel/generator": "7.12.1",
     "@babel/plugin-transform-runtime": "7.12.1",
@@ -18,7 +18,7 @@
     "@babel/runtime": "7.12.1",
     "@babel/template": "7.10.4",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#9db916cdd",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#6e3225388",
     "ansi-colors": "4.1.1",
     "autoprefixer": "9.8.6",
     "babel-loader": "8.1.0",
@@ -124,11 +124,5 @@
   "bugs": {
     "url": "https://github.com/angular/angular-cli/issues"
   },
-  "homepage": "https://github.com/angular/angular-cli",
-  "husky": {
-    "hooks": {
-      "commit-msg": "yarn -s ng-dev commit-message pre-commit-validate --file-env-variable HUSKY_GIT_PARAMS",
-      "prepare-commit-msg": "yarn -s ng-dev commit-message restore-commit-message-draft --file-env-variable HUSKY_GIT_PARAMS"
-    }
-  }
+  "homepage": "https://github.com/angular/angular-cli"
 }
