@@ -25,7 +25,6 @@ export declare function generateBundleStats(info: {
     rendered?: boolean;
     chunkType?: ChunkType;
 }): BundleStats;
-export declare const IGNORE_WARNINGS: RegExp[];
 export declare function statsWarningsToString(json: any, statsConfig: any): string;
 export declare function statsErrorsToString(json: any, statsConfig: any): string;
 export declare function statsHasErrors(json: any): boolean;

@@ -9,9 +9,7 @@ export interface Schema {
      */
     appModuleBundle?: string;
     /**
-     * A browser builder target use for rendering the app shell in the format of
-     * `project:target[:configuration]`. You can also pass in more than one configuration name
-     * as a comma-separated list. Example: `project:target:production,staging`.
+     * Target to build.
      */
     browserTarget: string;
     /**
@@ -28,9 +26,7 @@ export interface Schema {
      */
     route?: string;
     /**
-     * A server builder target use for rendering the app shell in the format of
-     * `project:target[:configuration]`. You can also pass in more than one configuration name
-     * as a comma-separated list. Example: `project:target:production,staging`.
+     * Server target to use for rendering the app shell.
      */
     serverTarget: string;
 }

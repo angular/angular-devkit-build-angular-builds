@@ -23,7 +23,6 @@ const spinner_1 = require("../../utils/spinner");
 const webpack_version_1 = require("../../utils/webpack-version");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
-const stats_1 = require("../utils/stats");
 const TerserPlugin = require('terser-webpack-plugin');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
 // tslint:disable-next-line:no-big-function
@@ -274,12 +273,10 @@ function getCommonConfig(wco) {
         // https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_angular/src/browser/index.ts
         extraPlugins.push(new plugins_1.BundleBudgetPlugin({ budgets: buildOptions.budgets }));
     }
-    if ((scriptsSourceMap || stylesSourceMap)) {
+    if ((scriptsSourceMap || stylesSourceMap) && vendorSourceMap) {
         extraRules.push({
             test: /\.m?js$/,
-            exclude: vendorSourceMap
-                ? /(ngfactory|ngstyle)\.js$/
-                : [/[\\\/]node_modules[\\\/]/, /(ngfactory|ngstyle)\.js$/],
+            exclude: /(ngfactory|ngstyle)\.js$/,
             enforce: 'pre',
             loader: require.resolve('source-map-loader'),
         });
@@ -410,7 +407,6 @@ function getCommonConfig(wco) {
         performance: {
             hints: false,
         },
-        ...webpack_version_1.withWebpackFourOrFive({}, { ignoreWarnings: stats_1.IGNORE_WARNINGS }),
         module: {
             // Show an error for missing exports instead of a warning.
             strictExportPresence: true,
@@ -479,6 +475,8 @@ function getCommonConfig(wco) {
             ...webpack_version_1.withWebpackFourOrFive({}, buildOptions.namedChunks ? { chunkIds: 'named' } : {}),
             ...webpack_version_1.withWebpackFourOrFive({ noEmitOnErrors: true }, { emitOnErrors: false }),
         },
+        // TODO_WEBPACK_5: Investigate non-working cache in development builds
+        ...webpack_version_1.withWebpackFourOrFive({}, { cache: false }),
         plugins: [
             // Always replace the context for the System.import in angular/core to prevent warnings.
             // https://github.com/angular/angular/issues/11580

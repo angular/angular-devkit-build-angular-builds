@@ -17,9 +17,7 @@ export interface Schema {
      */
     baseHref?: string;
     /**
-     * A browser builder target to serve in the format of `project:target[:configuration]`. You
-     * can also pass in more than one configuration name as a comma-separated list. Example:
-     * `project:target:production,staging`.
+     * Target to serve.
      */
     browserTarget: string;
     /**
@@ -64,10 +62,7 @@ export interface Schema {
      */
     open?: boolean;
     /**
-     * Enables optimization of the build output. Including minification of scripts and styles,
-     * tree-shaking, dead-code eliminiation, tree-shaking and fonts inlining. For more
-     * information, see
-     * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
+     * Enables optimization of the build output.
      * @deprecated Use the "optimization" option in the browser builder instead.
      */
     optimization?: OptimizationUnion;
@@ -135,10 +130,7 @@ export interface Schema {
     watch?: boolean;
 }
 /**
- * Enables optimization of the build output. Including minification of scripts and styles,
- * tree-shaking, dead-code eliminiation, tree-shaking and fonts inlining. For more
- * information, see
- * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
+ * Enables optimization of the build output.
  * @deprecated Use the "optimization" option in the browser builder instead.
  */
 export declare type OptimizationUnion = boolean | OptimizationClass;

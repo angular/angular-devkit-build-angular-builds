@@ -55,9 +55,6 @@ export interface Schema {
      * 'import()' syntax instead.
      */
     lazyModules?: string[];
-    /**
-     * Translate the bundles in one or more locales.
-     */
     localize?: Localize;
     /**
      * The name of the main entry-point file.
@@ -68,9 +65,7 @@ export interface Schema {
      */
     namedChunks?: boolean;
     /**
-     * Enables optimization of the build output. Including minification of scripts and styles,
-     * tree-shaking and dead-code eliminiation. For more information, see
-     * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
+     * Enables optimization of the build output.
      */
     optimization?: OptimizationUnion;
     /**
@@ -151,14 +146,9 @@ export declare enum I18NMissingTranslation {
     Ignore = "ignore",
     Warning = "warning"
 }
-/**
- * Translate the bundles in one or more locales.
- */
 export declare type Localize = string[] | boolean;
 /**
- * Enables optimization of the build output. Including minification of scripts and styles,
- * tree-shaking and dead-code eliminiation. For more information, see
- * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
+ * Enables optimization of the build output.
  */
 export declare type OptimizationUnion = boolean | OptimizationClass;
 export interface OptimizationClass {
