@@ -95,6 +95,9 @@ export interface Schema {
      * 'import()' syntax instead.
      */
     lazyModules?: string[];
+    /**
+     * Translate the bundles in one or more locales.
+     */
     localize?: Localize;
     /**
      * The full path for the main entry point to the app, relative to the current workspace.
@@ -109,7 +112,9 @@ export interface Schema {
      */
     ngswConfigPath?: string;
     /**
-     * Enables optimization of the build output.
+     * Enables optimization of the build output. Including minification of scripts and styles,
+     * tree-shaking, dead-code eliminiation and fonts inlining. For more information, see
+     * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
      */
     optimization?: OptimizationUnion;
     /**
@@ -308,9 +313,14 @@ export interface IndexObject {
      */
     output?: string;
 }
+/**
+ * Translate the bundles in one or more locales.
+ */
 export declare type Localize = string[] | boolean;
 /**
- * Enables optimization of the build output.
+ * Enables optimization of the build output. Including minification of scripts and styles,
+ * tree-shaking, dead-code eliminiation and fonts inlining. For more information, see
+ * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
  */
 export declare type OptimizationUnion = boolean | OptimizationClass;
 export interface OptimizationClass {

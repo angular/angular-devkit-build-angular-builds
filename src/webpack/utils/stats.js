@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.webpackStatsLogger = exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.generateBundleStats = exports.formatSize = void 0;
+exports.webpackStatsLogger = exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.IGNORE_WARNINGS = exports.generateBundleStats = exports.formatSize = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -14,6 +14,7 @@ const core_1 = require("@angular-devkit/core");
 const path = require("path");
 const textTable = require("text-table");
 const color_1 = require("../../utils/color");
+const webpack_version_1 = require("../../utils/webpack-version");
 function formatSize(size) {
     if (size <= 0) {
         return '0 bytes';
@@ -163,11 +164,18 @@ function statsToString(json, statsConfig, bundleState) {
       `);
     }
 }
-const ERRONEOUS_WARNINGS_FILTER = (warning) => ![
+exports.IGNORE_WARNINGS = [
     // Webpack 5+ has no facility to disable this warning.
     // System.import is used in @angular/core for deprecated string-form lazy routes
     /System.import\(\) is deprecated and will be removed soon/i,
-].some(msg => msg.test(warning));
+    // https://github.com/webpack-contrib/source-map-loader/blob/b2de4249c7431dd8432da607e08f0f65e9d64219/src/index.js#L83
+    /Failed to parse source map from/,
+];
+// TODO: remove when Webpack 4 is no longer supported.
+// See: https://webpack.js.org/configuration/other-options/#ignorewarnings
+const ERRONEOUS_WARNINGS_FILTER = webpack_version_1.isWebpackFiveOrHigher()
+    ? (warning) => warning
+    : (warning) => !exports.IGNORE_WARNINGS.some(msg => msg.test(warning));
 function statsWarningsToString(json, statsConfig) {
     const colors = statsConfig.colors;
     const c = (x) => colors ? color_1.colors.reset.cyan(x) : x;
