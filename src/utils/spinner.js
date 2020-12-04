@@ -14,13 +14,7 @@ class Spinner {
     constructor(text) {
         /** When false, only fail messages will be displayed. */
         this.enabled = true;
-        this.spinner = ora({
-            text,
-            // The below 2 options are needed because otherwise CTRL+C will be delayed
-            // when the underlying process is sync.
-            hideCursor: false,
-            discardStdin: false,
-        });
+        this.spinner = ora(text);
     }
     set text(text) {
         this.spinner.text = text;

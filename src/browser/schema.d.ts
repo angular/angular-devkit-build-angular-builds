@@ -95,9 +95,6 @@ export interface Schema {
      * 'import()' syntax instead.
      */
     lazyModules?: string[];
-    /**
-     * Translate the bundles in one or more locales.
-     */
     localize?: Localize;
     /**
      * The full path for the main entry point to the app, relative to the current workspace.
@@ -313,9 +310,6 @@ export interface IndexObject {
      */
     output?: string;
 }
-/**
- * Translate the bundles in one or more locales.
- */
 export declare type Localize = string[] | boolean;
 /**
  * Enables optimization of the build output. Including minification of scripts and styles,
