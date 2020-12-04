@@ -11,6 +11,8 @@ exports.IndexHtmlWebpackPlugin = void 0;
 const path = require("path");
 const webpack_sources_1 = require("webpack-sources");
 const index_html_generator_1 = require("../../utils/index-file/index-html-generator");
+const webpack_version_1 = require("../../utils/webpack-version");
+const PLUGIN_NAME = 'index-html-webpack-plugin';
 class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
     constructor(options) {
         super(options);
@@ -23,14 +25,29 @@ class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
         throw new Error('compilation is undefined.');
     }
     apply(compiler) {
-        compiler.hooks.emit.tapPromise('index-html-webpack-plugin', async (compilation) => {
+        if (webpack_version_1.isWebpackFiveOrHigher()) {
+            compiler.hooks.thisCompilation.tap(PLUGIN_NAME, compilation => {
+                this._compilation = compilation;
+                // webpack 5 migration "guide"
+                // https://github.com/webpack/webpack/blob/07fc554bef5930f8577f91c91a8b81791fc29746/lib/Compilation.js#L535-L539
+                // TODO_WEBPACK_5 const stage = Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE + 1;
+                // tslint:disable-next-line: no-any
+                compilation.hooks.processAssets.tapPromise({ name: PLUGIN_NAME, stage: 101 }, callback);
+            });
+        }
+        else {
+            compiler.hooks.emit.tapPromise(PLUGIN_NAME, async (compilation) => {
+                this._compilation = compilation;
+                await callback(compilation.assets);
+            });
+        }
+        const callback = async (assets) => {
             var _a;
-            this._compilation = compilation;
             // Get all files for selected entrypoints
             const files = [];
             const noModuleFiles = [];
             const moduleFiles = [];
-            for (const [entryName, entrypoint] of compilation.entrypoints) {
+            for (const [entryName, entrypoint] of this.compilation.entrypoints) {
                 const entryFiles = (_a = entrypoint === null || entrypoint === void 0 ? void 0 : entrypoint.getFiles()) === null || _a === void 0 ? void 0 : _a.map((f) => ({
                     name: entryName,
                     file: f,
@@ -57,8 +74,8 @@ class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
                 baseHref: this.options.baseHref,
                 lang: this.options.lang,
             });
-            compilation.assets[this.options.outputPath] = new webpack_sources_1.RawSource(content);
-        });
+            assets[this.options.outputPath] = new webpack_sources_1.RawSource(content);
+        };
     }
     async readAsset(path) {
         const data = this.compilation.assets[path].source();
