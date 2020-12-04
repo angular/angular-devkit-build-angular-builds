@@ -65,7 +65,7 @@ export interface Schema {
     open?: boolean;
     /**
      * Enables optimization of the build output. Including minification of scripts and styles,
-     * tree-shaking, dead-code eliminiation, tree-shaking and fonts inlining. For more
+     * tree-shaking, dead-code elimination, tree-shaking and fonts inlining. For more
      * information, see
      * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
      * @deprecated Use the "optimization" option in the browser builder instead.
@@ -136,7 +136,7 @@ export interface Schema {
 }
 /**
  * Enables optimization of the build output. Including minification of scripts and styles,
- * tree-shaking, dead-code eliminiation, tree-shaking and fonts inlining. For more
+ * tree-shaking, dead-code elimination, tree-shaking and fonts inlining. For more
  * information, see
  * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
  * @deprecated Use the "optimization" option in the browser builder instead.

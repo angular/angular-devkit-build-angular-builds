@@ -295,7 +295,7 @@ function getCommonConfig(wco) {
         ];
     }
     const extraMinimizers = [];
-    if (stylesOptimization) {
+    if (stylesOptimization.minify) {
         extraMinimizers.push(new plugins_1.OptimizeCssWebpackPlugin({
             sourceMap: stylesSourceMap,
             // component styles retain their original file name
@@ -376,7 +376,7 @@ function getCommonConfig(wco) {
         }));
     }
     return {
-        mode: scriptsOptimization || stylesOptimization ? 'production' : 'development',
+        mode: scriptsOptimization || stylesOptimization.minify ? 'production' : 'development',
         devtool: false,
         profile: buildOptions.statsJson,
         resolve: {

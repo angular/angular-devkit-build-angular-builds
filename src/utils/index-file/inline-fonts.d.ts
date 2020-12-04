@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export interface InlineFontsOptions {
-    minifyInlinedCSS: boolean;
+    minify?: boolean;
     WOFFSupportNeeded: boolean;
 }
 export declare class InlineFontsProcessor {

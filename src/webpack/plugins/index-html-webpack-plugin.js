@@ -8,9 +8,12 @@ exports.IndexHtmlWebpackPlugin = void 0;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const path = require("path");
+const path_1 = require("path");
 const webpack_sources_1 = require("webpack-sources");
 const index_html_generator_1 = require("../../utils/index-file/index-html-generator");
+const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
+const webpack_version_1 = require("../../utils/webpack-version");
+const PLUGIN_NAME = 'index-html-webpack-plugin';
 class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
     constructor(options) {
         super(options);
@@ -23,18 +26,33 @@ class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
         throw new Error('compilation is undefined.');
     }
     apply(compiler) {
-        compiler.hooks.emit.tapPromise('index-html-webpack-plugin', async (compilation) => {
+        if (webpack_version_1.isWebpackFiveOrHigher()) {
+            compiler.hooks.thisCompilation.tap(PLUGIN_NAME, compilation => {
+                this._compilation = compilation;
+                // webpack 5 migration "guide"
+                // https://github.com/webpack/webpack/blob/07fc554bef5930f8577f91c91a8b81791fc29746/lib/Compilation.js#L535-L539
+                // TODO_WEBPACK_5 const stage = Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE + 1;
+                // tslint:disable-next-line: no-any
+                compilation.hooks.processAssets.tapPromise({ name: PLUGIN_NAME, stage: 101 }, callback);
+            });
+        }
+        else {
+            compiler.hooks.emit.tapPromise(PLUGIN_NAME, async (compilation) => {
+                this._compilation = compilation;
+                await callback(compilation.assets);
+            });
+        }
+        const callback = async (assets) => {
             var _a;
-            this._compilation = compilation;
             // Get all files for selected entrypoints
             const files = [];
             const noModuleFiles = [];
             const moduleFiles = [];
-            for (const [entryName, entrypoint] of compilation.entrypoints) {
+            for (const [entryName, entrypoint] of this.compilation.entrypoints) {
                 const entryFiles = (_a = entrypoint === null || entrypoint === void 0 ? void 0 : entrypoint.getFiles()) === null || _a === void 0 ? void 0 : _a.map((f) => ({
                     name: entryName,
                     file: f,
-                    extension: path.extname(f),
+                    extension: path_1.extname(f),
                 }));
                 if (!entryFiles) {
                     continue;
@@ -49,19 +67,21 @@ class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
                     files.push(...entryFiles);
                 }
             }
-            const content = await this.process({
+            const { content, warnings, errors } = await this.process({
                 files,
                 noModuleFiles,
                 moduleFiles,
-                outputPath: this.options.outputPath,
+                outputPath: path_1.dirname(this.options.outputPath),
                 baseHref: this.options.baseHref,
                 lang: this.options.lang,
             });
-            compilation.assets[this.options.outputPath] = new webpack_sources_1.RawSource(content);
-        });
+            assets[this.options.outputPath] = new webpack_sources_1.RawSource(content);
+            warnings.forEach(msg => webpack_diagnostics_1.addWarning(this.compilation, msg));
+            errors.forEach(msg => webpack_diagnostics_1.addError(this.compilation, msg));
+        };
     }
     async readAsset(path) {
-        const data = this.compilation.assets[path].source();
+        const data = this.compilation.assets[path_1.basename(path)].source();
         return typeof data === 'string' ? data : data.toString();
     }
     async readIndex(path) {

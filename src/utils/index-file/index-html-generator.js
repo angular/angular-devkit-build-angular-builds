@@ -12,14 +12,18 @@ const path_1 = require("path");
 const fs_1 = require("../fs");
 const strip_bom_1 = require("../strip-bom");
 const augment_index_html_1 = require("./augment-index-html");
+const inline_critical_css_1 = require("./inline-critical-css");
 const inline_fonts_1 = require("./inline-fonts");
 class IndexHtmlGenerator {
     constructor(options) {
-        var _a;
+        var _a, _b;
         this.options = options;
         const extraPlugins = [];
         if ((_a = this.options.optimization) === null || _a === void 0 ? void 0 : _a.fonts.inline) {
             extraPlugins.push(inlineFontsPlugin(this));
+        }
+        if ((_b = this.options.optimization) === null || _b === void 0 ? void 0 : _b.styles.inlineCritical) {
+            extraPlugins.push(inlineCriticalCssPlugin(this));
         }
         this.plugins = [
             augmentIndexHtmlPlugin(this),
@@ -28,11 +32,29 @@ class IndexHtmlGenerator {
         ];
     }
     async process(options) {
-        let html = strip_bom_1.stripBom(await this.readIndex(this.options.indexPath));
+        let content = strip_bom_1.stripBom(await this.readIndex(this.options.indexPath));
+        const warnings = [];
+        const errors = [];
         for (const plugin of this.plugins) {
-            html = await plugin(html, options);
+            const result = await plugin(content, options);
+            if (typeof result === 'string') {
+                content = result;
+            }
+            else {
+                content = result.content;
+                if (result.warnings.length) {
+                    warnings.push(...result.warnings);
+                }
+                if (result.errors.length) {
+                    errors.push(...result.errors);
+                }
+            }
         }
-        return html;
+        return {
+            content,
+            warnings,
+            errors,
+        };
     }
     async readAsset(path) {
         return fs_1.readFile(path, 'utf-8');
@@ -64,10 +86,19 @@ function augmentIndexHtmlPlugin(generator) {
 function inlineFontsPlugin({ options }) {
     var _a;
     const inlineFontsProcessor = new inline_fonts_1.InlineFontsProcessor({
-        minifyInlinedCSS: !!((_a = options.optimization) === null || _a === void 0 ? void 0 : _a.styles),
+        minify: (_a = options.optimization) === null || _a === void 0 ? void 0 : _a.styles.minify,
         WOFFSupportNeeded: options.WOFFSupportNeeded,
     });
     return async (html) => inlineFontsProcessor.process(html);
+}
+function inlineCriticalCssPlugin(generator) {
+    var _a;
+    const inlineCriticalCssProcessor = new inline_critical_css_1.InlineCriticalCssProcessor({
+        minify: (_a = generator.options.optimization) === null || _a === void 0 ? void 0 : _a.styles.minify,
+        deployUrl: generator.options.deployUrl,
+        readAsset: filePath => generator.readAsset(filePath),
+    });
+    return async (html, options) => inlineCriticalCssProcessor.process(html, { outputPath: options.outputPath });
 }
 function postTransformPlugin({ options }) {
     return async (html) => options.postTransform ? options.postTransform(html) : html;

@@ -105,10 +105,7 @@ async function execute(options, context, transforms) {
     const ivyMessages = [];
     const { config, projectRoot } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext({
         ...browserOptions,
-        optimization: {
-            scripts: false,
-            styles: false,
-        },
+        optimization: false,
         sourceMap: {
             scripts: true,
             styles: false,

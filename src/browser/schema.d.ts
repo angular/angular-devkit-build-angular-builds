@@ -95,6 +95,9 @@ export interface Schema {
      * 'import()' syntax instead.
      */
     lazyModules?: string[];
+    /**
+     * Translate the bundles in one or more locales.
+     */
     localize?: Localize;
     /**
      * The full path for the main entry point to the app, relative to the current workspace.
@@ -110,7 +113,8 @@ export interface Schema {
     ngswConfigPath?: string;
     /**
      * Enables optimization of the build output. Including minification of scripts and styles,
-     * tree-shaking, dead-code eliminiation and fonts inlining. For more information, see
+     * tree-shaking, dead-code elimination, inlining of critical CSS and fonts inlining. For
+     * more information, see
      * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
      */
     optimization?: OptimizationUnion;
@@ -310,10 +314,14 @@ export interface IndexObject {
      */
     output?: string;
 }
+/**
+ * Translate the bundles in one or more locales.
+ */
 export declare type Localize = string[] | boolean;
 /**
  * Enables optimization of the build output. Including minification of scripts and styles,
- * tree-shaking, dead-code eliminiation and fonts inlining. For more information, see
+ * tree-shaking, dead-code elimination, inlining of critical CSS and fonts inlining. For
+ * more information, see
  * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
  */
 export declare type OptimizationUnion = boolean | OptimizationClass;
@@ -329,7 +337,7 @@ export interface OptimizationClass {
     /**
      * Enables optimization of the styles output.
      */
-    styles?: boolean;
+    styles?: StylesUnion;
 }
 /**
  * Enables optimization for fonts. This requires internet access.
@@ -341,6 +349,21 @@ export interface FontsClass {
      * index file. This requires internet access.
      */
     inline?: boolean;
+}
+/**
+ * Enables optimization of the styles output.
+ */
+export declare type StylesUnion = boolean | StylesClass;
+export interface StylesClass {
+    /**
+     * Extract and inline critical CSS definitions to improve first paint time.
+     */
+    inlineCritical?: boolean;
+    /**
+     * Minify CSS definitions by removing extraneous whitespace and comments, merging
+     * identifiers and minimizing values.
+     */
+    minify?: boolean;
 }
 /**
  * Define the output filename cache-busting hashing mode.

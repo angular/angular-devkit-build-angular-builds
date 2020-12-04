@@ -72,7 +72,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             ...previous,
             [key]: options[key],
         }), {});
-        // Get dev-server only options.
         const devServerOptions = Object.keys(options)
             .filter(key => !devServerBuildOverriddenKeys.includes(key) && key !== 'browserTarget')
             .reduce((previous, key) => ({
@@ -213,7 +212,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 lang: locale,
             }));
         }
-        if (normalizedOptimization.scripts || normalizedOptimization.styles) {
+        if (normalizedOptimization.scripts || normalizedOptimization.styles.minify) {
             logger.error(core_1.tags.stripIndents `
           ****************************************************************************************
           This is a simple server for use in testing or debugging Angular applications locally.

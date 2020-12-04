@@ -118,7 +118,7 @@ class InlineFontsProcessor {
                 cssContent += await this.getResponse(url, "Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11. 0) like Gecko" /* IE */);
             }
             cssContent += await this.getResponse(url, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36" /* Chrome */);
-            if (this.options.minifyInlinedCSS) {
+            if (this.options.minify) {
                 cssContent = cssContent
                     // Comments.
                     .replace(/\/\*([\s\S]*?)\*\//g, '')
