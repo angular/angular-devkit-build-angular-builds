@@ -119,9 +119,16 @@ function getStylesConfig(wco) {
             test: /\.styl$/,
             use: [
                 {
+                    loader: require.resolve('resolve-url-loader'),
+                    options: {
+                        sourceMap: cssSourceMap,
+                    },
+                },
+                {
                     loader: require.resolve('stylus-loader'),
                     options: {
                         sourceMap: cssSourceMap,
+                        webpackImporter: false,
                         stylusOptions: {
                             compress: false,
                             sourceMap: { comment: false },
@@ -191,7 +198,7 @@ function getStylesConfig(wco) {
     }));
     // load global css as css files
     if (globalStylePaths.length > 0) {
-        const globalSourceMap = !!cssSourceMap && !buildOptions.sourceMap.hidden;
+        const globalSourceMap = !!(cssSourceMap && !buildOptions.extractCss && !buildOptions.sourceMap.hidden);
         rules.push(...baseRules.map(({ test, use }) => {
             return {
                 include: globalStylePaths,
