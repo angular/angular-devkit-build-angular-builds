@@ -18,7 +18,7 @@ export declare class ScriptsWebpackPlugin {
     private _lastBuildTime?;
     private _cachedOutput?;
     constructor(options?: Partial<ScriptsWebpackPluginOptions>);
-    shouldSkip(compilation: any, scripts: string[]): boolean;
+    shouldSkip(compilation: any, scripts: string[]): Promise<boolean>;
     private _insertOutput;
     apply(compiler: Compiler): void;
 }
