@@ -113,7 +113,7 @@ export interface Schema {
     ngswConfigPath?: string;
     /**
      * Enables optimization of the build output. Including minification of scripts and styles,
-     * tree-shaking, dead-code eliminiation and fonts inlining. For more information, see
+     * tree-shaking, dead-code elimination and fonts inlining. For more information, see
      * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
      */
     optimization?: OptimizationUnion;
@@ -314,7 +314,7 @@ export interface IndexObject {
 export declare type Localize = string[] | boolean;
 /**
  * Enables optimization of the build output. Including minification of scripts and styles,
- * tree-shaking, dead-code eliminiation and fonts inlining. For more information, see
+ * tree-shaking, dead-code elimination and fonts inlining. For more information, see
  * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
  */
 export declare type OptimizationUnion = boolean | OptimizationClass;
