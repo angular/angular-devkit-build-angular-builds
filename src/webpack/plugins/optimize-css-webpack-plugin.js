@@ -95,7 +95,7 @@ class OptimizeCssWebpackPlugin {
                     // tslint:disable-next-line: no-any
                     cssNano.process(content, postCssOptions, cssNanoOptions)
                         .then(resolve)
-                        .catch((err) => reject(new Error(`${file} ${err.message}`)));
+                        .catch(reject);
                 });
                 for (const { text } of output.warnings()) {
                     webpack_diagnostics_1.addWarning(compilation, text);
