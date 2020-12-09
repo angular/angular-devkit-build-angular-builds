@@ -65,7 +65,7 @@ export interface Schema {
      */
     scripts?: ExtraEntryPoint[];
     /**
-     * Output sourcemaps.
+     * Output source maps.
      */
     sourceMap?: SourceMapUnion;
     /**
@@ -130,20 +130,20 @@ export interface ExtraEntryPointClass {
     input: string;
 }
 /**
- * Output sourcemaps.
+ * Output source maps.
  */
 export declare type SourceMapUnion = boolean | SourceMapClass;
 export interface SourceMapClass {
     /**
-     * Output sourcemaps for all scripts.
+     * Output source maps for all scripts.
      */
     scripts?: boolean;
     /**
-     * Output sourcemaps for all styles.
+     * Output source maps for all styles.
      */
     styles?: boolean;
     /**
-     * Resolve vendor packages sourcemaps.
+     * Resolve vendor packages source maps.
      */
     vendor?: boolean;
 }

@@ -104,7 +104,7 @@ export interface Schema {
      */
     servePathDefaultWarning?: boolean;
     /**
-     * Output sourcemaps.
+     * Output source maps.
      * @deprecated Use the "sourceMap" option in the browser builder instead.
      */
     sourceMap?: SourceMapUnion;
@@ -153,25 +153,25 @@ export interface OptimizationClass {
     styles?: boolean;
 }
 /**
- * Output sourcemaps.
+ * Output source maps.
  * @deprecated Use the "sourceMap" option in the browser builder instead.
  */
 export declare type SourceMapUnion = boolean | SourceMapClass;
 export interface SourceMapClass {
     /**
-     * Output sourcemaps used for error reporting tools.
+     * Output source maps used for error reporting tools.
      */
     hidden?: boolean;
     /**
-     * Output sourcemaps for all scripts.
+     * Output source maps for all scripts.
      */
     scripts?: boolean;
     /**
-     * Output sourcemaps for all styles.
+     * Output source maps for all styles.
      */
     styles?: boolean;
     /**
-     * Resolve vendor packages sourcemaps.
+     * Resolve vendor packages source maps.
      */
     vendor?: boolean;
 }
