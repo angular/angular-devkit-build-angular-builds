@@ -79,8 +79,8 @@ const init = (config, emitter, customFileHandlers) => {
         config.plugins = config.plugins || [];
         config.reporters = config.reporters || [];
         const { plugins, reporters } = config;
-        const hasCoveragePlugin = plugins.some((p) => 'reporter:coverage' in p);
-        const hasIstanbulPlugin = plugins.some((p) => 'reporter:coverage-istanbul' in p);
+        const hasCoveragePlugin = plugins.some(isPlugin('karma-coverage', 'reporter:coverage'));
+        const hasIstanbulPlugin = plugins.some(isPlugin('karma-coverage-istanbul-reporter', 'reporter:coverage-istanbul'));
         const hasCoverageReporter = reporters.includes('coverage');
         const hasIstanbulReporter = reporters.includes('coverage-istanbul');
         if (hasCoveragePlugin && !hasCoverageReporter) {
@@ -289,6 +289,21 @@ function fallbackMiddleware() {
         else {
             next();
         }
+    };
+}
+/**
+ * Returns a function that returns true if the plugin identifier matches the
+ * `moduleId` or `pluginName`. A plugin identifier can be either a string or
+ * an object according to https://karma-runner.github.io/5.2/config/plugins.html
+ * @param moduleId name of the node module (e.g. karma-coverage)
+ * @param pluginName name of the karma plugin (e.g. reporter:coverage)
+ */
+function isPlugin(moduleId, pluginName) {
+    return (plugin) => {
+        if (typeof plugin === 'string') {
+            return plugin === moduleId;
+        }
+        return pluginName in plugin;
     };
 }
 module.exports = {
