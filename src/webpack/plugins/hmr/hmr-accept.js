@@ -14,6 +14,10 @@ function default_1(mod) {
     if (!mod['hot']) {
         return;
     }
+    if (!core_1.isDevMode()) {
+        console.error(`[NG HMR] Cannot use HMR when Angular is running in production mode. To prevent production mode, do not call 'enableProdMode()'.`);
+        return;
+    }
     mod['hot'].accept();
     mod['hot'].dispose(() => {
         if (typeof ng === 'undefined') {
