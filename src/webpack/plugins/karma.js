@@ -1,13 +1,4 @@
 "use strict";
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const glob = require("glob");
@@ -25,6 +16,7 @@ const index_1 = require("../../utils/index");
  * require('source-map-support')
  * require('karma-source-map-support')
  */
+const KARMA_APPLICATION_PATH = '_karma_webpack_';
 let blocked = [];
 let isBlocked = false;
 let webpackMiddleware;
@@ -106,7 +98,7 @@ const init = (config, emitter, customFileHandlers) => {
         // Hide webpack output because its noisy.
         logLevel: 'error',
         stats: false,
-        publicPath: '/_karma_webpack_/',
+        publicPath: `/${KARMA_APPLICATION_PATH}/`,
     };
     const compilationErrorCb = (error, errors) => {
         // Notify potential listeners of the compile error
@@ -143,8 +135,8 @@ const init = (config, emitter, customFileHandlers) => {
         });
     }
     // Files need to be served from a custom path for Karma.
-    webpackConfig.output.path = '/_karma_webpack_/';
-    webpackConfig.output.publicPath = '/_karma_webpack_/';
+    webpackConfig.output.path = `/${KARMA_APPLICATION_PATH}/`;
+    webpackConfig.output.publicPath = `/${KARMA_APPLICATION_PATH}/`;
     let compiler;
     try {
         compiler = webpack(webpackConfig);
@@ -191,18 +183,18 @@ const init = (config, emitter, customFileHandlers) => {
     webpackMiddleware = new webpackDevMiddleware(compiler, webpackMiddlewareConfig);
     // Forward requests to webpack server.
     customFileHandlers.push({
-        urlRegex: /^\/_karma_webpack_\/.*/,
+        urlRegex: new RegExp(`\\/${KARMA_APPLICATION_PATH}\\/.*`),
         handler: function handler(req, res) {
             webpackMiddleware(req, res, function () {
                 // Ensure script and style bundles are served.
                 // They are mentioned in the custom karma context page and we don't want them to 404.
                 const alwaysServe = [
-                    '/_karma_webpack_/runtime.js',
-                    '/_karma_webpack_/polyfills.js',
-                    '/_karma_webpack_/polyfills-es5.js',
-                    '/_karma_webpack_/scripts.js',
-                    '/_karma_webpack_/styles.js',
-                    '/_karma_webpack_/vendor.js',
+                    `/${KARMA_APPLICATION_PATH}/runtime.js`,
+                    `/${KARMA_APPLICATION_PATH}/polyfills.js`,
+                    `/${KARMA_APPLICATION_PATH}/polyfills-es5.js`,
+                    `/${KARMA_APPLICATION_PATH}/scripts.js`,
+                    `/${KARMA_APPLICATION_PATH}/styles.js`,
+                    `/${KARMA_APPLICATION_PATH}/vendor.js`,
                 ];
                 if (alwaysServe.indexOf(req.url) != -1) {
                     res.statusCode = 200;
@@ -281,11 +273,10 @@ const sourceMapReporter = function (baseReporterDecorator, config) {
 sourceMapReporter.$inject = ['baseReporterDecorator', 'config'];
 // When a request is not found in the karma server, try looking for it from the webpack server root.
 function fallbackMiddleware() {
-    return function (req, res, next) {
+    return function (request, response, next) {
         if (webpackMiddleware) {
-            const webpackUrl = '/_karma_webpack_' + req.url;
-            const webpackReq = { ...req, url: webpackUrl };
-            webpackMiddleware(webpackReq, res, next);
+            request.url = '/' + KARMA_APPLICATION_PATH + request.url;
+            webpackMiddleware(request, response, next);
         }
         else {
             next();
