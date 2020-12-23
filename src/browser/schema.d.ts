@@ -115,7 +115,7 @@ export interface Schema {
      * Enables optimization of the build output. Including minification of scripts and styles,
      * tree-shaking, dead-code elimination, inlining of critical CSS and fonts inlining. For
      * more information, see
-     * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
+     * https://angular.io/guide/workspace-config#optimization-configuration.
      */
     optimization?: OptimizationUnion;
     /**
@@ -162,7 +162,8 @@ export interface Schema {
      */
     showCircularDependencies?: boolean;
     /**
-     * Output source maps.
+     * Output source maps for scripts and styles. For more information, see
+     * https://angular.io/guide/workspace-config#source-map-configuration.
      */
     sourceMap?: SourceMapUnion;
     /**
@@ -322,7 +323,7 @@ export declare type Localize = string[] | boolean;
  * Enables optimization of the build output. Including minification of scripts and styles,
  * tree-shaking, dead-code elimination, inlining of critical CSS and fonts inlining. For
  * more information, see
- * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
+ * https://angular.io/guide/workspace-config#optimization-configuration.
  */
 export declare type OptimizationUnion = boolean | OptimizationClass;
 export interface OptimizationClass {
@@ -390,7 +391,8 @@ export interface ExtraEntryPointClass {
     input: string;
 }
 /**
- * Output source maps.
+ * Output source maps for scripts and styles. For more information, see
+ * https://angular.io/guide/workspace-config#source-map-configuration.
  */
 export declare type SourceMapUnion = boolean | SourceMapClass;
 export interface SourceMapClass {

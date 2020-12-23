@@ -66,8 +66,7 @@ export interface Schema {
     /**
      * Enables optimization of the build output. Including minification of scripts and styles,
      * tree-shaking, dead-code elimination, tree-shaking and fonts inlining. For more
-     * information, see
-     * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
+     * information, see https://angular.io/guide/workspace-config#optimization-configuration.
      * @deprecated Use the "optimization" option in the browser builder instead.
      */
     optimization?: OptimizationUnion;
@@ -104,7 +103,8 @@ export interface Schema {
      */
     servePathDefaultWarning?: boolean;
     /**
-     * Output source maps.
+     * Output source maps for scripts and styles. For more information, see
+     * https://angular.io/guide/workspace-config#source-map-configuration.
      * @deprecated Use the "sourceMap" option in the browser builder instead.
      */
     sourceMap?: SourceMapUnion;
@@ -137,8 +137,7 @@ export interface Schema {
 /**
  * Enables optimization of the build output. Including minification of scripts and styles,
  * tree-shaking, dead-code elimination, tree-shaking and fonts inlining. For more
- * information, see
- * https://angular.io/guide/workspace-config#optimization-and-source-map-configuration.
+ * information, see https://angular.io/guide/workspace-config#optimization-configuration.
  * @deprecated Use the "optimization" option in the browser builder instead.
  */
 export declare type OptimizationUnion = boolean | OptimizationClass;
@@ -153,7 +152,8 @@ export interface OptimizationClass {
     styles?: boolean;
 }
 /**
- * Output source maps.
+ * Output source maps for scripts and styles. For more information, see
+ * https://angular.io/guide/workspace-config#source-map-configuration.
  * @deprecated Use the "sourceMap" option in the browser builder instead.
  */
 export declare type SourceMapUnion = boolean | SourceMapClass;
