@@ -433,7 +433,7 @@ function getCommonConfig(wco) {
                 },
                 {
                     test: /\.m?js$/,
-                    exclude: [/[\/\\](?:core-js|\@babel|tslib)[\/\\]/, /(ngfactory|ngstyle)\.js$/],
+                    exclude: [/[\/\\](?:core-js|\@babel|tslib|web-animations-js)[\/\\]/, /(ngfactory|ngstyle)\.js$/],
                     use: [
                         ...(wco.supportES2015
                             ? []
