@@ -12,7 +12,6 @@ const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
-const file_watching_1 = require("./file-watching");
 class BuilderHarness {
     constructor(builderHandler, host, builderInfo) {
         this.builderHandler = builderHandler;
@@ -61,17 +60,11 @@ class BuilderHarness {
     }
     execute(options = {}) {
         var _a;
-        const { configuration, outputLogsOnException = true, outputLogsOnFailure = true, useNativeFileWatching = false, } = options;
+        const { configuration, outputLogsOnException = true, outputLogsOnFailure = true } = options;
         const targetOptions = {
             ...this.options.get(null),
             ...((_a = (configuration && this.options.get(configuration))) !== null && _a !== void 0 ? _a : {}),
         };
-        if (!useNativeFileWatching) {
-            if (this.watcherNotifier) {
-                throw new Error('Only one harness execution at a time is supported.');
-            }
-            this.watcherNotifier = new file_watching_1.WatcherNotifier();
-        }
         const contextHost = {
             findBuilderByTarget: async (project, target) => {
                 this.validateProjectName(project);
@@ -130,7 +123,7 @@ class BuilderHarness {
                 return data;
             },
         };
-        const context = new HarnessBuilderContext(this.builderInfo, core_1.getSystemPath(this.host.root()), contextHost, useNativeFileWatching ? undefined : this.watcherNotifier);
+        const context = new HarnessBuilderContext(this.builderInfo, core_1.getSystemPath(this.host.root()), contextHost);
         if (this.targetName !== undefined) {
             context.target = {
                 project: this.projectName,
@@ -157,11 +150,11 @@ class BuilderHarness {
             const currentLogs = logs.slice();
             logs.length = 0;
             return { result, error, logs: currentLogs };
-        }), operators_1.finalize(() => {
-            this.watcherNotifier = undefined;
+        }), operators_1.mergeMap(async (executionResult) => {
             for (const teardown of context.teardowns) {
-                teardown();
+                await teardown();
             }
+            return executionResult;
         }));
     }
     async executeOnce(options) {
@@ -169,43 +162,23 @@ class BuilderHarness {
         return this.execute(options).pipe(operators_1.first()).toPromise();
     }
     async writeFile(path, content) {
-        var _a;
         this.host
             .scopedSync()
             .write(core_1.normalize(path), typeof content === 'string' ? Buffer.from(content) : content);
-        (_a = this.watcherNotifier) === null || _a === void 0 ? void 0 : _a.notify([
-            { path: core_1.getSystemPath(core_1.join(this.host.root(), path)), type: 'modified' },
-        ]);
     }
     async writeFiles(files) {
-        var _a;
-        const watchEvents = this.watcherNotifier
-            ? []
-            : undefined;
         for (const [path, content] of Object.entries(files)) {
             this.host
                 .scopedSync()
                 .write(core_1.normalize(path), typeof content === 'string' ? Buffer.from(content) : content);
-            watchEvents === null || watchEvents === void 0 ? void 0 : watchEvents.push({ path: core_1.getSystemPath(core_1.join(this.host.root(), path)), type: 'modified' });
-        }
-        if (watchEvents) {
-            (_a = this.watcherNotifier) === null || _a === void 0 ? void 0 : _a.notify(watchEvents);
         }
     }
     async removeFile(path) {
-        var _a;
-        this.host.scopedSync().delete(core_1.normalize(path));
-        (_a = this.watcherNotifier) === null || _a === void 0 ? void 0 : _a.notify([
-            { path: core_1.getSystemPath(core_1.join(this.host.root(), path)), type: 'deleted' },
-        ]);
+        return this.host.scopedSync().delete(core_1.normalize(path));
     }
     async modifyFile(path, modifier) {
-        var _a;
         const content = this.readFile(path);
         await this.writeFile(path, await modifier(content));
-        (_a = this.watcherNotifier) === null || _a === void 0 ? void 0 : _a.notify([
-            { path: core_1.getSystemPath(core_1.join(this.host.root(), path)), type: 'modified' },
-        ]);
     }
     hasFile(path) {
         return this.host.scopedSync().exists(core_1.normalize(path));
@@ -222,10 +195,9 @@ class BuilderHarness {
 }
 exports.BuilderHarness = BuilderHarness;
 class HarnessBuilderContext {
-    constructor(builder, basePath, contextHost, watcherFactory) {
+    constructor(builder, basePath, contextHost) {
         this.builder = builder;
         this.contextHost = contextHost;
-        this.watcherFactory = watcherFactory;
         this.id = Math.trunc(Math.random() * 1000000);
         this.logger = new core_1.logging.Logger(`builder-harness-${this.id}`);
         this.teardowns = [];
@@ -258,7 +230,7 @@ class HarnessBuilderContext {
             ...(await this.getTargetOptions(target)),
             ...overrides,
         }, info.builderName);
-        const context = new HarnessBuilderContext(info, this.workspaceRoot, this.contextHost, this.watcherFactory);
+        const context = new HarnessBuilderContext(info, this.workspaceRoot, this.contextHost);
         context.target = target;
         context.logger = (scheduleOptions === null || scheduleOptions === void 0 ? void 0 : scheduleOptions.logger) || this.logger.createChild('');
         const progressSubject = new rxjs_1.Subject();

@@ -19,7 +19,6 @@ export interface BuilderHarnessExecutionOptions {
     configuration: string;
     outputLogsOnFailure: boolean;
     outputLogsOnException: boolean;
-    useNativeFileWatching: boolean;
 }
 export declare class BuilderHarness<T> {
     private readonly builderHandler;
@@ -31,7 +30,6 @@ export declare class BuilderHarness<T> {
     private targetName?;
     private options;
     private builderTargets;
-    private watcherNotifier?;
     constructor(builderHandler: BuilderHandlerFn<T & json.JsonObject>, host: TestProjectHost, builderInfo?: Partial<BuilderInfo>);
     useProject(name: string, metadata?: Record<string, unknown>): this;
     useTarget(name: string, baseOptions: T): this;

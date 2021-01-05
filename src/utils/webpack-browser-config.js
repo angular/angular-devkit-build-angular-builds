@@ -7,7 +7,6 @@ const path = require("path");
 const webpack_merge_1 = require("webpack-merge");
 const utils_1 = require("../utils");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
-const builder_watch_plugin_1 = require("../webpack/plugins/builder-watch-plugin");
 const helpers_1 = require("../webpack/utils/helpers");
 const environment_options_1 = require("./environment-options");
 const i18n_options_1 = require("./i18n-options");
@@ -136,15 +135,6 @@ async function generateBrowserWebpackConfigFromContext(options, context, webpack
         : undefined;
     const normalizedOptions = utils_1.normalizeBrowserSchema(host, workspaceRoot, projectRoot, sourceRoot, options);
     const config = await generateWebpackConfig(core_1.getSystemPath(workspaceRoot), core_1.getSystemPath(projectRoot), sourceRoot && core_1.getSystemPath(sourceRoot), normalizedOptions, webpackPartialGenerator, context.logger, extraBuildOptions);
-    // If builder watch support is present in the context, add watch plugin
-    // This is internal only and currently only used for testing
-    const watcherFactory = context.watcherFactory;
-    if (watcherFactory) {
-        if (!config.plugins) {
-            config.plugins = [];
-        }
-        config.plugins.push(new builder_watch_plugin_1.BuilderWatchPlugin(watcherFactory));
-    }
     return {
         config,
         projectRoot: core_1.getSystemPath(projectRoot),
