@@ -40,6 +40,9 @@ function getStylesConfig(wco) {
                 }
                 catch (_a) { }
             }
+            if (!buildOptions.preserveSymlinks) {
+                resolvedPath = fs.realpathSync(resolvedPath);
+            }
             // Add style entry points.
             if (entryPoints[style.bundleName]) {
                 entryPoints[style.bundleName].push(resolvedPath);
