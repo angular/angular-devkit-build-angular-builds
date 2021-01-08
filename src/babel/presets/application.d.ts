@@ -1,10 +1,11 @@
-export declare type DiagnosticReporter = (type: 'error' | 'warning', message: string) => void;
+export declare type DiagnosticReporter = (type: 'error' | 'warning' | 'info', message: string) => void;
 export interface ApplicationPresetOptions {
     i18n?: {
         locale: string;
         missingTranslationBehavior?: 'error' | 'warning' | 'ignore';
         translation?: unknown;
     };
+    angularLinker?: boolean;
     forceES5?: boolean;
     forceAsyncTransformation?: boolean;
     diagnosticReporter?: DiagnosticReporter;

@@ -7,6 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+const fs = require("fs");
 const path = require("path");
 function createI18nDiagnostics(reporter) {
     // Babel currently is synchronous so import cannot be used
@@ -57,10 +58,39 @@ function createI18nPlugins(locale, translation, missingTranslationBehavior, diag
     plugins.push(makeLocalePlugin(locale));
     return plugins;
 }
+function createNgtscLogger(reporter) {
+    return {
+        level: 1,
+        debug(...args) { },
+        info(...args) {
+            reporter === null || reporter === void 0 ? void 0 : reporter('info', args.join());
+        },
+        warn(...args) {
+            reporter === null || reporter === void 0 ? void 0 : reporter('warning', args.join());
+        },
+        error(...args) {
+            reporter === null || reporter === void 0 ? void 0 : reporter('error', args.join());
+        },
+    };
+}
 function default_1(api, options) {
     const presets = [];
     const plugins = [];
     let needRuntimeTransform = false;
+    if (options.angularLinker) {
+        // Babel currently is synchronous so import cannot be used
+        const { createEs2015LinkerPlugin, } = require('@angular/compiler-cli/linker/babel');
+        plugins.push(createEs2015LinkerPlugin({
+            logger: createNgtscLogger(options.diagnosticReporter),
+            fileSystem: {
+                resolve: path.resolve,
+                exists: fs.existsSync,
+                dirname: path.dirname,
+                relative: path.relative,
+                readFile: fs.readFileSync,
+            },
+        }));
+    }
     if (options.forceES5) {
         presets.push([
             require('@babel/preset-env').default,
