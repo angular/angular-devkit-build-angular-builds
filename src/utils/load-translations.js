@@ -51,6 +51,9 @@ async function importParsers() {
         const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
         const diagnostics = new localizeDiag.Diagnostics();
         const parsers = {
+            arb: new (await Promise.resolve().then(() => require(
+            // tslint:disable-next-line:trailing-comma
+            '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/arb_translation_parser'))).ArbTranslationParser(),
             json: new (await Promise.resolve().then(() => require(
             // tslint:disable-next-line:trailing-comma
             '@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json_translation_parser'))).SimpleJsonTranslationParser(),

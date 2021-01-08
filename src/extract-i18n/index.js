@@ -29,6 +29,10 @@ function getI18nOutfile(format) {
         case 'xlf2':
         case 'xliff2':
             return 'messages.xlf';
+        case 'json':
+            return 'messages.json';
+        case 'arb':
+            return 'messages.arb';
         default:
             throw new Error(`Unsupported format "${format}"`);
     }
@@ -50,6 +54,19 @@ async function getSerializer(format, sourceLocale, basePath, useLegacyIds) {
             const { Xliff2TranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer'));
             // tslint:disable-next-line: no-any
             return new Xliff2TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
+        case schema_1.Format.Json:
+            const { SimpleJsonTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer'));
+            // tslint:disable-next-line: no-any
+            return new SimpleJsonTranslationSerializer(sourceLocale);
+        case schema_1.Format.Arb:
+            const { ArbTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer'));
+            const fileSystem = {
+                relative(from, to) {
+                    return path.relative(from, to);
+                },
+            };
+            // tslint:disable-next-line: no-any
+            return new ArbTranslationSerializer(sourceLocale, basePath, fileSystem);
     }
 }
 function normalizeFormatOption(options) {
@@ -69,6 +86,12 @@ function normalizeFormatOption(options) {
         case schema_1.Format.Xlf2:
         case schema_1.Format.Xliff2:
             format = schema_1.Format.Xlf2;
+            break;
+        case schema_1.Format.Json:
+            format = schema_1.Format.Json;
+            break;
+        case schema_1.Format.Arb:
+            format = schema_1.Format.Arb;
             break;
         case undefined:
             format = schema_1.Format.Xlf;
