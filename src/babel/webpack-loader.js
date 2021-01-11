@@ -8,6 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const babel_loader_1 = require("babel-loader");
+const typescript_1 = require("typescript");
 /**
  * Cached linker check utility function
  *
@@ -49,8 +50,10 @@ exports.default = babel_loader_1.custom(() => {
         sourceType: 'unambiguous',
     });
     return {
-        async customOptions({ forceES5, ...loaderOptions }, { source }) {
-            let shouldProcess = forceES5;
+        async customOptions({ scriptTarget, ...loaderOptions }, { source }) {
+            // Must process file if plugins are added
+            let shouldProcess = Array.isArray(loaderOptions.plugins) && loaderOptions.plugins.length > 0;
+            // Analyze file for linking
             let shouldLink = false;
             const { hasLinkerSupport, requiresLinking } = await checkLinking(this.resourcePath, source);
             if (requiresLinking && !hasLinkerSupport) {
@@ -61,15 +64,24 @@ exports.default = babel_loader_1.custom(() => {
                 shouldLink = requiresLinking;
             }
             shouldProcess || (shouldProcess = shouldLink);
+            // Analyze for ES target processing
+            let forceES5 = false;
+            const esTarget = scriptTarget;
+            if (esTarget < typescript_1.ScriptTarget.ES2015) {
+                forceES5 = true;
+            }
+            shouldProcess || (shouldProcess = forceES5);
+            // Add provided loader options to default base options
             const options = {
                 ...baseOptions,
                 ...loaderOptions,
             };
+            // Skip babel processing if no actions are needed
             if (!shouldProcess) {
                 // Force the current file to be ignored
                 options.ignore = [() => true];
             }
-            return { custom: { forceES5: !!forceES5, shouldLink }, loader: options };
+            return { custom: { forceES5, shouldLink }, loader: options };
         },
         config(configuration, { customOptions }) {
             return {

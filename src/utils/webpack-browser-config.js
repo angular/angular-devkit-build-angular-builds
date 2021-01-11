@@ -41,7 +41,7 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
         buildOptions,
         tsConfig,
         tsConfigPath,
-        supportES2015,
+        scriptTarget,
     };
     wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
     const webpackConfig = webpack_merge_1.merge(webpackPartialGenerator(wco));

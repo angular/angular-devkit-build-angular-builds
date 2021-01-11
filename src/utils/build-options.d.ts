@@ -84,5 +84,5 @@ export interface WebpackConfigOptions<T = BuildOptions> {
     buildOptions: T;
     tsConfig: ParsedConfiguration;
     tsConfigPath: string;
-    supportES2015: boolean;
+    scriptTarget: import('typescript').ScriptTarget;
 }
