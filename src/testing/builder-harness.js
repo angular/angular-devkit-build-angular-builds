@@ -168,6 +168,9 @@ class BuilderHarness {
         // Return the first result
         return this.execute(options).pipe(operators_1.first()).toPromise();
     }
+    async appendToFile(path, content) {
+        await this.writeFile(path, this.readFile(path).concat(content));
+    }
     async writeFile(path, content) {
         var _a;
         this.host

@@ -39,6 +39,7 @@ export declare class BuilderHarness<T> {
     withBuilderTarget<O>(target: string, handler: BuilderHandlerFn<O & json.JsonObject>, options?: O, info?: Partial<BuilderInfo>): this;
     execute(options?: Partial<BuilderHarnessExecutionOptions>): Observable<BuilderHarnessExecutionResult>;
     executeOnce(options?: Partial<BuilderHarnessExecutionOptions>): Promise<BuilderHarnessExecutionResult>;
+    appendToFile(path: string, content: string): Promise<void>;
     writeFile(path: string, content: string | Buffer): Promise<void>;
     writeFiles(files: Record<string, string | Buffer>): Promise<void>;
     removeFile(path: string): Promise<void>;
