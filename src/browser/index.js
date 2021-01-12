@@ -63,7 +63,7 @@ function getCompilerConfig(wco) {
     return {};
 }
 exports.getCompilerConfig = getCompilerConfig;
-async function initialize(options, context, host, differentialLoadingMode, webpackConfigurationTransform) {
+async function initialize(options, context, host, differentialLoadingNeeded, webpackConfigurationTransform) {
     var _a, _b;
     const originalOutputPath = options.outputPath;
     // Assets are processed directly by the builder except when watching
@@ -76,7 +76,7 @@ async function initialize(options, context, host, differentialLoadingMode, webpa
         getAnalyticsConfig(wco, context),
         getCompilerConfig(wco),
         wco.buildOptions.webWorkerTsConfig ? configs_1.getWorkerConfig(wco) : {},
-    ], host, { differentialLoadingMode });
+    ], host, { differentialLoadingNeeded });
     // Validate asset option values if processed directly
     if (((_a = options.assets) === null || _a === void 0 ? void 0 : _a.length) && !((_b = adjustedOptions.assets) === null || _b === void 0 ? void 0 : _b.length)) {
         utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), core_1.normalize(context.workspaceRoot), core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)).forEach(({ output }) => {
@@ -115,7 +115,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         const target = compilerOptions.target || typescript_1.ScriptTarget.ES5;
         const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(sysProjectRoot);
         const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded(target);
-        const differentialLoadingMode = !options.watch && isDifferentialLoadingNeeded;
         if (target > typescript_1.ScriptTarget.ES2015 && isDifferentialLoadingNeeded) {
             context.logger.warn(core_1.tags.stripIndent `
           Warning: Using differential loading with targets ES5 and ES2016 or higher may
@@ -133,7 +132,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 '\nFor additional information: https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile');
         }
         return {
-            ...(await initialize(options, context, host, differentialLoadingMode, transforms.webpackConfiguration)),
+            ...(await initialize(options, context, host, isDifferentialLoadingNeeded, transforms.webpackConfiguration)),
             buildBrowserFeatures,
             isDifferentialLoadingNeeded,
             target,

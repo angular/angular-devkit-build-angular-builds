@@ -68,7 +68,7 @@ export interface BuildOptions {
     fileReplacements: NormalizedFileReplacement[];
     experimentalRollupPass?: boolean;
     allowedCommonJsDependencies?: string[];
-    differentialLoadingMode?: boolean;
+    differentialLoadingNeeded?: boolean;
 }
 export interface WebpackTestOptions extends BuildOptions {
     codeCoverage?: boolean;

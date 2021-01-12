@@ -63,7 +63,7 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
         }
     }
     if (environment_options_1.profilingEnabled) {
-        const esVersionInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, buildOptions.differentialLoadingMode);
+        const esVersionInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, buildOptions.differentialLoadingNeeded);
         const SpeedMeasurePlugin = await Promise.resolve().then(() => require('speed-measure-webpack-plugin'));
         const smp = new SpeedMeasurePlugin({
             outputFormat: 'json',
