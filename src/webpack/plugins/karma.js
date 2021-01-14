@@ -43,7 +43,7 @@ function addKarmaFiles(files, newFiles, prepend = false) {
         files.push(...processedFiles);
     }
 }
-const init = (config, emitter, customFileHandlers) => {
+const init = (config, emitter) => {
     if (!config.buildWebpack) {
         throw new Error(`The '@angular-devkit/build-angular/plugins/karma' karma plugin is meant to` +
             ` be used from within Angular CLI and will not work correctly outside of it.`);
@@ -180,38 +180,12 @@ const init = (config, emitter, customFileHandlers) => {
         unblock();
     });
     webpackMiddleware = new webpackDevMiddleware(compiler, webpackMiddlewareConfig);
-    // Forward requests to webpack server.
-    customFileHandlers.push({
-        urlRegex: new RegExp(`\\/${KARMA_APPLICATION_PATH}\\/.*`),
-        handler: function handler(req, res) {
-            webpackMiddleware(req, res, function () {
-                // Ensure script and style bundles are served.
-                // They are mentioned in the custom karma context page and we don't want them to 404.
-                const alwaysServe = [
-                    `/${KARMA_APPLICATION_PATH}/runtime.js`,
-                    `/${KARMA_APPLICATION_PATH}/polyfills.js`,
-                    `/${KARMA_APPLICATION_PATH}/polyfills-es5.js`,
-                    `/${KARMA_APPLICATION_PATH}/scripts.js`,
-                    `/${KARMA_APPLICATION_PATH}/styles.js`,
-                    `/${KARMA_APPLICATION_PATH}/vendor.js`,
-                ];
-                if (alwaysServe.indexOf(req.url) != -1) {
-                    res.statusCode = 200;
-                    res.end();
-                }
-                else {
-                    res.statusCode = 404;
-                    res.end('Not found');
-                }
-            });
-        }
-    });
     emitter.on('exit', (done) => {
         webpackMiddleware.close();
         done();
     });
 };
-init.$inject = ['config', 'emitter', 'customFileHandlers'];
+init.$inject = ['config', 'emitter'];
 // Block requests until the Webpack compilation is done.
 function requestBlocker() {
     return function (_request, _response, next) {
@@ -274,8 +248,26 @@ sourceMapReporter.$inject = ['baseReporterDecorator', 'config'];
 function fallbackMiddleware() {
     return function (request, response, next) {
         if (webpackMiddleware) {
-            request.url = '/' + KARMA_APPLICATION_PATH + request.url;
-            webpackMiddleware(request, response, next);
+            if (request.url && !new RegExp(`\\/${KARMA_APPLICATION_PATH}\\/.*`).test(request.url)) {
+                request.url = '/' + KARMA_APPLICATION_PATH + request.url;
+            }
+            webpackMiddleware(request, response, () => {
+                const alwaysServe = [
+                    `/${KARMA_APPLICATION_PATH}/runtime.js`,
+                    `/${KARMA_APPLICATION_PATH}/polyfills.js`,
+                    `/${KARMA_APPLICATION_PATH}/polyfills-es5.js`,
+                    `/${KARMA_APPLICATION_PATH}/scripts.js`,
+                    `/${KARMA_APPLICATION_PATH}/styles.js`,
+                    `/${KARMA_APPLICATION_PATH}/vendor.js`,
+                ];
+                if (request.url && alwaysServe.includes(request.url)) {
+                    response.statusCode = 200;
+                    response.end();
+                }
+                else {
+                    next();
+                }
+            });
         }
         else {
             next();
