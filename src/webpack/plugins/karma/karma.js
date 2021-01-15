@@ -5,10 +5,10 @@ const glob = require("glob");
 const webpack = require("webpack");
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const karma_webpack_failure_cb_1 = require("./karma-webpack-failure-cb");
-const stats_1 = require("../utils/stats");
-const stats_2 = require("../configs/stats");
+const stats_1 = require("../../utils/stats");
+const stats_2 = require("../../configs/stats");
 const node_1 = require("@angular-devkit/core/node");
-const index_1 = require("../../utils/index");
+const index_1 = require("../../../utils/index");
 /**
  * Enumerate needed (but not require/imported) dependencies from this file
  *  to let the dependency validator know they are used.
