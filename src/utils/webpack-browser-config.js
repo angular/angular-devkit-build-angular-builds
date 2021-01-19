@@ -28,7 +28,6 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
     }
     const tsConfigPath = path.resolve(workspaceRoot, options.tsConfig);
     const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
-    // tslint:disable-next-line:no-implicit-dependencies
     const ts = await Promise.resolve().then(() => require('typescript'));
     const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES5;
     const supportES2015 = scriptTarget !== ts.ScriptTarget.JSON && scriptTarget > ts.ScriptTarget.ES5;
