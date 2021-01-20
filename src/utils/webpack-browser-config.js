@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getIndexInputFile = exports.getIndexOutputFile = exports.generateBrowserWebpackConfigFromContext = exports.generateI18nBrowserWebpackConfigFromContext = exports.generateWebpackConfig = void 0;
 const core_1 = require("@angular-devkit/core");
-const node_1 = require("@angular-devkit/core/node");
 const path = require("path");
 const webpack_merge_1 = require("webpack-merge");
 const utils_1 = require("../utils");
@@ -73,9 +72,9 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
     return webpackConfig;
 }
 exports.generateWebpackConfig = generateWebpackConfig;
-async function generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost(), extraBuildOptions = {}) {
+async function generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, extraBuildOptions = {}) {
     const { buildOptions, i18n } = await i18n_options_1.configureI18nBuild(context, options);
-    const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, webpackPartialGenerator, host, extraBuildOptions);
+    const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, webpackPartialGenerator, extraBuildOptions);
     const config = result.config;
     if (i18n.shouldInline) {
         // Remove localize "polyfill" if in AOT mode
@@ -121,7 +120,7 @@ async function generateI18nBrowserWebpackConfigFromContext(options, context, web
     return { ...result, i18n };
 }
 exports.generateI18nBrowserWebpackConfigFromContext = generateI18nBrowserWebpackConfigFromContext;
-async function generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, host = new node_1.NodeJsSyncHost(), extraBuildOptions = {}) {
+async function generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, extraBuildOptions = {}) {
     const projectName = context.target && context.target.project;
     if (!projectName) {
         throw new Error('The builder requires a target.');
@@ -133,7 +132,7 @@ async function generateBrowserWebpackConfigFromContext(options, context, webpack
     const sourceRoot = projectSourceRoot
         ? core_1.resolve(workspaceRoot, core_1.normalize(projectSourceRoot))
         : undefined;
-    const normalizedOptions = utils_1.normalizeBrowserSchema(host, workspaceRoot, projectRoot, sourceRoot, options);
+    const normalizedOptions = utils_1.normalizeBrowserSchema(workspaceRoot, projectRoot, sourceRoot, options);
     const config = await generateWebpackConfig(core_1.getSystemPath(workspaceRoot), core_1.getSystemPath(projectRoot), sourceRoot && core_1.getSystemPath(sourceRoot), normalizedOptions, webpackPartialGenerator, context.logger, extraBuildOptions);
     // If builder watch support is present in the context, add watch plugin
     // This is internal only and currently only used for testing

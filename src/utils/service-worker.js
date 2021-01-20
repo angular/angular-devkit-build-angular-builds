@@ -9,6 +9,7 @@ exports.augmentAppWithServiceWorker = void 0;
  * found in the LICENSE file at https://angular.io/license
  */
 const core_1 = require("@angular-devkit/core");
+const node_1 = require("@angular-devkit/core/node");
 const crypto = require("crypto");
 class CliFilesystem {
     constructor(_host, base) {
@@ -50,7 +51,8 @@ class CliFilesystem {
         return items;
     }
 }
-async function augmentAppWithServiceWorker(host, projectRoot, appRoot, outputPath, baseHref, ngswConfigPath) {
+async function augmentAppWithServiceWorker(projectRoot, appRoot, outputPath, baseHref, ngswConfigPath) {
+    const host = new node_1.NodeJsSyncHost();
     const distPath = core_1.normalize(outputPath);
     const systemProjectRoot = core_1.getSystemPath(projectRoot);
     // Find the service worker package

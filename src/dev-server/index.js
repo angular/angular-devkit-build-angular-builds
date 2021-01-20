@@ -11,7 +11,6 @@ exports.serveWebpackBrowser = void 0;
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
-const node_1 = require("@angular-devkit/core/node");
 const path = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
@@ -59,7 +58,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     const { logger, workspaceRoot } = context;
     version_1.assertCompatibleAngularVersion(workspaceRoot, logger);
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
-    const host = new node_1.NodeJsSyncHost();
     async function setup() {
         var _a;
         // Get the browser configuration from the target name.
@@ -97,7 +95,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             browser_1.getAnalyticsConfig(wco, context),
             browser_1.getCompilerConfig(wco),
             browserOptions.webWorkerTsConfig ? configs_1.getWorkerConfig(wco) : {},
-        ], host, devServerOptions);
+        ], devServerOptions);
         if (!config.devServer) {
             throw new Error('Webpack Dev Server configuration was not set.');
         }

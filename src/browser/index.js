@@ -11,7 +11,6 @@ exports.buildWebpackBrowser = exports.getCompilerConfig = exports.getAnalyticsCo
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
-const node_1 = require("@angular-devkit/core/node");
 const fs = require("fs");
 const path = require("path");
 const rxjs_1 = require("rxjs");
@@ -63,7 +62,7 @@ function getCompilerConfig(wco) {
     return {};
 }
 exports.getCompilerConfig = getCompilerConfig;
-async function initialize(options, context, host, differentialLoadingNeeded, webpackConfigurationTransform) {
+async function initialize(options, context, differentialLoadingNeeded, webpackConfigurationTransform) {
     var _a, _b;
     const originalOutputPath = options.outputPath;
     // Assets are processed directly by the builder except when watching
@@ -76,10 +75,10 @@ async function initialize(options, context, host, differentialLoadingNeeded, web
         getAnalyticsConfig(wco, context),
         getCompilerConfig(wco),
         wco.buildOptions.webWorkerTsConfig ? configs_1.getWorkerConfig(wco) : {},
-    ], host, { differentialLoadingNeeded });
+    ], { differentialLoadingNeeded });
     // Validate asset option values if processed directly
     if (((_a = options.assets) === null || _a === void 0 ? void 0 : _a.length) && !((_b = adjustedOptions.assets) === null || _b === void 0 ? void 0 : _b.length)) {
-        utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), core_1.normalize(context.workspaceRoot), core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)).forEach(({ output }) => {
+        utils_1.normalizeAssetPatterns(options.assets, core_1.normalize(context.workspaceRoot), core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)).forEach(({ output }) => {
             if (output.startsWith('..')) {
                 throw new Error('An asset cannot be written to a location outside of the output path.');
             }
@@ -97,7 +96,6 @@ async function initialize(options, context, host, differentialLoadingNeeded, web
 // tslint:disable-next-line: no-big-function
 function buildWebpackBrowser(options, context, transforms = {}) {
     var _a;
-    const host = new node_1.NodeJsSyncHost();
     const root = core_1.normalize(context.workspaceRoot);
     const projectName = (_a = context.target) === null || _a === void 0 ? void 0 : _a.project;
     if (!projectName) {
@@ -132,7 +130,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 '\nFor additional information: https://v10.angular.io/guide/deprecations#ie-9-10-and-mobile');
         }
         return {
-            ...(await initialize(options, context, host, isDifferentialLoadingNeeded, transforms.webpackConfiguration)),
+            ...(await initialize(options, context, isDifferentialLoadingNeeded, transforms.webpackConfiguration)),
             buildBrowserFeatures,
             isDifferentialLoadingNeeded,
             target,
@@ -459,7 +457,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 if (!options.watch && ((_d = options.assets) === null || _d === void 0 ? void 0 : _d.length)) {
                     spinner.start('Copying assets...');
                     try {
-                        await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, new core_1.virtualFs.SyncDelegateHost(host), root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), Array.from(outputPaths.values()), context.workspaceRoot);
+                        await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), Array.from(outputPaths.values()), context.workspaceRoot);
                         spinner.succeed('Copying assets complete.');
                     }
                     catch (err) {
@@ -517,7 +515,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         spinner.start('Generating service worker...');
                         for (const [locale, outputPath] of outputPaths.entries()) {
                             try {
-                                await service_worker_1.augmentAppWithServiceWorker(host, root, core_1.normalize(projectRoot), core_1.normalize(outputPath), getLocaleBaseHref(i18n, locale) || options.baseHref || '/', options.ngswConfigPath);
+                                await service_worker_1.augmentAppWithServiceWorker(root, core_1.normalize(projectRoot), core_1.normalize(outputPath), getLocaleBaseHref(i18n, locale) || options.baseHref || '/', options.ngswConfigPath);
                             }
                             catch (error) {
                                 spinner.fail('Service worker generation failed.');

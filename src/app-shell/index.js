@@ -9,7 +9,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
-const node_1 = require("@angular-devkit/core/node");
 const fs = require("fs");
 const path = require("path");
 const utils_1 = require("../utils");
@@ -27,7 +26,6 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
     const root = context.workspaceRoot;
     const zonePackage = require.resolve('zone.js', { paths: [root] });
     await Promise.resolve().then(() => require(zonePackage));
-    const host = new node_1.NodeJsSyncHost();
     const projectName = context.target && context.target.project;
     if (!projectName) {
         throw new Error('The builder requires a target.');
@@ -82,7 +80,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
         }
         await fs_1.writeFile(outputIndexPath, html);
         if (browserOptions.serviceWorker) {
-            await service_worker_1.augmentAppWithServiceWorker(host, core_1.normalize(root), projectRoot, core_1.normalize(outputPath), browserOptions.baseHref || '/', browserOptions.ngswConfigPath);
+            await service_worker_1.augmentAppWithServiceWorker(core_1.normalize(root), projectRoot, core_1.normalize(outputPath), browserOptions.baseHref || '/', browserOptions.ngswConfigPath);
         }
     }
     return browserResult;
