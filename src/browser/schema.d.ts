@@ -28,7 +28,7 @@ export interface Schema {
      */
     buildOptimizer?: boolean;
     /**
-     * Use a separate bundle containing code used across multiple bundles.
+     * Generate a seperate bundle containing code used across multiple bundles.
      */
     commonChunk?: boolean;
     /**
@@ -188,7 +188,8 @@ export interface Schema {
      */
     tsConfig: string;
     /**
-     * Use a separate bundle containing only vendor libraries.
+     * Generate a seperate bundle containing only vendor libraries. This option should only used
+     * for development.
      */
     vendorChunk?: boolean;
     /**
