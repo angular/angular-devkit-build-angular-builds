@@ -23,7 +23,7 @@ export interface Schema {
      */
     browserTarget: string;
     /**
-     * Generate a seperate bundle containing code used across multiple bundles.
+     * Use a separate bundle containing code used across multiple bundles.
      * @deprecated Use the "commonChunk" option in the browser builder instead.
      */
     commonChunk?: boolean;
@@ -121,8 +121,7 @@ export interface Schema {
      */
     sslKey?: string;
     /**
-     * Generate a seperate bundle containing only vendor libraries. This option should only used
-     * for development.
+     * Use a separate bundle containing only vendor libraries.
      * @deprecated Use the "vendorChunk" option in the browser builder instead.
      */
     vendorChunk?: boolean;
