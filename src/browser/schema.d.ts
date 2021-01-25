@@ -329,8 +329,7 @@ export declare type Localize = string[] | boolean;
 export declare type OptimizationUnion = boolean | OptimizationClass;
 export interface OptimizationClass {
     /**
-     * Enables optimization for fonts. This option requires internet access. `HTTPS_PROXY`
-     * environment variable can be used to specify a proxy server.
+     * Enables optimization for fonts. This requires internet access.
      */
     fonts?: FontsUnion;
     /**
@@ -343,15 +342,13 @@ export interface OptimizationClass {
     styles?: StylesUnion;
 }
 /**
- * Enables optimization for fonts. This option requires internet access. `HTTPS_PROXY`
- * environment variable can be used to specify a proxy server.
+ * Enables optimization for fonts. This requires internet access.
  */
 export declare type FontsUnion = boolean | FontsClass;
 export interface FontsClass {
     /**
      * Reduce render blocking requests by inlining external Google fonts and icons CSS
-     * definitions in the application's HTML index file. This option requires internet access.
-     * `HTTPS_PROXY` environment variable can be used to specify a proxy server.
+     * definitions in the application's HTML index file. This requires internet access.
      */
     inline?: boolean;
 }
