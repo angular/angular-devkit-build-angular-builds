@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InlineFontsProcessor = void 0;
 const cacache = require("cacache");
 const https = require("https");
+const proxyAgent = require("https-proxy-agent");
 const url_1 = require("url");
 const cache_path_1 = require("../cache-path");
 const environment_options_1 = require("../environment-options");
@@ -69,6 +70,7 @@ class InlineFontsProcessor {
         return transformedContent;
     }
     async getResponse(url, userAgent) {
+        var _a;
         const key = `${packageVersion}|${url}|${userAgent}`;
         if (cacheFontsPath) {
             const entry = await cacache.get.info(cacheFontsPath, key);
@@ -76,9 +78,16 @@ class InlineFontsProcessor {
                 return fs_1.readFile(entry.path, 'utf8');
             }
         }
+        let agent;
+        const httpsProxy = (_a = process.env.HTTPS_PROXY) !== null && _a !== void 0 ? _a : process.env.https_proxy;
+        if (httpsProxy) {
+            agent = proxyAgent(httpsProxy);
+        }
         const data = await new Promise((resolve, reject) => {
             let rawResponse = '';
             https.get(url, {
+                agent,
+                rejectUnauthorized: false,
                 headers: {
                     'user-agent': userAgent,
                 },
