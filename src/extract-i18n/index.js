@@ -89,7 +89,7 @@ async function execute(options, context, transforms) {
     const browserOptions = await context.validateOptions(await context.getTargetOptions(browserTarget), await context.getBuilderNameForTarget(browserTarget));
     const format = normalizeFormatOption(options);
     // We need to determine the outFile name so that AngularCompiler can retrieve it.
-    let outFile = options.outFile || getI18nOutfile(format);
+    let outFile = options.outFile || getI18nOutfile(options.format);
     if (options.outputPath) {
         // AngularCompilerPlugin doesn't support genDir so we have to adjust outFile instead.
         outFile = path.join(options.outputPath, outFile);
