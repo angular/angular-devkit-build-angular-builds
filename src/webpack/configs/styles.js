@@ -109,6 +109,7 @@ function getStylesConfig(wco) {
                 {
                     loader: require.resolve('less-loader'),
                     options: {
+                        implementation: require('less'),
                         sourceMap: cssSourceMap,
                         lessOptions: {
                             javascriptEnabled: true,
@@ -186,6 +187,7 @@ function getStylesConfig(wco) {
             {
                 loader: require.resolve('postcss-loader'),
                 options: {
+                    implementation: require('postcss'),
                     postcssOptions: postcssOptionsCreator(componentsSourceMap, false),
                 },
             },
@@ -215,6 +217,7 @@ function getStylesConfig(wco) {
                     {
                         loader: require.resolve('postcss-loader'),
                         options: {
+                            implementation: require('postcss'),
                             postcssOptions: postcssOptionsCreator(globalSourceMap, buildOptions.extractCss),
                         },
                     },

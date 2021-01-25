@@ -71,6 +71,7 @@ class ScriptsWebpackPlugin {
             compilation.chunks.push(chunk);
         }
         compilation.assets[filename] = source;
+        compilation.hooks.chunkAsset.call(chunk, filename);
     }
     apply(compiler) {
         if (!this.options.scripts || this.options.scripts.length === 0) {
