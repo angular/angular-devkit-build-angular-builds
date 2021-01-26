@@ -47,6 +47,7 @@ function createIvyPlugin(wco, aot, tsconfig) {
         compilerOptions,
         fileReplacements,
         emitNgModuleScope: !optimize,
+        suppressZoneJsIncompatibilityWarning: true,
     });
 }
 function _pluginOptionsOverrides(buildOptions, pluginOptions) {
@@ -107,6 +108,7 @@ function _createAotPlugin(wco, options, i18nExtract = false) {
         directTemplateLoading: true,
         ...options,
         compilerOptions,
+        suppressZoneJsIncompatibilityWarning: true,
     };
     pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
     return new webpack_1.AngularCompilerPlugin(pluginOptions);

@@ -19,7 +19,8 @@ const typescript_1 = require("typescript");
 let needsLinking;
 async function checkLinking(path, source) {
     // @angular/core and @angular/compiler will cause false positives
-    if (/[\\\/]@angular[\\\/](?:compiler|core)/.test(path)) {
+    // Also, TypeScript files do not require linking
+    if (/[\\\/]@angular[\\\/](?:compiler|core)|\.tsx?$/.test(path)) {
         return { requiresLinking: false };
     }
     if (needsLinking !== null) {
@@ -66,11 +67,16 @@ exports.default = babel_loader_1.custom(() => {
             shouldProcess || (shouldProcess = shouldLink);
             // Analyze for ES target processing
             let forceES5 = false;
+            let forceAsyncTransformation = false;
             const esTarget = scriptTarget;
             if (esTarget < typescript_1.ScriptTarget.ES2015) {
-                forceES5 = true;
+                // TypeScript files will have already been downlevelled
+                forceES5 = !/\.tsx?$/.test(this.resourcePath);
             }
-            shouldProcess || (shouldProcess = forceES5);
+            else if (esTarget >= typescript_1.ScriptTarget.ES2017) {
+                forceAsyncTransformation = source.includes('async');
+            }
+            shouldProcess || (shouldProcess = forceAsyncTransformation || forceES5);
             // Add provided loader options to default base options
             const options = {
                 ...baseOptions,
@@ -81,7 +87,7 @@ exports.default = babel_loader_1.custom(() => {
                 // Force the current file to be ignored
                 options.ignore = [() => true];
             }
-            return { custom: { forceES5, shouldLink }, loader: options };
+            return { custom: { forceAsyncTransformation, forceES5, shouldLink }, loader: options };
         },
         config(configuration, { customOptions }) {
             return {
@@ -93,6 +99,7 @@ exports.default = babel_loader_1.custom(() => {
                         {
                             angularLinker: customOptions.shouldLink,
                             forceES5: customOptions.forceES5,
+                            forceAsyncTransformation: customOptions.forceAsyncTransformation,
                             diagnosticReporter: (type, message) => {
                                 switch (type) {
                                     case 'error':
