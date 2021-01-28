@@ -74,8 +74,7 @@ function default_1(options) {
                     reject(err);
                     return;
                 }
-                let outputPath = loader_utils_1.interpolateName({ resourcePath: result }, filename(result), { content, context: loader.context || loader.rootContext })
-                    .replace(/\\|\//g, '-');
+                let outputPath = loader_utils_1.interpolateName({ resourcePath: result }, filename, { content });
                 if (resourcesOutputPath) {
                     outputPath = path.posix.join(resourcesOutputPath, outputPath);
                 }

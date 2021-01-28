@@ -136,7 +136,6 @@ function getStylesConfig(wco) {
             ],
         },
     ];
-    const assetNameTemplate = helpers_1.assetNameTemplateFactory(hashFormat);
     const postcssOptionsCreator = (sourceMap, extracted) => {
         return (loader) => ({
             map: sourceMap && {
@@ -164,7 +163,7 @@ function getStylesConfig(wco) {
                     deployUrl: buildOptions.deployUrl,
                     resourcesOutputPath: buildOptions.resourcesOutputPath,
                     loader,
-                    filename: assetNameTemplate,
+                    filename: `[name]${hashFormat.file}.[ext]`,
                     emitFile: buildOptions.platform !== 'server',
                     extracted,
                 }),
