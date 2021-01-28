@@ -7,10 +7,12 @@
  */
 import { WebpackConfigOptions } from '../../utils/build-options';
 export declare function getWebpackStatsConfig(verbose?: boolean): {
+    all: boolean;
     colors: boolean;
     hash: boolean;
     timings: boolean;
     chunks: boolean;
+    builtAt: boolean;
     chunkModules: boolean;
     children: boolean;
     modules: boolean;
@@ -24,10 +26,12 @@ export declare function getWebpackStatsConfig(verbose?: boolean): {
 };
 export declare function getStatsConfig(wco: WebpackConfigOptions): {
     stats: {
+        all: boolean;
         colors: boolean;
         hash: boolean;
         timings: boolean;
         chunks: boolean;
+        builtAt: boolean;
         chunkModules: boolean;
         children: boolean;
         modules: boolean;
