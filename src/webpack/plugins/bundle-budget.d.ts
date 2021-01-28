@@ -7,8 +7,10 @@
  */
 import { Compiler } from 'webpack';
 import { Budget } from '../../browser/schema';
+import { NormalizedEntryPoint } from '../utils/helpers';
 export interface BundleBudgetPluginOptions {
     budgets: Budget[];
+    extraEntryPoints: NormalizedEntryPoint[];
 }
 export declare class BundleBudgetPlugin {
     private options;

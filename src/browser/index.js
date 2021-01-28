@@ -159,8 +159,10 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 throw new Error('Webpack stats build result is required.');
             }
             // Fix incorrectly set `initial` value on chunks.
-            const extraEntryPoints = configs_1.normalizeExtraEntryPoints(options.styles || [], 'styles')
-                .concat(configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts'));
+            const extraEntryPoints = [
+                ...configs_1.normalizeExtraEntryPoints(options.styles || [], 'styles'),
+                ...configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts'),
+            ];
             const webpackStats = {
                 ...webpackRawStats,
                 chunks: async_chunks_1.markAsyncChunksNonInitial(webpackRawStats, extraEntryPoints),
