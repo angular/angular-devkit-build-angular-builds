@@ -10,10 +10,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStatsConfig = exports.getWebpackStatsConfig = void 0;
 const webpack_version_1 = require("../../utils/webpack-version");
 const webpackOutputOptions = {
+    all: false,
     colors: true,
     hash: true,
     timings: true,
     chunks: true,
+    builtAt: true,
     chunkModules: false,
     children: false,
     modules: false,
