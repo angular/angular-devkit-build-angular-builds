@@ -1,6 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkThresholds = exports.checkBudgets = exports.calculateThresholds = exports.ThresholdSeverity = void 0;
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+const path_1 = require("path");
 const schema_1 = require("../browser/schema");
 const stats_1 = require("../webpack/utils/stats");
 var ThresholdType;
@@ -133,6 +141,16 @@ class Calculator {
                 .reduce((l, r) => l + r, 0);
         }
     }
+    getAssetSize(asset) {
+        if (asset.name.endsWith('.js')) {
+            const processResult = this.processResults
+                .find((processResult) => processResult.original && path_1.basename(processResult.original.filename) === asset.name);
+            if (processResult === null || processResult === void 0 ? void 0 : processResult.original) {
+                return processResult.original.size;
+            }
+        }
+        return asset.size;
+    }
 }
 /**
  * A named bundle.
@@ -193,7 +211,7 @@ class AllScriptCalculator extends Calculator {
     calculate() {
         const size = this.assets
             .filter(asset => asset.name.endsWith('.js'))
-            .map(asset => asset.size)
+            .map(asset => this.getAssetSize(asset))
             .reduce((total, size) => total + size, 0);
         return [{ size, label: 'total scripts' }];
     }
@@ -205,7 +223,7 @@ class AllCalculator extends Calculator {
     calculate() {
         const size = this.assets
             .filter(asset => !asset.name.endsWith('.map'))
-            .map(asset => asset.size)
+            .map(asset => this.getAssetSize(asset))
             .reduce((total, size) => total + size, 0);
         return [{ size, label: 'total' }];
     }
@@ -218,7 +236,7 @@ class AnyScriptCalculator extends Calculator {
         return this.assets
             .filter(asset => asset.name.endsWith('.js'))
             .map(asset => ({
-            size: asset.size,
+            size: this.getAssetSize(asset),
             label: asset.name,
         }));
     }
@@ -231,7 +249,7 @@ class AnyCalculator extends Calculator {
         return this.assets
             .filter(asset => !asset.name.endsWith('.map'))
             .map(asset => ({
-            size: asset.size,
+            size: this.getAssetSize(asset),
             label: asset.name,
         }));
     }
