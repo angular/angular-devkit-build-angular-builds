@@ -7,7 +7,7 @@ export interface PostcssCliResourcesOptions {
     rebaseRootRelative?: boolean;
     /** CSS is extracted to a `.css` or is embedded in a `.js` file. */
     extracted?: boolean;
-    filename: string;
+    filename: (resourcePath: string) => string;
     loader: webpack.loader.LoaderContext;
     emitFile: boolean;
 }
