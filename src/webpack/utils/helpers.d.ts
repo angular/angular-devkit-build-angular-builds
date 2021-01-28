@@ -24,3 +24,4 @@ export declare function getSourceMapDevTool(scriptsSourceMap: boolean | undefine
 export declare function getEsVersionForFileName(scriptTarget: ScriptTarget | undefined, esVersionInFileName?: boolean): string;
 export declare function isPolyfillsEntry(name: string): boolean;
 export declare function getWatchOptions(poll: number | undefined): Options.WatchOptions;
+export declare function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath: string) => string;

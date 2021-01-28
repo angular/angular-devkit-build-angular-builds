@@ -45,6 +45,7 @@ export declare class BuilderHarness<T> {
     removeFile(path: string): Promise<void>;
     modifyFile(path: string, modifier: (content: string) => string | Promise<string>): Promise<void>;
     hasFile(path: string): boolean;
+    hasFileMatch(directory: string, pattern: RegExp): boolean;
     readFile(path: string): string;
     private validateProjectName;
 }
