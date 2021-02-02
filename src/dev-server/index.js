@@ -224,7 +224,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             logging: transforms.logging || stats_1.createWebpackLoggingCallback(!!options.verbose, logger),
             webpackFactory: require('webpack'),
             webpackDevServerFactory: require('webpack-dev-server'),
-        }).pipe(operators_1.concatMap((buildEvent, index) => {
+        }).pipe(operators_1.concatMap(async (buildEvent, index) => {
             var _a;
             // Resolve serve address.
             const serverAddress = url.format({
@@ -241,14 +241,14 @@ function serveWebpackBrowser(options, context, transforms = {}) {
               **
             ` + '\n');
                 if (options.open) {
-                    const open = require('open');
-                    open(serverAddress);
+                    const open = await Promise.resolve().then(() => require('open'));
+                    await open(serverAddress);
                 }
             }
             if (buildEvent.success) {
                 logger.info(`\n${color_1.colors.greenBright(color_1.colors.symbols.check)} Compiled successfully.`);
             }
-            return rxjs_1.of({ ...buildEvent, baseUrl: serverAddress });
+            return { ...buildEvent, baseUrl: serverAddress };
         }));
     }));
 }
