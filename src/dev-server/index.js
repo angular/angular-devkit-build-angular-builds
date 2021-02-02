@@ -29,7 +29,6 @@ const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const webpack_diagnostics_1 = require("../utils/webpack-diagnostics");
 const configs_1 = require("../webpack/configs");
-const dev_server_1 = require("../webpack/configs/dev-server");
 const index_html_webpack_plugin_1 = require("../webpack/plugins/index-html-webpack-plugin");
 const stats_1 = require("../webpack/utils/stats");
 const devServerBuildOverriddenKeys = [
@@ -87,7 +86,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         const browserName = await context.getBuilderNameForTarget(browserTarget);
         const browserOptions = await context.validateOptions({ ...rawBrowserOptions, ...overrides }, browserName);
         const { config, projectRoot, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(browserOptions, context, wco => [
-            dev_server_1.getDevServerConfig(wco),
+            configs_1.getDevServerConfig(wco),
             configs_1.getCommonConfig(wco),
             configs_1.getBrowserConfig(wco),
             configs_1.getStylesConfig(wco),

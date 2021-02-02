@@ -36,6 +36,7 @@ const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const configs_1 = require("../webpack/configs");
 const analytics_1 = require("../webpack/plugins/analytics");
 const async_chunks_1 = require("../webpack/utils/async-chunks");
+const helpers_1 = require("../webpack/utils/helpers");
 const stats_1 = require("../webpack/utils/stats");
 const cacheDownlevelPath = environment_options_1.cachingDisabled ? undefined : cache_path_1.findCachePath('angular-build-dl');
 function getAnalyticsConfig(wco, context) {
@@ -158,8 +159,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             }
             // Fix incorrectly set `initial` value on chunks.
             const extraEntryPoints = [
-                ...configs_1.normalizeExtraEntryPoints(options.styles || [], 'styles'),
-                ...configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts'),
+                ...helpers_1.normalizeExtraEntryPoints(options.styles || [], 'styles'),
+                ...helpers_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts'),
             ];
             const webpackStats = {
                 ...webpackRawStats,
@@ -182,7 +183,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 let noModuleFiles;
                 let moduleFiles;
                 let files;
-                const scriptsEntryPointName = configs_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map(x => x.bundleName);
+                const scriptsEntryPointName = helpers_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map(x => x.bundleName);
                 if (isDifferentialLoadingNeeded && options.watch) {
                     moduleFiles = emittedFiles;
                     files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
