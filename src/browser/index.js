@@ -178,6 +178,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 return { success };
             }
             else {
+                const processResults = [];
                 const bundleInfoStats = [];
                 outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
                 let noModuleFiles;
@@ -298,7 +299,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     }
                     const processActions = [];
                     let processRuntimeAction;
-                    const processResults = [];
                     for (const action of actions) {
                         // If SRI is enabled always process the runtime bundle
                         // Lazy route integrity values are stored in the runtime bundle
@@ -428,8 +428,22 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         const asset = (_c = webpackStats.assets) === null || _c === void 0 ? void 0 : _c.find(a => a.name === chunk.files[0]);
                         bundleInfoStats.push(stats_1.generateBundleStats({ ...chunk, size: asset === null || asset === void 0 ? void 0 : asset.size }));
                     }
-                    // Check for budget errors and display them to the user.
-                    const budgets = options.budgets || [];
+                }
+                else {
+                    files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
+                    noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
+                    if (i18n.shouldInline) {
+                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, 
+                        // tslint:disable-next-line: no-non-null-assertion
+                        webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
+                        if (!success) {
+                            return { success: false };
+                        }
+                    }
+                }
+                // Check for budget errors and display them to the user.
+                const budgets = options.budgets;
+                if (budgets === null || budgets === void 0 ? void 0 : budgets.length) {
                     const budgetFailures = bundle_calculator_1.checkBudgets(budgets, webpackStats, processResults);
                     for (const { severity, message } of budgetFailures) {
                         switch (severity) {
@@ -444,31 +458,20 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                     }
                 }
-                else {
-                    files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
-                    noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
-                    if (i18n.shouldInline) {
-                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, 
-                        // tslint:disable-next-line: no-non-null-assertion
-                        webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
-                        if (!success) {
-                            return { success: false };
+                const buildSuccess = success && !stats_1.statsHasErrors(webpackStats);
+                if (buildSuccess) {
+                    // Copy assets
+                    if (!options.watch && ((_d = options.assets) === null || _d === void 0 ? void 0 : _d.length)) {
+                        spinner.start('Copying assets...');
+                        try {
+                            await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), Array.from(outputPaths.values()), context.workspaceRoot);
+                            spinner.succeed('Copying assets complete.');
+                        }
+                        catch (err) {
+                            spinner.fail(color_1.colors.redBright('Copying of assets failed.'));
+                            return { success: false, error: 'Unable to copy assets: ' + err.message };
                         }
                     }
-                }
-                // Copy assets
-                if (!options.watch && ((_d = options.assets) === null || _d === void 0 ? void 0 : _d.length)) {
-                    spinner.start('Copying assets...');
-                    try {
-                        await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), Array.from(outputPaths.values()), context.workspaceRoot);
-                        spinner.succeed('Copying assets complete.');
-                    }
-                    catch (err) {
-                        spinner.fail(color_1.colors.redBright('Copying of assets failed.'));
-                        return { success: false, error: 'Unable to copy assets: ' + err.message };
-                    }
-                }
-                if (success) {
                     if (options.index) {
                         spinner.start('Generating index html...');
                         const WOFFSupportNeeded = !buildBrowserFeatures.isFeatureSupported('woff2');
@@ -529,7 +532,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     }
                 }
                 stats_1.webpackStatsLogger(context.logger, webpackStats, config, bundleInfoStats);
-                return { success: !stats_1.statsHasErrors(webpackStats) };
+                return { success: buildSuccess };
             }
         }), operators_1.map(event => ({
             ...event,

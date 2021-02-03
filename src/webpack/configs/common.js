@@ -269,15 +269,6 @@ function getCommonConfig(wco) {
         // Provide full names for lazy routes that use the deprecated string format
         extraPlugins.push(new webpack_1.ContextReplacementPlugin(/\@angular[\\\/]core[\\\/]/, (data) => (data.chunkName = '[request]')));
     }
-    if (buildOptions.budgets.length && !differentialLoadingMode) {
-        // Budgets are computed after differential builds, not via a plugin.
-        // https://github.com/angular/angular-cli/blob/master/packages/angular_devkit/build_angular/src/browser/index.ts
-        const extraEntryPoints = [
-            ...helpers_1.normalizeExtraEntryPoints(buildOptions.styles || [], 'styles'),
-            ...helpers_1.normalizeExtraEntryPoints(buildOptions.scripts || [], 'scripts'),
-        ];
-        extraPlugins.push(new plugins_1.BundleBudgetPlugin({ budgets: buildOptions.budgets, extraEntryPoints }));
-    }
     if ((scriptsSourceMap || stylesSourceMap)) {
         extraRules.push({
             test: /\.m?js$/,
