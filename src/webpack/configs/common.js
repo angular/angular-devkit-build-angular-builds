@@ -412,6 +412,15 @@ function getCommonConfig(wco) {
             strictExportPresence: true,
             rules: [
                 {
+                    test: /\.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani|avif)$/,
+                    loader: require.resolve('file-loader'),
+                    options: {
+                        name: `[name]${hashFormat.file}.[ext]`,
+                        // Re-use emitted files from browser builder on the server.
+                        emitFile: platform !== 'server',
+                    },
+                },
+                {
                     // Mark files inside `@angular/core` as using SystemJS style dynamic imports.
                     // Removing this will cause deprecation warnings to appear.
                     test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
@@ -432,9 +441,6 @@ function getCommonConfig(wco) {
                             loader: require.resolve('../../babel/webpack-loader'),
                             options: {
                                 cacheDirectory: cache_path_1.findCachePath('babel-webpack'),
-                                cacheIdentifier: JSON.stringify({
-                                    buildAngular: require('../../../package.json').version,
-                                }),
                                 scriptTarget: wco.scriptTarget,
                             },
                         },
