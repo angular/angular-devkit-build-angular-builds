@@ -30,7 +30,6 @@ function createIvyPlugin(wco, aot, tsconfig) {
     const { buildOptions } = wco;
     const optimize = buildOptions.optimization.scripts;
     const compilerOptions = {
-        skipTemplateCodegen: !aot,
         sourceMap: buildOptions.sourceMap.scripts,
     };
     if (buildOptions.preserveSymlinks !== undefined) {
@@ -46,6 +45,7 @@ function createIvyPlugin(wco, aot, tsconfig) {
         tsconfig,
         compilerOptions,
         fileReplacements,
+        jitMode: !aot,
         emitNgModuleScope: !optimize,
     });
 }
