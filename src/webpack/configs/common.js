@@ -432,9 +432,6 @@ function getCommonConfig(wco) {
                             loader: require.resolve('../../babel/webpack-loader'),
                             options: {
                                 cacheDirectory: cache_path_1.findCachePath('babel-webpack'),
-                                cacheIdentifier: JSON.stringify({
-                                    buildAngular: require('../../../package.json').version,
-                                }),
                                 scriptTarget: wco.scriptTarget,
                             },
                         },
