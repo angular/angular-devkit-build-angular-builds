@@ -10,9 +10,7 @@ exports.colors = exports.removeColor = void 0;
  */
 const ansiColors = require("ansi-colors");
 const tty_1 = require("tty");
-// Typings do not contain the function call (added in Node.js v9.9.0)
-const supportsColor = process.stdout instanceof tty_1.WriteStream &&
-    process.stdout.getColorDepth() > 1;
+const supportsColor = process.stdout instanceof tty_1.WriteStream && process.stdout.getColorDepth() > 1;
 function removeColor(text) {
     // This has been created because when colors.enabled is false unstyle doesn't work
     // see: https://github.com/doowb/ansi-colors/blob/a4794363369d7b4d1872d248fc43a12761640d8e/index.js#L38

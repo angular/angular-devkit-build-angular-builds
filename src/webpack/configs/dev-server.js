@@ -17,6 +17,7 @@ const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const hmr_loader_1 = require("../plugins/hmr/hmr-loader");
 const helpers_1 = require("../utils/helpers");
 function getDevServerConfig(wco) {
+    var _a;
     const { buildOptions: { optimization, host, port, index, headers, poll, ssl, hmr, main, disableHostCheck, liveReload, allowedHosts, watch, proxyConfig, }, logger, root, } = wco;
     const servePath = buildServePath(wco.buildOptions, logger);
     const { styles: stylesOptimization, scripts: scriptsOptimization } = utils_1.normalizeOptimization(optimization);
@@ -28,7 +29,7 @@ function getDevServerConfig(wco) {
             publicHost = `${ssl ? 'https' : 'http'}://${publicHost}`;
         }
         const parsedHost = url.parse(publicHost);
-        publicHost = parsedHost.host;
+        publicHost = (_a = parsedHost.host) !== null && _a !== void 0 ? _a : undefined;
     }
     else {
         publicHost = '0.0.0.0:0';

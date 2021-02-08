@@ -8,7 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InlineCriticalCssProcessor = void 0;
-const fs_1 = require("../fs");
+const fs = require("fs");
 const Critters = require('critters');
 class CrittersExtended extends Critters {
     constructor(optionsExtended) {
@@ -34,7 +34,7 @@ class CrittersExtended extends Critters {
     }
     readFile(path) {
         const readAsset = this.optionsExtended.readAsset;
-        return readAsset ? readAsset(path) : fs_1.readFile(path, 'utf-8');
+        return readAsset ? readAsset(path) : fs.promises.readFile(path, 'utf-8');
     }
 }
 class InlineCriticalCssProcessor {

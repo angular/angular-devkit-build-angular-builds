@@ -23,7 +23,6 @@ const cache_path_1 = require("../utils/cache-path");
 const color_1 = require("../utils/color");
 const copy_assets_1 = require("../utils/copy-assets");
 const environment_options_1 = require("../utils/environment-options");
-const fs_1 = require("../utils/fs");
 const i18n_inlining_1 = require("../utils/i18n-inlining");
 const index_html_generator_1 = require("../utils/index-file/index-html-generator");
 const output_paths_1 = require("../utils/output-paths");
@@ -507,8 +506,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                     spinner.start();
                                 }
                                 const indexOutput = path.join(outputPath, webpack_browser_config_1.getIndexOutputFile(options.index));
-                                await fs_1.mkdir(path.dirname(indexOutput), { recursive: true });
-                                await fs_1.writeFile(indexOutput, content);
+                                await fs.promises.mkdir(path.dirname(indexOutput), { recursive: true });
+                                await fs.promises.writeFile(indexOutput, content);
                             }
                             catch (error) {
                                 spinner.fail('Index html generation failed.');

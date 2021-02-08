@@ -12,7 +12,6 @@ const core_1 = require("@angular-devkit/core");
 const fs = require("fs");
 const path = require("path");
 const utils_1 = require("../utils");
-const fs_1 = require("../utils/fs");
 const inline_critical_css_1 = require("../utils/index-file/inline-critical-css");
 const service_worker_1 = require("../utils/service-worker");
 const spinner_1 = require("../utils/spinner");
@@ -42,7 +41,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
     for (const outputPath of browserResult.outputPaths) {
         const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
         const browserIndexOutputPath = path.join(outputPath, 'index.html');
-        const indexHtml = await fs_1.readFile(browserIndexOutputPath, 'utf8');
+        const indexHtml = await fs.promises.readFile(browserIndexOutputPath, 'utf8');
         const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult, localeDirectory);
         const { AppServerModule, AppServerModuleNgFactory, renderModule, renderModuleFactory, } = await Promise.resolve().then(() => require(serverBundlePath));
         let renderModuleFn;
@@ -78,7 +77,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
                 spinner.start();
             }
         }
-        await fs_1.writeFile(outputIndexPath, html);
+        await fs.promises.writeFile(outputIndexPath, html);
         if (browserOptions.serviceWorker) {
             await service_worker_1.augmentAppWithServiceWorker(core_1.normalize(root), projectRoot, core_1.normalize(outputPath), browserOptions.baseHref || '/', browserOptions.ngswConfigPath);
         }

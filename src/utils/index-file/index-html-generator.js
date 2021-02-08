@@ -8,8 +8,8 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IndexHtmlGenerator = void 0;
+const fs = require("fs");
 const path_1 = require("path");
-const fs_1 = require("../fs");
 const strip_bom_1 = require("../strip-bom");
 const augment_index_html_1 = require("./augment-index-html");
 const inline_critical_css_1 = require("./inline-critical-css");
@@ -57,10 +57,10 @@ class IndexHtmlGenerator {
         };
     }
     async readAsset(path) {
-        return fs_1.readFile(path, 'utf-8');
+        return fs.promises.readFile(path, 'utf-8');
     }
     async readIndex(path) {
-        return fs_1.readFile(path, 'utf-8');
+        return fs.promises.readFile(path, 'utf-8');
     }
 }
 exports.IndexHtmlGenerator = IndexHtmlGenerator;
