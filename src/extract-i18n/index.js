@@ -144,6 +144,8 @@ async function execute(options, context, transforms) {
         scripts: [],
         styles: [],
         deleteOutputPath: false,
+        extractLicenses: false,
+        subresourceIntegrity: false,
     }, context, (wco) => {
         var _a;
         const isIvyApplication = wco.tsConfig.options.enableIvy !== false;
@@ -163,6 +165,7 @@ async function execute(options, context, transforms) {
         const partials = [
             { plugins: [new NoEmitPlugin()] },
             configs_1.getCommonConfig(wco),
+            configs_1.getBrowserConfig(wco),
             // Only use VE extraction if not using Ivy
             configs_1.getAotConfig(wco, !usingIvy),
             configs_1.getStatsConfig(wco),
