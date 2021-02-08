@@ -146,6 +146,7 @@ function getStylesConfig(wco) {
         const fullPath = path.join(basePath, tailwindConfigFile);
         if (fs.existsSync(fullPath)) {
             tailwindConfigPath = fullPath;
+            break;
         }
     }
     // Only load Tailwind CSS plugin if configuration file was found.
