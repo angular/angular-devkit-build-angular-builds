@@ -14,4 +14,3 @@ export { NamedLazyChunksPlugin } from './named-chunks-plugin';
 export { DedupeModuleResolvePlugin } from './dedupe-module-resolve-plugin';
 export { CommonJsUsageWarnPlugin } from './common-js-usage-warn-plugin';
 export { default as PostcssCliResources, PostcssCliResourcesOptions, } from './postcss-cli-resources';
-export declare const WebpackRollupLoader: string;

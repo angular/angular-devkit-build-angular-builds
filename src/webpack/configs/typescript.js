@@ -20,10 +20,6 @@ function canUseIvyPlugin(wco) {
     if (wco.buildOptions.lazyModules && wco.buildOptions.lazyModules.length > 0) {
         return false;
     }
-    // This pass relies on internals of the original plugin
-    if (wco.buildOptions.experimentalRollupPass) {
-        return false;
-    }
     return true;
 }
 function createIvyPlugin(wco, aot, tsconfig) {

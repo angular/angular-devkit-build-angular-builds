@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WebpackRollupLoader = exports.PostcssCliResources = exports.CommonJsUsageWarnPlugin = exports.DedupeModuleResolvePlugin = exports.NamedLazyChunksPlugin = exports.RemoveHashPlugin = exports.SuppressExtractedTextChunksWebpackPlugin = exports.ScriptsWebpackPlugin = exports.OptimizeCssWebpackPlugin = exports.AnyComponentStyleBudgetChecker = void 0;
+exports.PostcssCliResources = exports.CommonJsUsageWarnPlugin = exports.DedupeModuleResolvePlugin = exports.NamedLazyChunksPlugin = exports.RemoveHashPlugin = exports.SuppressExtractedTextChunksWebpackPlugin = exports.ScriptsWebpackPlugin = exports.OptimizeCssWebpackPlugin = exports.AnyComponentStyleBudgetChecker = void 0;
 // Exports the webpack plugins we use internally.
 var any_component_style_budget_checker_1 = require("./any-component-style-budget-checker");
 Object.defineProperty(exports, "AnyComponentStyleBudgetChecker", { enumerable: true, get: function () { return any_component_style_budget_checker_1.AnyComponentStyleBudgetChecker; } });
@@ -27,5 +27,3 @@ var common_js_usage_warn_plugin_1 = require("./common-js-usage-warn-plugin");
 Object.defineProperty(exports, "CommonJsUsageWarnPlugin", { enumerable: true, get: function () { return common_js_usage_warn_plugin_1.CommonJsUsageWarnPlugin; } });
 var postcss_cli_resources_1 = require("./postcss-cli-resources");
 Object.defineProperty(exports, "PostcssCliResources", { enumerable: true, get: function () { return postcss_cli_resources_1.default; } });
-const path_1 = require("path");
-exports.WebpackRollupLoader = require.resolve(path_1.join(__dirname, 'webpack-rollup-loader'));

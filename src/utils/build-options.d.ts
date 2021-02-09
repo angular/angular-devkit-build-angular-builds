@@ -66,7 +66,6 @@ export interface BuildOptions {
     lazyModules: string[];
     platform?: 'browser' | 'server';
     fileReplacements: NormalizedFileReplacement[];
-    experimentalRollupPass?: boolean;
     allowedCommonJsDependencies?: string[];
     differentialLoadingNeeded?: boolean;
 }
