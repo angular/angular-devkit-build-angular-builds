@@ -292,18 +292,7 @@ function fallbackMiddleware() {
 function isPlugin(moduleId, pluginName) {
     return (plugin) => {
         if (typeof plugin === 'string') {
-            if (!plugin.includes('*')) {
-                return plugin === moduleId;
-            }
-            const regexp = new RegExp(`^${plugin.replace('*', '.*')}`);
-            if (regexp.test(moduleId)) {
-                try {
-                    require.resolve(moduleId);
-                    return true;
-                }
-                catch (_a) { }
-            }
-            return false;
+            return plugin === moduleId;
         }
         return pluginName in plugin;
     };
