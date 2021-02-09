@@ -11,14 +11,15 @@ exports.getStylesConfig = void 0;
 const core_1 = require("@angular-devkit/core");
 const fs = require("fs");
 const path = require("path");
+const build_browser_features_1 = require("../../utils/build-browser-features");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
 // tslint:disable-next-line:no-big-function
 function getStylesConfig(wco) {
     var _a, _b, _c;
-    const autoprefixer = require('autoprefixer');
     const MiniCssExtractPlugin = require('mini-css-extract-plugin');
     const postcssImports = require('postcss-import');
+    const postcssPresetEnv = require('postcss-preset-env');
     const { root, buildOptions } = wco;
     const entryPoints = {};
     const globalStylePaths = [];
@@ -167,6 +168,7 @@ function getStylesConfig(wco) {
             extraPostcssPlugins.push(require(tailwindPackagePath)({ config: tailwindConfigPath }));
         }
     }
+    const { supportedBrowsers } = new build_browser_features_1.BuildBrowserFeatures(wco.projectRoot);
     const postcssOptionsCreator = (sourceMap, extracted) => {
         return (loader) => ({
             map: sourceMap && {
@@ -199,7 +201,12 @@ function getStylesConfig(wco) {
                     extracted,
                 }),
                 ...extraPostcssPlugins,
-                autoprefixer(),
+                postcssPresetEnv({
+                    // tslint:disable-next-line: no-any
+                    browsers: supportedBrowsers,
+                    autoprefixer: true,
+                    stage: 3,
+                }),
             ],
         });
     };
