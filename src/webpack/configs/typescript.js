@@ -135,20 +135,20 @@ function getAotConfig(wco, i18nExtract = false) {
     const { tsConfigPath, buildOptions } = wco;
     const optimize = buildOptions.optimization.scripts;
     const useIvyOnlyPlugin = canUseIvyPlugin(wco) && !i18nExtract;
-    let buildOptimizerRules = [];
-    if (buildOptions.buildOptimizer) {
-        buildOptimizerRules = [{
-                loader: build_optimizer_1.buildOptimizerLoaderPath,
-                options: { sourceMap: buildOptions.sourceMap.scripts }
-            }];
-    }
     return {
         module: {
             rules: [
                 {
                     test: useIvyOnlyPlugin ? /\.tsx?$/ : /(?:\.ngfactory\.js|\.ngstyle\.js|\.tsx?)$/,
                     use: [
-                        ...buildOptimizerRules,
+                        ...(buildOptions.buildOptimizer
+                            ? [
+                                {
+                                    loader: build_optimizer_1.buildOptimizerLoaderPath,
+                                    options: { sourceMap: buildOptions.sourceMap.scripts },
+                                },
+                            ]
+                            : []),
                         useIvyOnlyPlugin ? webpack_1.ivy.AngularWebpackLoaderPath : webpack_1.NgToolsLoader,
                     ],
                 },
