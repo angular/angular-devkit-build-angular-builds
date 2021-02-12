@@ -46,9 +46,9 @@ function assertCompatibleAngularVersion(projectRoot, logger) {
         // In this case we don't provide as many version checks.
         return;
     }
-    if (angularCliPkgJson['version'] === '0.0.0' || angularPkgJson['version'] === '0.0.0') {
+    if (angularCliPkgJson['version'] === '0.0.0' || angularPkgJson['version'] === '0.0.0-PLACEHOLDER') {
         // Internal CLI testing version or integration testing in the angular/angular
-        // repository with the generated development @angular/core npm package which is versioned "0.0.0".
+        // repository with the generated development @angular/core npm package which is versioned "0.0.0-PLACEHOLDER".
         return;
     }
     const angularVersion = new semver_1.SemVer(angularPkgJson['version']);
