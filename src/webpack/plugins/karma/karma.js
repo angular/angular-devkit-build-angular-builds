@@ -95,7 +95,6 @@ const init = (config, emitter) => {
     const webpackConfig = config.buildWebpack.webpackConfig;
     const webpackMiddlewareConfig = {
         // Hide webpack output because its noisy.
-        logLevel: 'error',
         stats: false,
         publicPath: `/${KARMA_APPLICATION_PATH}/`,
     };
