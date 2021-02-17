@@ -33,6 +33,23 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
     };
     wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
     const webpackConfig = webpack_merge_1.merge(webpackPartialGenerator(wco));
+    if (supportES2015) {
+        if (!webpackConfig.resolve) {
+            webpackConfig.resolve = {};
+        }
+        if (Array.isArray(webpackConfig.resolve.alias)) {
+            webpackConfig.resolve.alias.push({
+                alias: 'zone.js/dist/zone',
+                name: 'zone.js/dist/zone-evergreen',
+            });
+        }
+        else {
+            if (!webpackConfig.resolve.alias) {
+                webpackConfig.resolve.alias = {};
+            }
+            webpackConfig.resolve.alias['zone.js/dist/zone'] = 'zone.js/dist/zone-evergreen';
+        }
+    }
     if (environment_options_1.profilingEnabled) {
         const esVersionInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, buildOptions.differentialLoadingNeeded);
         const SpeedMeasurePlugin = await Promise.resolve().then(() => require('speed-measure-webpack-plugin'));
