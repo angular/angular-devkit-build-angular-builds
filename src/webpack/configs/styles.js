@@ -112,6 +112,7 @@ function getStylesConfig(wco) {
                         implementation: require('less'),
                         sourceMap: cssSourceMap,
                         lessOptions: {
+                            math: 'always',
                             javascriptEnabled: true,
                             paths: includePaths,
                         },
