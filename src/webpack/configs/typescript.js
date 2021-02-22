@@ -31,6 +31,8 @@ function createIvyPlugin(wco, aot, tsconfig) {
     const optimize = buildOptions.optimization.scripts;
     const compilerOptions = {
         sourceMap: buildOptions.sourceMap.scripts,
+        declaration: false,
+        declarationMap: false,
     };
     if (buildOptions.preserveSymlinks !== undefined) {
         compilerOptions.preserveSymlinks = buildOptions.preserveSymlinks;
