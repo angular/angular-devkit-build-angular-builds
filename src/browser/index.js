@@ -513,8 +513,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 spinner.fail('Index html generation failed.');
                                 return { success: false, error: mapErrorToMessage(error) };
                             }
-                            spinner.succeed('Index html generation complete.');
                         }
+                        spinner.succeed('Index html generation complete.');
                     }
                     if (options.serviceWorker) {
                         spinner.start('Generating service worker...');
@@ -526,8 +526,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 spinner.fail('Service worker generation failed.');
                                 return { success: false, error: mapErrorToMessage(error) };
                             }
-                            spinner.succeed('Service worker generation complete.');
                         }
+                        spinner.succeed('Service worker generation complete.');
                     }
                 }
                 stats_1.webpackStatsLogger(context.logger, webpackStats, config, bundleInfoStats);
