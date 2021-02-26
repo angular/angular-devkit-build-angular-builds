@@ -27,6 +27,7 @@ class CrittersExtended extends Critters {
             mergeStylesheets: false,
             preload: 'media',
             noscriptFallback: true,
+            inlineFonts: true,
         });
         this.optionsExtended = optionsExtended;
         this.warnings = [];
