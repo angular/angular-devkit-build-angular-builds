@@ -44,10 +44,6 @@ export interface Schema {
      */
     deployUrl?: string;
     /**
-     * Concatenate modules with Rollup before bundling them with Webpack.
-     */
-    experimentalRollupPass?: boolean;
-    /**
      * Extract CSS from global styles into '.css' files instead of '.js'.
      * @deprecated Deprecated since version 11.0. No longer required to disable CSS extraction
      * for HMR.
