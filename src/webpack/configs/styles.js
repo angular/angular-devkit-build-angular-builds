@@ -169,12 +169,14 @@ function getStylesConfig(wco) {
         }
     }
     const { supportedBrowsers } = new build_browser_features_1.BuildBrowserFeatures(wco.projectRoot);
-    const postcssOptionsCreator = (sourceMap, extracted) => {
+    const postcssOptionsCreator = (inlineSourcemaps, extracted) => {
         return (loader) => ({
-            map: sourceMap && {
-                inline: true,
-                annotation: false,
-            },
+            map: inlineSourcemaps
+                ? {
+                    inline: true,
+                    annotation: false,
+                }
+                : undefined,
             plugins: [
                 postcssImports({
                     resolve: (url) => url.startsWith('~') ? url.substr(1) : url,
@@ -235,7 +237,6 @@ function getStylesConfig(wco) {
     }));
     // load global css as css files
     if (globalStylePaths.length > 0) {
-        const globalSourceMap = !!cssSourceMap && !buildOptions.sourceMap.hidden;
         rules.push(...baseRules.map(({ test, use }) => {
             return {
                 include: globalStylePaths,
@@ -250,14 +251,15 @@ function getStylesConfig(wco) {
                         loader: require.resolve('css-loader'),
                         options: {
                             url: false,
-                            sourceMap: globalSourceMap,
+                            sourceMap: !!cssSourceMap,
                         },
                     },
                     {
                         loader: require.resolve('postcss-loader'),
                         options: {
                             implementation: require('postcss'),
-                            postcssOptions: postcssOptionsCreator(globalSourceMap, buildOptions.extractCss),
+                            postcssOptions: postcssOptionsCreator(false, buildOptions.extractCss),
+                            sourceMap: !!cssSourceMap,
                         },
                     },
                     ...use,
