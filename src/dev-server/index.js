@@ -27,7 +27,6 @@ const package_chunk_sort_1 = require("../utils/package-chunk-sort");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
-const webpack_diagnostics_1 = require("../utils/webpack-diagnostics");
 const configs_1 = require("../webpack/configs");
 const index_html_webpack_plugin_1 = require("../webpack/plugins/index-html-webpack-plugin");
 const stats_1 = require("../webpack/utils/stats");
@@ -255,7 +254,6 @@ exports.serveWebpackBrowser = serveWebpackBrowser;
 async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
     var _a;
     const localeDescription = i18n.locales[locale];
-    const i18nDiagnostics = [];
     // Modify main entrypoint to include locale data
     if ((localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.dataPath) &&
         typeof webpackConfig.entry === 'object' &&
@@ -274,37 +272,24 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
         missingTranslationBehavior = 'ignore';
         translation = {};
     }
+    const i18nLoaderOptions = {
+        locale,
+        missingTranslationBehavior,
+        translation: i18n.shouldInline ? translation : undefined,
+    };
     const i18nRule = {
-        test: /\.(?:m?js|ts)$/,
+        test: /\.(?:[cm]?js|ts)$/,
         enforce: 'post',
         use: [
             {
-                loader: require.resolve('babel-loader'),
+                loader: require.resolve('../babel/webpack-loader'),
                 options: {
-                    babelrc: false,
-                    configFile: false,
-                    compact: false,
-                    cacheCompression: false,
-                    cacheDirectory: cache_path_1.findCachePath('babel-loader'),
+                    cacheDirectory: cache_path_1.findCachePath('babel-dev-server-i18n'),
                     cacheIdentifier: JSON.stringify({
-                        buildAngular: require('../../package.json').version,
                         locale,
                         translationIntegrity: localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.files.map((file) => file.integrity),
                     }),
-                    sourceType: 'unambiguous',
-                    presets: [
-                        [
-                            require.resolve('../babel/presets/application'),
-                            {
-                                i18n: {
-                                    locale,
-                                    translation: i18n.shouldInline ? translation : undefined,
-                                    missingTranslationBehavior,
-                                },
-                                diagnosticReporter: (type, message) => i18nDiagnostics.push({ type, message }),
-                            },
-                        ],
-                    ],
+                    i18n: i18nLoaderOptions,
                 },
             },
         ],
@@ -318,24 +303,5 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
         webpackConfig.module.rules = rules;
     }
     rules.push(i18nRule);
-    // Add a plugin to inject the i18n diagnostics
-    // tslint:disable-next-line: no-non-null-assertion
-    webpackConfig.plugins.push({
-        apply: (compiler) => {
-            compiler.hooks.thisCompilation.tap('build-angular', compilation => {
-                compilation.hooks.finishModules.tap('build-angular', () => {
-                    for (const diagnostic of i18nDiagnostics) {
-                        if (diagnostic.type === 'error') {
-                            webpack_diagnostics_1.addError(compilation, diagnostic.message);
-                        }
-                        else {
-                            webpack_diagnostics_1.addWarning(compilation, diagnostic.message);
-                        }
-                    }
-                    i18nDiagnostics.length = 0;
-                });
-            });
-        },
-    });
 }
 exports.default = architect_1.createBuilder(serveWebpackBrowser);
