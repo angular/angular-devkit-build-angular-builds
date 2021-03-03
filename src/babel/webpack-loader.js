@@ -51,61 +51,51 @@ exports.default = babel_loader_1.custom(() => {
         sourceType: 'unambiguous',
     });
     return {
-        async customOptions({ i18n, scriptTarget, ...rawOptions }, { source }) {
+        async customOptions({ scriptTarget, ...loaderOptions }, { source }) {
             // Must process file if plugins are added
-            let shouldProcess = Array.isArray(rawOptions.plugins) && rawOptions.plugins.length > 0;
-            const customOptions = {
-                forceAsyncTransformation: false,
-                forceES5: false,
-                shouldLink: false,
-                i18n: undefined,
-            };
+            let shouldProcess = Array.isArray(loaderOptions.plugins) && loaderOptions.plugins.length > 0;
             // Analyze file for linking
+            let shouldLink = false;
             const { hasLinkerSupport, requiresLinking } = await checkLinking(this.resourcePath, source);
             if (requiresLinking && !hasLinkerSupport) {
                 // Cannot link if there is no linker support
                 this.emitError('File requires the Angular linker. "@angular/compiler-cli" version 11.1.0 or greater is needed.');
             }
             else {
-                customOptions.shouldLink = requiresLinking;
+                shouldLink = requiresLinking;
             }
-            shouldProcess || (shouldProcess = customOptions.shouldLink);
+            shouldProcess || (shouldProcess = shouldLink);
             // Analyze for ES target processing
+            let forceES5 = false;
+            let forceAsyncTransformation = false;
             const esTarget = scriptTarget;
-            if (esTarget !== undefined) {
-                if (esTarget < typescript_1.ScriptTarget.ES2015) {
-                    // TypeScript files will have already been downlevelled
-                    customOptions.forceES5 = !/\.tsx?$/.test(this.resourcePath);
-                }
-                else if (esTarget >= typescript_1.ScriptTarget.ES2017) {
-                    customOptions.forceAsyncTransformation = source.includes('async');
-                }
-                shouldProcess || (shouldProcess = customOptions.forceAsyncTransformation || customOptions.forceES5);
+            if (esTarget < typescript_1.ScriptTarget.ES2015) {
+                // TypeScript files will have already been downlevelled
+                forceES5 = !/\.tsx?$/.test(this.resourcePath);
             }
-            // Analyze for i18n inlining
-            if (i18n &&
-                !/[\\\/]@angular[\\\/](?:compiler|localize)/.test(this.resourcePath) &&
-                source.includes('$localize')) {
-                customOptions.i18n = i18n;
-                shouldProcess = true;
+            else if (esTarget >= typescript_1.ScriptTarget.ES2017) {
+                forceAsyncTransformation = source.includes('async');
             }
+            shouldProcess || (shouldProcess = forceAsyncTransformation || forceES5);
             // Add provided loader options to default base options
-            const loaderOptions = {
+            const options = {
                 ...baseOptions,
-                ...rawOptions,
+                ...loaderOptions,
                 cacheIdentifier: JSON.stringify({
                     buildAngular: require('../../package.json').version,
-                    customOptions,
+                    forceAsyncTransformation,
+                    forceES5,
+                    shouldLink,
                     baseOptions,
-                    rawOptions,
+                    loaderOptions,
                 }),
             };
             // Skip babel processing if no actions are needed
             if (!shouldProcess) {
                 // Force the current file to be ignored
-                loaderOptions.ignore = [() => true];
+                options.ignore = [() => true];
             }
-            return { custom: customOptions, loader: loaderOptions };
+            return { custom: { forceAsyncTransformation, forceES5, shouldLink }, loader: options };
         },
         config(configuration, { customOptions }) {
             return {
@@ -118,7 +108,6 @@ exports.default = babel_loader_1.custom(() => {
                             angularLinker: customOptions.shouldLink,
                             forceES5: customOptions.forceES5,
                             forceAsyncTransformation: customOptions.forceAsyncTransformation,
-                            i18n: customOptions.i18n,
                             diagnosticReporter: (type, message) => {
                                 switch (type) {
                                     case 'error':
