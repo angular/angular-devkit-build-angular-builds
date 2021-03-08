@@ -112,6 +112,9 @@ class BuilderHarness {
                 this.validateProjectName(project);
                 return this.targetName === target || this.builderTargets.has(target);
             },
+            getDefaultConfigurationName: async (_project, _target) => {
+                return undefined;
+            },
             validate: async (options, builderName) => {
                 let schema;
                 if (builderName === this.builderInfo.builderName) {
