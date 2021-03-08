@@ -1,4 +1,6 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getStylesConfig = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,23 +8,52 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStylesConfig = void 0;
-const core_1 = require("@angular-devkit/core");
 const fs = require("fs");
 const path = require("path");
 const build_browser_features_1 = require("../../utils/build-browser-features");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
-// tslint:disable-next-line:no-big-function
+function resolveGlobalStyles(styleEntrypoints, root, preserveSymlinks) {
+    const entryPoints = {};
+    const noInjectNames = [];
+    const paths = [];
+    if (styleEntrypoints.length === 0) {
+        return { entryPoints, noInjectNames, paths };
+    }
+    for (const style of helpers_1.normalizeExtraEntryPoints(styleEntrypoints, 'styles')) {
+        let resolvedPath = path.resolve(root, style.input);
+        if (!fs.existsSync(resolvedPath)) {
+            try {
+                resolvedPath = require.resolve(style.input, { paths: [root] });
+            }
+            catch (_a) { }
+        }
+        if (!preserveSymlinks) {
+            resolvedPath = fs.realpathSync(resolvedPath);
+        }
+        // Add style entry points.
+        if (entryPoints[style.bundleName]) {
+            entryPoints[style.bundleName].push(resolvedPath);
+        }
+        else {
+            entryPoints[style.bundleName] = [resolvedPath];
+        }
+        // Add non injected styles to the list.
+        if (!style.inject) {
+            noInjectNames.push(style.bundleName);
+        }
+        // Add global css paths.
+        paths.push(resolvedPath);
+    }
+    return { entryPoints, noInjectNames, paths };
+}
+// tslint:disable-next-line: no-big-function
 function getStylesConfig(wco) {
     var _a, _b, _c;
     const MiniCssExtractPlugin = require('mini-css-extract-plugin');
     const postcssImports = require('postcss-import');
     const postcssPresetEnv = require('postcss-preset-env');
     const { root, buildOptions } = wco;
-    const entryPoints = {};
-    const globalStylePaths = [];
     const extraPlugins = [];
     extraPlugins.push(new plugins_1.AnyComponentStyleBudgetChecker(buildOptions.budgets));
     const cssSourceMap = buildOptions.sourceMap.styles;
@@ -31,112 +62,21 @@ function getStylesConfig(wco) {
     // use includePaths from appConfig
     const includePaths = (_c = (_b = (_a = buildOptions.stylePreprocessorOptions) === null || _a === void 0 ? void 0 : _a.includePaths) === null || _b === void 0 ? void 0 : _b.map(p => path.resolve(root, p))) !== null && _c !== void 0 ? _c : [];
     // Process global styles.
-    if (buildOptions.styles.length > 0) {
-        const chunkNames = [];
-        helpers_1.normalizeExtraEntryPoints(buildOptions.styles, 'styles').forEach(style => {
-            let resolvedPath = path.resolve(root, style.input);
-            if (!fs.existsSync(resolvedPath)) {
-                try {
-                    resolvedPath = require.resolve(style.input, { paths: [root] });
-                }
-                catch (_a) { }
-            }
-            if (!buildOptions.preserveSymlinks) {
-                resolvedPath = fs.realpathSync(resolvedPath);
-            }
-            // Add style entry points.
-            if (entryPoints[style.bundleName]) {
-                entryPoints[style.bundleName].push(resolvedPath);
-            }
-            else {
-                entryPoints[style.bundleName] = [resolvedPath];
-            }
-            // Add non injected styles to the list.
-            if (!style.inject) {
-                chunkNames.push(style.bundleName);
-            }
-            // Add global css paths.
-            globalStylePaths.push(resolvedPath);
-        });
-        if (chunkNames.length > 0) {
-            // Add plugin to remove hashes from lazy styles.
-            extraPlugins.push(new plugins_1.RemoveHashPlugin({ chunkNames, hashFormat }));
-        }
+    const { entryPoints, noInjectNames, paths: globalStylePaths } = resolveGlobalStyles(buildOptions.styles, root, !!buildOptions.preserveSymlinks);
+    if (noInjectNames.length > 0) {
+        // Add plugin to remove hashes from lazy styles.
+        extraPlugins.push(new plugins_1.RemoveHashPlugin({ chunkNames: noInjectNames, hashFormat }));
     }
     let sassImplementation;
     try {
         // tslint:disable-next-line:no-implicit-dependencies
         sassImplementation = require('node-sass');
-        wco.logger.warn(core_1.tags.oneLine `'node-sass' usage is deprecated and will be removed in a future major version.
-      To opt-out of the deprecated behaviour and start using 'sass' uninstall 'node-sass'.`);
+        wco.logger.warn(`'node-sass' usage is deprecated and will be removed in a future major version. ` +
+            `To opt-out of the deprecated behaviour and start using 'sass' uninstall 'node-sass'.`);
     }
     catch (_d) {
         sassImplementation = require('sass');
     }
-    // set base rules to derive final rules from
-    const baseRules = [
-        { test: /\.css$/, use: [] },
-        {
-            test: /\.scss$|\.sass$/,
-            use: [
-                {
-                    loader: require.resolve('resolve-url-loader'),
-                    options: {
-                        sourceMap: cssSourceMap,
-                    },
-                },
-                {
-                    loader: require.resolve('sass-loader'),
-                    options: {
-                        implementation: sassImplementation,
-                        sourceMap: true,
-                        sassOptions: {
-                            // bootstrap-sass requires a minimum precision of 8
-                            precision: 8,
-                            includePaths,
-                            // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
-                            // Ex: /* autoprefixer grid: autoplace */
-                            // tslint:disable-next-line: max-line-length
-                            // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
-                            outputStyle: 'expanded',
-                        },
-                    },
-                },
-            ],
-        },
-        {
-            test: /\.less$/,
-            use: [
-                {
-                    loader: require.resolve('less-loader'),
-                    options: {
-                        implementation: require('less'),
-                        sourceMap: cssSourceMap,
-                        lessOptions: {
-                            javascriptEnabled: true,
-                            paths: includePaths,
-                        },
-                    },
-                },
-            ],
-        },
-        {
-            test: /\.styl$/,
-            use: [
-                {
-                    loader: require.resolve('stylus-loader'),
-                    options: {
-                        sourceMap: cssSourceMap,
-                        stylusOptions: {
-                            compress: false,
-                            sourceMap: { comment: false },
-                            paths: includePaths,
-                        },
-                    },
-                },
-            ],
-        },
-    ];
     const assetNameTemplate = helpers_1.assetNameTemplateFactory(hashFormat);
     const extraPostcssPlugins = [];
     // Attempt to setup Tailwind CSS
@@ -220,53 +160,6 @@ function getStylesConfig(wco) {
         // Inline all sourcemap types except hidden ones, which are the same as no sourcemaps
         // for component css.
         && !buildOptions.sourceMap.hidden);
-    const rules = baseRules.map(({ test, use }) => ({
-        exclude: globalStylePaths,
-        test,
-        use: [
-            { loader: require.resolve('raw-loader') },
-            {
-                loader: require.resolve('postcss-loader'),
-                options: {
-                    implementation: require('postcss'),
-                    postcssOptions: postcssOptionsCreator(componentsSourceMap, false),
-                },
-            },
-            ...use,
-        ],
-    }));
-    // load global css as css files
-    if (globalStylePaths.length > 0) {
-        rules.push(...baseRules.map(({ test, use }) => {
-            return {
-                include: globalStylePaths,
-                test,
-                use: [
-                    buildOptions.extractCss
-                        ? {
-                            loader: MiniCssExtractPlugin.loader,
-                        }
-                        : require.resolve('style-loader'),
-                    {
-                        loader: require.resolve('css-loader'),
-                        options: {
-                            url: false,
-                            sourceMap: !!cssSourceMap,
-                        },
-                    },
-                    {
-                        loader: require.resolve('postcss-loader'),
-                        options: {
-                            implementation: require('postcss'),
-                            postcssOptions: postcssOptionsCreator(false, buildOptions.extractCss),
-                            sourceMap: !!cssSourceMap,
-                        },
-                    },
-                    ...use,
-                ],
-            };
-        }));
-    }
     if (buildOptions.extractCss) {
         // extract global css from js files into own css file.
         extraPlugins.push(new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }));
@@ -276,9 +169,129 @@ function getStylesConfig(wco) {
             extraPlugins.push(new plugins_1.SuppressExtractedTextChunksWebpackPlugin());
         }
     }
+    // Rule for all supported style types
+    const styleRule = {
+        test: /\.(?:css|scss|sass|less|styl)$/,
+        rules: [
+            // Setup processing rules for global and component styles
+            {
+                oneOf: [
+                    // Component styles are all styles except defined global styles
+                    {
+                        exclude: globalStylePaths,
+                        use: [
+                            { loader: require.resolve('raw-loader') },
+                            {
+                                loader: require.resolve('postcss-loader'),
+                                options: {
+                                    implementation: require('postcss'),
+                                    postcssOptions: postcssOptionsCreator(componentsSourceMap, false),
+                                },
+                            },
+                        ],
+                    },
+                    // Global styles are only defined global styles
+                    {
+                        include: globalStylePaths,
+                        use: [
+                            buildOptions.extractCss
+                                ? {
+                                    loader: MiniCssExtractPlugin.loader,
+                                }
+                                : require.resolve('style-loader'),
+                            {
+                                loader: require.resolve('css-loader'),
+                                options: {
+                                    url: false,
+                                    sourceMap: !!cssSourceMap,
+                                },
+                            },
+                            {
+                                loader: require.resolve('postcss-loader'),
+                                options: {
+                                    implementation: require('postcss'),
+                                    postcssOptions: postcssOptionsCreator(false, buildOptions.extractCss),
+                                    sourceMap: !!cssSourceMap,
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+            // Setup preprocessor rules for all styles
+            {
+                oneOf: [
+                    // No preprocessing required for CSS
+                    { test: /\.css$/, use: [] },
+                    {
+                        test: /\.scss$|\.sass$/,
+                        use: [
+                            {
+                                loader: require.resolve('resolve-url-loader'),
+                                options: {
+                                    sourceMap: cssSourceMap,
+                                },
+                            },
+                            {
+                                loader: require.resolve('sass-loader'),
+                                options: {
+                                    implementation: sassImplementation,
+                                    sourceMap: true,
+                                    sassOptions: {
+                                        // bootstrap-sass requires a minimum precision of 8
+                                        precision: 8,
+                                        includePaths,
+                                        // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
+                                        // Ex: /* autoprefixer grid: autoplace */
+                                        // tslint:disable-next-line: max-line-length
+                                        // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
+                                        outputStyle: 'expanded',
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        test: /\.less$/,
+                        use: [
+                            {
+                                loader: require.resolve('less-loader'),
+                                options: {
+                                    implementation: require('less'),
+                                    sourceMap: cssSourceMap,
+                                    lessOptions: {
+                                        javascriptEnabled: true,
+                                        paths: includePaths,
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        test: /\.styl$/,
+                        use: [
+                            {
+                                loader: require.resolve('stylus-loader'),
+                                options: {
+                                    sourceMap: cssSourceMap,
+                                    stylusOptions: {
+                                        compress: false,
+                                        sourceMap: { comment: false },
+                                        paths: includePaths,
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    };
     return {
         entry: entryPoints,
-        module: { rules },
+        module: {
+            rules: [styleRule],
+        },
         plugins: extraPlugins,
     };
 }
