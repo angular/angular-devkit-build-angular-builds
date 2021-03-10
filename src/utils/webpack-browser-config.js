@@ -7,8 +7,6 @@ const webpack_merge_1 = require("webpack-merge");
 const utils_1 = require("../utils");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
 const builder_watch_plugin_1 = require("../webpack/plugins/builder-watch-plugin");
-const helpers_1 = require("../webpack/utils/helpers");
-const environment_options_1 = require("./environment-options");
 const i18n_options_1 = require("./i18n-options");
 async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, options, webpackPartialGenerator, logger, extraBuildOptions) {
     // Ensure Build Optimizer is only used with AOT.
@@ -19,7 +17,6 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
     const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
     const ts = await Promise.resolve().then(() => require('typescript'));
     const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES5;
-    const supportES2015 = scriptTarget !== ts.ScriptTarget.JSON && scriptTarget > ts.ScriptTarget.ES5;
     const buildOptions = { ...options, ...extraBuildOptions };
     const wco = {
         root: workspaceRoot,
@@ -33,15 +30,6 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
     };
     wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
     const webpackConfig = webpack_merge_1.merge(webpackPartialGenerator(wco));
-    if (environment_options_1.profilingEnabled) {
-        const esVersionInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, buildOptions.differentialLoadingNeeded);
-        const SpeedMeasurePlugin = await Promise.resolve().then(() => require('speed-measure-webpack-plugin'));
-        const smp = new SpeedMeasurePlugin({
-            outputFormat: 'json',
-            outputTarget: path.resolve(workspaceRoot, `speed-measure-plugin${esVersionInFileName}.json`),
-        });
-        return smp.wrap(webpackConfig);
-    }
     return webpackConfig;
 }
 exports.generateWebpackConfig = generateWebpackConfig;
