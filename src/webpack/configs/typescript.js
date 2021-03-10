@@ -16,10 +16,6 @@ function canUseIvyPlugin(wco) {
         wco.logger.warn('"NG_BUILD_IVY_LEGACY" environment variable detected. Using legacy Ivy build system.');
         return false;
     }
-    // Lazy modules option uses the deprecated string format for lazy routes
-    if (wco.buildOptions.lazyModules && wco.buildOptions.lazyModules.length > 0) {
-        return false;
-    }
     return true;
 }
 function createIvyPlugin(wco, aot, tsconfig) {
@@ -85,12 +81,6 @@ function _createAotPlugin(wco, options, i18nExtract = false) {
         // Extraction of i18n is still using the legacy VE pipeline
         compilerOptions.enableIvy = false;
     }
-    const additionalLazyModules = {};
-    if (buildOptions.lazyModules) {
-        for (const lazyModule of buildOptions.lazyModules) {
-            additionalLazyModules[lazyModule] = path.resolve(root, lazyModule);
-        }
-    }
     let pluginOptions = {
         mainPath: path.join(root, buildOptions.main),
         ...i18nFileAndFormat,
@@ -98,10 +88,8 @@ function _createAotPlugin(wco, options, i18nExtract = false) {
         platform: buildOptions.platform === 'server' ? webpack_1.PLATFORM.Server : webpack_1.PLATFORM.Browser,
         missingTranslation: buildOptions.i18nMissingTranslation,
         sourceMap: buildOptions.sourceMap.scripts,
-        additionalLazyModules,
         nameLazyFiles: buildOptions.namedChunks,
         forkTypeChecker: buildOptions.forkTypeChecker,
-        contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
         logger: wco.logger,
         directTemplateLoading: true,
         ...options,
@@ -185,12 +173,9 @@ function getTypescriptWorkerPlugin(wco, workerTsConfigPath) {
         platform: webpack_1.PLATFORM.Browser,
         sourceMap: buildOptions.sourceMap.scripts,
         forkTypeChecker: buildOptions.forkTypeChecker,
-        contextElementDependencyConstructor: require('webpack/lib/dependencies/ContextElementDependency'),
         logger: wco.logger,
         // Run no transformers.
         platformTransformers: [],
-        // Don't attempt lazy route discovery.
-        discoverLazyRoutes: false,
     };
     pluginOptions = _pluginOptionsOverrides(buildOptions, pluginOptions);
     return new webpack_1.AngularCompilerPlugin(pluginOptions);

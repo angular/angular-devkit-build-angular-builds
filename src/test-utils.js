@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.lazyModuleFnImport = exports.lazyModuleStringImport = exports.lazyModuleFiles = exports.browserBuild = exports.createArchitect = exports.protractorTargetSpec = exports.tslintTargetSpec = exports.karmaTargetSpec = exports.extractI18nTargetSpec = exports.devServerTargetSpec = exports.browserTargetSpec = exports.outputPath = exports.host = exports.workspaceRoot = exports.veEnabled = void 0;
+exports.lazyModuleFnImport = exports.lazyModuleFiles = exports.browserBuild = exports.createArchitect = exports.protractorTargetSpec = exports.tslintTargetSpec = exports.karmaTargetSpec = exports.extractI18nTargetSpec = exports.devServerTargetSpec = exports.browserTargetSpec = exports.outputPath = exports.host = exports.workspaceRoot = exports.veEnabled = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -106,7 +106,7 @@ exports.lazyModuleFiles = {
     export class LazyModule { }
   `,
 };
-exports.lazyModuleStringImport = {
+exports.lazyModuleFnImport = {
     'src/app/app.module.ts': `
     import { BrowserModule } from '@angular/platform-browser';
     import { NgModule } from '@angular/core';
@@ -121,15 +121,12 @@ exports.lazyModuleStringImport = {
       imports: [
         BrowserModule,
         RouterModule.forRoot([
-          { path: 'lazy', loadChildren: './lazy/lazy.module#LazyModule' }
+          { path: 'lazy', loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule) }
         ])
       ],
       providers: [],
       bootstrap: [AppComponent]
     })
     export class AppModule { }
-  `,
-};
-exports.lazyModuleFnImport = {
-    'src/app/app.module.ts': exports.lazyModuleStringImport['src/app/app.module.ts'].replace(`loadChildren: './lazy/lazy.module#LazyModule'`, `loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule)`),
+`,
 };

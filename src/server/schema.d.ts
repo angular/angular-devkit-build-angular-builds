@@ -49,13 +49,6 @@ export interface Schema {
      */
     i18nMissingTranslation?: I18NMissingTranslation;
     /**
-     * List of additional NgModule files that will be lazy loaded. Lazy router modules will be
-     * discovered automatically.
-     * @deprecated 'SystemJsNgModuleLoader' is deprecated, and this is part of its usage. Use
-     * 'import()' syntax instead.
-     */
-    lazyModules?: string[];
-    /**
      * Translate the bundles in one or more locales.
      */
     localize?: Localize;

@@ -62,8 +62,6 @@ export interface BuildOptions {
     stylePreprocessorOptions?: {
         includePaths: string[];
     };
-    /** @deprecated SystemJsNgModuleLoader is deprecated, and this is part of its usage. */
-    lazyModules: string[];
     platform?: 'browser' | 'server';
     fileReplacements: NormalizedFileReplacement[];
     allowedCommonJsDependencies?: string[];
