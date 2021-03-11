@@ -26,7 +26,7 @@ function resolveGlobalStyles(styleEntrypoints, root, preserveSymlinks) {
             try {
                 resolvedPath = require.resolve(style.input, { paths: [root] });
             }
-            catch (_a) { }
+            catch { }
         }
         if (!preserveSymlinks) {
             resolvedPath = fs.realpathSync(resolvedPath);
@@ -74,7 +74,7 @@ function getStylesConfig(wco) {
         wco.logger.warn(`'node-sass' usage is deprecated and will be removed in a future major version. ` +
             `To opt-out of the deprecated behaviour and start using 'sass' uninstall 'node-sass'.`);
     }
-    catch (_d) {
+    catch {
         sassImplementation = require('sass');
     }
     const assetNameTemplate = helpers_1.assetNameTemplateFactory(hashFormat);
@@ -98,7 +98,7 @@ function getStylesConfig(wco) {
         try {
             tailwindPackagePath = require.resolve('tailwindcss', { paths: [wco.root] });
         }
-        catch (_e) {
+        catch {
             const relativeTailwindConfigPath = path.relative(wco.root, tailwindConfigPath);
             wco.logger.warn(`Tailwind CSS configuration file found (${relativeTailwindConfigPath})` +
                 ` but the 'tailwindcss' package is not installed.` +

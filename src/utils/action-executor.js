@@ -19,7 +19,7 @@ const hasThreadSupport = (() => {
         require('worker_threads');
         return true;
     }
-    catch (_a) {
+    catch {
         return false;
     }
 })();
@@ -87,7 +87,7 @@ class BundleActionExecutor {
                     return cachedResult;
                 }
             }
-            catch (_a) { }
+            catch { }
         }
         return this.executeAction('process', action);
     }

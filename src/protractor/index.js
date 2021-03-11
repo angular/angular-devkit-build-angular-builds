@@ -127,7 +127,7 @@ async function execute(options, context) {
     try {
         return await runProtractor(context.workspaceRoot, { ...options, baseUrl });
     }
-    catch (_a) {
+    catch {
         return { success: false };
     }
     finally {

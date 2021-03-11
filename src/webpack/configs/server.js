@@ -63,7 +63,7 @@ function externalizePackages(context, request, callback) {
         require.resolve(request, { paths: [context] });
         callback(undefined, request);
     }
-    catch (_a) {
+    catch {
         // Node couldn't find it, so it must be user-aliased
         callback();
     }

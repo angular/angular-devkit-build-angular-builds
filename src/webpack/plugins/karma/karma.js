@@ -292,7 +292,7 @@ function isPlugin(moduleId, pluginName) {
                     require.resolve(moduleId);
                     return true;
                 }
-                catch (_a) { }
+                catch { }
             }
             return false;
         }

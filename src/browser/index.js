@@ -257,7 +257,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                     fs.unlinkSync(filename + '.map');
                                 }
                             }
-                            catch (_g) { }
+                            catch { }
                         }
                         if (es5Polyfills) {
                             fs.unlinkSync(filename);

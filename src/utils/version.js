@@ -21,7 +21,7 @@ function assertCompatibleAngularVersion(projectRoot, logger) {
         angularPkgJson = require(angularPackagePath);
         rxjsPkgJson = require(rxjsPackagePath);
     }
-    catch (_a) {
+    catch {
         logger.error(core_1.tags.stripIndents `
       You seem to not be depending on "@angular/core" and/or "rxjs". This is an error.
     `);
@@ -41,7 +41,7 @@ function assertCompatibleAngularVersion(projectRoot, logger) {
             return;
         }
     }
-    catch (_b) {
+    catch {
         // Not using @angular-devkit/build-angular with @angular/cli is ok too.
         // In this case we don't provide as many version checks.
         return;

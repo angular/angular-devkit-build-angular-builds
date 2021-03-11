@@ -26,7 +26,7 @@ async function resolve(file, base, resolver) {
     try {
         return await resolver('./' + file, base);
     }
-    catch (_a) {
+    catch {
         return resolver(file, base);
     }
 }

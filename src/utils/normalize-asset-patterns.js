@@ -38,7 +38,7 @@ function normalizeAssetPatterns(assetPatterns, root, projectRoot, maybeSourceRoo
             try {
                 isDirectory = fs_1.statSync(core_1.getSystemPath(resolvedAssetPath)).isDirectory();
             }
-            catch (_a) {
+            catch {
                 isDirectory = true;
             }
             if (isDirectory) {

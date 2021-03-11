@@ -239,7 +239,7 @@ async function configureI18nBuild(context, options) {
             try {
                 rimraf.sync(tempPath);
             }
-            catch (_a) { }
+            catch { }
         });
     }
     return { buildOptions, i18n };
@@ -274,7 +274,7 @@ function findLocaleDataBasePath(projectRoot) {
         }
         return localesPath;
     }
-    catch (_a) {
+    catch {
         return null;
     }
 }

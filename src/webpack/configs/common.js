@@ -116,7 +116,7 @@ function getCommonConfig(wco) {
             try {
                 resolvedPath = require.resolve(input, { paths: [root] });
             }
-            catch (_a) {
+            catch {
                 throw new Error(`Script file ${input} does not exist.`);
             }
         }

@@ -70,7 +70,7 @@ async function importParsers() {
         };
         return { parsers, diagnostics };
     }
-    catch (_a) {
+    catch {
         throw new Error(`Unable to load translation file parsers. Please ensure '@angular/localize' is installed.`);
     }
 }

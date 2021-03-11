@@ -198,7 +198,7 @@ async function execute(options, context, transforms) {
         try {
             require.resolve('@angular/localize');
         }
-        catch (_b) {
+        catch {
             return {
                 success: false,
                 error: `Ivy extraction requires the '@angular/localize' package.`,

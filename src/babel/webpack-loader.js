@@ -31,7 +31,7 @@ async function checkLinking(path, source) {
             // If the linker entry point is present then there is linker support
             return { hasLinkerSupport: true, requiresLinking: needsLinking(path, source) };
         }
-        catch (_a) {
+        catch {
             needsLinking = null;
         }
     }

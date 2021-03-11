@@ -23,7 +23,7 @@ function copyFile(src, dest) {
         try {
             fs.unlinkSync(dest);
         }
-        catch (_a) { }
+        catch { }
     }
     fs.copyFileSync(src, dest, fs.constants.COPYFILE_FICLONE);
 }

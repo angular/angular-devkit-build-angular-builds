@@ -32,7 +32,7 @@ async function _run(options, context) {
     try {
         tslint = await Promise.resolve().then(() => require('tslint'));
     }
-    catch (_a) {
+    catch {
         throw new Error('Unable to find TSLint. Ensure TSLint is installed.');
     }
     const tslintConfigPath = options.tslintConfig
@@ -171,7 +171,7 @@ function getFileContents(file) {
     try {
         return strip_bom_1.stripBom(fs_1.readFileSync(file, 'utf-8'));
     }
-    catch (_a) {
+    catch {
         throw new Error(`Could not read file '${file}'.`);
     }
 }
