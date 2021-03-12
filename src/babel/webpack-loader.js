@@ -49,6 +49,7 @@ exports.default = babel_loader_1.custom(() => {
         compact: false,
         cacheCompression: false,
         sourceType: 'unambiguous',
+        inputSourceMap: false,
     });
     return {
         async customOptions({ i18n, scriptTarget, ...rawOptions }, { source }) {
