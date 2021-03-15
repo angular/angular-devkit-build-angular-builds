@@ -80,6 +80,9 @@ exports.default = babel_loader_1.custom(() => {
         config(configuration, { customOptions }) {
             return {
                 ...configuration.options,
+                // Workaround for https://github.com/babel/babel-loader/pull/896 is available
+                // Delete once the above PR is released
+                inputSourceMap: (configuration.options.inputSourceMap || false),
                 presets: [
                     ...(configuration.options.presets || []),
                     [
