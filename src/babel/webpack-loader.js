@@ -7,40 +7,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+const linker_1 = require("@angular/compiler-cli/linker");
 const babel_loader_1 = require("babel-loader");
 const typescript_1 = require("typescript");
-/**
- * Cached linker check utility function
- *
- * If undefined, not yet been imported
- * If null, attempted import failed and no linker support
- * If function, import succeeded and linker supported
- */
-let needsLinking;
-async function checkLinking(path, source) {
+function requiresLinking(path, source) {
     // @angular/core and @angular/compiler will cause false positives
     // Also, TypeScript files do not require linking
     if (/[\\\/]@angular[\\\/](?:compiler|core)|\.tsx?$/.test(path)) {
-        return { requiresLinking: false };
+        return false;
     }
-    if (needsLinking !== null) {
-        try {
-            if (needsLinking === undefined) {
-                needsLinking = (await Promise.resolve().then(() => require('@angular/compiler-cli/linker'))).needsLinking;
-            }
-            // If the linker entry point is present then there is linker support
-            return { hasLinkerSupport: true, requiresLinking: needsLinking(path, source) };
-        }
-        catch {
-            needsLinking = null;
-        }
-    }
-    // Fallback for Angular versions less than 11.1.0 with no linker support.
-    // This information is used to issue errors if a partially compiled library is used when unsupported.
-    return {
-        hasLinkerSupport: false,
-        requiresLinking: source.includes('ɵɵngDeclareDirective') || source.includes('ɵɵngDeclareComponent'),
-    };
+    return linker_1.needsLinking(path, source);
 }
 exports.default = babel_loader_1.custom(() => {
     const baseOptions = Object.freeze({
@@ -62,14 +38,7 @@ exports.default = babel_loader_1.custom(() => {
                 i18n: undefined,
             };
             // Analyze file for linking
-            const { hasLinkerSupport, requiresLinking } = await checkLinking(this.resourcePath, source);
-            if (requiresLinking && !hasLinkerSupport) {
-                // Cannot link if there is no linker support
-                this.emitError('File requires the Angular linker. "@angular/compiler-cli" version 11.1.0 or greater is needed.');
-            }
-            else {
-                customOptions.shouldLink = requiresLinking;
-            }
+            customOptions.shouldLink = await requiresLinking(this.resourcePath, source);
             shouldProcess || (shouldProcess = customOptions.shouldLink);
             // Analyze for ES target processing
             const esTarget = scriptTarget;
