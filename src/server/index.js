@@ -57,16 +57,14 @@ function execute(options, context, transforms = {}) {
                 }
             },
         }).pipe(operators_1.concatMap(async (output) => {
-            const { emittedFiles = [], webpackStats } = output;
+            const { emittedFiles = [], outputPath, webpackStats } = output;
             if (!webpackStats) {
                 throw new Error('Webpack stats build result is required.');
             }
             let success = output.success;
             if (success && i18n.shouldInline) {
                 outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
-                success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), [], 
-                // tslint:disable-next-line: no-non-null-assertion
-                webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
+                success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), [], outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
             }
             stats_1.webpackStatsLogger(context.logger, webpackStats, config);
             return { ...output, success };

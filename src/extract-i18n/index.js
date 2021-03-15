@@ -202,6 +202,7 @@ async function execute(options, context, transforms) {
             return {
                 success: false,
                 error: `Ivy extraction requires the '@angular/localize' package.`,
+                outputPath: outFile,
             };
         }
     }
@@ -209,12 +210,10 @@ async function execute(options, context, transforms) {
         logging: stats_1.createWebpackLoggingCallback(false, context.logger),
         webpackFactory: webpack,
     }).toPromise();
-    // Complete if using VE
-    if (!usingIvy) {
-        return webpackResult;
-    }
-    // Nothing to process if the Webpack build failed
-    if (!webpackResult.success) {
+    // Set the outputPath to the extraction output location for downstream consumers
+    webpackResult.outputPath = outFile;
+    // Complete if using VE or if Webpack build failed
+    if (!usingIvy || !webpackResult.success) {
         return webpackResult;
     }
     const basePath = config.context || projectRoot;

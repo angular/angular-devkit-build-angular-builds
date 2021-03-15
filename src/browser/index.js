@@ -144,7 +144,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             var _a, _b, _c, _d, _e, _f;
             const spinner = new spinner_1.Spinner();
             spinner.enabled = options.progress !== false;
-            const { webpackStats: webpackRawStats, success, emittedFiles = [] } = buildEvent;
+            const { webpackStats: webpackRawStats, success, emittedFiles = [], outputPath: webpackOutputPath, } = buildEvent;
             if (!webpackRawStats) {
                 throw new Error('Webpack stats build result is required.');
             }
@@ -180,9 +180,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     moduleFiles = emittedFiles;
                     files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
                     if (i18n.shouldInline) {
-                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, 
-                        // tslint:disable-next-line: no-non-null-assertion
-                        webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
+                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, webpackOutputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
                         if (!success) {
                             return { success: false };
                         }
@@ -246,8 +244,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                         // Retrieve the content/map for the file
                         // NOTE: Additional future optimizations will read directly from memory
-                        // tslint:disable-next-line: no-non-null-assertion
-                        let filename = path.join(webpackStats.outputPath, file.file);
+                        let filename = path.join(webpackOutputPath, file.file);
                         const code = fs.readFileSync(filename, 'utf8');
                         let map;
                         if (actionOptions.sourceMaps) {
@@ -377,12 +374,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 await copy_assets_1.copyAssets([
                                     {
                                         glob: '**/*',
-                                        // tslint:disable-next-line: no-non-null-assertion
-                                        input: webpackStats.outputPath,
+                                        input: webpackOutputPath,
                                         output: '',
-                                        ignore: [...processedFiles].map(f => 
-                                        // tslint:disable-next-line: no-non-null-assertion
-                                        path.relative(webpackStats.outputPath, f)),
+                                        ignore: [...processedFiles].map(f => path.relative(webpackOutputPath, f)),
                                     },
                                 ], Array.from(outputPaths.values()), '');
                             }
@@ -424,9 +418,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
                     noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
                     if (i18n.shouldInline) {
-                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, 
-                        // tslint:disable-next-line: no-non-null-assertion
-                        webpackStats.outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
+                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, webpackOutputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
                         if (!success) {
                             return { success: false };
                         }
