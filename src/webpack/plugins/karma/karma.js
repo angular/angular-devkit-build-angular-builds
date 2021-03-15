@@ -164,10 +164,9 @@ const init = (config, emitter) => {
     let lastCompilationHash;
     const statsConfig = stats_2.getWebpackStatsConfig();
     compiler.hooks.done.tap('karma', (stats) => {
-        if (stats.compilation.errors.length > 0) {
-            const json = stats.toJson(config.stats);
+        if (stats.hasErrors()) {
             // Print compilation errors.
-            logger.error(stats_1.statsErrorsToString(json, statsConfig));
+            logger.error(stats_1.statsErrorsToString(stats.compilation, statsConfig));
             lastCompilationHash = undefined;
             // Emit a failure build event if there are compilation errors.
             failureCb();
