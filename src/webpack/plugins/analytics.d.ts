@@ -58,7 +58,7 @@ export declare class NgBuildAnalyticsPlugin {
     protected _checkTsNormalModule(module: NormalModule): void;
     protected _checkNgFactoryNormalModule(module: NormalModule): void;
     protected _collectErrors(stats: Stats): void;
-    protected _collectBundleStats(json: any): void;
+    protected _collectBundleStats(compilation: compilation.Compilation): void;
     /************************************************************************************************
      * The next section is all the different Webpack hooks for this plugin.
      */
