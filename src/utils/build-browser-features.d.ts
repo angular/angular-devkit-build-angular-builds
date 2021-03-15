@@ -12,7 +12,7 @@ export declare class BuildBrowserFeatures {
     constructor(projectRoot: string);
     /**
      * True, when one or more browsers requires ES5
-     * support and the scirpt target is ES2015 or greater.
+     * support and the script target is ES2015 or greater.
      */
     isDifferentialLoadingNeeded(scriptTarget: ts.ScriptTarget): boolean;
     /**
