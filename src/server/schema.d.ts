@@ -93,6 +93,8 @@ export interface Schema {
     resourcesOutputPath?: string;
     /**
      * Show circular dependency warnings on builds.
+     * @deprecated The recommended method to detect circular dependencies in project code is to
+     * use a either a lint rule or other external tooling.
      */
     showCircularDependencies?: boolean;
     /**
