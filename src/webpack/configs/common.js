@@ -14,7 +14,6 @@ const fs_1 = require("fs");
 const path = require("path");
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
-const webpack_sources_1 = require("webpack-sources");
 const utils_1 = require("../../utils");
 const cache_path_1 = require("../../utils/cache-path");
 const environment_options_1 = require("../../utils/environment-options");
@@ -257,9 +256,14 @@ function getCommonConfig(wco) {
     if (buildOptions.statsJson) {
         extraPlugins.push(new (class {
             apply(compiler) {
-                compiler.hooks.emit.tap('angular-cli-stats', compilation => {
-                    const data = JSON.stringify(compilation.getStats().toJson('verbose'), undefined, 2);
-                    compilation.assets['stats.json'] = new webpack_sources_1.RawSource(data);
+                compiler.hooks.done.tapPromise('angular-cli-stats', async (stats) => {
+                    const { stringifyStream } = await Promise.resolve().then(() => require('@discoveryjs/json-ext'));
+                    const data = stats.toJson('verbose');
+                    const statsOutputPath = path.join(stats.compilation.outputOptions.path, 'stats.json');
+                    return new Promise((resolve, reject) => stringifyStream(data)
+                        .pipe(fs_1.createWriteStream(statsOutputPath))
+                        .on('close', resolve)
+                        .on('error', reject));
                 });
             }
         })());

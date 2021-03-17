@@ -1,3 +1,4 @@
+/// <reference types="packages/angular_devkit/build_angular/src/babel-bazel" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
