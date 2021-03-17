@@ -28,6 +28,7 @@ class CrittersExtended extends Critters {
             preload: 'media',
             noscriptFallback: true,
             inlineFonts: true,
+            // tslint:disable-next-line: no-any
         });
         this.optionsExtended = optionsExtended;
         this.warnings = [];

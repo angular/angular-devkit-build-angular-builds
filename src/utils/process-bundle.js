@@ -258,6 +258,8 @@ async function terserMangle(code, options = {}) {
         sourceMap: !!options.map &&
             {
                 asObject: true,
+                // typings don't include asObject option
+                // tslint:disable-next-line: no-any
             },
     });
     // tslint:disable-next-line: no-non-null-assertion
