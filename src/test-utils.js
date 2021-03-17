@@ -47,6 +47,13 @@ async function browserBuild(architect, host, target, overrides, scheduleOptions)
     const run = await architect.scheduleTarget(target, overrides, scheduleOptions);
     const output = (await run.result);
     expect(output.success).toBe(true);
+    if (!output.success) {
+        await run.stop();
+        return {
+            output,
+            files: {},
+        };
+    }
     expect(output.outputPaths[0]).not.toBeUndefined();
     const outputPath = core_1.normalize(output.outputPaths[0]);
     const fileNames = await host.list(outputPath).toPromise();
