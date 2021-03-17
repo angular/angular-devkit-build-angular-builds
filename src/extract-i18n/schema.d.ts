@@ -48,6 +48,7 @@ export interface Schema {
 export declare enum Format {
     Arb = "arb",
     Json = "json",
+    LegacyMigrate = "legacy-migrate",
     Xlf = "xlf",
     Xlf2 = "xlf2",
     Xlif = "xlif",

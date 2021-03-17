@@ -13,6 +13,7 @@ var Format;
 (function (Format) {
     Format["Arb"] = "arb";
     Format["Json"] = "json";
+    Format["LegacyMigrate"] = "legacy-migrate";
     Format["Xlf"] = "xlf";
     Format["Xlf2"] = "xlf2";
     Format["Xlif"] = "xlif";

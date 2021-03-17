@@ -30,6 +30,7 @@ function getI18nOutfile(format) {
         case 'xliff2':
             return 'messages.xlf';
         case 'json':
+        case 'legacy-migrate':
             return 'messages.json';
         case 'arb':
             return 'messages.arb';
@@ -37,7 +38,7 @@ function getI18nOutfile(format) {
             throw new Error(`Unsupported format "${format}"`);
     }
 }
-async function getSerializer(format, sourceLocale, basePath, useLegacyIds) {
+async function getSerializer(format, sourceLocale, basePath, useLegacyIds, diagnostics) {
     switch (format) {
         case schema_1.Format.Xmb:
             const { XmbTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer'));
@@ -56,8 +57,10 @@ async function getSerializer(format, sourceLocale, basePath, useLegacyIds) {
             return new Xliff2TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
         case schema_1.Format.Json:
             const { SimpleJsonTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer'));
-            // tslint:disable-next-line: no-any
             return new SimpleJsonTranslationSerializer(sourceLocale);
+        case schema_1.Format.LegacyMigrate:
+            const { LegacyMessageIdMigrationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer'));
+            return new LegacyMessageIdMigrationSerializer(diagnostics);
         case schema_1.Format.Arb:
             const { ArbTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer'));
             const fileSystem = {
@@ -92,6 +95,9 @@ function normalizeFormatOption(options) {
             break;
         case schema_1.Format.Arb:
             format = schema_1.Format.Arb;
+            break;
+        case schema_1.Format.LegacyMigrate:
+            format = schema_1.Format.LegacyMigrate;
             break;
         case undefined:
             format = schema_1.Format.Xlf;
@@ -236,7 +242,7 @@ async function execute(options, context, transforms) {
         context.logger.warn(diagnostics.formatDiagnostics(''));
     }
     // Serialize all extracted messages
-    const serializer = await getSerializer(format, i18n.sourceLocale, basePath, useLegacyIds);
+    const serializer = await getSerializer(format, i18n.sourceLocale, basePath, useLegacyIds, diagnostics);
     const content = serializer.serialize(ivyMessages);
     // Ensure directory exists
     const outputPath = path.dirname(outFile);
