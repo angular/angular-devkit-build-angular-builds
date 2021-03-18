@@ -5,7 +5,10 @@ export interface ApplicationPresetOptions {
         missingTranslationBehavior?: 'error' | 'warning' | 'ignore';
         translation?: unknown;
     };
-    angularLinker?: boolean;
+    angularLinker?: {
+        shouldLink: boolean;
+        jitMode: boolean;
+    };
     forceES5?: boolean;
     forceAsyncTransformation?: boolean;
     diagnosticReporter?: DiagnosticReporter;

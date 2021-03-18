@@ -28,18 +28,23 @@ exports.default = babel_loader_1.custom(() => {
         inputSourceMap: false,
     });
     return {
-        async customOptions({ i18n, scriptTarget, ...rawOptions }, { source }) {
+        async customOptions({ i18n, scriptTarget, aot, ...rawOptions }, { source }) {
             // Must process file if plugins are added
             let shouldProcess = Array.isArray(rawOptions.plugins) && rawOptions.plugins.length > 0;
             const customOptions = {
                 forceAsyncTransformation: false,
                 forceES5: false,
-                shouldLink: false,
+                angularLinker: undefined,
                 i18n: undefined,
             };
             // Analyze file for linking
-            customOptions.shouldLink = await requiresLinking(this.resourcePath, source);
-            shouldProcess || (shouldProcess = customOptions.shouldLink);
+            if (await requiresLinking(this.resourcePath, source)) {
+                customOptions.angularLinker = {
+                    shouldLink: true,
+                    jitMode: aot !== true,
+                };
+                shouldProcess = true;
+            }
             // Analyze for ES target processing
             const esTarget = scriptTarget;
             if (esTarget !== undefined) {
@@ -88,10 +93,7 @@ exports.default = babel_loader_1.custom(() => {
                     [
                         require('./presets/application').default,
                         {
-                            angularLinker: customOptions.shouldLink,
-                            forceES5: customOptions.forceES5,
-                            forceAsyncTransformation: customOptions.forceAsyncTransformation,
-                            i18n: customOptions.i18n,
+                            ...customOptions,
                             diagnosticReporter: (type, message) => {
                                 switch (type) {
                                     case 'error':

@@ -74,13 +74,15 @@ function createNgtscLogger(reporter) {
     };
 }
 function default_1(api, options) {
+    var _a;
     const presets = [];
     const plugins = [];
     let needRuntimeTransform = false;
-    if (options.angularLinker) {
+    if ((_a = options.angularLinker) === null || _a === void 0 ? void 0 : _a.shouldLink) {
         // Babel currently is synchronous so import cannot be used
         const { createEs2015LinkerPlugin, } = require('@angular/compiler-cli/linker/babel');
         plugins.push(createEs2015LinkerPlugin({
+            linkerJitMode: options.angularLinker.jitMode,
             logger: createNgtscLogger(options.diagnosticReporter),
             fileSystem: {
                 resolve: path.resolve,
@@ -88,6 +90,8 @@ function default_1(api, options) {
                 dirname: path.dirname,
                 relative: path.relative,
                 readFile: fs.readFileSync,
+                // Node.JS types don't overlap the Compiler types.
+                // tslint:disable-next-line: no-any
             },
         }));
     }
