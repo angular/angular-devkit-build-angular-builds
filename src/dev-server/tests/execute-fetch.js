@@ -18,7 +18,7 @@ async function executeOnceAndFetch(harness, url, options) {
         var _a;
         let response = undefined;
         if ((_a = executionResult.result) === null || _a === void 0 ? void 0 : _a.success) {
-            const resolvedUrl = new url_1.URL(url, executionResult.result.baseUrl);
+            const resolvedUrl = new url_1.URL(url, `${executionResult.result.baseUrl}/`);
             response = await node_fetch_1.default(resolvedUrl, options === null || options === void 0 ? void 0 : options.request);
         }
         return { ...executionResult, response };
