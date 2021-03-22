@@ -19,6 +19,7 @@ const cache_path_1 = require("../../utils/cache-path");
 const environment_options_1 = require("../../utils/environment-options");
 const find_up_1 = require("../../utils/find-up");
 const spinner_1 = require("../../utils/spinner");
+const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const webpack_version_1 = require("../../utils/webpack-version");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
@@ -260,10 +261,16 @@ function getCommonConfig(wco) {
                     const { stringifyStream } = await Promise.resolve().then(() => require('@discoveryjs/json-ext'));
                     const data = stats.toJson('verbose');
                     const statsOutputPath = path.join(stats.compilation.outputOptions.path, 'stats.json');
-                    return new Promise((resolve, reject) => stringifyStream(data)
-                        .pipe(fs_1.createWriteStream(statsOutputPath))
-                        .on('close', resolve)
-                        .on('error', reject));
+                    try {
+                        await fs_1.promises.mkdir(path.dirname(statsOutputPath), { recursive: true });
+                        await new Promise((resolve, reject) => stringifyStream(data)
+                            .pipe(fs_1.createWriteStream(statsOutputPath))
+                            .on('close', resolve)
+                            .on('error', reject));
+                    }
+                    catch (error) {
+                        webpack_diagnostics_1.addError(stats.compilation, `Unable to write stats file: ${error.message || 'unknown error'}`);
+                    }
                 });
             }
         })());
