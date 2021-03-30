@@ -129,7 +129,6 @@ async function execute(options, context, transforms) {
     }
     const metadata = await context.getProjectMetadata(context.target);
     const i18n = i18n_options_1.createI18nOptions(metadata);
-    let usingIvy = false;
     let useLegacyIds = true;
     const ivyMessages = [];
     const { config, projectRoot } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext({
@@ -154,44 +153,32 @@ async function execute(options, context, transforms) {
         subresourceIntegrity: false,
     }, context, (wco) => {
         var _a;
-        const isIvyApplication = wco.tsConfig.options.enableIvy !== false;
+        if (wco.tsConfig.options.enableIvy === false) {
+            context.logger.warn('Ivy extraction enabled but application is not Ivy enabled. Extraction may fail.');
+        }
         // Default value for legacy message ids is currently true
         useLegacyIds = (_a = wco.tsConfig.options.enableI18nLegacyMessageIdFormat) !== null && _a !== void 0 ? _a : true;
-        // Ivy extraction is the default for Ivy applications.
-        usingIvy = (isIvyApplication && options.ivy === undefined) || !!options.ivy;
-        if (usingIvy) {
-            if (!isIvyApplication) {
-                context.logger.warn('Ivy extraction enabled but application is not Ivy enabled. Extraction may fail.');
-            }
-        }
-        else if (isIvyApplication) {
-            context.logger.warn('Ivy extraction not enabled but application is Ivy enabled. ' +
-                'If the extraction fails, the `--ivy` flag will enable Ivy extraction.');
-        }
         const partials = [
             { plugins: [new NoEmitPlugin()] },
             configs_1.getCommonConfig(wco),
             configs_1.getBrowserConfig(wco),
-            // Only use VE extraction if not using Ivy
-            configs_1.getAotConfig(wco, !usingIvy),
+            configs_1.getAotConfig(wco),
             configs_1.getStatsConfig(wco),
         ];
         // Add Ivy application file extractor support
-        if (usingIvy) {
-            partials.unshift({
-                module: {
-                    rules: [
-                        {
-                            test: /\.[t|j]s$/,
-                            loader: require.resolve('./ivy-extract-loader'),
-                            options: {
-                                messageHandler: (messages) => ivyMessages.push(...messages),
-                            },
+        partials.unshift({
+            module: {
+                rules: [
+                    {
+                        test: /\.[t|j]s$/,
+                        loader: require.resolve('./ivy-extract-loader'),
+                        options: {
+                            messageHandler: (messages) => ivyMessages.push(...messages),
                         },
-                    ],
-                },
-            });
-        }
+                    },
+                ],
+            },
+        });
         // Replace all stylesheets with an empty default export
         partials.push({
             plugins: [
@@ -200,17 +187,15 @@ async function execute(options, context, transforms) {
         });
         return partials;
     });
-    if (usingIvy) {
-        try {
-            require.resolve('@angular/localize');
-        }
-        catch {
-            return {
-                success: false,
-                error: `Ivy extraction requires the '@angular/localize' package.`,
-                outputPath: outFile,
-            };
-        }
+    try {
+        require.resolve('@angular/localize');
+    }
+    catch {
+        return {
+            success: false,
+            error: `Ivy extraction requires the '@angular/localize' package.`,
+            outputPath: outFile,
+        };
     }
     const webpackResult = await build_webpack_1.runWebpack((await ((_a = transforms === null || transforms === void 0 ? void 0 : transforms.webpackConfiguration) === null || _a === void 0 ? void 0 : _a.call(transforms, config))) || config, context, {
         logging: stats_1.createWebpackLoggingCallback(false, context.logger),
@@ -218,8 +203,8 @@ async function execute(options, context, transforms) {
     }).toPromise();
     // Set the outputPath to the extraction output location for downstream consumers
     webpackResult.outputPath = outFile;
-    // Complete if using VE or if Webpack build failed
-    if (!usingIvy || !webpackResult.success) {
+    // Complete if Webpack build failed
+    if (!webpackResult.success) {
         return webpackResult;
     }
     const basePath = config.context || projectRoot;

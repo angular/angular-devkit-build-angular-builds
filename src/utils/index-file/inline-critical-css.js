@@ -16,9 +16,9 @@ class CrittersExtended extends Critters {
             logger: {
                 warn: (s) => this.warnings.push(s),
                 error: (s) => this.errors.push(s),
-                log: () => { },
                 info: () => { },
             },
+            logLevel: 'warn',
             path: optionsExtended.outputPath,
             publicPath: optionsExtended.deployUrl,
             compress: !!optionsExtended.minify,
@@ -28,7 +28,6 @@ class CrittersExtended extends Critters {
             preload: 'media',
             noscriptFallback: true,
             inlineFonts: true,
-            // tslint:disable-next-line: no-any
         });
         this.optionsExtended = optionsExtended;
         this.warnings = [];
