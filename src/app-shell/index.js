@@ -43,18 +43,9 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
         const browserIndexOutputPath = path.join(outputPath, 'index.html');
         const indexHtml = await fs.promises.readFile(browserIndexOutputPath, 'utf8');
         const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult, localeDirectory);
-        const { AppServerModule, AppServerModuleNgFactory, renderModule, renderModuleFactory, } = await Promise.resolve().then(() => require(serverBundlePath));
-        let renderModuleFn;
-        let AppServerModuleDef;
-        if (renderModuleFactory && AppServerModuleNgFactory) {
-            renderModuleFn = renderModuleFactory;
-            AppServerModuleDef = AppServerModuleNgFactory;
-        }
-        else if (renderModule && AppServerModule) {
-            renderModuleFn = renderModule;
-            AppServerModuleDef = AppServerModule;
-        }
-        else {
+        const { AppServerModule, renderModule, } = await Promise.resolve().then(() => require(serverBundlePath));
+        const renderModuleFn = renderModule;
+        if (!(renderModuleFn && AppServerModule)) {
             throw new Error(`renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`);
         }
         // Load platform server module renderer
@@ -62,7 +53,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
             document: indexHtml,
             url: options.route,
         };
-        let html = await renderModuleFn(AppServerModuleDef, renderOpts);
+        let html = await renderModuleFn(AppServerModule, renderOpts);
         // Overwrite the client index file.
         const outputIndexPath = options.outputIndexPath
             ? path.join(root, options.outputIndexPath)

@@ -210,7 +210,7 @@ function getCommonConfig(wco) {
     if (buildOptions.showCircularDependencies) {
         const CircularDependencyPlugin = require('circular-dependency-plugin');
         extraPlugins.push(new CircularDependencyPlugin({
-            exclude: /([\\\/]node_modules[\\\/])|(ngfactory\.js$)/,
+            exclude: /[\\\/]node_modules[\\\/]/,
         }));
     }
     if (buildOptions.statsJson) {
@@ -243,8 +243,8 @@ function getCommonConfig(wco) {
         extraRules.push({
             test: /\.m?js$/,
             exclude: vendorSourceMap
-                ? /(ngfactory|ngstyle)\.js$/
-                : [/[\\\/]node_modules[\\\/]/, /(ngfactory|ngstyle)\.js$/],
+                ? undefined
+                : /[\\\/]node_modules[\\\/]/,
             enforce: 'pre',
             loader: require.resolve('source-map-loader'),
         });
@@ -395,7 +395,7 @@ function getCommonConfig(wco) {
                 },
                 {
                     test: /\.[cm]?js$|\.tsx?$/,
-                    exclude: [/[\/\\](?:core-js|\@babel|tslib|web-animations-js)[\/\\]/, /(ngfactory|ngstyle)\.js$/],
+                    exclude: [/[\/\\](?:core-js|\@babel|tslib|web-animations-js)[\/\\]/],
                     use: [
                         {
                             loader: require.resolve('../../babel/webpack-loader'),
