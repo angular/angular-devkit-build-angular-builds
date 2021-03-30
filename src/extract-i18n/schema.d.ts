@@ -23,6 +23,10 @@ export interface Schema {
      */
     i18nLocale?: string;
     /**
+     * Use Ivy compiler to extract translations. The default for Ivy applications.
+     */
+    ivy?: boolean;
+    /**
      * Name of the file to output.
      */
     outFile?: string;
