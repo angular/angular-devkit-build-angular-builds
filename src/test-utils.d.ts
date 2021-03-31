@@ -8,6 +8,7 @@
 import { Architect, BuilderOutput, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
 import { Path, json, virtualFs, workspaces } from '@angular-devkit/core';
+export declare let veEnabled: boolean;
 export declare const workspaceRoot: Path;
 export declare const host: TestProjectHost;
 export declare const outputPath: Path;
