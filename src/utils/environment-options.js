@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.legacyIvyPluginEnabled = exports.profilingEnabled = exports.cachingBasePath = exports.cachingDisabled = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
+exports.profilingEnabled = exports.cachingBasePath = exports.cachingDisabled = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -72,6 +72,3 @@ exports.cachingBasePath = (() => {
 // Build profiling
 const profilingVariable = process.env['NG_BUILD_PROFILING'];
 exports.profilingEnabled = isPresent(profilingVariable) && isEnabled(profilingVariable);
-// Legacy Webpack plugin with Ivy
-const legacyIvyVariable = process.env['NG_BUILD_IVY_LEGACY'];
-exports.legacyIvyPluginEnabled = isPresent(legacyIvyVariable) && !isDisabled(legacyIvyVariable);
