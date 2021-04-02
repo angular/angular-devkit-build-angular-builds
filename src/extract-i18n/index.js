@@ -73,13 +73,7 @@ async function getSerializer(format, sourceLocale, basePath, useLegacyIds, diagn
     }
 }
 function normalizeFormatOption(options) {
-    let format;
-    if (options.i18nFormat !== schema_1.Format.Xlf) {
-        format = options.i18nFormat;
-    }
-    else {
-        format = options.format;
-    }
+    let format = options.format;
     switch (format) {
         case schema_1.Format.Xlf:
         case schema_1.Format.Xlif:
@@ -90,20 +84,9 @@ function normalizeFormatOption(options) {
         case schema_1.Format.Xliff2:
             format = schema_1.Format.Xlf2;
             break;
-        case schema_1.Format.Json:
-            format = schema_1.Format.Json;
-            break;
-        case schema_1.Format.Arb:
-            format = schema_1.Format.Arb;
-            break;
-        case schema_1.Format.LegacyMigrate:
-            format = schema_1.Format.LegacyMigrate;
-            break;
-        case undefined:
-            format = schema_1.Format.Xlf;
-            break;
     }
-    return format;
+    // Default format is xliff1
+    return format !== null && format !== void 0 ? format : schema_1.Format.Xlf;
 }
 class NoEmitPlugin {
     apply(compiler) {
@@ -140,7 +123,7 @@ async function execute(options, context, transforms) {
             vendor: true,
         },
         buildOptimizer: false,
-        i18nLocale: options.i18nLocale || i18n.sourceLocale,
+        i18nLocale: i18n.sourceLocale,
         i18nFormat: format,
         i18nFile: outFile,
         aot: true,

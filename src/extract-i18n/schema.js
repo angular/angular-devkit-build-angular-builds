@@ -5,9 +5,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Format = void 0;
 /**
  * Output format for the generated file.
- *
- * Output format for the generated file.
- * @deprecated Use 'format' option instead.
  */
 var Format;
 (function (Format) {
