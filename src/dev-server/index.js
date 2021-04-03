@@ -146,11 +146,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
       `);
         }
         let locale;
-        if (browserOptions.i18nLocale) {
-            // Deprecated VE option
-            locale = browserOptions.i18nLocale;
-        }
-        else if (i18n.shouldInline) {
+        if (i18n.shouldInline) {
             // Dev-server only supports one locale
             locale = [...i18n.inlineLocales][0];
         }

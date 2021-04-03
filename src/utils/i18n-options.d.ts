@@ -24,7 +24,6 @@ export interface I18nOptions {
     }>;
     flatOutput?: boolean;
     readonly shouldInline: boolean;
-    veCompatLocale?: string;
     hasDefinedSourceLocale?: boolean;
 }
 export declare function createI18nOptions(metadata: json.JsonObject, inline?: boolean | string[]): I18nOptions;

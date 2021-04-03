@@ -30,21 +30,6 @@ export interface Schema {
      */
     forkTypeChecker?: boolean;
     /**
-     * Localization file to use for i18n.
-     * @deprecated Use 'locales' object in the project metadata instead.
-     */
-    i18nFile?: string;
-    /**
-     * Format of the localization file specified with --i18n-file.
-     * @deprecated No longer needed as the format will be determined automatically.
-     */
-    i18nFormat?: string;
-    /**
-     * Locale to use for i18n.
-     * @deprecated Use 'localize' instead.
-     */
-    i18nLocale?: string;
-    /**
      * How to handle missing translations for i18n.
      */
     i18nMissingTranslation?: I18NMissingTranslation;
