@@ -1,4 +1,4 @@
-import { ivy } from '@ngtools/webpack';
+import { AngularWebpackPlugin } from '@ngtools/webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
 export declare function getNonAotConfig(wco: WebpackConfigOptions): {
     module: {
@@ -7,7 +7,7 @@ export declare function getNonAotConfig(wco: WebpackConfigOptions): {
             loader: string;
         }[];
     };
-    plugins: ivy.AngularWebpackPlugin[];
+    plugins: AngularWebpackPlugin[];
 };
 export declare function getAotConfig(wco: WebpackConfigOptions): {
     module: {
@@ -21,6 +21,6 @@ export declare function getAotConfig(wco: WebpackConfigOptions): {
             })[];
         }[];
     };
-    plugins: ivy.AngularWebpackPlugin[];
+    plugins: AngularWebpackPlugin[];
 };
-export declare function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsConfigPath: string): ivy.AngularWebpackPlugin;
+export declare function getTypescriptWorkerPlugin(wco: WebpackConfigOptions, workerTsConfigPath: string): AngularWebpackPlugin;

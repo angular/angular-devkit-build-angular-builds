@@ -38,7 +38,7 @@ function createIvyPlugin(wco, aot, tsconfig) {
             fileReplacements[core_1.getSystemPath(replacement.replace)] = core_1.getSystemPath(replacement.with);
         }
     }
-    return new webpack_1.ivy.AngularWebpackPlugin({
+    return new webpack_1.AngularWebpackPlugin({
         tsconfig,
         compilerOptions,
         fileReplacements,
@@ -53,7 +53,7 @@ function getNonAotConfig(wco) {
             rules: [
                 {
                     test: /\.[jt]sx?$/,
-                    loader: webpack_1.ivy.AngularWebpackLoaderPath,
+                    loader: webpack_1.AngularWebpackLoaderPath,
                 },
             ],
         },
@@ -80,13 +80,13 @@ function getAotConfig(wco) {
                                 },
                             ]
                             : []),
-                        webpack_1.ivy.AngularWebpackLoaderPath,
+                        webpack_1.AngularWebpackLoaderPath,
                     ],
                 },
                 // "allowJs" support with ivy plugin - ensures build optimizer is not run twice
                 {
                     test: /\.jsx?$/,
-                    use: [webpack_1.ivy.AngularWebpackLoaderPath],
+                    use: [webpack_1.AngularWebpackLoaderPath],
                 },
             ],
         },
