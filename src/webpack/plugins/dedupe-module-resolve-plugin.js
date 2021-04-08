@@ -7,12 +7,12 @@ function getResourceData(resolveData) {
     var _a, _b;
     if (resolveData.createData) {
         // Webpack 5+
-        const { descriptionFileData, relativePath, resource, } = resolveData.createData.resourceResolveData;
+        const { descriptionFileData, relativePath, } = resolveData.createData.resourceResolveData;
         return {
             packageName: descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.name,
             packageVersion: descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.version,
             relativePath,
-            resource,
+            resource: resolveData.createData.resource,
         };
     }
     else {
@@ -72,7 +72,15 @@ class DedupeModuleResolvePlugin {
                     webpack_diagnostics_1.addWarning(compilation, `[DedupeModuleResolvePlugin]: ${resource} -> ${prevResource}`);
                 }
                 // Alter current request with previously resolved module.
-                result.request = prevRequest;
+                // tslint:disable-next-line: no-any
+                const createData = result.createData;
+                if (createData) {
+                    createData.resource = prevResource;
+                    createData.userRequest = prevResource;
+                }
+                else {
+                    result.request = prevRequest;
+                }
             });
         });
     }

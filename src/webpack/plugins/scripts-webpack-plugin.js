@@ -92,11 +92,12 @@ class ScriptsWebpackPlugin {
                 const sourceGetters = scripts.map(fullPath => {
                     return new Promise((resolve, reject) => {
                         compilation.inputFileSystem.readFile(fullPath, (err, data) => {
+                            var _a;
                             if (err) {
                                 reject(err);
                                 return;
                             }
-                            const content = data.toString();
+                            const content = (_a = data === null || data === void 0 ? void 0 : data.toString()) !== null && _a !== void 0 ? _a : '';
                             let source;
                             if (this.options.sourceMap) {
                                 // TODO: Look for source map file (for '.min' scripts, etc.)

@@ -9,7 +9,7 @@ exports.OptimizeCssWebpackPlugin = void 0;
  * found in the LICENSE file at https://angular.io/license
  */
 const cssNano = require("cssnano");
-const webpack_sources_1 = require("webpack-sources");
+const webpack_1 = require("webpack");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const webpack_version_1 = require("../../utils/webpack-version");
 const PLUGIN_NAME = 'optimize-css-webpack-plugin';
@@ -102,12 +102,12 @@ class OptimizeCssWebpackPlugin {
                 }
                 let newSource;
                 if (output.map) {
-                    newSource = new webpack_sources_1.SourceMapSource(output.css, file, 
+                    newSource = new webpack_1.sources.SourceMapSource(output.css, file, 
                     // tslint:disable-next-line: no-any
                     output.map.toString(), content, map);
                 }
                 else {
-                    newSource = new webpack_sources_1.RawSource(output.css);
+                    newSource = new webpack_1.sources.RawSource(output.css);
                 }
                 compilation.assets[file] = newSource;
             });

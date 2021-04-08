@@ -92,12 +92,13 @@ class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
     async readIndex(path) {
         return new Promise((resolve, reject) => {
             this.compilation.inputFileSystem.readFile(path, (err, data) => {
+                var _a;
                 if (err) {
                     reject(err);
                     return;
                 }
                 this.compilation.fileDependencies.add(path);
-                resolve(data.toString());
+                resolve((_a = data === null || data === void 0 ? void 0 : data.toString()) !== null && _a !== void 0 ? _a : '');
             });
         });
     }

@@ -1,2 +1,2 @@
-declare const _default: import("webpack").loader.Loader;
+declare const _default: any;
 export default _default;

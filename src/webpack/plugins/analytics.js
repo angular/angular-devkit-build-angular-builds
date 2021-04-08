@@ -153,13 +153,15 @@ class NgBuildAnalyticsPlugin {
         }
     }
     _collectBundleStats(compilation) {
-        // `compilation.chunks` is a Set in Webpack 5
-        const chunks = Array.from(compilation.chunks);
-        chunks
-            .filter((chunk) => chunk.rendered)
-            .forEach((chunk) => {
-            const asset = compilation.assets[chunk.files[0]];
-            const size = asset ? asset.size() : 0;
+        var _a, _b;
+        const chunkAssets = new Set();
+        for (const chunk of compilation.chunks) {
+            if (!chunk.rendered) {
+                continue;
+            }
+            const firstFile = Array.from(chunk.files)[0];
+            const size = (_b = (_a = compilation.getAsset(firstFile)) === null || _a === void 0 ? void 0 : _a.source.size()) !== null && _b !== void 0 ? _b : 0;
+            chunkAssets.add(firstFile);
             if (chunk.canBeInitial()) {
                 this._stats.initialChunkSize += size;
             }
@@ -169,26 +171,19 @@ class NgBuildAnalyticsPlugin {
             }
             this._stats.totalChunkCount++;
             this._stats.totalChunkSize += size;
-        });
-        Object.entries(compilation.assets)
-            // Filter out chunks. We only count assets that are not JS.
-            .filter(([name]) => {
-            return chunks.every((chunk) => chunk.files[0] != name);
-        })
-            .forEach(([, asset]) => {
-            this._stats.assetSize += asset.size();
-            this._stats.assetCount++;
-        });
-        for (const [name, asset] of Object.entries(compilation.assets)) {
-            if (name == 'polyfill') {
-                this._stats.polyfillSize += asset.size();
+            if (firstFile.endsWith('.css')) {
+                this._stats.cssSize += size;
             }
         }
-        for (const chunk of compilation.chunks) {
-            if (chunk.files[0] && chunk.files[0].endsWith('.css')) {
-                const asset = compilation.assets[chunk.files[0]];
-                const size = asset ? asset.size() : 0;
-                this._stats.cssSize += size;
+        for (const asset of compilation.getAssets()) {
+            // Only count non-JavaScript related files
+            if (chunkAssets.has(asset.name)) {
+                continue;
+            }
+            this._stats.assetSize += asset.source.size();
+            this._stats.assetCount++;
+            if (asset.name == 'polyfill') {
+                this._stats.polyfillSize += asset.source.size();
             }
         }
     }

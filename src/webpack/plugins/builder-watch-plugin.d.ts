@@ -45,7 +45,7 @@ export declare class BuilderWatchPlugin {
     private readonly watcherFactory;
     constructor(watcherFactory: BuilderWatcherFactory);
     apply(compiler: Compiler & {
-        watchFileSystem: WebpackWatchFileSystem;
+        watchFileSystem: unknown;
     }): void;
 }
 export {};

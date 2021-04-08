@@ -25,6 +25,13 @@ export interface JsonCompilationStats {
     assets?: JsonAssetStats[];
     chunks?: JsonChunkStats[];
     entrypoints?: Record<string, JsonEntrypointStats>;
+    outputPath?: string;
+    warnings?: ({
+        message: string;
+    } | string)[];
+    errors?: ({
+        message: string;
+    } | string)[];
 }
 export declare function formatSize(size: number): string;
 export declare type BundleStatsData = [files: string, names: string, size: number | string];

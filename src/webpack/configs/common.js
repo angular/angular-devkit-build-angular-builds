@@ -47,31 +47,6 @@ function getCommonConfig(wco) {
             if (buildBrowserFeatures.isEs5SupportNeeded()) {
                 const polyfillsChunkName = 'polyfills-es5';
                 entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
-                if (differentialLoadingMode) {
-                    // Since the chunkFileName option schema does not allow the function overload, add a plugin
-                    // that changes the name of the ES5 polyfills chunk to not include ES2015.
-                    extraPlugins.push({
-                        apply(compiler) {
-                            compiler.hooks.compilation.tap('build-angular', compilation => {
-                                const assetPath = (filename, data) => {
-                                    var _a;
-                                    const assetName = typeof filename === 'function' ? filename(data) : filename;
-                                    const isMap = assetName === null || assetName === void 0 ? void 0 : assetName.endsWith('.map');
-                                    return ((_a = data.chunk) === null || _a === void 0 ? void 0 : _a.name) === 'polyfills-es5'
-                                        ? `polyfills-es5${hashFormat.chunk}.js${isMap ? '.map' : ''}`
-                                        : assetName;
-                                };
-                                if (webpack_version_1.isWebpackFiveOrHigher()) {
-                                    compilation.hooks.assetPath.tap('remove-hash-plugin', assetPath);
-                                }
-                                else {
-                                    const mainTemplate = compilation.mainTemplate;
-                                    mainTemplate.hooks.assetPath.tap('build-angular', assetPath);
-                                }
-                            });
-                        },
-                    });
-                }
                 if (!buildOptions.aot) {
                     if (differentialLoadingMode) {
                         entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'jit-polyfills.js'));
@@ -186,6 +161,8 @@ function getCommonConfig(wco) {
         });
         extraPlugins.push(new CopyWebpackPlugin({
             patterns: copyWebpackPluginPatterns,
+            // The typings for copy-webpack-plugin use the old @types/webpack package
+            // tslint:disable-next-line: no-any
         }));
     }
     if (buildOptions.progress) {
@@ -219,7 +196,7 @@ function getCommonConfig(wco) {
                 compiler.hooks.done.tapPromise('angular-cli-stats', async (stats) => {
                     const { stringifyStream } = await Promise.resolve().then(() => require('@discoveryjs/json-ext'));
                     const data = stats.toJson('verbose');
-                    const statsOutputPath = path.join(stats.compilation.outputOptions.path, 'stats.json');
+                    const statsOutputPath = path.join(root, buildOptions.outputPath, 'stats.json');
                     try {
                         await fs_1.promises.mkdir(path.dirname(statsOutputPath), { recursive: true });
                         await new Promise((resolve, reject) => stringifyStream(data)
@@ -368,7 +345,15 @@ function getCommonConfig(wco) {
             ...webpack_version_1.withWebpackFourOrFive({ futureEmitAssets: true }, {}),
             path: path.resolve(root, buildOptions.outputPath),
             publicPath: buildOptions.deployUrl,
-            filename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
+            filename: ({ chunk }) => {
+                if ((chunk === null || chunk === void 0 ? void 0 : chunk.name) === 'polyfills-es5') {
+                    return `polyfills-es5${hashFormat.chunk}.js`;
+                }
+                else {
+                    return `[name]${targetInFileName}${hashFormat.chunk}.js`;
+                }
+            },
+            chunkFilename: `[id]${targetInFileName}${hashFormat.chunk}.js`,
         },
         watch: buildOptions.watch,
         watchOptions: helpers_1.getWatchOptions(buildOptions.poll),
@@ -411,10 +396,11 @@ function getCommonConfig(wco) {
                 ...extraRules,
             ],
         },
+        cache: !!buildOptions.watch,
         optimization: {
             minimizer: extraMinimizers,
             moduleIds: webpack_version_1.withWebpackFourOrFive('hashed', 'deterministic'),
-            ...webpack_version_1.withWebpackFourOrFive({}, buildOptions.namedChunks ? { chunkIds: 'named' } : {}),
+            chunkIds: buildOptions.namedChunks ? 'named' : 'deterministic',
             ...webpack_version_1.withWebpackFourOrFive({ noEmitOnErrors: true }, { emitOnErrors: false }),
         },
         plugins: [

@@ -134,10 +134,11 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         }).pipe(
         // tslint:disable-next-line: no-big-function
         operators_1.concatMap(async (buildEvent) => {
-            var _a, _b, _c, _d, _e, _f;
+            var _a, _b, _c, _d, _e, _f, _g, _h;
             const spinner = new spinner_1.Spinner();
             spinner.enabled = options.progress !== false;
-            const { webpackStats: webpackRawStats, success, emittedFiles = [], outputPath: webpackOutputPath, } = buildEvent;
+            const { success, emittedFiles = [], outputPath: webpackOutputPath, } = buildEvent;
+            const webpackRawStats = buildEvent.webpackStats;
             if (!webpackRawStats) {
                 throw new Error('Webpack stats build result is required.');
             }
@@ -424,10 +425,10 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     for (const { severity, message } of budgetFailures) {
                         switch (severity) {
                             case bundle_calculator_1.ThresholdSeverity.Warning:
-                                webpackStats.warnings.push(message);
+                                (_d = webpackStats.warnings) === null || _d === void 0 ? void 0 : _d.push({ message });
                                 break;
                             case bundle_calculator_1.ThresholdSeverity.Error:
-                                webpackStats.errors.push(message);
+                                (_e = webpackStats.errors) === null || _e === void 0 ? void 0 : _e.push({ message });
                                 break;
                             default:
                                 assertNever(severity);
@@ -437,7 +438,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 const buildSuccess = success && !stats_1.statsHasErrors(webpackStats);
                 if (buildSuccess) {
                     // Copy assets
-                    if (!options.watch && ((_d = options.assets) === null || _d === void 0 ? void 0 : _d.length)) {
+                    if (!options.watch && ((_f = options.assets) === null || _f === void 0 ? void 0 : _f.length)) {
                         spinner.start('Copying assets...');
                         try {
                             await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), Array.from(outputPaths.values()), context.workspaceRoot);
@@ -452,8 +453,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         spinner.start('Generating index html...');
                         const WOFFSupportNeeded = !buildBrowserFeatures.isFeatureSupported('woff2');
                         const entrypoints = package_chunk_sort_1.generateEntryPoints({
-                            scripts: (_e = options.scripts) !== null && _e !== void 0 ? _e : [],
-                            styles: (_f = options.styles) !== null && _f !== void 0 ? _f : [],
+                            scripts: (_g = options.scripts) !== null && _g !== void 0 ? _g : [],
+                            styles: (_h = options.styles) !== null && _h !== void 0 ? _h : [],
                         });
                         const indexHtmlGenerator = new index_html_generator_1.IndexHtmlGenerator({
                             indexPath: path.join(context.workspaceRoot, webpack_browser_config_1.getIndexInputFile(options.index)),

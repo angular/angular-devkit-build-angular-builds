@@ -57,7 +57,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     version_1.assertCompatibleAngularVersion(workspaceRoot, logger);
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
     async function setup() {
-        var _a;
+        var _a, _b;
         // Get the browser configuration from the target name.
         const rawBrowserOptions = (await context.getTargetOptions(browserTarget));
         options.port = await check_port_1.checkPort((_a = options.port) !== null && _a !== void 0 ? _a : 4200, options.host || 'localhost');
@@ -82,6 +82,9 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             overrides.outputHashing = schema_1.OutputHashing.None;
             logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
         }
+        // Webpack's live reload functionality adds the `strip-ansi` package which is commonJS
+        (_b = rawBrowserOptions.allowedCommonJsDependencies) !== null && _b !== void 0 ? _b : (rawBrowserOptions.allowedCommonJsDependencies = []);
+        rawBrowserOptions.allowedCommonJsDependencies.push('strip-ansi');
         const browserName = await context.getBuilderNameForTarget(browserTarget);
         const browserOptions = await context.validateOptions({ ...rawBrowserOptions, ...overrides }, browserName);
         const { config, projectRoot, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(browserOptions, context, wco => [
@@ -101,6 +104,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             // This is needed because we cannot use the inline option directly in the config
             // because of the SuppressExtractedTextChunksWebpackPlugin
             // Consider not using SuppressExtractedTextChunksWebpackPlugin when liveReload is enable.
+            // tslint:disable-next-line: no-any
             webpackDevServer.addDevServerEntrypoints(config, {
                 ...config.devServer,
                 inline: true,
@@ -110,7 +114,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             // 'addDevServerEntrypoints' adds addional entry-points to all entries.
             if (config.entry && typeof config.entry === 'object' && !Array.isArray(config.entry) && config.entry.main) {
                 for (const [key, value] of Object.entries(config.entry)) {
-                    if (key === 'main' || typeof value === 'string') {
+                    if (key === 'main' || !Array.isArray(value)) {
                         continue;
                     }
                     const webpackClientScriptIndex = value.findIndex(x => x.includes('webpack-dev-server/client/index.js'));

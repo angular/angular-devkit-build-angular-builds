@@ -1,7 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBrowserConfig = void 0;
-const webpack_version_1 = require("../../utils/webpack-version");
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+const typescript_1 = require("typescript");
+const utils_1 = require("../../utils");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
 function getBrowserConfig(wco) {
@@ -37,12 +45,15 @@ function getBrowserConfig(wco) {
     else if (crossOrigin !== 'none') {
         crossOriginLoading = crossOrigin;
     }
+    const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(wco.projectRoot);
     return {
         devtool: false,
         resolve: {
             mainFields: ['es2015', 'browser', 'module', 'main'],
         },
-        ...webpack_version_1.withWebpackFourOrFive({}, { target: ['web', 'es5'] }),
+        target: wco.tsConfig.options.target === typescript_1.ScriptTarget.ES5 || buildBrowserFeatures.isEs5SupportNeeded()
+            ? ['web', 'es5']
+            : 'web',
         output: {
             crossOriginLoading,
         },

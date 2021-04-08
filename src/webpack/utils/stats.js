@@ -272,7 +272,13 @@ function createWebpackLoggingCallback(verbose, logger) {
         if (verbose) {
             logger.info(stats.toString(config.stats));
         }
-        webpackStatsLogger(logger, stats.toJson(config.stats), config);
+        webpackStatsLogger(logger, stats.toJson({
+            errors: true,
+            warnings: true,
+            builtAt: true,
+            assets: true,
+            chunks: true,
+        }), config);
     };
 }
 exports.createWebpackLoggingCallback = createWebpackLoggingCallback;
