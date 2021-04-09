@@ -39,7 +39,7 @@ async function initialize(options, context, webpackConfigurationTransformer) {
 function execute(options, context, transforms = {}) {
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
-    return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.switchMap(([karma, webpackConfig]) => new rxjs_1.Observable(subscriber => {
+    return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.switchMap(async ([karma, webpackConfig]) => {
         var _a;
         const karmaOptions = {};
         if (options.watch !== undefined) {
@@ -64,8 +64,7 @@ function execute(options, context, transforms = {}) {
             const files = find_tests_1.findTests(options.include, path_1.dirname(mainFilePath), context.workspaceRoot);
             // early exit, no reason to start karma
             if (!files.length) {
-                subscriber.error(`Specified patterns: "${options.include.join(', ')}" did not match any spec files`);
-                return;
+                throw new Error(`Specified patterns: "${options.include.join(', ')}" did not match any spec files.`);
             }
             // Get the rules and ensure the Webpack configuration is setup properly
             const rules = ((_a = webpackConfig.module) === null || _a === void 0 ? void 0 : _a.rules) || [];
@@ -87,22 +86,29 @@ function execute(options, context, transforms = {}) {
                 },
             });
         }
-        // Assign additional karmaConfig options to the local ngapp config
-        karmaOptions.configFile = path_1.resolve(context.workspaceRoot, options.karmaConfig);
         karmaOptions.buildWebpack = {
             options,
             webpackConfig,
-            // Pass onto Karma to emit BuildEvents.
-            successCb: () => subscriber.next({ success: true }),
-            failureCb: () => subscriber.next({ success: false }),
-            // Workaround for https://github.com/karma-runner/karma/issues/3154
-            // When this workaround is removed, user projects need to be updated to use a Karma
-            // version that has a fix for this issue.
-            toJSON: () => { },
             logger: context.logger,
         };
+        // @types/karma doesn't include the last parameter.
+        // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/52286
+        // tslint:disable-next-line: no-any
+        const config = await karma.config.parseConfig(path_1.resolve(context.workspaceRoot, options.karmaConfig), transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, { promiseConfig: true, throwErrors: true });
+        return [karma, config];
+    }), operators_1.switchMap(([karma, karmaConfig]) => new rxjs_1.Observable(subscriber => {
+        var _a, _b, _c;
+        var _d, _e;
+        // Pass onto Karma to emit BuildEvents.
+        (_a = karmaConfig.buildWebpack) !== null && _a !== void 0 ? _a : (karmaConfig.buildWebpack = {});
+        if (typeof karmaConfig.buildWebpack === 'object') {
+            // tslint:disable-next-line: no-any
+            (_b = (_d = karmaConfig.buildWebpack).failureCb) !== null && _b !== void 0 ? _b : (_d.failureCb = () => subscriber.next({ success: false }));
+            // tslint:disable-next-line: no-any
+            (_c = (_e = karmaConfig.buildWebpack).successCb) !== null && _c !== void 0 ? _c : (_e.successCb = () => subscriber.next({ success: true }));
+        }
         // Complete the observable once the Karma server returns.
-        const karmaServer = new karma.Server(transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, (exitCode) => {
+        const karmaServer = new karma.Server(karmaConfig, (exitCode) => {
             subscriber.next({ success: exitCode === 0 });
             subscriber.complete();
         });
@@ -111,11 +117,8 @@ function execute(options, context, transforms = {}) {
         const karmaStart = karmaServer.start();
         // Cleanup, signal Karma to exit.
         return () => {
-            // Karma only has the `stop` method start with 3.1.1, so we must defensively check.
             const karmaServerWithStop = karmaServer;
-            if (typeof karmaServerWithStop.stop === 'function') {
-                return karmaStart.then(() => karmaServerWithStop.stop());
-            }
+            return karmaStart.then(() => karmaServerWithStop.stop());
         };
     })), operators_1.defaultIfEmpty({ success: false }));
 }
