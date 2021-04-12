@@ -44,6 +44,7 @@ function createIvyPlugin(wco, aot, tsconfig) {
         fileReplacements,
         jitMode: !aot,
         emitNgModuleScope: !optimize,
+        inlineStyleMimeType: 'text/css',
     });
 }
 function getNonAotConfig(wco) {
