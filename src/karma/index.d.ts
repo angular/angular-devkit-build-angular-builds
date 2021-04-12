@@ -6,11 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import { ConfigOptions } from 'karma';
 import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import { Schema as KarmaBuilderOptions } from './schema';
-export declare type KarmaConfigOptions = import('karma').ConfigOptions & {
+export declare type KarmaConfigOptions = ConfigOptions & {
     buildWebpack?: unknown;
     configFile?: string;
 };

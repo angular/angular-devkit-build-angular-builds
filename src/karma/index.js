@@ -91,9 +91,6 @@ function execute(options, context, transforms = {}) {
             webpackConfig,
             logger: context.logger,
         };
-        // @types/karma doesn't include the last parameter.
-        // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/52286
-        // tslint:disable-next-line: no-any
         const config = await karma.config.parseConfig(path_1.resolve(context.workspaceRoot, options.karmaConfig), transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, { promiseConfig: true, throwErrors: true });
         return [karma, config];
     }), operators_1.switchMap(([karma, karmaConfig]) => new rxjs_1.Observable(subscriber => {
@@ -108,18 +105,13 @@ function execute(options, context, transforms = {}) {
             (_c = (_e = karmaConfig.buildWebpack).successCb) !== null && _c !== void 0 ? _c : (_e.successCb = () => subscriber.next({ success: true }));
         }
         // Complete the observable once the Karma server returns.
-        const karmaServer = new karma.Server(karmaConfig, (exitCode) => {
+        const karmaServer = new karma.Server(karmaConfig, exitCode => {
             subscriber.next({ success: exitCode === 0 });
             subscriber.complete();
         });
-        // karma typings incorrectly define start's return value as void
-        // tslint:disable-next-line:no-use-of-empty-return-value
         const karmaStart = karmaServer.start();
         // Cleanup, signal Karma to exit.
-        return () => {
-            const karmaServerWithStop = karmaServer;
-            return karmaStart.then(() => karmaServerWithStop.stop());
-        };
+        return () => karmaStart.then(() => karmaServer.stop());
     })), operators_1.defaultIfEmpty({ success: false }));
 }
 exports.execute = execute;
