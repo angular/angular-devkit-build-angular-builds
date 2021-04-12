@@ -1,1 +1,1 @@
-export default function localizeExtractLoader(this: import('webpack').loader.LoaderContext, content: string, map: any): void;
+export default function localizeExtractLoader(this: any, content: string, map: any): void;

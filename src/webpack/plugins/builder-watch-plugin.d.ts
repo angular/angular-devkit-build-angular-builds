@@ -30,8 +30,7 @@ export interface WebpackWatcher {
         timestamp: number;
     }>;
 }
-declare type WatchCallback4 = (error: Error | undefined, fileChanges: Set<string>, directoryChanges: Set<string>, missingChanges: Set<string>, files: Map<string, number>, contexts: Map<string, number>, removals: Set<string>) => void;
-declare type WatchCallback5 = (error: Error | undefined, files: Map<string, {
+declare type WatchCallback = (error: Error | undefined, files: Map<string, {
     safeTime: number;
     timestamp: number;
 }>, contexts: Map<string, {
@@ -39,7 +38,7 @@ declare type WatchCallback5 = (error: Error | undefined, files: Map<string, {
     timestamp: number;
 }>, changes: Set<string>, removals: Set<string>) => void;
 export interface WebpackWatchFileSystem {
-    watch(files: Iterable<string>, directories: Iterable<string>, missing: Iterable<string>, startTime: number, options: {}, callback: WatchCallback4 | WatchCallback5, callbackUndelayed: (file: string, time: number) => void): WebpackWatcher;
+    watch(files: Iterable<string>, directories: Iterable<string>, missing: Iterable<string>, startTime: number, options: {}, callback: WatchCallback, callbackUndelayed: (file: string, time: number) => void): WebpackWatcher;
 }
 export declare class BuilderWatchPlugin {
     private readonly watcherFactory;

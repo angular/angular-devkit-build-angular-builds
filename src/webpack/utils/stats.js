@@ -14,7 +14,6 @@ const core_1 = require("@angular-devkit/core");
 const path = require("path");
 const textTable = require("text-table");
 const color_1 = require("../../utils/color");
-const webpack_version_1 = require("../../utils/webpack-version");
 function formatSize(size) {
     if (size <= 0) {
         return '0 bytes';
@@ -171,11 +170,6 @@ exports.IGNORE_WARNINGS = [
     // https://github.com/webpack-contrib/source-map-loader/blob/b2de4249c7431dd8432da607e08f0f65e9d64219/src/index.js#L83
     /Failed to parse source map from/,
 ];
-// TODO: remove when Webpack 4 is no longer supported.
-// See: https://webpack.js.org/configuration/other-options/#ignorewarnings
-const ERRONEOUS_WARNINGS_FILTER = webpack_version_1.isWebpackFiveOrHigher()
-    ? (warning) => warning
-    : (warning) => !exports.IGNORE_WARNINGS.some(msg => msg.test(warning));
 function statsWarningsToString(json, statsConfig) {
     const colors = statsConfig.colors;
     const c = (x) => colors ? color_1.colors.reset.cyan(x) : x;
@@ -190,15 +184,9 @@ function statsWarningsToString(json, statsConfig) {
     let output = '';
     for (const warning of warnings) {
         if (typeof warning === 'string') {
-            if (!ERRONEOUS_WARNINGS_FILTER(warning)) {
-                continue;
-            }
             output += yb(`Warning: ${warning}\n\n`);
         }
         else {
-            if (!ERRONEOUS_WARNINGS_FILTER(warning.message)) {
-                continue;
-            }
             const file = warning.file || warning.moduleName;
             if (file) {
                 output += c(file);
@@ -263,8 +251,7 @@ function statsHasErrors(json) {
 exports.statsHasErrors = statsHasErrors;
 function statsHasWarnings(json) {
     var _a;
-    return json.warnings.filter(ERRONEOUS_WARNINGS_FILTER).length ||
-        !!((_a = json.children) === null || _a === void 0 ? void 0 : _a.some((c) => c.warnings.filter(ERRONEOUS_WARNINGS_FILTER).length));
+    return json.warnings.length || !!((_a = json.children) === null || _a === void 0 ? void 0 : _a.some((c) => c.warnings.length));
 }
 exports.statsHasWarnings = statsHasWarnings;
 function createWebpackLoggingCallback(verbose, logger) {

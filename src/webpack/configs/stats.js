@@ -8,7 +8,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStatsConfig = exports.getWebpackStatsConfig = void 0;
-const webpack_version_1 = require("../../utils/webpack-version");
 const webpackOutputOptions = {
     all: false,
     colors: true,
@@ -41,12 +40,7 @@ const verboseWebpackOutputOptions = {
     moduleTrace: true,
     logging: 'verbose',
 };
-if (webpack_version_1.isWebpackFiveOrHigher()) {
-    verboseWebpackOutputOptions['modulesSpace'] = Infinity;
-}
-else {
-    verboseWebpackOutputOptions['maxModules'] = Infinity;
-}
+verboseWebpackOutputOptions['modulesSpace'] = Infinity;
 function getWebpackStatsConfig(verbose = false) {
     return verbose
         ? { ...webpackOutputOptions, ...verboseWebpackOutputOptions }

@@ -110,6 +110,7 @@ function getStylesConfig(wco) {
     }
     const { supportedBrowsers } = new build_browser_features_1.BuildBrowserFeatures(wco.projectRoot);
     const postcssOptionsCreator = (inlineSourcemaps, extracted) => {
+        // tslint:disable-next-line: no-any
         return (loader) => ({
             map: inlineSourcemaps
                 ? {

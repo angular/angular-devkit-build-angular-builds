@@ -19,14 +19,13 @@ const terser_1 = require("terser");
 const v8 = require("v8");
 const webpack_sources_1 = require("webpack-sources");
 const environment_options_1 = require("./environment-options");
-const deserialize = v8.deserialize;
 // If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
 const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
 let cachePath;
 let i18n;
 function setup(data) {
     const options = Array.isArray(data)
-        ? deserialize(Buffer.from(data))
+        ? v8.deserialize(Buffer.from(data))
         : data;
     cachePath = options.cachePath;
     i18n = options.i18n;

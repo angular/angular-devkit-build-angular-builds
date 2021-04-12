@@ -6,14 +6,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScriptsWebpackPlugin = void 0;
-const webpack_sources_1 = require("webpack-sources");
 const loader_utils_1 = require("loader-utils");
 const path = require("path");
-const webpack_version_1 = require("../../utils/webpack-version");
+const webpack_sources_1 = require("webpack-sources");
 const Chunk = require('webpack/lib/Chunk');
 const EntryPoint = require('webpack/lib/Entrypoint');
 function addDependencies(compilation, scripts) {
@@ -22,26 +19,25 @@ function addDependencies(compilation, scripts) {
     }
 }
 class ScriptsWebpackPlugin {
-    constructor(options = {}) {
+    constructor(options) {
         this.options = options;
     }
+    // tslint:disable-next-line: no-any
     async shouldSkip(compilation, scripts) {
         if (this._lastBuildTime == undefined) {
             this._lastBuildTime = Date.now();
             return false;
         }
         for (const script of scripts) {
-            const scriptTime = webpack_version_1.isWebpackFiveOrHigher()
-                ? await new Promise((resolve, reject) => {
-                    compilation.fileSystemInfo.getFileTimestamp(script, (error, entry) => {
-                        if (error) {
-                            reject(error);
-                            return;
-                        }
-                        resolve(typeof entry !== 'string' ? entry.safeTime : undefined);
-                    });
-                })
-                : compilation.fileTimestamps.get(script);
+            const scriptTime = await new Promise((resolve, reject) => {
+                compilation.fileSystemInfo.getFileTimestamp(script, (error, entry) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    }
+                    resolve((entry && typeof entry !== 'string') ? entry.safeTime : undefined);
+                });
+            });
             if (!scriptTime || scriptTime > this._lastBuildTime) {
                 this._lastBuildTime = Date.now();
                 return false;
@@ -54,22 +50,13 @@ class ScriptsWebpackPlugin {
         chunk.rendered = !cached;
         chunk.id = this.options.name;
         chunk.ids = [chunk.id];
-        if (webpack_version_1.isWebpackFiveOrHigher()) {
-            chunk.files.add(filename);
-        }
-        else {
-            chunk.files.push(filename);
-        }
+        chunk.files.add(filename);
         const entrypoint = new EntryPoint(this.options.name);
         entrypoint.pushChunk(chunk);
         chunk.addGroup(entrypoint);
         compilation.entrypoints.set(this.options.name, entrypoint);
-        if (webpack_version_1.isWebpackFiveOrHigher()) {
-            compilation.chunks.add(chunk);
-        }
-        else {
-            compilation.chunks.push(chunk);
-        }
+        compilation.chunks.add(chunk);
+        // tslint:disable-next-line: no-any
         compilation.assets[filename] = source;
         compilation.hooks.chunkAsset.call(chunk, filename);
     }

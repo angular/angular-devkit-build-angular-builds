@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging } from '@angular-devkit/core';
-import { loader } from 'webpack';
 export interface SingleTestTransformLoaderOptions {
     files?: string[];
     logger?: logging.Logger;
@@ -25,4 +24,4 @@ export declare const SingleTestTransformLoader: string;
  * Then it adds import statements for each file in the files options
  * array to import them directly, and thus run the tests there.
  */
-export default function loader(this: loader.LoaderContext, source: string): string;
+export default function loader(this: any, source: string): string;

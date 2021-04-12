@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { analytics } from '@angular-devkit/core';
-import { Compiler, Module, Stats, compilation } from 'webpack';
+import { Compilation, Compiler, Module, Stats } from 'webpack';
 import { OriginalSource } from 'webpack-sources';
 declare const NormalModule: any;
 interface NormalModule extends Module {
@@ -57,7 +57,7 @@ export declare class NgBuildAnalyticsPlugin {
     protected _reportRebuildMetrics(stats: Stats): void;
     protected _checkTsNormalModule(module: NormalModule): void;
     protected _collectErrors(stats: Stats): void;
-    protected _collectBundleStats(compilation: compilation.Compilation): void;
+    protected _collectBundleStats(compilation: Compilation): void;
     /************************************************************************************************
      * The next section is all the different Webpack hooks for this plugin.
      */
@@ -65,8 +65,8 @@ export declare class NgBuildAnalyticsPlugin {
      * Reports a succeed module.
      * @private
      */
-    protected _succeedModule(mod: compilation.Module): void;
-    protected _compilation(compiler: Compiler, compilation: compilation.Compilation): void;
+    protected _succeedModule(mod: Module): void;
+    protected _compilation(compiler: Compiler, compilation: Compilation): void;
     protected _done(stats: Stats): void;
     apply(compiler: Compiler): void;
 }

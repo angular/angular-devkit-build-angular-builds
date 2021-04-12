@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PostcssCliResources = exports.CommonJsUsageWarnPlugin = exports.DedupeModuleResolvePlugin = exports.NamedLazyChunksPlugin = exports.RemoveHashPlugin = exports.SuppressExtractedTextChunksWebpackPlugin = exports.ScriptsWebpackPlugin = exports.OptimizeCssWebpackPlugin = exports.AnyComponentStyleBudgetChecker = void 0;
+exports.PostcssCliResources = exports.CommonJsUsageWarnPlugin = exports.DedupeModuleResolvePlugin = exports.RemoveHashPlugin = exports.SuppressExtractedTextChunksWebpackPlugin = exports.ScriptsWebpackPlugin = exports.OptimizeCssWebpackPlugin = exports.AnyComponentStyleBudgetChecker = void 0;
 // Exports the webpack plugins we use internally.
 var any_component_style_budget_checker_1 = require("./any-component-style-budget-checker");
 Object.defineProperty(exports, "AnyComponentStyleBudgetChecker", { enumerable: true, get: function () { return any_component_style_budget_checker_1.AnyComponentStyleBudgetChecker; } });
@@ -19,8 +19,6 @@ var suppress_entry_chunks_webpack_plugin_1 = require("./suppress-entry-chunks-we
 Object.defineProperty(exports, "SuppressExtractedTextChunksWebpackPlugin", { enumerable: true, get: function () { return suppress_entry_chunks_webpack_plugin_1.SuppressExtractedTextChunksWebpackPlugin; } });
 var remove_hash_plugin_1 = require("./remove-hash-plugin");
 Object.defineProperty(exports, "RemoveHashPlugin", { enumerable: true, get: function () { return remove_hash_plugin_1.RemoveHashPlugin; } });
-var named_chunks_plugin_1 = require("./named-chunks-plugin");
-Object.defineProperty(exports, "NamedLazyChunksPlugin", { enumerable: true, get: function () { return named_chunks_plugin_1.NamedLazyChunksPlugin; } });
 var dedupe_module_resolve_plugin_1 = require("./dedupe-module-resolve-plugin");
 Object.defineProperty(exports, "DedupeModuleResolvePlugin", { enumerable: true, get: function () { return dedupe_module_resolve_plugin_1.DedupeModuleResolvePlugin; } });
 var common_js_usage_warn_plugin_1 = require("./common-js-usage-warn-plugin");

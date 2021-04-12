@@ -20,12 +20,10 @@ const environment_options_1 = require("../../utils/environment-options");
 const find_up_1 = require("../../utils/find-up");
 const spinner_1 = require("../../utils/spinner");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
-const webpack_version_1 = require("../../utils/webpack-version");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
 const stats_1 = require("../utils/stats");
 const TerserPlugin = require('terser-webpack-plugin');
-const PnpWebpackPlugin = require('pnp-webpack-plugin');
 // tslint:disable-next-line:no-big-function
 function getCommonConfig(wco) {
     const { root, projectRoot, buildOptions, tsConfig } = wco;
@@ -211,11 +209,6 @@ function getCommonConfig(wco) {
             }
         })());
     }
-    if (buildOptions.namedChunks && !webpack_version_1.isWebpackFiveOrHigher()) {
-        extraPlugins.push(new plugins_1.NamedLazyChunksPlugin());
-        // Provide full names for lazy routes that use the deprecated string format
-        extraPlugins.push(new webpack_1.ContextReplacementPlugin(/\@angular[\\\/]core[\\\/]/, (data) => (data.chunkName = '[request]')));
-    }
     if ((scriptsSourceMap || stylesSourceMap)) {
         extraRules.push({
             test: /\.m?js$/,
@@ -326,7 +319,6 @@ function getCommonConfig(wco) {
             extensions: ['.ts', '.tsx', '.mjs', '.js'],
             symlinks: !buildOptions.preserveSymlinks,
             modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
-            plugins: webpack_version_1.isWebpackFiveOrHigher() ? [] : [PnpWebpackPlugin],
         },
         resolveLoader: {
             symlinks: !buildOptions.preserveSymlinks,
@@ -337,12 +329,10 @@ function getCommonConfig(wco) {
                 'node_modules',
                 ...find_up_1.findAllNodeModules(__dirname, projectRoot),
             ],
-            plugins: webpack_version_1.isWebpackFiveOrHigher() ? [] : [PnpWebpackPlugin.moduleLoader(module)],
         },
         context: root,
         entry: entryPoints,
         output: {
-            ...webpack_version_1.withWebpackFourOrFive({ futureEmitAssets: true }, {}),
             path: path.resolve(root, buildOptions.outputPath),
             publicPath: buildOptions.deployUrl,
             filename: ({ chunk }) => {
@@ -360,7 +350,7 @@ function getCommonConfig(wco) {
         performance: {
             hints: false,
         },
-        ...webpack_version_1.withWebpackFourOrFive({}, { ignoreWarnings: stats_1.IGNORE_WARNINGS }),
+        ignoreWarnings: stats_1.IGNORE_WARNINGS,
         module: {
             // Show an error for missing exports instead of a warning.
             strictExportPresence: true,
@@ -396,12 +386,12 @@ function getCommonConfig(wco) {
                 ...extraRules,
             ],
         },
-        cache: !!buildOptions.watch,
+        cache: !!buildOptions.watch && !environment_options_1.cachingDisabled,
         optimization: {
             minimizer: extraMinimizers,
-            moduleIds: webpack_version_1.withWebpackFourOrFive('hashed', 'deterministic'),
+            moduleIds: 'deterministic',
             chunkIds: buildOptions.namedChunks ? 'named' : 'deterministic',
-            ...webpack_version_1.withWebpackFourOrFive({ noEmitOnErrors: true }, { emitOnErrors: false }),
+            emitOnErrors: false,
         },
         plugins: [
             // Always replace the context for the System.import in angular/core to prevent warnings.

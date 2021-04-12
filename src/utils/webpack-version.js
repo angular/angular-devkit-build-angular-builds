@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.withWebpackFourOrFive = exports.isWebpackFiveOrHigher = void 0;
+exports.isWebpackFiveOrHigher = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -23,8 +23,3 @@ function isWebpackFiveOrHigher() {
     return cachedIsWebpackFiveOrHigher;
 }
 exports.isWebpackFiveOrHigher = isWebpackFiveOrHigher;
-// tslint:disable-next-line: no-any
-function withWebpackFourOrFive(webpackFourValue, webpackFiveValue) {
-    return isWebpackFiveOrHigher() ? webpackFiveValue : webpackFourValue;
-}
-exports.withWebpackFourOrFive = withWebpackFourOrFive;

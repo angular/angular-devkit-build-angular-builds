@@ -25,6 +25,7 @@ exports.SingleTestTransformLoader = __filename;
  * Then it adds import statements for each file in the files options
  * array to import them directly, and thus run the tests there.
  */
+// tslint:disable-next-line: no-any
 function loader(source) {
     const { files = [], logger = console } = loader_utils_1.getOptions(this);
     // signal the user that expected content is not present.

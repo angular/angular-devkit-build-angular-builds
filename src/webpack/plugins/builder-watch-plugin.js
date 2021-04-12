@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BuilderWatchPlugin = void 0;
-const webpack_version_1 = require("../../utils/webpack-version");
 class TimeInfoMap extends Map {
     update(path, timestamp) {
         this.set(path, Object.freeze({ safeTime: timestamp, timestamp }));
@@ -62,12 +61,7 @@ class BuilderWatchFileSystem {
                         }
                     }
                 }
-                if (webpack_version_1.isWebpackFiveOrHigher()) {
-                    callback(undefined, new Map(timeInfo), new Map(timeInfo), new Set([...fileChanges, ...directoryChanges, ...missingChanges]), removals);
-                }
-                else {
-                    callback(undefined, fileChanges, directoryChanges, missingChanges, timeInfo.toTimestamps(), timeInfo.toTimestamps(), removals);
-                }
+                callback(undefined, new Map(timeInfo), new Map(timeInfo), new Set([...fileChanges, ...directoryChanges, ...missingChanges]), removals);
             });
         });
         return {

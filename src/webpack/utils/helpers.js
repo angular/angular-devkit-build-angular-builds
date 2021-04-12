@@ -12,7 +12,6 @@ const core_1 = require("@angular-devkit/core");
 const path = require("path");
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
-const webpack_version_1 = require("../../utils/webpack-version");
 function getOutputHashFormat(option, length = 20) {
     const hashFormats = {
         none: { chunk: '', extract: '', file: '', script: '' },
@@ -95,7 +94,7 @@ exports.isPolyfillsEntry = isPolyfillsEntry;
 function getWatchOptions(poll) {
     return {
         poll,
-        ignored: poll === undefined ? undefined : webpack_version_1.withWebpackFourOrFive(/[\\\/]node_modules[\\\/]/, 'node_modules/**'),
+        ignored: poll === undefined ? undefined : 'node_modules/**',
     };
 }
 exports.getWatchOptions = getWatchOptions;

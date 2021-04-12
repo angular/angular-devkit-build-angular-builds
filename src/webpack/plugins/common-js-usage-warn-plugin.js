@@ -10,7 +10,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommonJsUsageWarnPlugin = void 0;
 const path_1 = require("path");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
-const webpack_version_1 = require("../../utils/webpack-version");
 // Webpack doesn't export these so the deep imports can potentially break.
 const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
@@ -23,7 +22,7 @@ class CommonJsUsageWarnPlugin {
     apply(compiler) {
         compiler.hooks.compilation.tap('CommonJsUsageWarnPlugin', compilation => {
             compilation.hooks.finishModules.tap('CommonJsUsageWarnPlugin', modules => {
-                var _a;
+                var _a, _b;
                 const mainEntry = compilation.entries.get('main');
                 if (!mainEntry) {
                     return;
@@ -66,7 +65,7 @@ class CommonJsUsageWarnPlugin {
                         // will require CommonJS libraries for live reloading such as 'sockjs-node'.
                         // tslint:disable-next-line: no-any
                         if (mainIssuer && mainModules.has(mainIssuer)) {
-                            const warning = `${issuer === null || issuer === void 0 ? void 0 : issuer.userRequest} depends on '${rawRequest}'. ` +
+                            const warning = `${(_b = issuer) === null || _b === void 0 ? void 0 : _b.userRequest} depends on '${rawRequest}'. ` +
                                 'CommonJS or AMD dependencies can cause optimization bailouts.\n' +
                                 'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
                             // Avoid showing the same warning multiple times when in 'watch' mode.
@@ -107,16 +106,11 @@ function getIssuer(compilation, module) {
     if (!module) {
         return null;
     }
-    if (!webpack_version_1.isWebpackFiveOrHigher()) {
-        return module === null || module === void 0 ? void 0 : module.issuer;
-    }
-    return compilation
-        .moduleGraph.getIssuer(module);
+    return compilation.moduleGraph.getIssuer(module);
 }
 function getWebpackModule(compilation, dependency) {
-    if (!webpack_version_1.isWebpackFiveOrHigher()) {
-        return dependency.module;
+    if (!dependency) {
+        return null;
     }
-    return compilation
-        .moduleGraph.getModule(dependency);
+    return compilation.moduleGraph.getModule(dependency);
 }

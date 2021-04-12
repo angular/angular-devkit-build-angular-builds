@@ -9,10 +9,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AnyComponentStyleBudgetChecker = void 0;
 const path = require("path");
+const webpack_1 = require("webpack");
 const schema_1 = require("../../browser/schema");
 const bundle_calculator_1 = require("../../utils/bundle-calculator");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
-const webpack_version_1 = require("../../utils/webpack-version");
 const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
 /**
  * Check budget sizes for component styles by emitting a warning or error if a
@@ -61,17 +61,10 @@ class AnyComponentStyleBudgetChecker {
                     }
                 }
             };
-            if (webpack_version_1.isWebpackFiveOrHigher()) {
-                // webpack 5 migration "guide"
-                // https://github.com/webpack/webpack/blob/07fc554bef5930f8577f91c91a8b81791fc29746/lib/Compilation.js#L535-L539
-                // TODO_WEBPACK_5 const stage = Compilation.PROCESS_ASSETS_STAGE_ANALYSE;
-                const stage = 4000;
-                // tslint:disable-next-line: no-any
-                compilation.hooks.processAssets.tap({ name: PLUGIN_NAME, stage }, afterOptimizeChunkAssets);
-            }
-            else {
-                compilation.hooks.afterOptimizeChunkAssets.tap(PLUGIN_NAME, afterOptimizeChunkAssets);
-            }
+            compilation.hooks.processAssets.tap({
+                name: PLUGIN_NAME,
+                stage: webpack_1.Compilation.PROCESS_ASSETS_STAGE_ANALYSE,
+            }, afterOptimizeChunkAssets);
         });
     }
 }
