@@ -164,9 +164,8 @@ function getCommonConfig(wco) {
         }));
     }
     if (buildOptions.progress) {
-        const ProgressPlugin = require('webpack/lib/ProgressPlugin');
         const spinner = new spinner_1.Spinner();
-        extraPlugins.push(new ProgressPlugin({
+        extraPlugins.push(new webpack_1.ProgressPlugin({
             handler: (percentage, message) => {
                 switch (percentage) {
                     case 0:

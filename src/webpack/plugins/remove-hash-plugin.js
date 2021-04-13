@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RemoveHashPlugin = void 0;
-const webpack_version_1 = require("../../utils/webpack-version");
 class RemoveHashPlugin {
     constructor(options) {
         this.options = options;
@@ -20,13 +19,7 @@ class RemoveHashPlugin {
                 }
                 return path;
             };
-            if (webpack_version_1.isWebpackFiveOrHigher()) {
-                compilation.hooks.assetPath.tap('remove-hash-plugin', assetPath);
-            }
-            else {
-                const mainTemplate = compilation.mainTemplate;
-                mainTemplate.hooks.assetPath.tap('remove-hash-plugin', assetPath);
-            }
+            compilation.hooks.assetPath.tap('remove-hash-plugin', assetPath);
         });
     }
 }
