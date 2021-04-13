@@ -11,7 +11,6 @@ exports.ScriptsWebpackPlugin = void 0;
 const loader_utils_1 = require("loader-utils");
 const path = require("path");
 const webpack_1 = require("webpack");
-const webpack_sources_1 = require("webpack-sources");
 const Entrypoint = require('webpack/lib/Entrypoint');
 function addDependencies(compilation, scripts) {
     for (const script of scripts) {
@@ -92,22 +91,22 @@ class ScriptsWebpackPlugin {
                                 if (this.options.basePath) {
                                     adjustedPath = path.relative(this.options.basePath, fullPath);
                                 }
-                                source = new webpack_sources_1.OriginalSource(content, adjustedPath);
+                                source = new webpack_1.sources.OriginalSource(content, adjustedPath);
                             }
                             else {
-                                source = new webpack_sources_1.RawSource(content);
+                                source = new webpack_1.sources.RawSource(content);
                             }
                             resolve(source);
                         });
                     });
                 });
                 const sources = await Promise.all(sourceGetters);
-                const concatSource = new webpack_sources_1.ConcatSource();
+                const concatSource = new webpack_1.sources.ConcatSource();
                 sources.forEach(source => {
                     concatSource.add(source);
                     concatSource.add('\n;');
                 });
-                const combinedSource = new webpack_sources_1.CachedSource(concatSource);
+                const combinedSource = new webpack_1.sources.CachedSource(concatSource);
                 const filename = loader_utils_1.interpolateName({ resourcePath: 'scripts.js' }, this.options.filename, { content: combinedSource.source() });
                 const output = { filename, source: combinedSource };
                 this._insertOutput(compilation, output);
