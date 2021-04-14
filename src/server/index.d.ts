@@ -11,6 +11,9 @@ import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import { Schema as ServerBuilderOptions } from './schema';
+/**
+ * @experimental Direct usage of this type is considered experimental.
+ */
 export declare type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
     baseOutputPath: string;
     outputPaths: string[];
@@ -20,6 +23,9 @@ export declare type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
     outputPath: string;
 };
 export { ServerBuilderOptions };
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
 export declare function execute(options: ServerBuilderOptions, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
 }): Observable<ServerBuilderOutput>;
