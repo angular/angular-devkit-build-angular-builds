@@ -44,13 +44,11 @@ const devServerBuildOverriddenKeys = [
     'deployUrl',
 ];
 /**
- * Reusable implementation of the Angular Webpack development server builder.
+ * Reusable implementation of the build angular webpack dev server builder.
  * @param options Dev Server options.
  * @param context The build context.
  * @param transforms A map of transforms that can be used to hook into some logic (such as
  *     transforming webpack configuration before passing it to webpack).
- *
- * @experimental Direct usage of this function is considered experimental.
  */
 // tslint:disable-next-line: no-big-function
 function serveWebpackBrowser(options, context, transforms = {}) {

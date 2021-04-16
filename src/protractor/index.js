@@ -58,9 +58,6 @@ async function updateWebdriver() {
         quiet: true,
     });
 }
-/**
- * @experimental Direct usage of this function is considered experimental.
- */
 async function execute(options, context) {
     // ensure that only one of these options is used
     if (options.devServerTarget && options.baseUrl) {

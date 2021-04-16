@@ -93,9 +93,6 @@ async function initialize(options, context, differentialLoadingNeeded, webpackCo
     }
     return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
 }
-/**
- * @experimental Direct usage of this function is considered experimental.
- */
 // tslint:disable-next-line: no-big-function
 function buildWebpackBrowser(options, context, transforms = {}) {
     var _a;

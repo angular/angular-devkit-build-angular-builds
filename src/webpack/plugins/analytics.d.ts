@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { analytics } from '@angular-devkit/core';
-import { Compilation, Compiler, Module, Stats, sources } from 'webpack';
+import { Compilation, Compiler, Module, Stats } from 'webpack';
+import { OriginalSource } from 'webpack-sources';
 declare const NormalModule: any;
 interface NormalModule extends Module {
-    _source?: sources.OriginalSource | null;
+    _source?: OriginalSource | null;
     resource?: string;
 }
 /**

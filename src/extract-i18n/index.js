@@ -93,9 +93,6 @@ class NoEmitPlugin {
         compiler.hooks.shouldEmit.tap('angular-no-emit', () => false);
     }
 }
-/**
- * @experimental Direct usage of this function is considered experimental.
- */
 async function execute(options, context, transforms) {
     var _a;
     // Check Angular version.

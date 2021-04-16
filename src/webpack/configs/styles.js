@@ -212,8 +212,7 @@ function getStylesConfig(wco) {
             use: [],
         },
         {
-            extensions: ['scss'],
-            mimetype: 'text/x-scss',
+            extensions: ['sass', 'scss'],
             use: [
                 {
                     loader: require.resolve('resolve-url-loader'),
@@ -227,36 +226,6 @@ function getStylesConfig(wco) {
                         implementation: sassImplementation,
                         sourceMap: true,
                         sassOptions: {
-                            // bootstrap-sass requires a minimum precision of 8
-                            precision: 8,
-                            includePaths,
-                            // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
-                            // Ex: /* autoprefixer grid: autoplace */
-                            // tslint:disable-next-line: max-line-length
-                            // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
-                            outputStyle: 'expanded',
-                        },
-                    },
-                },
-            ],
-        },
-        {
-            extensions: ['sass'],
-            mimetype: 'text/x-sass',
-            use: [
-                {
-                    loader: require.resolve('resolve-url-loader'),
-                    options: {
-                        sourceMap: cssSourceMap,
-                    },
-                },
-                {
-                    loader: require.resolve('sass-loader'),
-                    options: {
-                        implementation: sassImplementation,
-                        sourceMap: true,
-                        sassOptions: {
-                            indentedSyntax: true,
                             // bootstrap-sass requires a minimum precision of 8
                             precision: 8,
                             includePaths,
@@ -272,7 +241,6 @@ function getStylesConfig(wco) {
         },
         {
             extensions: ['less'],
-            mimetype: 'text/x-less',
             use: [
                 {
                     loader: require.resolve('less-loader'),
@@ -289,7 +257,6 @@ function getStylesConfig(wco) {
         },
         {
             extensions: ['styl'],
-            mimetype: 'text/x-stylus',
             use: [
                 {
                     loader: require.resolve('stylus-loader'),

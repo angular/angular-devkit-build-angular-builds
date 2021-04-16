@@ -70,10 +70,6 @@ export interface Schema {
      */
     index: IndexUnion;
     /**
-     * The stylesheet language to use for the application's inline component styles.
-     */
-    inlineStyleLanguage?: InlineStyleLanguage;
-    /**
      * Translate the bundles in one or more locales.
      */
     localize?: Localize;
@@ -295,15 +291,6 @@ export interface IndexObject {
      * will be used and will be considered relative to the application's configured output path.
      */
     output?: string;
-}
-/**
- * The stylesheet language to use for the application's inline component styles.
- */
-export declare enum InlineStyleLanguage {
-    Css = "css",
-    Less = "less",
-    Sass = "sass",
-    Scss = "scss"
 }
 /**
  * Translate the bundles in one or more locales.

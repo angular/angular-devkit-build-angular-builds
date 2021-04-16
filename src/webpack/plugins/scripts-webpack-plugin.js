@@ -10,8 +10,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScriptsWebpackPlugin = void 0;
 const loader_utils_1 = require("loader-utils");
 const path = require("path");
-const webpack_1 = require("webpack");
-const Entrypoint = require('webpack/lib/Entrypoint');
+const webpack_sources_1 = require("webpack-sources");
+const Chunk = require('webpack/lib/Chunk');
+const EntryPoint = require('webpack/lib/Entrypoint');
 function addDependencies(compilation, scripts) {
     for (const script of scripts) {
         compilation.fileDependencies.add(script);
@@ -45,12 +46,12 @@ class ScriptsWebpackPlugin {
         return true;
     }
     _insertOutput(compilation, { filename, source }, cached = false) {
-        const chunk = new webpack_1.Chunk(this.options.name);
+        const chunk = new Chunk(this.options.name);
         chunk.rendered = !cached;
         chunk.id = this.options.name;
         chunk.ids = [chunk.id];
         chunk.files.add(filename);
-        const entrypoint = new Entrypoint(this.options.name);
+        const entrypoint = new EntryPoint(this.options.name);
         entrypoint.pushChunk(chunk);
         chunk.addGroup(entrypoint);
         compilation.entrypoints.set(this.options.name, entrypoint);
@@ -91,22 +92,22 @@ class ScriptsWebpackPlugin {
                                 if (this.options.basePath) {
                                     adjustedPath = path.relative(this.options.basePath, fullPath);
                                 }
-                                source = new webpack_1.sources.OriginalSource(content, adjustedPath);
+                                source = new webpack_sources_1.OriginalSource(content, adjustedPath);
                             }
                             else {
-                                source = new webpack_1.sources.RawSource(content);
+                                source = new webpack_sources_1.RawSource(content);
                             }
                             resolve(source);
                         });
                     });
                 });
                 const sources = await Promise.all(sourceGetters);
-                const concatSource = new webpack_1.sources.ConcatSource();
+                const concatSource = new webpack_sources_1.ConcatSource();
                 sources.forEach(source => {
                     concatSource.add(source);
                     concatSource.add('\n;');
                 });
-                const combinedSource = new webpack_1.sources.CachedSource(concatSource);
+                const combinedSource = new webpack_sources_1.CachedSource(concatSource);
                 const filename = loader_utils_1.interpolateName({ resourcePath: 'scripts.js' }, this.options.filename, { content: combinedSource.source() });
                 const output = { filename, source: combinedSource };
                 this._insertOutput(compilation, output);

@@ -164,16 +164,10 @@ function getCommonConfig(wco) {
         }));
     }
     if (buildOptions.progress) {
+        const ProgressPlugin = require('webpack/lib/ProgressPlugin');
         const spinner = new spinner_1.Spinner();
-        let previousPercentage;
-        extraPlugins.push(new webpack_1.ProgressPlugin({
+        extraPlugins.push(new ProgressPlugin({
             handler: (percentage, message) => {
-                if (previousPercentage === 1 && percentage !== 0) {
-                    // In some scenarios in Webpack 5 percentage goes from 1 back to 0.99.
-                    // Ex: 0.99 -> 1 -> 0.99 -> 1
-                    // This causes the "complete" message to be displayed multiple times.
-                    return;
-                }
                 switch (percentage) {
                     case 0:
                         spinner.start(`Generating ${platform} application bundles...`);
@@ -185,7 +179,6 @@ function getCommonConfig(wco) {
                         spinner.text = `Generating ${platform} application bundles (phase: ${message})...`;
                         break;
                 }
-                previousPercentage = percentage;
             },
         }));
     }

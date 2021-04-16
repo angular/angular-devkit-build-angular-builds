@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "BuildAngularWebpackServerSchema",
+  "$schema": "http://json-schema.org/schema",
+  "id": "BuildAngularWebpackServerSchema",
   "title": "Universal Target",
   "type": "object",
   "properties": {
@@ -12,17 +12,6 @@
       "type": "string",
       "default": "tsconfig.app.json",
       "description": "The name of the TypeScript configuration file."
-    },
-    "inlineStyleLanguage": {
-      "description": "The stylesheet language to use for the application's inline component styles.",
-      "type": "string",
-      "default": "css",
-      "enum": [
-        "css",
-        "less",
-        "sass",
-        "scss"
-      ]
     },
     "stylePreprocessorOptions": {
       "description": "Options to pass to style preprocessors",
