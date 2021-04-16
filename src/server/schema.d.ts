@@ -34,6 +34,10 @@ export interface Schema {
      */
     i18nMissingTranslation?: I18NMissingTranslation;
     /**
+     * The stylesheet language to use for the application's inline component styles.
+     */
+    inlineStyleLanguage?: InlineStyleLanguage;
+    /**
      * Translate the bundles in one or more locales.
      */
     localize?: Localize;
@@ -131,6 +135,15 @@ export declare enum I18NMissingTranslation {
     Error = "error",
     Ignore = "ignore",
     Warning = "warning"
+}
+/**
+ * The stylesheet language to use for the application's inline component styles.
+ */
+export declare enum InlineStyleLanguage {
+    Css = "css",
+    Less = "less",
+    Sass = "sass",
+    Scss = "scss"
 }
 /**
  * Translate the bundles in one or more locales.

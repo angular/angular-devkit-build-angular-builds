@@ -36,6 +36,9 @@ async function initialize(options, context, webpackConfigurationTransformer) {
         webpackConfigurationTransformer ? await webpackConfigurationTransformer(config) : config,
     ];
 }
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
 function execute(options, context, transforms = {}) {
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);

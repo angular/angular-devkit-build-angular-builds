@@ -23,6 +23,9 @@ const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const configs_1 = require("../webpack/configs");
 const stats_1 = require("../webpack/utils/stats");
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
 function execute(options, context, transforms = {}) {
     const root = context.workspaceRoot;
     // Check Angular version.

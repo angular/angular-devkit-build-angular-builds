@@ -10,7 +10,6 @@ exports.IndexHtmlWebpackPlugin = void 0;
  */
 const path_1 = require("path");
 const webpack_1 = require("webpack");
-const webpack_sources_1 = require("webpack-sources");
 const index_html_generator_1 = require("../../utils/index-file/index-html-generator");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const PLUGIN_NAME = 'index-html-webpack-plugin';
@@ -67,7 +66,7 @@ class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
                     baseHref: this.options.baseHref,
                     lang: this.options.lang,
                 });
-                assets[this.options.outputPath] = new webpack_sources_1.RawSource(content);
+                assets[this.options.outputPath] = new webpack_1.sources.RawSource(content);
                 warnings.forEach(msg => webpack_diagnostics_1.addWarning(this.compilation, msg));
                 errors.forEach(msg => webpack_diagnostics_1.addError(this.compilation, msg));
             }

@@ -32,6 +32,10 @@ export interface Schema {
      */
     include?: string[];
     /**
+     * The stylesheet language to use for the application's inline component styles.
+     */
+    inlineStyleLanguage?: InlineStyleLanguage;
+    /**
      * The name of the Karma configuration file.
      */
     karmaConfig: string;
@@ -114,6 +118,15 @@ export interface FileReplacement {
     replaceWith?: string;
     src?: string;
     with?: string;
+}
+/**
+ * The stylesheet language to use for the application's inline component styles.
+ */
+export declare enum InlineStyleLanguage {
+    Css = "css",
+    Less = "less",
+    Sass = "sass",
+    Scss = "scss"
 }
 export declare type ExtraEntryPoint = ExtraEntryPointClass | string;
 export interface ExtraEntryPointClass {

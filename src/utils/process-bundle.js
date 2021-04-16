@@ -17,8 +17,9 @@ const path = require("path");
 const source_map_1 = require("source-map");
 const terser_1 = require("terser");
 const v8 = require("v8");
-const webpack_sources_1 = require("webpack-sources");
+const webpack_1 = require("webpack");
 const environment_options_1 = require("./environment-options");
+const { ConcatSource, OriginalSource, ReplaceSource, SourceMapSource, } = webpack_1.sources;
 // If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
 const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
 let cachePath;
@@ -137,7 +138,7 @@ async function mergeSourceMaps(inputCode, inputSourceMap, resultCode, resultSour
     // SourceMapSource produces high-quality sourcemaps
     // Final sourcemap will always be available when providing the input sourcemaps
     // tslint:disable-next-line: no-non-null-assertion
-    const finalSourceMap = new webpack_sources_1.SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
+    const finalSourceMap = new SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
     return finalSourceMap;
 }
 async function mergeSourceMapsFast(first, second) {
@@ -495,10 +496,10 @@ async function inlineLocalesDirect(ast, options) {
         delete inputMap.sourceRoot;
     }
     for (const locale of i18n.inlineLocales) {
-        const content = new webpack_sources_1.ReplaceSource(inputMap
+        const content = new ReplaceSource(inputMap
             ? // tslint:disable-next-line: no-any
-                new webpack_sources_1.SourceMapSource(options.code, options.filename, inputMap)
-            : new webpack_sources_1.OriginalSource(options.code, options.filename));
+                new SourceMapSource(options.code, options.filename, inputMap)
+            : new OriginalSource(options.code, options.filename));
         const isSourceLocale = locale === i18n.sourceLocale;
         // tslint:disable-next-line: no-any
         const translations = isSourceLocale ? {} : i18n.locales[locale].translation || {};
@@ -516,12 +517,12 @@ async function inlineLocalesDirect(ast, options) {
             const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
             if (localeDataPath) {
                 const localeDataContent = await loadLocaleData(localeDataPath, true, options.es5);
-                localeDataSource = new webpack_sources_1.OriginalSource(localeDataContent, path.basename(localeDataPath));
+                localeDataSource = new OriginalSource(localeDataContent, path.basename(localeDataPath));
             }
             outputSource = localeDataSource
                 // The semicolon ensures that there is no syntax error between statements
-                ? new webpack_sources_1.ConcatSource(setLocaleText, localeDataSource, ';\n', content)
-                : new webpack_sources_1.ConcatSource(setLocaleText, content);
+                ? new ConcatSource(setLocaleText, localeDataSource, ';\n', content)
+                : new ConcatSource(setLocaleText, content);
         }
         const { source: outputCode, map: outputMap } = outputSource.sourceAndMap();
         const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);

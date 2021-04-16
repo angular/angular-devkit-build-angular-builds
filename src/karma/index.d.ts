@@ -15,6 +15,9 @@ export declare type KarmaConfigOptions = ConfigOptions & {
     buildWebpack?: unknown;
     configFile?: string;
 };
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
 export declare function execute(options: KarmaBuilderOptions, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;

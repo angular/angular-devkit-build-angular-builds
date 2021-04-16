@@ -14,6 +14,9 @@ import { ExecutionTransformer } from '../transforms';
 import { WebpackConfigOptions } from '../utils/build-options';
 import { IndexHtmlTransform } from '../utils/index-file/index-html-generator';
 import { Schema as BrowserBuilderSchema } from './schema';
+/**
+ * @experimental Direct usage of this type is considered experimental.
+ */
 export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
     baseOutputPath: string;
     outputPaths: string[];
@@ -24,6 +27,9 @@ export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
 };
 export declare function getAnalyticsConfig(wco: WebpackConfigOptions, context: BuilderContext): webpack.Configuration;
 export declare function getCompilerConfig(wco: WebpackConfigOptions): webpack.Configuration;
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
 export declare function buildWebpackBrowser(options: BrowserBuilderSchema, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
     logging?: WebpackLoggingCallback;
