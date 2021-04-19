@@ -26,7 +26,7 @@ async function initialize(options, context, webpackConfigurationTransformer) {
     { ...options, outputPath: '', budgets: undefined }, context, wco => [
         configs_1.getCommonConfig(wco),
         configs_1.getStylesConfig(wco),
-        configs_1.getNonAotConfig(wco),
+        configs_1.getTypeScriptConfig(wco),
         configs_1.getTestConfig(wco),
         configs_1.getWorkerConfig(wco),
     ]);

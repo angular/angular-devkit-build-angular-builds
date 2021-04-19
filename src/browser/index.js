@@ -57,7 +57,7 @@ function getAnalyticsConfig(wco, context) {
 exports.getAnalyticsConfig = getAnalyticsConfig;
 function getCompilerConfig(wco) {
     if (wco.buildOptions.main || wco.buildOptions.polyfills) {
-        return wco.buildOptions.aot ? configs_1.getAotConfig(wco) : configs_1.getNonAotConfig(wco);
+        return configs_1.getTypeScriptConfig(wco);
     }
     return {};
 }

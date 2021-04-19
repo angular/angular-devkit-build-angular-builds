@@ -145,7 +145,7 @@ async function execute(options, context, transforms) {
             { plugins: [new NoEmitPlugin()] },
             configs_1.getCommonConfig(wco),
             configs_1.getBrowserConfig(wco),
-            configs_1.getAotConfig(wco),
+            configs_1.getTypeScriptConfig(wco),
             configs_1.getStatsConfig(wco),
         ];
         // Add Ivy application file extractor support
