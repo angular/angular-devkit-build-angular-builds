@@ -26,9 +26,7 @@ class AnyComponentStyleBudgetChecker {
         compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
             const afterOptimizeChunkAssets = () => {
                 // In AOT compilations component styles get processed in child compilations.
-                // tslint:disable-next-line: no-any
-                const parentCompilation = compilation.compiler.parentCompilation;
-                if (!parentCompilation) {
+                if (!compilation.compiler.parentCompilation) {
                     return;
                 }
                 const cssExtensions = [

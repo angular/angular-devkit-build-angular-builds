@@ -4,27 +4,13 @@ exports.DedupeModuleResolvePlugin = void 0;
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 // tslint:disable-next-line: no-any
 function getResourceData(resolveData) {
-    var _a, _b;
-    if (resolveData.createData) {
-        // Webpack 5+
-        const { descriptionFileData, relativePath, } = resolveData.createData.resourceResolveData;
-        return {
-            packageName: descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.name,
-            packageVersion: descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.version,
-            relativePath,
-            resource: resolveData.createData.resource,
-        };
-    }
-    else {
-        // Webpack 4
-        const { resource, resourceResolveData } = resolveData;
-        return {
-            packageName: (_a = resourceResolveData.descriptionFileData) === null || _a === void 0 ? void 0 : _a.name,
-            packageVersion: (_b = resourceResolveData.descriptionFileData) === null || _b === void 0 ? void 0 : _b.version,
-            relativePath: resourceResolveData.relativePath,
-            resource: resource,
-        };
-    }
+    const { descriptionFileData, relativePath, } = resolveData.createData.resourceResolveData;
+    return {
+        packageName: descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.name,
+        packageVersion: descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.version,
+        relativePath,
+        resource: resolveData.createData.resource,
+    };
 }
 /**
  * DedupeModuleResolvePlugin is a webpack plugin which dedupes modules with the same name and versions
@@ -72,15 +58,9 @@ class DedupeModuleResolvePlugin {
                     webpack_diagnostics_1.addWarning(compilation, `[DedupeModuleResolvePlugin]: ${resource} -> ${prevResource}`);
                 }
                 // Alter current request with previously resolved module.
-                // tslint:disable-next-line: no-any
                 const createData = result.createData;
-                if (createData) {
-                    createData.resource = prevResource;
-                    createData.userRequest = prevResource;
-                }
-                else {
-                    result.request = prevRequest;
-                }
+                createData.resource = prevResource;
+                createData.userRequest = prevRequest;
             });
         });
     }

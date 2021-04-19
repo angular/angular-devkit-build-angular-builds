@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getIndexInputFile = exports.getIndexOutputFile = exports.generateBrowserWebpackConfigFromContext = exports.generateI18nBrowserWebpackConfigFromContext = exports.generateWebpackConfig = void 0;
 const core_1 = require("@angular-devkit/core");
 const path = require("path");
+const webpack_1 = require("webpack");
 const webpack_merge_1 = require("webpack-merge");
 const utils_1 = require("../utils");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
@@ -34,6 +35,7 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
 }
 exports.generateWebpackConfig = generateWebpackConfig;
 async function generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, extraBuildOptions = {}) {
+    var _a;
     const { buildOptions, i18n } = await i18n_options_1.configureI18nBuild(context, options);
     const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, webpackPartialGenerator, extraBuildOptions);
     const config = result.config;
@@ -58,20 +60,11 @@ async function generateI18nBrowserWebpackConfigFromContext(options, context, web
         }
         // Update file hashes to include translation file content
         const i18nHash = Object.values(i18n.locales).reduce((data, locale) => data + locale.files.map((file) => file.integrity || '').join('|'), '');
-        if (!config.plugins) {
-            config.plugins = [];
-        }
+        (_a = config.plugins) !== null && _a !== void 0 ? _a : (config.plugins = []);
         config.plugins.push({
             apply(compiler) {
                 compiler.hooks.compilation.tap('build-angular', compilation => {
-                    // Webpack typings do not contain template hashForChunk hook
-                    // tslint:disable-next-line: no-any
-                    compilation.mainTemplate.hooks.hashForChunk.tap('build-angular', (hash) => {
-                        hash.update('$localize' + i18nHash);
-                    });
-                    // Webpack typings do not contain hooks property
-                    // tslint:disable-next-line: no-any
-                    compilation.chunkTemplate.hooks.hashForChunk.tap('build-angular', (hash) => {
+                    webpack_1.JavascriptModulesPlugin.getCompilationHooks(compilation).chunkHash.tap('build-angular', (_, hash) => {
                         hash.update('$localize' + i18nHash);
                     });
                 });

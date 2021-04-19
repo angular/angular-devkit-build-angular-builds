@@ -98,7 +98,7 @@ async function initialize(options, context, webpackConfigurationTransform) {
         configs_1.getServerConfig(wco),
         configs_1.getStylesConfig(wco),
         configs_1.getStatsConfig(wco),
-        configs_1.getAotConfig(wco),
+        configs_1.getTypeScriptConfig(wco),
     ]);
     let transformedConfig;
     if (webpackConfigurationTransform) {

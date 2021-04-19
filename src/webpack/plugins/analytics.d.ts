@@ -6,12 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { analytics } from '@angular-devkit/core';
-import { Compilation, Compiler, Module, Stats, sources } from 'webpack';
-declare const NormalModule: any;
-interface NormalModule extends Module {
-    _source?: sources.OriginalSource | null;
-    resource?: string;
-}
+import { Compilation, Compiler, Module, NormalModule, Stats } from 'webpack';
 /**
  * Faster than using a RegExp, so we use this to count occurences in source code.
  * @param source The source to look into.
@@ -64,7 +59,7 @@ export declare class NgBuildAnalyticsPlugin {
      * Reports a succeed module.
      * @private
      */
-    protected _succeedModule(mod: Module): void;
+    protected _succeedModule(module: Module): void;
     protected _compilation(compiler: Compiler, compilation: Compilation): void;
     protected _done(stats: Stats): void;
     apply(compiler: Compiler): void;
