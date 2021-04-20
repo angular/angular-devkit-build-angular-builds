@@ -67,26 +67,30 @@ class OptimizeCssWebpackPlugin {
                     from: file,
                     map: map && { annotation: false, prev: map },
                 };
-                const output = await new Promise((resolve, reject) => {
-                    // @types/cssnano are not up to date with version 5.
-                    // tslint:disable-next-line: no-any
-                    cssNano(cssNanoOptions).process(content, postCssOptions)
-                        .then(resolve)
-                        .catch((err) => reject(new Error(`${file} ${err.message}`)));
-                });
-                for (const { text } of output.warnings()) {
-                    webpack_diagnostics_1.addWarning(compilation, text);
+                try {
+                    const output = await new Promise((resolve, reject) => {
+                        // @types/cssnano are not up to date with version 5.
+                        // tslint:disable-next-line: no-any
+                        cssNano(cssNanoOptions).process(content, postCssOptions)
+                            .then(resolve)
+                            .catch((err) => reject(err));
+                    });
+                    for (const { text } of output.warnings()) {
+                        webpack_diagnostics_1.addWarning(compilation, text);
+                    }
+                    let newSource;
+                    if (output.map) {
+                        newSource = new webpack_1.sources.SourceMapSource(output.css, file, output.map.toString(), content, map);
+                    }
+                    else {
+                        newSource = new webpack_1.sources.RawSource(output.css);
+                    }
+                    compilation.assets[file] = newSource;
                 }
-                let newSource;
-                if (output.map) {
-                    newSource = new webpack_1.sources.SourceMapSource(output.css, file, 
-                    // tslint:disable-next-line: no-any
-                    output.map.toString(), content, map);
+                catch (error) {
+                    webpack_diagnostics_1.addError(compilation, error.message);
+                    return;
                 }
-                else {
-                    newSource = new webpack_1.sources.RawSource(output.css);
-                }
-                compilation.assets[file] = newSource;
             });
             return Promise.all(actions).then(() => { });
         });
