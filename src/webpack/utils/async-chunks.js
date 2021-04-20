@@ -13,8 +13,9 @@ function markAsyncChunksNonInitial(webpackStats, extraEntryPoints) {
     // to worry about transitive dependencies because extra entry points cannot be
     // depended upon in Webpack, thus any extra entry point with `inject: false`,
     // **cannot** be loaded in main bundle.
-    const asyncEntryPoints = extraEntryPoints.filter((entryPoint) => !entryPoint.inject);
-    const asyncChunkIds = flatMap(asyncEntryPoints, (entryPoint) => entryPoints[entryPoint.bundleName].chunks);
+    const asyncChunkIds = extraEntryPoints
+        .filter((entryPoint) => !entryPoint.inject)
+        .flatMap((entryPoint) => entryPoints[entryPoint.bundleName].chunks);
     // Find chunks for each ID.
     const asyncChunks = asyncChunkIds.map((chunkId) => {
         const chunk = chunks.find((chunk) => chunk.id === chunkId);
@@ -25,7 +26,7 @@ function markAsyncChunksNonInitial(webpackStats, extraEntryPoints) {
     })
         // All Webpack chunks are dependent on `runtime`, which is never an async
         // entry point, simply ignore this one.
-        .filter((chunk) => chunk.names.indexOf('runtime') === -1);
+        .filter((chunk) => { var _a; return !!((_a = chunk.names) === null || _a === void 0 ? void 0 : _a.includes('runtime')); });
     // A chunk is considered `initial` only if Webpack already belives it to be initial
     // and the application developer did not mark it async via an extra entry point.
     return chunks.map((chunk) => ({
@@ -34,6 +35,3 @@ function markAsyncChunksNonInitial(webpackStats, extraEntryPoints) {
     }));
 }
 exports.markAsyncChunksNonInitial = markAsyncChunksNonInitial;
-function flatMap(list, mapper) {
-    return [].concat(...list.map(mapper));
-}
