@@ -4,18 +4,9 @@ const path = require("path");
 const glob = require("glob");
 const webpack = require("webpack");
 const webpackDevMiddleware = require('webpack-dev-middleware');
-const karma_webpack_failure_cb_1 = require("./karma-webpack-failure-cb");
 const stats_1 = require("../../utils/stats");
-const stats_2 = require("../../configs/stats");
 const node_1 = require("@angular-devkit/core/node");
 const index_1 = require("../../../utils/index");
-/**
- * Enumerate needed (but not require/imported) dependencies from this file
- *  to let the dependency validator know they are used.
- *
- * require('source-map-support')
- * require('karma-source-map-support')
- */
 const KARMA_APPLICATION_PATH = '_karma_webpack_';
 let blocked = [];
 let isBlocked = false;
@@ -98,18 +89,9 @@ const init = (config, emitter) => {
         stats: false,
         publicPath: `/${KARMA_APPLICATION_PATH}/`,
     };
-    const compilationErrorCb = (error, errors) => {
-        // Notify potential listeners of the compile error
-        emitter.emit('compile_error', errors);
-        // Finish Karma run early in case of compilation error.
-        emitter.emit('run_complete', [], { exitCode: 1 });
-        // Unblock any karma requests (potentially started using `karma run`)
-        unblock();
-    };
-    webpackConfig.plugins.push(new karma_webpack_failure_cb_1.KarmaWebpackFailureCb(compilationErrorCb));
     // Use existing config if any.
-    config.webpack = Object.assign(webpackConfig, config.webpack);
-    config.webpackMiddleware = Object.assign(webpackMiddlewareConfig, config.webpackMiddleware);
+    config.webpack = { ...webpackConfig, ...config.webpack };
+    config.webpackMiddleware = { ...webpackMiddlewareConfig, ...config.webpackMiddleware };
     // Our custom context and debug files list the webpack bundles directly instead of using
     // the karma files array.
     config.customContextFile = `${__dirname}/karma-context.html`;
@@ -120,7 +102,10 @@ const init = (config, emitter) => {
     config.middleware = config.middleware || [];
     config.middleware.push('@angular-devkit/build-angular--fallback');
     // The webpack tier owns the watch behavior so we want to force it in the config.
-    webpackConfig.watch = !config.singleRun;
+    // When not in watch mode, webpack-dev-middleware will call `compiler.watch` anyway.
+    // https://github.com/webpack/webpack-dev-middleware/blob/698c9ae5e9bb9a013985add6189ff21c1a1ec185/src/index.js#L65
+    // https://github.com/webpack/webpack/blob/cde1b73e12eb8a77eb9ba42e7920c9ec5d29c2c9/lib/Compiler.js#L379-L388
+    webpackConfig.watch = true;
     if (config.singleRun) {
         // There's no option to turn off file watching in webpack-dev-server, but
         // we can override the file watcher instead.
@@ -135,22 +120,33 @@ const init = (config, emitter) => {
     // Files need to be served from a custom path for Karma.
     webpackConfig.output.path = `/${KARMA_APPLICATION_PATH}/`;
     webpackConfig.output.publicPath = `/${KARMA_APPLICATION_PATH}/`;
-    let compiler;
-    try {
-        compiler = webpack(webpackConfig);
-    }
-    catch (e) {
-        logger.error(e.stack || e);
-        if (e.details) {
-            logger.error(e.details);
+    const compiler = webpack(webpackConfig, (error, stats) => {
+        var _a;
+        if (error) {
+            throw error;
         }
-        throw e;
-    }
+        if (stats === null || stats === void 0 ? void 0 : stats.hasErrors()) {
+            // Only generate needed JSON stats and when needed.
+            const statsJson = stats === null || stats === void 0 ? void 0 : stats.toJson({
+                all: false,
+                children: true,
+                errors: true,
+                warnings: true,
+            });
+            logger.error(stats_1.statsErrorsToString(statsJson, { colors: true }));
+            // Notify potential listeners of the compile error.
+            emitter.emit('compile_error', {
+                errors: (_a = statsJson.errors) === null || _a === void 0 ? void 0 : _a.map(e => e.message),
+            });
+            // Finish Karma run early in case of compilation error.
+            emitter.emit('run_complete', [], { exitCode: 1 });
+            // Emit a failure build event if there are compilation errors.
+            failureCb();
+        }
+    });
     function handler(callback) {
         isBlocked = true;
-        if (typeof callback === 'function') {
-            callback();
-        }
+        callback === null || callback === void 0 ? void 0 : callback();
     }
     compiler.hooks.invalid.tap('karma', () => handler());
     compiler.hooks.watchRun.tapAsync('karma', (_, callback) => handler(callback));
@@ -161,14 +157,9 @@ const init = (config, emitter) => {
         blocked = [];
     }
     let lastCompilationHash;
-    const statsConfig = stats_2.getWebpackStatsConfig();
     compiler.hooks.done.tap('karma', (stats) => {
         if (stats.hasErrors()) {
-            // Print compilation errors.
-            logger.error(stats_1.statsErrorsToString(stats.compilation, statsConfig));
             lastCompilationHash = undefined;
-            // Emit a failure build event if there are compilation errors.
-            failureCb();
         }
         else if (stats.hash != lastCompilationHash) {
             // Refresh karma only when there are no webpack errors, and if the compilation changed.
@@ -177,7 +168,7 @@ const init = (config, emitter) => {
         }
         unblock();
     });
-    webpackMiddleware = new webpackDevMiddleware(compiler, webpackMiddlewareConfig);
+    webpackMiddleware = webpackDevMiddleware(compiler, webpackMiddlewareConfig);
     emitter.on('exit', (done) => {
         webpackMiddleware.close();
         done();
@@ -203,11 +194,11 @@ function requestBlocker() {
 // browser log, because it is an utility reporter,
 // unless it's alone in the "reporters" option and base reporter is used.
 function muteDuplicateReporterLogging(context, config) {
-    context.writeCommonMsg = function () { };
+    context.writeCommonMsg = () => { };
     const reporterName = '@angular/cli';
     const hasTrailingReporters = config.reporters.slice(-1).pop() !== reporterName;
     if (hasTrailingReporters) {
-        context.writeCommonMsg = function () { };
+        context.writeCommonMsg = () => { };
     }
 }
 // Emits builder events.

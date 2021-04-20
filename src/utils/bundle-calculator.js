@@ -120,7 +120,7 @@ class Calculator {
     calculateChunkSize(chunk, buildType) {
         // Look for a process result containing different builds for this chunk.
         const processResult = this.processResults
-            .find((processResult) => processResult.name === chunk.id.toString());
+            .find((processResult) => { var _a; return processResult.name === ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()); });
         if (processResult) {
             // Found a differential build, use the correct size information.
             const processResultFile = getDifferentialBuildResult(processResult, buildType);
@@ -128,8 +128,10 @@ class Calculator {
         }
         else {
             // No differential builds, get the chunk size by summing its assets.
-            return chunk.files
-                .filter(file => !file.endsWith('.map'))
+            if (!chunk.files) {
+                return 0;
+            }
+            return chunk.files.filter(file => !file.endsWith('.map'))
                 .map(file => {
                 const asset = this.assets.find((asset) => asset.name === file);
                 if (!asset) {
@@ -165,7 +167,8 @@ class BundleCalculator extends Calculator {
         // each then check afterwards if they are all the same.
         const buildSizes = Object.values(DifferentialBuildType).map((buildType) => {
             const size = this.chunks
-                .filter(chunk => chunk.names.includes(budgetName))
+                .filter(chunk => { var _a; return (_a = chunk === null || chunk === void 0 ? void 0 : chunk.names) === null || _a === void 0 ? void 0 : _a.includes(budgetName); })
+                // tslint:disable-next-line: no-non-null-assertion
                 .map(chunk => this.calculateChunkSize(chunk, buildType))
                 .reduce((l, r) => l + r, 0);
             return { size, label: `bundle ${this.budget.name}-${buildTypeLabels[buildType]}` };

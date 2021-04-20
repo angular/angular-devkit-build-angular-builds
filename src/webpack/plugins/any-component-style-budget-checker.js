@@ -24,7 +24,10 @@ class AnyComponentStyleBudgetChecker {
     }
     apply(compiler) {
         compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
-            const afterOptimizeChunkAssets = () => {
+            compilation.hooks.processAssets.tap({
+                name: PLUGIN_NAME,
+                stage: webpack_1.Compilation.PROCESS_ASSETS_STAGE_ANALYSE,
+            }, () => {
                 // In AOT compilations component styles get processed in child compilations.
                 if (!compilation.compiler.parentCompilation) {
                     return;
@@ -42,7 +45,7 @@ class AnyComponentStyleBudgetChecker {
                     size: compilation.assets[name].size(),
                     label: name,
                 }));
-                const thresholds = flatMap(this.budgets, (budget) => bundle_calculator_1.calculateThresholds(budget));
+                const thresholds = this.budgets.flatMap(budget => [...bundle_calculator_1.calculateThresholds(budget)]);
                 for (const { size, label } of componentStyles) {
                     for (const { severity, message } of bundle_calculator_1.checkThresholds(thresholds[Symbol.iterator](), size, label)) {
                         switch (severity) {
@@ -54,22 +57,14 @@ class AnyComponentStyleBudgetChecker {
                                 break;
                             default:
                                 assertNever(severity);
-                                break;
                         }
                     }
                 }
-            };
-            compilation.hooks.processAssets.tap({
-                name: PLUGIN_NAME,
-                stage: webpack_1.Compilation.PROCESS_ASSETS_STAGE_ANALYSE,
-            }, afterOptimizeChunkAssets);
+            });
         });
     }
 }
 exports.AnyComponentStyleBudgetChecker = AnyComponentStyleBudgetChecker;
 function assertNever(input) {
     throw new Error(`Unexpected call to assertNever() with input: ${JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
-}
-function flatMap(list, mapper) {
-    return [].concat(...list.map(mapper).map((iterator) => Array.from(iterator)));
 }

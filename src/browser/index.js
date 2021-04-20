@@ -396,7 +396,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         executor.stop();
                     }
                     for (const result of processResults) {
-                        const chunk = (_a = webpackStats.chunks) === null || _a === void 0 ? void 0 : _a.find((chunk) => chunk.id.toString() === result.name);
+                        const chunk = (_a = webpackStats.chunks) === null || _a === void 0 ? void 0 : _a.find((chunk) => { var _a; return ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()) === result.name; });
                         if (result.original) {
                             bundleInfoStats.push(generateBundleInfoStats(result.original, chunk, 'modern'));
                         }
@@ -405,9 +405,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                     }
                     const unprocessedChunks = ((_b = webpackStats.chunks) === null || _b === void 0 ? void 0 : _b.filter((chunk) => !processResults
-                        .find((result) => chunk.id.toString() === result.name))) || [];
+                        .find((result) => { var _a; return ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()) === result.name; }))) || [];
                     for (const chunk of unprocessedChunks) {
-                        const asset = (_c = webpackStats.assets) === null || _c === void 0 ? void 0 : _c.find(a => a.name === chunk.files[0]);
+                        const asset = (_c = webpackStats.assets) === null || _c === void 0 ? void 0 : _c.find(a => { var _a; return a.name === ((_a = chunk.files) === null || _a === void 0 ? void 0 : _a[0]); });
                         bundleInfoStats.push(stats_1.generateBundleStats({ ...chunk, size: asset === null || asset === void 0 ? void 0 : asset.size }));
                     }
                 }
@@ -543,11 +543,12 @@ function assertNever(input) {
     throw new Error(`Unexpected call to assertNever() with input: ${JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
 }
 function generateBundleInfoStats(bundle, chunk, chunkType) {
+    var _a;
     return stats_1.generateBundleStats({
         size: bundle.size,
         files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
         names: chunk === null || chunk === void 0 ? void 0 : chunk.names,
-        entry: !!(chunk === null || chunk === void 0 ? void 0 : chunk.names.includes('runtime')),
+        entry: !!((_a = chunk === null || chunk === void 0 ? void 0 : chunk.names) === null || _a === void 0 ? void 0 : _a.includes('runtime')),
         initial: !!(chunk === null || chunk === void 0 ? void 0 : chunk.initial),
         rendered: true,
         chunkType,
