@@ -13,12 +13,13 @@ const build_webpack_1 = require("@angular-devkit/build-webpack");
 const fs = require("fs");
 const path = require("path");
 const webpack = require("webpack");
+const schema_1 = require("../browser/schema");
 const i18n_options_1 = require("../utils/i18n-options");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const configs_1 = require("../webpack/configs");
 const stats_1 = require("../webpack/utils/stats");
-const schema_1 = require("./schema");
+const schema_2 = require("./schema");
 function getI18nOutfile(format) {
     switch (format) {
         case 'xmb':
@@ -40,28 +41,28 @@ function getI18nOutfile(format) {
 }
 async function getSerializer(format, sourceLocale, basePath, useLegacyIds, diagnostics) {
     switch (format) {
-        case schema_1.Format.Xmb:
+        case schema_2.Format.Xmb:
             const { XmbTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer'));
             // tslint:disable-next-line: no-any
             return new XmbTranslationSerializer(basePath, useLegacyIds);
-        case schema_1.Format.Xlf:
-        case schema_1.Format.Xlif:
-        case schema_1.Format.Xliff:
+        case schema_2.Format.Xlf:
+        case schema_2.Format.Xlif:
+        case schema_2.Format.Xliff:
             const { Xliff1TranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer'));
             // tslint:disable-next-line: no-any
             return new Xliff1TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
-        case schema_1.Format.Xlf2:
-        case schema_1.Format.Xliff2:
+        case schema_2.Format.Xlf2:
+        case schema_2.Format.Xliff2:
             const { Xliff2TranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer'));
             // tslint:disable-next-line: no-any
             return new Xliff2TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
-        case schema_1.Format.Json:
+        case schema_2.Format.Json:
             const { SimpleJsonTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer'));
             return new SimpleJsonTranslationSerializer(sourceLocale);
-        case schema_1.Format.LegacyMigrate:
+        case schema_2.Format.LegacyMigrate:
             const { LegacyMessageIdMigrationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer'));
             return new LegacyMessageIdMigrationSerializer(diagnostics);
-        case schema_1.Format.Arb:
+        case schema_2.Format.Arb:
             const { ArbTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer'));
             const fileSystem = {
                 relative(from, to) {
@@ -75,18 +76,18 @@ async function getSerializer(format, sourceLocale, basePath, useLegacyIds, diagn
 function normalizeFormatOption(options) {
     let format = options.format;
     switch (format) {
-        case schema_1.Format.Xlf:
-        case schema_1.Format.Xlif:
-        case schema_1.Format.Xliff:
-            format = schema_1.Format.Xlf;
+        case schema_2.Format.Xlf:
+        case schema_2.Format.Xlif:
+        case schema_2.Format.Xliff:
+            format = schema_2.Format.Xlf;
             break;
-        case schema_1.Format.Xlf2:
-        case schema_1.Format.Xliff2:
-            format = schema_1.Format.Xlf2;
+        case schema_2.Format.Xlf2:
+        case schema_2.Format.Xliff2:
+            format = schema_2.Format.Xlf2;
             break;
     }
     // Default format is xliff1
-    return format !== null && format !== void 0 ? format : schema_1.Format.Xlf;
+    return format !== null && format !== void 0 ? format : schema_2.Format.Xlf;
 }
 class NoEmitPlugin {
     apply(compiler) {
@@ -128,12 +129,15 @@ async function execute(options, context, transforms) {
         buildOptimizer: false,
         aot: true,
         progress: options.progress,
+        budgets: [],
         assets: [],
         scripts: [],
         styles: [],
         deleteOutputPath: false,
         extractLicenses: false,
         subresourceIntegrity: false,
+        outputHashing: schema_1.OutputHashing.None,
+        namedChunks: true,
     }, context, (wco) => {
         var _a;
         if (wco.tsConfig.options.enableIvy === false) {

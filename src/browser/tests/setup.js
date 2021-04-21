@@ -17,4 +17,7 @@ exports.BASE_OPTIONS = Object.freeze({
     outputPath: 'dist',
     tsConfig: 'src/tsconfig.app.json',
     progress: false,
+    // Disable optimizations
+    optimization: false,
+    buildOptimizer: false,
 });
