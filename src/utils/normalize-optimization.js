@@ -8,7 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeOptimization = void 0;
-function normalizeOptimization(optimization = false) {
+function normalizeOptimization(optimization = true) {
     if (typeof optimization === 'object') {
         return {
             scripts: !!optimization.scripts,

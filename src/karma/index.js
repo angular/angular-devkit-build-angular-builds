@@ -13,6 +13,7 @@ const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
+const schema_1 = require("../browser/schema");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const configs_1 = require("../webpack/configs");
@@ -23,7 +24,18 @@ async function initialize(options, context, webpackConfigurationTransformer) {
     // only two properties are missing:
     // * `outputPath` which is fixed for tests
     // * `budgets` which might be incorrect due to extra dev libs
-    { ...options, outputPath: '', budgets: undefined }, context, wco => [
+    {
+        ...options,
+        outputPath: '',
+        budgets: undefined,
+        optimization: false,
+        buildOptimizer: false,
+        aot: false,
+        vendorChunk: true,
+        namedChunks: true,
+        extractLicenses: false,
+        outputHashing: schema_1.OutputHashing.None,
+    }, context, wco => [
         configs_1.getCommonConfig(wco),
         configs_1.getStylesConfig(wco),
         configs_1.getTypeScriptConfig(wco),

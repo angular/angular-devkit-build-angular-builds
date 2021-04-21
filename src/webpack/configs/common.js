@@ -394,7 +394,10 @@ function getCommonConfig(wco) {
                 ...extraRules,
             ],
         },
-        cache: !!buildOptions.watch && !environment_options_1.cachingDisabled,
+        cache: !!buildOptions.watch && !environment_options_1.cachingDisabled && {
+            type: 'memory',
+            maxGenerations: 1,
+        },
         optimization: {
             minimizer: extraMinimizers,
             moduleIds: 'deterministic',
