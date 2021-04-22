@@ -22,7 +22,6 @@ function normalizeBrowserSchema(root, projectRoot, sourceRoot, options) {
         sourceMap: normalizedSourceMapOptions,
         preserveSymlinks: options.preserveSymlinks === undefined ? process.execArgv.includes('--preserve-symlinks') : options.preserveSymlinks,
         statsJson: options.statsJson || false,
-        forkTypeChecker: options.forkTypeChecker || false,
         budgets: options.budgets || [],
         scripts: options.scripts || [],
         styles: options.styles || [],
