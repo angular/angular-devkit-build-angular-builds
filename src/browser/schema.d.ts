@@ -58,10 +58,6 @@ export interface Schema {
      */
     fileReplacements?: FileReplacement[];
     /**
-     * Run the TypeScript type checker in a forked process.
-     */
-    forkTypeChecker?: boolean;
-    /**
      * How to handle missing translations for i18n.
      */
     i18nMissingTranslation?: I18NMissingTranslation;
