@@ -35,6 +35,11 @@ async function initialize(options, context, webpackConfigurationTransformer) {
         namedChunks: true,
         extractLicenses: false,
         outputHashing: schema_1.OutputHashing.None,
+        // The webpack tier owns the watch behavior so we want to force it in the config.
+        // When not in watch mode, webpack-dev-middleware will call `compiler.watch` anyway.
+        // https://github.com/webpack/webpack-dev-middleware/blob/698c9ae5e9bb9a013985add6189ff21c1a1ec185/src/index.js#L65
+        // https://github.com/webpack/webpack/blob/cde1b73e12eb8a77eb9ba42e7920c9ec5d29c2c9/lib/Compiler.js#L379-L388
+        watch: true,
     }, context, wco => [
         configs_1.getCommonConfig(wco),
         configs_1.getStylesConfig(wco),
@@ -54,12 +59,15 @@ async function initialize(options, context, webpackConfigurationTransformer) {
 function execute(options, context, transforms = {}) {
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
+    let singleRun;
+    if (options.watch !== undefined) {
+        singleRun = !options.watch;
+    }
     return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.switchMap(async ([karma, webpackConfig]) => {
         var _a;
-        const karmaOptions = {};
-        if (options.watch !== undefined) {
-            karmaOptions.singleRun = !options.watch;
-        }
+        const karmaOptions = {
+            singleRun,
+        };
         // Convert browsers from a string to an array
         if (options.browsers) {
             karmaOptions.browsers = options.browsers.split(',');
