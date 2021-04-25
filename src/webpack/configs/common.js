@@ -160,8 +160,6 @@ function getCommonConfig(wco) {
         });
         extraPlugins.push(new CopyWebpackPlugin({
             patterns: copyWebpackPluginPatterns,
-            // The typings for copy-webpack-plugin use the old @types/webpack package
-            // tslint:disable-next-line: no-any
         }));
     }
     if (buildOptions.progress) {
