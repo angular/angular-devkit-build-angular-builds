@@ -1,11 +1,4 @@
 /**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-/**
  * Use CPU count -1 with limit to 7 for workers not to clog the system.
  * Some environments, like CircleCI which use Docker report a number of CPUs by the host and not the count of available.
  * This cause `Error: Call retries were exceeded` errors when trying to use them.

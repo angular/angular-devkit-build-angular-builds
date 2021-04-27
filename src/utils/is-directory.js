@@ -1,15 +1,15 @@
 "use strict";
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable
-// TODO: cleanup this file, it's copied as is from Angular CLI.
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isDirectory = void 0;
+// tslint:disable
+// TODO: cleanup this file, it's copied as is from Angular CLI.
 const fs = require("fs");
 function isDirectory(path) {
     try {
