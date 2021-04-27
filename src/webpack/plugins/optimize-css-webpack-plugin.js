@@ -91,11 +91,11 @@ class OptimizeCssWebpackPlugin {
                     map: map && { annotation: false, prev: map },
                 };
                 const output = await new Promise((resolve, reject) => {
-                    // the last parameter is not in the typings
+                    // @types/cssnano are not up to date with version 5.
                     // tslint:disable-next-line: no-any
-                    cssNano.process(content, postCssOptions, cssNanoOptions)
+                    cssNano(cssNanoOptions).process(content, postCssOptions)
                         .then(resolve)
-                        .catch((err) => reject(new Error(`${file} ${err.message}`)));
+                        .catch((err) => reject(err));
                 });
                 for (const { text } of output.warnings()) {
                     webpack_diagnostics_1.addWarning(compilation, text);

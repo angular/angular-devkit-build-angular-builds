@@ -96,7 +96,7 @@ function getDevServerConfig(wco) {
             hot: hmr,
             proxy: addProxyConfig(root, proxyConfig),
             contentBase: false,
-            logLevel: 'silent',
+            logLevel: 'error',
         },
     };
 }
