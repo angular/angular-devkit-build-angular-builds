@@ -11,22 +11,9 @@ exports.BundleActionExecutor = void 0;
 const jest_worker_1 = require("jest-worker");
 const os = require("os");
 const path = require("path");
-const v8 = require("v8");
+const v8_1 = require("v8");
 const action_cache_1 = require("./action-cache");
 const workers_1 = require("./workers");
-const hasThreadSupport = (() => {
-    try {
-        require('worker_threads');
-        return true;
-    }
-    catch {
-        return false;
-    }
-})();
-// This is used to normalize serialization messaging across threads and processes
-// Threads use the structured clone algorithm which handles more types
-// Processes use JSON which is much more limited
-const serialize = v8.serialize;
 let workerFile = require.resolve('./process-bundle');
 workerFile =
     path.extname(workerFile) === '.ts'
@@ -50,7 +37,7 @@ class BundleActionExecutor {
         // larger files are processed in a separate process to limit memory usage in the main process
         return (this.largeWorker = new jest_worker_1.default(workerFile, {
             exposedMethods: ['process', 'inlineLocales'],
-            setupArgs: [[...serialize(this.workerOptions)]],
+            setupArgs: [[...v8_1.serialize(this.workerOptions)]],
             numWorkers: workers_1.maxWorkers,
         }));
     }
@@ -62,9 +49,9 @@ class BundleActionExecutor {
         // The limited number also prevents a large increase in memory usage for an otherwise short operation
         return (this.smallWorker = new jest_worker_1.default(workerFile, {
             exposedMethods: ['process', 'inlineLocales'],
-            setupArgs: hasThreadSupport ? [this.workerOptions] : [[...serialize(this.workerOptions)]],
+            setupArgs: [this.workerOptions],
             numWorkers: os.cpus().length < 2 ? 1 : 2,
-            enableWorkerThreads: hasThreadSupport,
+            enableWorkerThreads: true,
         }));
     }
     executeAction(method, action) {
