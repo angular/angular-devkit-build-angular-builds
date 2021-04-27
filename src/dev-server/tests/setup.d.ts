@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import { Schema as BrowserSchema } from '../../browser/schema';
 import { BuilderHarness } from '../../testing/builder-harness';
 import { Schema } from '../schema';

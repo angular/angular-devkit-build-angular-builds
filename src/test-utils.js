@@ -1,13 +1,13 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.lazyModuleFnImport = exports.lazyModuleFiles = exports.browserBuild = exports.createArchitect = exports.protractorTargetSpec = exports.tslintTargetSpec = exports.karmaTargetSpec = exports.extractI18nTargetSpec = exports.devServerTargetSpec = exports.browserTargetSpec = exports.outputPath = exports.host = exports.workspaceRoot = void 0;
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.lazyModuleFnImport = exports.lazyModuleFiles = exports.browserBuild = exports.createArchitect = exports.protractorTargetSpec = exports.tslintTargetSpec = exports.karmaTargetSpec = exports.extractI18nTargetSpec = exports.devServerTargetSpec = exports.browserTargetSpec = exports.outputPath = exports.host = exports.workspaceRoot = void 0;
 const architect_1 = require("@angular-devkit/architect");
 const node_1 = require("@angular-devkit/architect/node");
 const testing_1 = require("@angular-devkit/architect/testing");

@@ -1,10 +1,3 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 export declare type LoadOutputFileFunctionType = (file: string) => Promise<string>;
 export declare type CrossOriginValue = 'none' | 'anonymous' | 'use-credentials';
 export interface AugmentIndexHtmlOptions {

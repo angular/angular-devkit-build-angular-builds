@@ -1,13 +1,13 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.assertCompatibleAngularVersion = void 0;
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.assertCompatibleAngularVersion = void 0;
 const core_1 = require("@angular-devkit/core");
 const semver_1 = require("semver");
 function assertCompatibleAngularVersion(projectRoot, logger) {
