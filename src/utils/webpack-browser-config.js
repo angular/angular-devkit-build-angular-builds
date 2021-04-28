@@ -71,7 +71,7 @@ async function generateI18nBrowserWebpackConfigFromContext(options, context, web
         config.plugins.push({
             apply(compiler) {
                 compiler.hooks.compilation.tap('build-angular', compilation => {
-                    webpack_1.JavascriptModulesPlugin.getCompilationHooks(compilation).chunkHash.tap('build-angular', (_, hash) => {
+                    webpack_1.javascript.JavascriptModulesPlugin.getCompilationHooks(compilation).chunkHash.tap('build-angular', (_, hash) => {
                         hash.update('$localize' + i18nHash);
                     });
                 });
