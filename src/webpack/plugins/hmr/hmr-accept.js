@@ -7,7 +7,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-// tslint:disable-next-line: no-implicit-dependencies
 const core_1 = require("@angular/core");
 const operators_1 = require("rxjs/operators");
 function default_1(mod) {
@@ -42,8 +41,7 @@ function default_1(mod) {
         const oldInputs = document.querySelectorAll('input:not([type="hidden"]), textarea');
         const oldOptions = document.querySelectorAll('option');
         // Create new application
-        appRef.components
-            .forEach(cp => {
+        appRef.components.forEach((cp) => {
             const element = cp.location.nativeElement;
             const parentNode = element.parentNode;
             parentNode.insertBefore(document.createElement(element.tagName), element);
@@ -56,7 +54,7 @@ function default_1(mod) {
         }
         // Restore all inputs and options
         const bodyElement = document.body;
-        if ((oldInputs.length + oldOptions.length) === 0 || !bodyElement) {
+        if (oldInputs.length + oldOptions.length === 0 || !bodyElement) {
             return;
         }
         // Use a `MutationObserver` to wait until the app-root element has been bootstrapped.
@@ -73,10 +71,9 @@ function default_1(mod) {
             }
             // Wait until the application isStable to restore the form values
             newAppRef.isStable
-                .pipe(operators_1.filter(isStable => !!isStable), operators_1.take(1))
+                .pipe(operators_1.filter((isStable) => !!isStable), operators_1.take(1))
                 .subscribe(() => restoreFormValues(oldInputs, oldOptions));
-        })
-            .observe(bodyElement, {
+        }).observe(bodyElement, {
             attributes: true,
             subtree: true,
             attributeFilter: ['ng-version'],
@@ -93,7 +90,7 @@ function getAppRoot() {
     return appRoot;
 }
 function getToken(appRoot, token) {
-    return typeof ng === 'object' && ng.getInjector(appRoot).get(token) || undefined;
+    return (typeof ng === 'object' && ng.getInjector(appRoot).get(token)) || undefined;
 }
 function getApplicationRef(appRoot) {
     const appRef = getToken(appRoot, core_1.ApplicationRef);

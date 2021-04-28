@@ -43,7 +43,7 @@ async function _run(options, context) {
     if (options.tsConfig) {
         const tsConfigs = Array.isArray(options.tsConfig) ? options.tsConfig : [options.tsConfig];
         context.reportProgress(0, tsConfigs.length);
-        const allPrograms = tsConfigs.map(tsConfig => {
+        const allPrograms = tsConfigs.map((tsConfig) => {
             return Linter.createProgram(path.resolve(systemRoot, tsConfig));
         });
         let i = 0;
@@ -54,8 +54,8 @@ async function _run(options, context) {
             }
             else {
                 result.failures = result.failures
-                    .filter(curr => {
-                    return !partial.failures.some(prev => curr.equals(prev));
+                    .filter((curr) => {
+                    return !partial.failures.some((prev) => curr.equals(prev));
                 })
                     .concat(partial.failures);
                 // we are not doing much with 'errorCount' and 'warningCount'
@@ -117,7 +117,7 @@ async function _lint(projectTslint, systemRoot, tslintConfigPath, options, progr
     for (const file of files) {
         if (program && allPrograms) {
             // If it cannot be found in ANY program, then this is an error.
-            if (allPrograms.every(p => p.getSourceFile(file) === undefined)) {
+            if (allPrograms.every((p) => p.getSourceFile(file) === undefined)) {
                 throw new Error(`File ${JSON.stringify(file)} is not part of a TypeScript project '${options.tsConfig}'.`);
             }
             else if (program.getSourceFile(file) === undefined) {
@@ -149,9 +149,9 @@ function getFilesToLint(root, options, linter, program) {
     const files = options.files || [];
     if (files.length > 0) {
         return files
-            .map(file => glob.sync(file, { cwd: root, ignore, nodir: true }))
+            .map((file) => glob.sync(file, { cwd: root, ignore, nodir: true }))
             .reduce((prev, curr) => prev.concat(curr), [])
-            .map(file => path.join(root, file));
+            .map((file) => path.join(root, file));
     }
     if (!program) {
         return [];
@@ -159,10 +159,8 @@ function getFilesToLint(root, options, linter, program) {
     let programFiles = linter.getFileNames(program);
     if (ignore && ignore.length > 0) {
         // normalize to support ./ paths
-        const ignoreMatchers = ignore
-            .map(pattern => new minimatch_1.Minimatch(path.normalize(pattern), { dot: true }));
-        programFiles = programFiles
-            .filter(file => !ignoreMatchers.some(matcher => matcher.match(path.relative(root, file))));
+        const ignoreMatchers = ignore.map((pattern) => new minimatch_1.Minimatch(path.normalize(pattern), { dot: true }));
+        programFiles = programFiles.filter((file) => !ignoreMatchers.some((matcher) => matcher.match(path.relative(root, file))));
     }
     return programFiles;
 }

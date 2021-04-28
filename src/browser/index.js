@@ -49,7 +49,9 @@ function getAnalyticsConfig(wco, context) {
         }
         // The category is the builder name if it's an angular builder.
         return {
-            plugins: [new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category, !!wco.tsConfig.options.enableIvy)],
+            plugins: [
+                new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category, !!wco.tsConfig.options.enableIvy),
+            ],
         };
     }
     return {};
@@ -67,7 +69,7 @@ async function initialize(options, context, differentialLoadingNeeded, webpackCo
     const originalOutputPath = options.outputPath;
     // Assets are processed directly by the builder except when watching
     const adjustedOptions = options.watch ? options : { ...options, assets: [] };
-    const { config, projectRoot, projectSourceRoot, i18n, } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, wco => [
+    const { config, projectRoot, projectSourceRoot, i18n, } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, (wco) => [
         configs_1.getCommonConfig(wco),
         configs_1.getBrowserConfig(wco),
         configs_1.getStylesConfig(wco),
@@ -108,8 +110,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     let outputPaths;
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
-    return rxjs_1.from(context.getProjectMetadata(projectName))
-        .pipe(operators_1.switchMap(async (projectMetadata) => {
+    return rxjs_1.from(context.getProjectMetadata(projectName)).pipe(operators_1.switchMap(async (projectMetadata) => {
         var _a;
         const sysProjectRoot = core_1.getSystemPath(core_1.resolve(core_1.normalize(context.workspaceRoot), core_1.normalize((_a = projectMetadata.root) !== null && _a !== void 0 ? _a : '')));
         const { options: compilerOptions } = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
@@ -125,22 +126,23 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         };
     }), 
     // tslint:disable-next-line: no-big-function
-    operators_1.switchMap(({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target }) => {
+    operators_1.switchMap(({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target, }) => {
         const normalizedOptimization = utils_1.normalizeOptimization(options.optimization);
         return build_webpack_1.runWebpack(config, context, {
             webpackFactory: require('webpack'),
-            logging: transforms.logging || ((stats, config) => {
-                if (options.verbose) {
-                    context.logger.info(stats.toString(config.stats));
-                }
-            }),
+            logging: transforms.logging ||
+                ((stats, config) => {
+                    if (options.verbose) {
+                        context.logger.info(stats.toString(config.stats));
+                    }
+                }),
         }).pipe(
         // tslint:disable-next-line: no-big-function
         operators_1.concatMap(async (buildEvent) => {
             var _a, _b, _c, _d, _e, _f, _g, _h;
             const spinner = new spinner_1.Spinner();
             spinner.enabled = options.progress !== false;
-            const { success, emittedFiles = [], outputPath: webpackOutputPath, } = buildEvent;
+            const { success, emittedFiles = [], outputPath: webpackOutputPath } = buildEvent;
             const webpackRawStats = buildEvent.webpackStats;
             if (!webpackRawStats) {
                 throw new Error('Webpack stats build result is required.');
@@ -172,10 +174,10 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 let noModuleFiles;
                 let moduleFiles;
                 let files;
-                const scriptsEntryPointName = helpers_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map(x => x.bundleName);
+                const scriptsEntryPointName = helpers_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map((x) => x.bundleName);
                 if (isDifferentialLoadingNeeded && options.watch) {
                     moduleFiles = emittedFiles;
-                    files = moduleFiles.filter(x => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
+                    files = moduleFiles.filter((x) => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
                     if (i18n.shouldInline) {
                         const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, webpackOutputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
                         if (!success) {
@@ -308,7 +310,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 runtimeData: processResults,
                                 supportedBrowsers: buildBrowserFeatures.supportedBrowsers,
                             };
-                            processResults.push(await Promise.resolve().then(() => require('../utils/process-bundle')).then(m => m.process(runtimeOptions)));
+                            processResults.push(await Promise.resolve().then(() => require('../utils/process-bundle')).then((m) => m.process(runtimeOptions)));
                         }
                         spinner.succeed('ES5 bundle generation complete.');
                         if (i18n.shouldInline) {
@@ -373,7 +375,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                         glob: '**/*',
                                         input: webpackOutputPath,
                                         output: '',
-                                        ignore: [...processedFiles].map(f => path.relative(webpackOutputPath, f)),
+                                        ignore: [...processedFiles].map((f) => path.relative(webpackOutputPath, f)),
                                     },
                                 ], Array.from(outputPaths.values()), '');
                             }
@@ -404,16 +406,15 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk, 'legacy'));
                         }
                     }
-                    const unprocessedChunks = ((_b = webpackStats.chunks) === null || _b === void 0 ? void 0 : _b.filter((chunk) => !processResults
-                        .find((result) => { var _a; return ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()) === result.name; }))) || [];
+                    const unprocessedChunks = ((_b = webpackStats.chunks) === null || _b === void 0 ? void 0 : _b.filter((chunk) => !processResults.find((result) => { var _a; return ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()) === result.name; }))) || [];
                     for (const chunk of unprocessedChunks) {
-                        const asset = (_c = webpackStats.assets) === null || _c === void 0 ? void 0 : _c.find(a => { var _a; return a.name === ((_a = chunk.files) === null || _a === void 0 ? void 0 : _a[0]); });
+                        const asset = (_c = webpackStats.assets) === null || _c === void 0 ? void 0 : _c.find((a) => { var _a; return a.name === ((_a = chunk.files) === null || _a === void 0 ? void 0 : _a[0]); });
                         bundleInfoStats.push(stats_1.generateBundleStats({ ...chunk, size: asset === null || asset === void 0 ? void 0 : asset.size }));
                     }
                 }
                 else {
-                    files = emittedFiles.filter(x => x.name !== 'polyfills-es5');
-                    noModuleFiles = emittedFiles.filter(x => x.name === 'polyfills-es5');
+                    files = emittedFiles.filter((x) => x.name !== 'polyfills-es5');
+                    noModuleFiles = emittedFiles.filter((x) => x.name === 'polyfills-es5');
                     if (i18n.shouldInline) {
                         const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, webpackOutputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
                         if (!success) {
@@ -482,8 +483,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 });
                                 if (warnings.length || errors.length) {
                                     spinner.stop();
-                                    warnings.forEach(m => context.logger.warn(m));
-                                    errors.forEach(m => context.logger.error(m));
+                                    warnings.forEach((m) => context.logger.warn(m));
+                                    errors.forEach((m) => context.logger.error(m));
                                     spinner.start();
                                 }
                                 const indexOutput = path.join(outputPath, webpack_browser_config_1.getIndexOutputFile(options.index));
@@ -514,11 +515,11 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 stats_1.webpackStatsLogger(context.logger, webpackStats, config, bundleInfoStats);
                 return { success: buildSuccess };
             }
-        }), operators_1.map(event => ({
+        }), operators_1.map((event) => ({
             ...event,
             baseOutputPath,
             outputPath: baseOutputPath,
-            outputPaths: outputPaths && Array.from(outputPaths.values()) || [baseOutputPath],
+            outputPaths: (outputPaths && Array.from(outputPaths.values())) || [baseOutputPath],
         })));
     }));
     function getLocaleBaseHref(i18n, locale) {

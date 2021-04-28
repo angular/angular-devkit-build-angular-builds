@@ -65,13 +65,13 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         options.port = await check_port_1.checkPort((_a = options.port) !== null && _a !== void 0 ? _a : 4200, options.host || 'localhost');
         // Override options we need to override, if defined.
         const overrides = Object.keys(options)
-            .filter(key => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
+            .filter((key) => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
             .reduce((previous, key) => ({
             ...previous,
             [key]: options[key],
         }), {});
         const devServerOptions = Object.keys(options)
-            .filter(key => !devServerBuildOverriddenKeys.includes(key) && key !== 'browserTarget')
+            .filter((key) => !devServerBuildOverriddenKeys.includes(key) && key !== 'browserTarget')
             .reduce((previous, key) => ({
             ...previous,
             [key]: options[key],
@@ -88,8 +88,8 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         (_b = rawBrowserOptions.allowedCommonJsDependencies) !== null && _b !== void 0 ? _b : (rawBrowserOptions.allowedCommonJsDependencies = []);
         rawBrowserOptions.allowedCommonJsDependencies.push('strip-ansi');
         const browserName = await context.getBuilderNameForTarget(browserTarget);
-        const browserOptions = await context.validateOptions({ ...rawBrowserOptions, ...overrides }, browserName);
-        const { config, projectRoot, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(browserOptions, context, wco => [
+        const browserOptions = (await context.validateOptions({ ...rawBrowserOptions, ...overrides }, browserName));
+        const { config, projectRoot, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(browserOptions, context, (wco) => [
             configs_1.getDevServerConfig(wco),
             configs_1.getCommonConfig(wco),
             configs_1.getBrowserConfig(wco),
@@ -114,12 +114,15 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             // Remove live-reload code from all entrypoints but not main.
             // Otherwise this will break SuppressExtractedTextChunksWebpackPlugin because
             // 'addDevServerEntrypoints' adds addional entry-points to all entries.
-            if (config.entry && typeof config.entry === 'object' && !Array.isArray(config.entry) && config.entry.main) {
+            if (config.entry &&
+                typeof config.entry === 'object' &&
+                !Array.isArray(config.entry) &&
+                config.entry.main) {
                 for (const [key, value] of Object.entries(config.entry)) {
                     if (key === 'main' || !Array.isArray(value)) {
                         continue;
                     }
-                    const webpackClientScriptIndex = value.findIndex(x => x.includes('webpack-dev-server/client/index.js'));
+                    const webpackClientScriptIndex = value.findIndex((x) => x.includes('webpack-dev-server/client/index.js'));
                     if (webpackClientScriptIndex >= 0) {
                         // Remove the webpack-dev-server/client script from array.
                         value.splice(webpackClientScriptIndex, 1);
@@ -131,9 +134,9 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             logger.warn(core_1.tags.stripIndents `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
       See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
         }
-        if (options.host
-            && !/^127\.\d+\.\d+\.\d+/g.test(options.host)
-            && options.host !== 'localhost') {
+        if (options.host &&
+            !/^127\.\d+\.\d+\.\d+/g.test(options.host) &&
+            options.host !== 'localhost') {
             logger.warn(core_1.tags.stripIndent `
         Warning: This is a simple server for use in testing or debugging Angular applications
         locally. It hasn't been reviewed for security issues.
@@ -234,12 +237,14 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 port: buildEvent.port,
             });
             if (index === 0) {
-                logger.info('\n' + core_1.tags.oneLine `
+                logger.info('\n' +
+                    core_1.tags.oneLine `
               **
               Angular Live Development Server is listening on ${options.host}:${buildEvent.port},
               open your browser on ${serverAddress}
               **
-            ` + '\n');
+            ` +
+                    '\n');
                 if (options.open) {
                     const open = await Promise.resolve().then(() => require('open'));
                     await open(serverAddress);
@@ -265,7 +270,10 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
             webpackConfig.entry['main'].unshift(localeDescription.dataPath);
         }
         else {
-            webpackConfig.entry['main'] = [localeDescription.dataPath, webpackConfig.entry['main']];
+            webpackConfig.entry['main'] = [
+                localeDescription.dataPath,
+                webpackConfig.entry['main'],
+            ];
         }
     }
     let missingTranslationBehavior = browserOptions.i18nMissingTranslation || 'ignore';

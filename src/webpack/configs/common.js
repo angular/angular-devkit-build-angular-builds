@@ -28,7 +28,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 function getCommonConfig(wco) {
     var _a;
     const { root, projectRoot, buildOptions, tsConfig } = wco;
-    const { platform = 'browser', sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap, }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization, }, } = buildOptions;
+    const { platform = 'browser', sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, } = buildOptions;
     const extraPlugins = [];
     const extraRules = [];
     const entryPoints = {};
@@ -94,7 +94,7 @@ function getCommonConfig(wco) {
                 throw new Error(`Script file ${input} does not exist.`);
             }
         }
-        const existingEntry = prev.find(el => el.bundleName === bundleName);
+        const existingEntry = prev.find((el) => el.bundleName === bundleName);
         if (existingEntry) {
             if (existingEntry.inject && !inject) {
                 // All entries have to be lazy for the bundle to be lazy.
@@ -154,7 +154,7 @@ function getCommonConfig(wco) {
                         // causes negate patterns not to match.
                         // See: https://github.com/webpack-contrib/copy-webpack-plugin/issues/498#issuecomment-639327909
                         ...ignore,
-                    ].map(i => path.posix.join(input, i)),
+                    ].map((i) => path.posix.join(input, i)),
                 },
             };
         });
@@ -178,7 +178,7 @@ function getCommonConfig(wco) {
                         spinner.start(`Generating ${platform} application bundles...`);
                         break;
                     case 1:
-                        spinner.succeed(`${platform.replace(/^\w/, s => s.toUpperCase())} application bundle generation complete.`);
+                        spinner.succeed(`${platform.replace(/^\w/, (s) => s.toUpperCase())} application bundle generation complete.`);
                         break;
                     default:
                         spinner.text = `Generating ${platform} application bundles (phase: ${message})...`;
@@ -215,12 +215,10 @@ function getCommonConfig(wco) {
             }
         })());
     }
-    if ((scriptsSourceMap || stylesSourceMap)) {
+    if (scriptsSourceMap || stylesSourceMap) {
         extraRules.push({
             test: /\.m?js$/,
-            exclude: vendorSourceMap
-                ? undefined
-                : /[\\\/]node_modules[\\\/]/,
+            exclude: vendorSourceMap ? undefined : /[\\\/]node_modules[\\\/]/,
             enforce: 'pre',
             loader: require.resolve('source-map-loader'),
         });
@@ -240,11 +238,11 @@ function getCommonConfig(wco) {
         extraMinimizers.push(new plugins_1.OptimizeCssWebpackPlugin({
             sourceMap: stylesSourceMap,
             // component styles retain their original file name
-            test: file => /\.(?:css|scss|sass|less|styl)$/.test(file),
+            test: (file) => /\.(?:css|scss|sass|less|styl)$/.test(file),
         }));
     }
     if (scriptsOptimization) {
-        const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT } = require('@angular/compiler-cli');
+        const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT, } = require('@angular/compiler-cli');
         const angularGlobalDefinitions = buildOptions.aot
             ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT
             : GLOBAL_DEFS_FOR_TERSER;
@@ -285,7 +283,7 @@ function getCommonConfig(wco) {
             // Name mangling is handled within the browser builder
             mangle: environment_options_1.allowMangle && platform !== 'server' && !differentialLoadingMode,
         };
-        const globalScriptsNames = globalScriptsByBundleName.map(s => s.bundleName);
+        const globalScriptsNames = globalScriptsByBundleName.map((s) => s.bundleName);
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,
             parallel: utils_1.maxWorkers,
@@ -392,7 +390,8 @@ function getCommonConfig(wco) {
                 ...extraRules,
             ],
         },
-        cache: !!buildOptions.watch && !environment_options_1.cachingDisabled && {
+        cache: !!buildOptions.watch &&
+            !environment_options_1.cachingDisabled && {
             type: 'memory',
             maxGenerations: 1,
         },

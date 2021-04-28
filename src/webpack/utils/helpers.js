@@ -33,7 +33,7 @@ function getOutputHashFormat(option, length = 20) {
 }
 exports.getOutputHashFormat = getOutputHashFormat;
 function normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName) {
-    return extraEntryPoints.map(entry => {
+    return extraEntryPoints.map((entry) => {
         if (typeof entry === 'string') {
             return { input: entry, inject: true, bundleName: defaultBundleName };
         }

@@ -13,7 +13,7 @@ const fs = require("fs");
 // https://github.com/angular/angular-cli/issues/15544 & https://github.com/nodejs/node/pull/27241
 let copyFileWorkaround = false;
 if (process.platform === 'darwin') {
-    const version = process.versions.node.split('.').map(part => Number(part));
+    const version = process.versions.node.split('.').map((part) => Number(part));
     if (version[0] < 10 || version[0] === 11 || (version[0] === 10 && version[1] < 16)) {
         copyFileWorkaround = true;
     }

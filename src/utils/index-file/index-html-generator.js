@@ -25,11 +25,7 @@ class IndexHtmlGenerator {
         if ((_b = this.options.optimization) === null || _b === void 0 ? void 0 : _b.styles.inlineCritical) {
             extraPlugins.push(inlineCriticalCssPlugin(this));
         }
-        this.plugins = [
-            augmentIndexHtmlPlugin(this),
-            ...extraPlugins,
-            postTransformPlugin(this),
-        ];
+        this.plugins = [augmentIndexHtmlPlugin(this), ...extraPlugins, postTransformPlugin(this)];
     }
     async process(options) {
         let content = strip_bom_1.stripBom(await this.readIndex(this.options.indexPath));
@@ -65,9 +61,9 @@ class IndexHtmlGenerator {
 }
 exports.IndexHtmlGenerator = IndexHtmlGenerator;
 function augmentIndexHtmlPlugin(generator) {
-    const { deployUrl, crossOrigin, sri = false, entrypoints, } = generator.options;
+    const { deployUrl, crossOrigin, sri = false, entrypoints } = generator.options;
     return async (html, options) => {
-        const { lang, baseHref, outputPath = '', noModuleFiles, files, moduleFiles, } = options;
+        const { lang, baseHref, outputPath = '', noModuleFiles, files, moduleFiles } = options;
         return augment_index_html_1.augmentIndexHtml({
             html,
             baseHref,
@@ -76,7 +72,7 @@ function augmentIndexHtmlPlugin(generator) {
             sri,
             lang,
             entrypoints,
-            loadOutputFile: filePath => generator.readAsset(path_1.join(outputPath, filePath)),
+            loadOutputFile: (filePath) => generator.readAsset(path_1.join(outputPath, filePath)),
             noModuleFiles,
             moduleFiles,
             files,
@@ -96,10 +92,10 @@ function inlineCriticalCssPlugin(generator) {
     const inlineCriticalCssProcessor = new inline_critical_css_1.InlineCriticalCssProcessor({
         minify: (_a = generator.options.optimization) === null || _a === void 0 ? void 0 : _a.styles.minify,
         deployUrl: generator.options.deployUrl,
-        readAsset: filePath => generator.readAsset(filePath),
+        readAsset: (filePath) => generator.readAsset(filePath),
     });
     return async (html, options) => inlineCriticalCssProcessor.process(html, { outputPath: options.outputPath });
 }
 function postTransformPlugin({ options }) {
-    return async (html) => options.postTransform ? options.postTransform(html) : html;
+    return async (html) => (options.postTransform ? options.postTransform(html) : html);
 }

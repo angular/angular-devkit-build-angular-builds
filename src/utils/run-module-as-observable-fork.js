@@ -15,7 +15,7 @@ const treeKill = require('tree-kill');
 function runModuleAsObservableFork(cwd, modulePath, exportName, 
 // tslint:disable-next-line:no-any
 args) {
-    return new rxjs_1.Observable(obs => {
+    return new rxjs_1.Observable((obs) => {
         const workerPath = path_1.resolve(__dirname, './run-module-worker.js');
         const debugArgRegex = /--inspect(?:-brk|-port)?|--debug(?:-brk|-port)/;
         const execArgv = process.execArgv.filter((arg) => {

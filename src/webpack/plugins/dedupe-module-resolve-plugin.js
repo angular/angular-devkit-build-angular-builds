@@ -11,7 +11,7 @@ exports.DedupeModuleResolvePlugin = void 0;
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 // tslint:disable-next-line: no-any
 function getResourceData(resolveData) {
-    const { descriptionFileData, relativePath, } = resolveData.createData.resourceResolveData;
+    const { descriptionFileData, relativePath } = resolveData.createData.resourceResolveData;
     return {
         packageName: descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.name,
         packageVersion: descriptionFileData === null || descriptionFileData === void 0 ? void 0 : descriptionFileData.version,

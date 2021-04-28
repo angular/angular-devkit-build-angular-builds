@@ -16,10 +16,7 @@ function getTestConfig(wco) {
     const extraRules = [];
     const extraPlugins = [];
     if (codeCoverage) {
-        const exclude = [
-            /\.(e2e|spec)\.tsx?$/,
-            /node_modules/,
-        ];
+        const exclude = [/\.(e2e|spec)\.tsx?$/, /node_modules/];
         if (codeCoverageExclude) {
             for (const excludeGlob of codeCoverageExclude) {
                 glob

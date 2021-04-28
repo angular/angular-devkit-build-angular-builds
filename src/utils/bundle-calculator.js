@@ -119,20 +119,20 @@ class Calculator {
     /** Calculates the size of the given chunk for the provided build type. */
     calculateChunkSize(chunk, buildType) {
         // Look for a process result containing different builds for this chunk.
-        const processResult = this.processResults
-            .find((processResult) => { var _a; return processResult.name === ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()); });
+        const processResult = this.processResults.find((processResult) => { var _a; return processResult.name === ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()); });
         if (processResult) {
             // Found a differential build, use the correct size information.
             const processResultFile = getDifferentialBuildResult(processResult, buildType);
-            return processResultFile && processResultFile.size || 0;
+            return (processResultFile && processResultFile.size) || 0;
         }
         else {
             // No differential builds, get the chunk size by summing its assets.
             if (!chunk.files) {
                 return 0;
             }
-            return chunk.files.filter(file => !file.endsWith('.map'))
-                .map(file => {
+            return chunk.files
+                .filter((file) => !file.endsWith('.map'))
+                .map((file) => {
                 const asset = this.assets.find((asset) => asset.name === file);
                 if (!asset) {
                     throw new Error(`Could not find asset for file: ${file}`);
@@ -144,8 +144,7 @@ class Calculator {
     }
     getAssetSize(asset) {
         if (asset.name.endsWith('.js')) {
-            const processResult = this.processResults
-                .find((processResult) => processResult.original && path_1.basename(processResult.original.filename) === asset.name);
+            const processResult = this.processResults.find((processResult) => processResult.original && path_1.basename(processResult.original.filename) === asset.name);
             if (processResult === null || processResult === void 0 ? void 0 : processResult.original) {
                 return processResult.original.size;
             }
@@ -167,9 +166,9 @@ class BundleCalculator extends Calculator {
         // each then check afterwards if they are all the same.
         const buildSizes = Object.values(DifferentialBuildType).map((buildType) => {
             const size = this.chunks
-                .filter(chunk => { var _a; return (_a = chunk === null || chunk === void 0 ? void 0 : chunk.names) === null || _a === void 0 ? void 0 : _a.includes(budgetName); })
+                .filter((chunk) => { var _a; return (_a = chunk === null || chunk === void 0 ? void 0 : chunk.names) === null || _a === void 0 ? void 0 : _a.includes(budgetName); })
                 // tslint:disable-next-line: no-non-null-assertion
-                .map(chunk => this.calculateChunkSize(chunk, buildType))
+                .map((chunk) => this.calculateChunkSize(chunk, buildType))
                 .reduce((l, r) => l + r, 0);
             return { size, label: `bundle ${this.budget.name}-${buildTypeLabels[buildType]}` };
         });
@@ -193,8 +192,8 @@ class InitialCalculator extends Calculator {
             return {
                 label: `bundle initial-${buildTypeLabels[buildType]}`,
                 size: this.chunks
-                    .filter(chunk => chunk.initial)
-                    .map(chunk => this.calculateChunkSize(chunk, buildType))
+                    .filter((chunk) => chunk.initial)
+                    .map((chunk) => this.calculateChunkSize(chunk, buildType))
                     .reduce((l, r) => l + r, 0),
             };
         });
@@ -214,8 +213,8 @@ class InitialCalculator extends Calculator {
 class AllScriptCalculator extends Calculator {
     calculate() {
         const size = this.assets
-            .filter(asset => asset.name.endsWith('.js'))
-            .map(asset => this.getAssetSize(asset))
+            .filter((asset) => asset.name.endsWith('.js'))
+            .map((asset) => this.getAssetSize(asset))
             .reduce((total, size) => total + size, 0);
         return [{ size, label: 'total scripts' }];
     }
@@ -226,8 +225,8 @@ class AllScriptCalculator extends Calculator {
 class AllCalculator extends Calculator {
     calculate() {
         const size = this.assets
-            .filter(asset => !asset.name.endsWith('.map'))
-            .map(asset => this.getAssetSize(asset))
+            .filter((asset) => !asset.name.endsWith('.map'))
+            .map((asset) => this.getAssetSize(asset))
             .reduce((total, size) => total + size, 0);
         return [{ size, label: 'total' }];
     }
@@ -238,8 +237,8 @@ class AllCalculator extends Calculator {
 class AnyScriptCalculator extends Calculator {
     calculate() {
         return this.assets
-            .filter(asset => asset.name.endsWith('.js'))
-            .map(asset => ({
+            .filter((asset) => asset.name.endsWith('.js'))
+            .map((asset) => ({
             size: this.getAssetSize(asset),
             label: asset.name,
         }));
@@ -251,8 +250,8 @@ class AnyScriptCalculator extends Calculator {
 class AnyCalculator extends Calculator {
     calculate() {
         return this.assets
-            .filter(asset => !asset.name.endsWith('.map'))
-            .map(asset => ({
+            .filter((asset) => !asset.name.endsWith('.map'))
+            .map((asset) => ({
             size: this.getAssetSize(asset),
             label: asset.name,
         }));
@@ -266,11 +265,11 @@ function calculateBytes(input, baseline, factor = 1) {
     if (!matches) {
         return NaN;
     }
-    const baselineBytes = baseline && calculateBytes(baseline) || 0;
+    const baselineBytes = (baseline && calculateBytes(baseline)) || 0;
     let value = Number(matches[1]);
     switch (matches[2] && matches[2].toLowerCase()) {
         case '%':
-            value = baselineBytes * value / 100;
+            value = (baselineBytes * value) / 100;
             break;
         case 'kb':
             value *= 1024;
@@ -333,8 +332,10 @@ exports.checkThresholds = checkThresholds;
 /** Returns the {@link ProcessBundleFile} for the given {@link DifferentialBuildType}. */
 function getDifferentialBuildResult(processResult, buildType) {
     switch (buildType) {
-        case DifferentialBuildType.ORIGINAL: return processResult.original || null;
-        case DifferentialBuildType.DOWNLEVEL: return processResult.downlevel || null;
+        case DifferentialBuildType.ORIGINAL:
+            return processResult.original || null;
+        case DifferentialBuildType.DOWNLEVEL:
+            return processResult.downlevel || null;
     }
 }
 /**
@@ -348,10 +349,12 @@ function mergeDifferentialBuildSizes(buildSizes, mergeLabel) {
         return [];
     }
     // Only one size.
-    return [{
+    return [
+        {
             label: mergeLabel,
             size: buildSizes[0].size,
-        }];
+        },
+    ];
 }
 /** Returns whether or not all items in the list are equivalent to each other. */
 function allEquivalent(items) {
@@ -360,8 +363,7 @@ function allEquivalent(items) {
 function getBuildTypeLabels(processResults) {
     var _a, _b, _c;
     const fileNameSuffixRegExp = /\-(es20\d{2}|esnext)\./;
-    const originalFileName = (_b = (_a = processResults
-        .find(({ original }) => (original === null || original === void 0 ? void 0 : original.filename) && fileNameSuffixRegExp.test(original.filename))) === null || _a === void 0 ? void 0 : _a.original) === null || _b === void 0 ? void 0 : _b.filename;
+    const originalFileName = (_b = (_a = processResults.find(({ original }) => (original === null || original === void 0 ? void 0 : original.filename) && fileNameSuffixRegExp.test(original.filename))) === null || _a === void 0 ? void 0 : _a.original) === null || _b === void 0 ? void 0 : _b.filename;
     let originalSuffix;
     if (originalFileName) {
         originalSuffix = (_c = fileNameSuffixRegExp.exec(originalFileName)) === null || _c === void 0 ? void 0 : _c[1];

@@ -20,8 +20,8 @@ class CommonJsUsageWarnPlugin {
         this.allowedDependencies = new Set(this.options.allowedDependencies);
     }
     apply(compiler) {
-        compiler.hooks.compilation.tap('CommonJsUsageWarnPlugin', compilation => {
-            compilation.hooks.finishModules.tap('CommonJsUsageWarnPlugin', modules => {
+        compiler.hooks.compilation.tap('CommonJsUsageWarnPlugin', (compilation) => {
+            compilation.hooks.finishModules.tap('CommonJsUsageWarnPlugin', (modules) => {
                 var _a, _b;
                 const mainEntry = compilation.entries.get('main');
                 if (!mainEntry) {
@@ -50,7 +50,8 @@ class CommonJsUsageWarnPlugin {
                         // Check if it's parent issuer is also a CommonJS dependency.
                         // In case it is skip as an warning will be show for the parent CommonJS dependency.
                         const parentDependencies = (_a = getIssuer(compilation, issuer)) === null || _a === void 0 ? void 0 : _a.dependencies;
-                        if (parentDependencies && this.hasCommonJsDependencies(compilation, parentDependencies, true)) {
+                        if (parentDependencies &&
+                            this.hasCommonJsDependencies(compilation, parentDependencies, true)) {
                             continue;
                         }
                         // Find the main issuer (entry-point).
@@ -95,10 +96,10 @@ class CommonJsUsageWarnPlugin {
     }
     rawRequestToPackageName(rawRequest) {
         return rawRequest.startsWith('@')
-            // Scoped request ex: @angular/common/locale/en -> @angular/common
-            ? rawRequest.split('/', 2).join('/')
-            // Non-scoped request ex: lodash/isEmpty -> lodash
-            : rawRequest.split('/', 1)[0];
+            ? // Scoped request ex: @angular/common/locale/en -> @angular/common
+                rawRequest.split('/', 2).join('/')
+            : // Non-scoped request ex: lodash/isEmpty -> lodash
+                rawRequest.split('/', 1)[0];
     }
 }
 exports.CommonJsUsageWarnPlugin = CommonJsUsageWarnPlugin;

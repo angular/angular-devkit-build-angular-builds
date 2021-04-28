@@ -26,7 +26,10 @@ function runProtractor(root, options) {
     // TODO: Protractor manages process.exit itself, so this target will allways quit the
     // process. To work around this we run it in a subprocess.
     // https://github.com/angular/protractor/issues/4160
-    return utils_1.runModuleAsObservableFork(root, 'protractor/built/launcher', 'init', [path_1.resolve(root, options.protractorConfig), additionalProtractorConfig]).toPromise();
+    return utils_1.runModuleAsObservableFork(root, 'protractor/built/launcher', 'init', [
+        path_1.resolve(root, options.protractorConfig),
+        additionalProtractorConfig,
+    ]).toPromise();
 }
 async function updateWebdriver() {
     // The webdriver-manager update command can only be accessed via a deep import.
@@ -104,9 +107,7 @@ async function execute(options, context) {
         if (typeof serverOptions.publicHost === 'string') {
             let publicHost = serverOptions.publicHost;
             if (!/^\w+:\/\//.test(publicHost)) {
-                publicHost = `${serverOptions.ssl
-                    ? 'https'
-                    : 'http'}://${publicHost}`;
+                publicHost = `${serverOptions.ssl ? 'https' : 'http'}://${publicHost}`;
             }
             const clientUrl = url.parse(publicHost);
             baseUrl = url.format(clientUrl);

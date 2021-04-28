@@ -32,20 +32,14 @@ class AnyComponentStyleBudgetChecker {
                 if (!compilation.compiler.parentCompilation) {
                     return;
                 }
-                const cssExtensions = [
-                    '.css',
-                    '.scss',
-                    '.less',
-                    '.styl',
-                    '.sass',
-                ];
+                const cssExtensions = ['.css', '.scss', '.less', '.styl', '.sass'];
                 const componentStyles = Object.keys(compilation.assets)
                     .filter((name) => cssExtensions.includes(path.extname(name)))
                     .map((name) => ({
                     size: compilation.assets[name].size(),
                     label: name,
                 }));
-                const thresholds = this.budgets.flatMap(budget => [...bundle_calculator_1.calculateThresholds(budget)]);
+                const thresholds = this.budgets.flatMap((budget) => [...bundle_calculator_1.calculateThresholds(budget)]);
                 for (const { size, label } of componentStyles) {
                     for (const { severity, message } of bundle_calculator_1.checkThresholds(thresholds[Symbol.iterator](), size, label)) {
                         switch (severity) {

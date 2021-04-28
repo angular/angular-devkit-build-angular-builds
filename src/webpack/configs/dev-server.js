@@ -50,7 +50,7 @@ function getDevServerConfig(wco) {
     if (hmr) {
         extraRules.push({
             loader: hmr_loader_1.HmrLoader,
-            include: [main].map(p => path_1.resolve(wco.root, p)),
+            include: [main].map((p) => path_1.resolve(wco.root, p)),
         });
     }
     return {
@@ -72,7 +72,7 @@ function getDevServerConfig(wco) {
                 rewrites: [
                     {
                         from: new RegExp(`^(?!${servePath})/.*`),
-                        to: context => url.format(context.parsedUrl),
+                        to: (context) => url.format(context.parsedUrl),
                     },
                 ],
             },
@@ -173,7 +173,7 @@ function findDefaultServePath(baseHref, deployUrl) {
     // normalize baseHref
     // for ng serve the starting base is always `/` so a relative
     // and root relative value are identical
-    const baseHrefParts = (baseHref || '').split('/').filter(part => part !== '');
+    const baseHrefParts = (baseHref || '').split('/').filter((part) => part !== '');
     if (baseHref && !baseHref.endsWith('/')) {
         baseHrefParts.pop();
     }

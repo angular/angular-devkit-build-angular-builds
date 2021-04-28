@@ -40,7 +40,7 @@ async function initialize(options, context, webpackConfigurationTransformer) {
         // https://github.com/webpack/webpack-dev-middleware/blob/698c9ae5e9bb9a013985add6189ff21c1a1ec185/src/index.js#L65
         // https://github.com/webpack/webpack/blob/cde1b73e12eb8a77eb9ba42e7920c9ec5d29c2c9/lib/Compiler.js#L379-L388
         watch: true,
-    }, context, wco => [
+    }, context, (wco) => [
         configs_1.getCommonConfig(wco),
         configs_1.getStylesConfig(wco),
         configs_1.getTypeScriptConfig(wco),
@@ -76,7 +76,7 @@ function execute(options, context, transforms = {}) {
             // Split along commas to make it more natural, and remove empty strings.
             const reporters = options.reporters
                 .reduce((acc, curr) => acc.concat(curr.split(',')), [])
-                .filter(x => !!x);
+                .filter((x) => !!x);
             if (reporters.length > 0) {
                 karmaOptions.reporters = reporters;
             }
@@ -116,7 +116,7 @@ function execute(options, context, transforms = {}) {
         };
         const config = await karma.config.parseConfig(path_1.resolve(context.workspaceRoot, options.karmaConfig), transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, { promiseConfig: true, throwErrors: true });
         return [karma, config];
-    }), operators_1.switchMap(([karma, karmaConfig]) => new rxjs_1.Observable(subscriber => {
+    }), operators_1.switchMap(([karma, karmaConfig]) => new rxjs_1.Observable((subscriber) => {
         var _a, _b, _c;
         var _d, _e;
         // Pass onto Karma to emit BuildEvents.
@@ -128,7 +128,7 @@ function execute(options, context, transforms = {}) {
             (_c = (_e = karmaConfig.buildWebpack).successCb) !== null && _c !== void 0 ? _c : (_e.successCb = () => subscriber.next({ success: true }));
         }
         // Complete the observable once the Karma server returns.
-        const karmaServer = new karma.Server(karmaConfig, exitCode => {
+        const karmaServer = new karma.Server(karmaConfig, (exitCode) => {
             subscriber.next({ success: exitCode === 0 });
             subscriber.complete();
         });

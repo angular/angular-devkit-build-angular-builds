@@ -16,9 +16,7 @@ const action_cache_1 = require("./action-cache");
 const workers_1 = require("./workers");
 let workerFile = require.resolve('./process-bundle');
 workerFile =
-    path.extname(workerFile) === '.ts'
-        ? require.resolve('./process-bundle-bootstrap')
-        : workerFile;
+    path.extname(workerFile) === '.ts' ? require.resolve('./process-bundle-bootstrap') : workerFile;
 class BundleActionExecutor {
     constructor(workerOptions, integrityAlgorithm, sizeThreshold = 32 * 1024) {
         this.workerOptions = workerOptions;
@@ -79,19 +77,19 @@ class BundleActionExecutor {
         return this.executeAction('process', action);
     }
     processAll(actions) {
-        return BundleActionExecutor.executeAll(actions, action => this.process(action));
+        return BundleActionExecutor.executeAll(actions, (action) => this.process(action));
     }
     async inline(action) {
         return this.executeAction('inlineLocales', action);
     }
     inlineAll(actions) {
-        return BundleActionExecutor.executeAll(actions, action => this.inline(action));
+        return BundleActionExecutor.executeAll(actions, (action) => this.inline(action));
     }
     static async *executeAll(actions, executor) {
         const executions = new Map();
         for (const action of actions) {
             const execution = executor(action);
-            executions.set(execution, execution.then(result => {
+            executions.set(execution, execution.then((result) => {
                 executions.delete(execution);
                 return result;
             }));

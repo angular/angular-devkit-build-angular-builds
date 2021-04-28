@@ -65,7 +65,7 @@ async function browserBuild(architect, host, target, overrides, scheduleOptions)
                 cache = host
                     .read(core_1.join(outputPath, path))
                     .toPromise()
-                    .then(content => core_1.virtualFs.fileBufferToString(content));
+                    .then((content) => core_1.virtualFs.fileBufferToString(content));
                 return cache;
             },
         });

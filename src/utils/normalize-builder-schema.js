@@ -20,15 +20,15 @@ function normalizeBrowserSchema(root, projectRoot, sourceRoot, options) {
         fileReplacements: normalize_file_replacements_1.normalizeFileReplacements(options.fileReplacements || [], root),
         optimization: normalize_optimization_1.normalizeOptimization(options.optimization),
         sourceMap: normalizedSourceMapOptions,
-        preserveSymlinks: options.preserveSymlinks === undefined ? process.execArgv.includes('--preserve-symlinks') : options.preserveSymlinks,
+        preserveSymlinks: options.preserveSymlinks === undefined
+            ? process.execArgv.includes('--preserve-symlinks')
+            : options.preserveSymlinks,
         statsJson: options.statsJson || false,
         budgets: options.budgets || [],
         scripts: options.scripts || [],
         styles: options.styles || [],
         stylePreprocessorOptions: {
-            includePaths: options.stylePreprocessorOptions
-                && options.stylePreprocessorOptions.includePaths
-                || [],
+            includePaths: (options.stylePreprocessorOptions && options.stylePreprocessorOptions.includePaths) || [],
         },
         // Using just `--poll` will result in a value of 0 which is very likely not the intention
         // A value of 0 is falsy and will disable polling rather then enable

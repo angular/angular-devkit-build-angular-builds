@@ -43,7 +43,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
         const browserIndexOutputPath = path.join(outputPath, 'index.html');
         const indexHtml = await fs.promises.readFile(browserIndexOutputPath, 'utf8');
         const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult, localeDirectory);
-        const { AppServerModule, renderModule, } = await Promise.resolve().then(() => require(serverBundlePath));
+        const { AppServerModule, renderModule } = await Promise.resolve().then(() => require(serverBundlePath));
         const renderModuleFn = renderModule;
         if (!(renderModuleFn && AppServerModule)) {
             throw new Error(`renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`);
@@ -59,12 +59,14 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
             ? path.join(root, options.outputIndexPath)
             : browserIndexOutputPath;
         if (inlineCriticalCssProcessor) {
-            const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, { outputPath });
+            const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, {
+                outputPath,
+            });
             html = content;
             if (warnings.length || errors.length) {
                 spinner.stop();
-                warnings.forEach(m => context.logger.warn(m));
-                errors.forEach(m => context.logger.error(m));
+                warnings.forEach((m) => context.logger.warn(m));
+                errors.forEach((m) => context.logger.error(m));
                 spinner.start();
             }
         }
@@ -85,7 +87,7 @@ async function _getServerModuleBundlePath(options, context, serverResult, browse
         throw new Error(`Could not find server output directory: ${outputPath}.`);
     }
     const re = /^main\.(?:[a-zA-Z0-9]{20}\.)?js$/;
-    const maybeMain = fs.readdirSync(outputPath).find(x => re.test(x));
+    const maybeMain = fs.readdirSync(outputPath).find((x) => re.test(x));
     if (!maybeMain) {
         throw new Error('Could not find the main bundle.');
     }

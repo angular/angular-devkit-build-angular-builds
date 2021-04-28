@@ -217,9 +217,10 @@ class BuilderHarness {
         return this.host.scopedSync().exists(core_1.normalize(path));
     }
     hasFileMatch(directory, pattern) {
-        return this.host.scopedSync()
+        return this.host
+            .scopedSync()
             .list(core_1.normalize(directory))
-            .some(name => pattern.test(name));
+            .some((name) => pattern.test(name));
     }
     readFile(path) {
         const content = this.host.scopedSync().read(core_1.normalize(path));

@@ -17,14 +17,14 @@ function hook(compiler, action) {
         compilation.hooks.processAssets.tapPromise({
             name: PLUGIN_NAME,
             stage: webpack_1.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE,
-        }, assets => action(compilation, Object.keys(assets)));
+        }, (assets) => action(compilation, Object.keys(assets)));
     });
 }
 class OptimizeCssWebpackPlugin {
     constructor(options) {
         this._options = {
             sourceMap: false,
-            test: file => file.endsWith('.css'),
+            test: (file) => file.endsWith('.css'),
             ...options,
         };
     }
@@ -32,7 +32,7 @@ class OptimizeCssWebpackPlugin {
         hook(compiler, (compilation, assetsURI) => {
             const files = [...compilation.additionalChunkAssets, ...assetsURI];
             const actions = files
-                .filter(file => this._options.test(file))
+                .filter((file) => this._options.test(file))
                 .map(async (file) => {
                 const asset = compilation.assets[file];
                 if (!asset) {
@@ -56,12 +56,15 @@ class OptimizeCssWebpackPlugin {
                     return;
                 }
                 const cssNanoOptions = {
-                    preset: ['default', {
+                    preset: [
+                        'default',
+                        {
                             // Disable SVG optimizations, as this can cause optimizations which are not compatible in all browsers.
                             svgo: false,
                             // Disable `calc` optimizations, due to several issues. #16910, #16875, #17890
                             calc: false,
-                        }],
+                        },
+                    ],
                 };
                 const postCssOptions = {
                     from: file,
@@ -71,7 +74,8 @@ class OptimizeCssWebpackPlugin {
                     const output = await new Promise((resolve, reject) => {
                         // @types/cssnano are not up to date with version 5.
                         // tslint:disable-next-line: no-any
-                        cssNano(cssNanoOptions).process(content, postCssOptions)
+                        cssNano(cssNanoOptions)
+                            .process(content, postCssOptions)
                             .then(resolve)
                             .catch((err) => reject(err));
                     });

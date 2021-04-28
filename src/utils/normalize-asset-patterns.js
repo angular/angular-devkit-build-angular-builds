@@ -23,8 +23,7 @@ function normalizeAssetPatterns(assetPatterns, root, projectRoot, maybeSourceRoo
     if (assetPatterns.length === 0) {
         return [];
     }
-    return assetPatterns
-        .map(assetPattern => {
+    return assetPatterns.map((assetPattern) => {
         // Normalize string asset patterns to objects.
         if (typeof assetPattern === 'string') {
             const assetPath = core_1.normalize(assetPattern);

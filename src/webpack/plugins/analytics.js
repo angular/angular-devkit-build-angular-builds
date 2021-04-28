@@ -88,7 +88,7 @@ class NgBuildAnalyticsPlugin {
         const startTime = +(stats.startTime || 0);
         const endTime = +(stats.endTime || 0);
         const metrics = [];
-        metrics[core_1.analytics.NgCliAnalyticsMetrics.BuildTime] = (endTime - startTime);
+        metrics[core_1.analytics.NgCliAnalyticsMetrics.BuildTime] = endTime - startTime;
         metrics[core_1.analytics.NgCliAnalyticsMetrics.NgOnInitCount] = this._stats.numberOfNgOnInit;
         metrics[core_1.analytics.NgCliAnalyticsMetrics.NgComponentCount] = this._stats.numberOfComponents;
         metrics[core_1.analytics.NgCliAnalyticsMetrics.InitialChunkSize] = this._stats.initialChunkSize;
@@ -144,7 +144,7 @@ class NgBuildAnalyticsPlugin {
             for (const errObject of stats.compilation.errors) {
                 if (errObject instanceof Error) {
                     const allErrors = errObject.message.match(webpackAllErrorMessageRe);
-                    for (const err of [...allErrors || []].slice(1)) {
+                    for (const err of [...(allErrors || [])].slice(1)) {
                         const message = (err.match(webpackTsErrorMessageRe) || [])[1];
                         if (message) {
                             // At this point this should be a TS1234.
@@ -205,9 +205,9 @@ class NgBuildAnalyticsPlugin {
         // Only reports modules that are part of the user's project. We also don't do node_modules.
         // There is a chance that someone name a file path `hello_node_modules` or something and we
         // will ignore that file for the purpose of gathering, but we're willing to take the risk.
-        if (!module.resource
-            || !module.resource.startsWith(this._projectRoot)
-            || module.resource.indexOf('node_modules') >= 0) {
+        if (!module.resource ||
+            !module.resource.startsWith(this._projectRoot) ||
+            module.resource.indexOf('node_modules') >= 0) {
             return;
         }
         // Check that it's a source file from the project.

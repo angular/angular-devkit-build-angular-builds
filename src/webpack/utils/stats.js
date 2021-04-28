@@ -27,7 +27,7 @@ exports.formatSize = formatSize;
 function generateBundleStats(info) {
     var _a, _b, _c;
     const size = typeof info.size === 'number' ? info.size : '-';
-    const files = (_b = (_a = info.files) === null || _a === void 0 ? void 0 : _a.filter(f => !f.endsWith('.map')).map(f => path.basename(f)).join(', ')) !== null && _b !== void 0 ? _b : '';
+    const files = (_b = (_a = info.files) === null || _a === void 0 ? void 0 : _a.filter((f) => !f.endsWith('.map')).map((f) => path.basename(f)).join(', ')) !== null && _b !== void 0 ? _b : '';
     const names = ((_c = info.names) === null || _c === void 0 ? void 0 : _c.length) ? info.names.join(', ') : '-';
     const initial = !!(info.entry || info.initial);
     const chunkType = info.chunkType || 'unknown';
@@ -39,10 +39,10 @@ function generateBundleStats(info) {
 }
 exports.generateBundleStats = generateBundleStats;
 function generateBuildStatsTable(data, colors, showTotalSize) {
-    const g = (x) => colors ? color_1.colors.greenBright(x) : x;
-    const c = (x) => colors ? color_1.colors.cyanBright(x) : x;
-    const bold = (x) => colors ? color_1.colors.bold(x) : x;
-    const dim = (x) => colors ? color_1.colors.dim(x) : x;
+    const g = (x) => (colors ? color_1.colors.greenBright(x) : x);
+    const c = (x) => (colors ? color_1.colors.cyanBright(x) : x);
+    const bold = (x) => (colors ? color_1.colors.bold(x) : x);
+    const dim = (x) => (colors ? color_1.colors.dim(x) : x);
     const changedEntryChunksStats = [];
     const changedLazyChunksStats = [];
     let initialModernTotalSize = 0;
@@ -104,22 +104,23 @@ function generateBuildStatsTable(data, colors, showTotalSize) {
     }
     return textTable(bundleInfo, {
         hsep: dim(' | '),
-        stringLength: s => color_1.removeColor(s).length,
+        stringLength: (s) => color_1.removeColor(s).length,
         align: ['l', 'l', 'r'],
     });
 }
 function generateBuildStats(hash, time, colors) {
-    const w = (x) => colors ? color_1.colors.bold.white(x) : x;
+    const w = (x) => (colors ? color_1.colors.bold.white(x) : x);
     return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
+function statsToString(json, 
 // tslint:disable-next-line: no-any
-function statsToString(json, statsConfig, bundleState) {
+statsConfig, bundleState) {
     var _a, _b;
     if (!((_a = json.chunks) === null || _a === void 0 ? void 0 : _a.length)) {
         return '';
     }
     const colors = statsConfig.colors;
-    const rs = (x) => colors ? color_1.colors.reset(x) : x;
+    const rs = (x) => (colors ? color_1.colors.reset(x) : x);
     const changedChunksStats = bundleState !== null && bundleState !== void 0 ? bundleState : [];
     let unchangedChunkNumber = 0;
     if (!(bundleState === null || bundleState === void 0 ? void 0 : bundleState.length)) {
@@ -127,8 +128,8 @@ function statsToString(json, statsConfig, bundleState) {
             if (!chunk.rendered) {
                 continue;
             }
-            const assets = (_b = json.assets) === null || _b === void 0 ? void 0 : _b.filter(asset => { var _a; return (_a = chunk.files) === null || _a === void 0 ? void 0 : _a.includes(asset.name); });
-            const summedSize = assets === null || assets === void 0 ? void 0 : assets.filter(asset => !asset.name.endsWith('.map')).reduce((total, asset) => total + asset.size, 0);
+            const assets = (_b = json.assets) === null || _b === void 0 ? void 0 : _b.filter((asset) => { var _a; return (_a = chunk.files) === null || _a === void 0 ? void 0 : _a.includes(asset.name); });
+            const summedSize = assets === null || assets === void 0 ? void 0 : assets.filter((asset) => !asset.name.endsWith('.map')).reduce((total, asset) => total + asset.size, 0);
             changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }));
         }
         unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
@@ -149,23 +150,25 @@ function statsToString(json, statsConfig, bundleState) {
     // This will correct the time and include these.
     let time = 0;
     if (json.builtAt !== undefined && json.time !== undefined) {
-        time = (Date.now() - json.builtAt) + json.time;
+        time = Date.now() - json.builtAt + json.time;
     }
     if (unchangedChunkNumber > 0) {
-        return '\n' + rs(core_1.tags.stripIndents `
+        return ('\n' +
+            rs(core_1.tags.stripIndents `
       ${statsTable}
 
       ${unchangedChunkNumber} unchanged chunks
 
       ${generateBuildStats(json.hash || '', time, colors)}
-      `);
+      `));
     }
     else {
-        return '\n' + rs(core_1.tags.stripIndents `
+        return ('\n' +
+            rs(core_1.tags.stripIndents `
       ${statsTable}
 
       ${generateBuildStats(json.hash || '', time, colors)}
-      `);
+      `));
     }
 }
 exports.IGNORE_WARNINGS = [
@@ -178,14 +181,12 @@ exports.IGNORE_WARNINGS = [
 // tslint:disable-next-line: no-any
 function statsWarningsToString(json, statsConfig) {
     const colors = statsConfig.colors;
-    const c = (x) => colors ? color_1.colors.reset.cyan(x) : x;
-    const y = (x) => colors ? color_1.colors.reset.yellow(x) : x;
-    const yb = (x) => colors ? color_1.colors.reset.yellowBright(x) : x;
+    const c = (x) => (colors ? color_1.colors.reset.cyan(x) : x);
+    const y = (x) => (colors ? color_1.colors.reset.yellow(x) : x);
+    const yb = (x) => (colors ? color_1.colors.reset.yellowBright(x) : x);
     const warnings = json.warnings ? [...json.warnings] : [];
     if (json.children) {
-        warnings.push(...json.children
-            .map(c => { var _a; return (_a = c.warnings) !== null && _a !== void 0 ? _a : []; })
-            .reduce((a, b) => [...a, ...b], []));
+        warnings.push(...json.children.map((c) => { var _a; return (_a = c.warnings) !== null && _a !== void 0 ? _a : []; }).reduce((a, b) => [...a, ...b], []));
     }
     let output = '';
     for (const warning of warnings) {
@@ -213,14 +214,12 @@ exports.statsWarningsToString = statsWarningsToString;
 // tslint:disable-next-line: no-any
 function statsErrorsToString(json, statsConfig) {
     const colors = statsConfig.colors;
-    const c = (x) => colors ? color_1.colors.reset.cyan(x) : x;
-    const yb = (x) => colors ? color_1.colors.reset.yellowBright(x) : x;
-    const r = (x) => colors ? color_1.colors.reset.redBright(x) : x;
+    const c = (x) => (colors ? color_1.colors.reset.cyan(x) : x);
+    const yb = (x) => (colors ? color_1.colors.reset.yellowBright(x) : x);
+    const r = (x) => (colors ? color_1.colors.reset.redBright(x) : x);
     const errors = json.errors ? [...json.errors] : [];
     if (json.children) {
-        errors.push(...json.children
-            .map(c => (c === null || c === void 0 ? void 0 : c.errors) || [])
-            .reduce((a, b) => [...a, ...b], []));
+        errors.push(...json.children.map((c) => (c === null || c === void 0 ? void 0 : c.errors) || []).reduce((a, b) => [...a, ...b], []));
     }
     let output = '';
     for (const error of errors) {
@@ -247,12 +246,12 @@ function statsErrorsToString(json, statsConfig) {
 exports.statsErrorsToString = statsErrorsToString;
 function statsHasErrors(json) {
     var _a, _b;
-    return !!(((_a = json.errors) === null || _a === void 0 ? void 0 : _a.length) || ((_b = json.children) === null || _b === void 0 ? void 0 : _b.some(c => { var _a; return (_a = c.errors) === null || _a === void 0 ? void 0 : _a.length; })));
+    return !!(((_a = json.errors) === null || _a === void 0 ? void 0 : _a.length) || ((_b = json.children) === null || _b === void 0 ? void 0 : _b.some((c) => { var _a; return (_a = c.errors) === null || _a === void 0 ? void 0 : _a.length; })));
 }
 exports.statsHasErrors = statsHasErrors;
 function statsHasWarnings(json) {
     var _a, _b;
-    return !!(((_a = json.warnings) === null || _a === void 0 ? void 0 : _a.length) || ((_b = json.children) === null || _b === void 0 ? void 0 : _b.some(c => { var _a; return (_a = c.warnings) === null || _a === void 0 ? void 0 : _a.length; })));
+    return !!(((_a = json.warnings) === null || _a === void 0 ? void 0 : _a.length) || ((_b = json.children) === null || _b === void 0 ? void 0 : _b.some((c) => { var _a; return (_a = c.warnings) === null || _a === void 0 ? void 0 : _a.length; })));
 }
 exports.statsHasWarnings = statsHasWarnings;
 function createWebpackLoggingCallback(verbose, logger) {

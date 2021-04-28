@@ -25,7 +25,7 @@ class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
         throw new Error('compilation is undefined.');
     }
     apply(compiler) {
-        compiler.hooks.thisCompilation.tap(PLUGIN_NAME, compilation => {
+        compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
             this._compilation = compilation;
             compilation.hooks.processAssets.tapPromise({
                 name: PLUGIN_NAME,
@@ -67,8 +67,8 @@ class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
                     lang: this.options.lang,
                 });
                 assets[this.options.outputPath] = new webpack_1.sources.RawSource(content);
-                warnings.forEach(msg => webpack_diagnostics_1.addWarning(this.compilation, msg));
-                errors.forEach(msg => webpack_diagnostics_1.addError(this.compilation, msg));
+                warnings.forEach((msg) => webpack_diagnostics_1.addWarning(this.compilation, msg));
+                errors.forEach((msg) => webpack_diagnostics_1.addError(this.compilation, msg));
             }
             catch (error) {
                 webpack_diagnostics_1.addError(this.compilation, error.message);

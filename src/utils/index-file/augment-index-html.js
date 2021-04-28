@@ -77,10 +77,7 @@ async function augmentIndexHtml(params) {
     }
     let linkTags = [];
     for (const stylesheet of stylesheets) {
-        const attrs = [
-            `rel="stylesheet"`,
-            `href="${deployUrl}${stylesheet}"`,
-        ];
+        const attrs = [`rel="stylesheet"`, `href="${deployUrl}${stylesheet}"`];
         if (crossOrigin !== 'none') {
             attrs.push(`crossorigin="${crossOrigin}"`);
         }
@@ -93,7 +90,7 @@ async function augmentIndexHtml(params) {
     const { rewriter, transformedContent } = await html_rewriting_stream_1.htmlRewritingStream(html);
     const baseTagExists = html.includes('<base');
     rewriter
-        .on('startTag', tag => {
+        .on('startTag', (tag) => {
         switch (tag.tagName) {
             case 'html':
                 // Adjust document locale if specified
@@ -118,7 +115,7 @@ async function augmentIndexHtml(params) {
         }
         rewriter.emitStartTag(tag);
     })
-        .on('endTag', tag => {
+        .on('endTag', (tag) => {
         switch (tag.tagName) {
             case 'head':
                 for (const linkTag of linkTags) {
@@ -146,13 +143,11 @@ async function augmentIndexHtml(params) {
 exports.augmentIndexHtml = augmentIndexHtml;
 function generateSriAttributes(content) {
     const algo = 'sha384';
-    const hash = crypto_1.createHash(algo)
-        .update(content, 'utf8')
-        .digest('base64');
+    const hash = crypto_1.createHash(algo).update(content, 'utf8').digest('base64');
     return `integrity="${algo}-${hash}"`;
 }
 function updateAttribute(tag, name, value) {
-    const index = tag.attrs.findIndex(a => a.name === name);
+    const index = tag.attrs.findIndex((a) => a.name === name);
     const newValue = { name, value };
     if (index === -1) {
         tag.attrs.push(newValue);
