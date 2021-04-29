@@ -25,13 +25,13 @@ function addKarmaFiles(files, newFiles, prepend = false) {
     const defaults = {
         included: true,
         served: true,
-        watched: true
+        watched: true,
     };
     const processedFiles = newFiles
         // Remove globs that do not match any files, otherwise Karma will show a warning for these.
-        .filter(file => glob.sync(file.pattern, { nodir: true }).length != 0)
+        .filter((file) => glob.sync(file.pattern, { nodir: true }).length != 0)
         // Fill in pattern properties with defaults.
-        .map(file => ({ ...defaults, ...file }));
+        .map((file) => ({ ...defaults, ...file }));
     // It's important to not replace the array, because
     // karma already has a reference to the existing array.
     if (prepend) {
@@ -60,7 +60,7 @@ const init = (config, emitter) => {
         const ksmsPath = path.dirname(require.resolve('karma-source-map-support'));
         addKarmaFiles(config.files, [
             { pattern: path.join(smsPath, 'browser-source-map-support.js'), watched: false },
-            { pattern: path.join(ksmsPath, 'client.js'), watched: false }
+            { pattern: path.join(ksmsPath, 'client.js'), watched: false },
         ], true);
     }
     config.reporters.unshift('@angular-devkit/build-angular--event-reporter');
@@ -113,6 +113,7 @@ const init = (config, emitter) => {
         // we can override the file watcher instead.
         webpackConfig.plugins.unshift({
             apply: (compiler) => {
+                // tslint:disable-line:no-any
                 compiler.hooks.afterEnvironment.tap('karma', () => {
                     compiler.watchFileSystem = { watch: () => { } };
                 });
@@ -138,7 +139,7 @@ const init = (config, emitter) => {
             logger.error(stats_1.statsErrorsToString(statsJson, { colors: true }));
             // Notify potential listeners of the compile error.
             emitter.emit('compile_error', {
-                errors: (_a = statsJson.errors) === null || _a === void 0 ? void 0 : _a.map(e => e.message),
+                errors: (_a = statsJson.errors) === null || _a === void 0 ? void 0 : _a.map((e) => e.message),
             });
             // Finish Karma run early in case of compilation error.
             emitter.emit('run_complete', [], { exitCode: 1 });
@@ -296,5 +297,5 @@ module.exports = {
     'reporter:@angular-devkit/build-angular--sourcemap-reporter': ['type', sourceMapReporter],
     'reporter:@angular-devkit/build-angular--event-reporter': ['type', eventReporter],
     'middleware:@angular-devkit/build-angular--blocker': ['factory', requestBlocker],
-    'middleware:@angular-devkit/build-angular--fallback': ['factory', fallbackMiddleware]
+    'middleware:@angular-devkit/build-angular--fallback': ['factory', fallbackMiddleware],
 };

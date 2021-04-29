@@ -72,7 +72,7 @@ function execute(options, context, transforms = {}) {
             stats_1.webpackStatsLogger(context.logger, webpackStats, config);
             return { ...output, success };
         }));
-    }), operators_1.map(output => {
+    }), operators_1.map((output) => {
         if (!output.success) {
             return output;
         }
@@ -93,7 +93,7 @@ async function initialize(options, context, webpackConfigurationTransform) {
         buildOptimizer: false,
         aot: true,
         platform: 'server',
-    }, context, wco => [
+    }, context, (wco) => [
         configs_1.getCommonConfig(wco),
         configs_1.getServerConfig(wco),
         configs_1.getStylesConfig(wco),

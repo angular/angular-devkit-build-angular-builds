@@ -16,7 +16,7 @@ const helpers_1 = require("../utils/helpers");
  * @param wco Options which include the build options and app config
  */
 function getServerConfig(wco) {
-    const { sourceMap, bundleDependencies, externalDependencies = [], } = wco.buildOptions;
+    const { sourceMap, bundleDependencies, externalDependencies = [] } = wco.buildOptions;
     const extraPlugins = [];
     const { scripts, styles, hidden } = sourceMap;
     if (scripts || styles) {

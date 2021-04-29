@@ -17,7 +17,7 @@ function findTests(patterns, cwd, workspaceRoot) {
     return patterns.reduce((files, pattern) => {
         const relativePathToMain = cwd.replace(workspaceRoot, '').substr(1); // remove leading slash
         const tests = findMatchingTests(pattern, cwd, relativePathToMain);
-        tests.forEach(file => {
+        tests.forEach((file) => {
             if (!files.includes(file)) {
                 files.push(file);
             }

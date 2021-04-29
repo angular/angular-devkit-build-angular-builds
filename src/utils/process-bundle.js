@@ -19,7 +19,7 @@ const terser_1 = require("terser");
 const v8 = require("v8");
 const webpack_1 = require("webpack");
 const environment_options_1 = require("./environment-options");
-const { ConcatSource, OriginalSource, ReplaceSource, SourceMapSource, } = webpack_1.sources;
+const { ConcatSource, OriginalSource, ReplaceSource, SourceMapSource } = webpack_1.sources;
 // If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
 const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
 let cachePath;
@@ -80,7 +80,8 @@ async function process(options) {
             inputSourceMap: false,
             babelrc: false,
             configFile: false,
-            presets: [[
+            presets: [
+                [
                     require.resolve('@babel/preset-env'),
                     {
                         // browserslist-compatible query or object of minimum environment versions to support
@@ -90,7 +91,8 @@ async function process(options) {
                         // 'transform-typeof-symbol' generates slower code
                         exclude: ['transform-typeof-symbol'],
                     },
-                ]],
+                ],
+            ],
             plugins: [
                 createIifeWrapperPlugin(),
                 ...(options.replacements ? [createReplacePlugin(options.replacements)] : []),
@@ -146,9 +148,9 @@ async function mergeSourceMapsFast(first, second) {
     const generator = new source_map_1.SourceMapGenerator();
     // sourcemap package adds the sourceRoot to all position source paths if not removed
     delete first.sourceRoot;
-    await source_map_1.SourceMapConsumer.with(first, null, originalConsumer => {
-        return source_map_1.SourceMapConsumer.with(second, null, newConsumer => {
-            newConsumer.eachMapping(mapping => {
+    await source_map_1.SourceMapConsumer.with(first, null, (originalConsumer) => {
+        return source_map_1.SourceMapConsumer.with(second, null, (newConsumer) => {
+            newConsumer.eachMapping((mapping) => {
                 if (mapping.originalLine === null) {
                     return;
                 }
@@ -284,11 +286,7 @@ function createFileEntry(filename, code, map, integrityAlgorithm) {
     };
 }
 function generateIntegrityValue(hashAlgorithm, code) {
-    return (hashAlgorithm +
-        '-' +
-        crypto_1.createHash(hashAlgorithm)
-            .update(code)
-            .digest('base64'));
+    return hashAlgorithm + '-' + crypto_1.createHash(hashAlgorithm).update(code).digest('base64');
 }
 // The webpack runtime chunk is already ES5.
 // However, two variants are still needed due to lazy routing and SRI differences
@@ -520,8 +518,8 @@ async function inlineLocalesDirect(ast, options) {
                 localeDataSource = new OriginalSource(localeDataContent, path.basename(localeDataPath));
             }
             outputSource = localeDataSource
-                // The semicolon ensures that there is no syntax error between statements
-                ? new ConcatSource(setLocaleText, localeDataSource, ';\n', content)
+                ? // The semicolon ensures that there is no syntax error between statements
+                    new ConcatSource(setLocaleText, localeDataSource, ';\n', content)
                 : new ConcatSource(setLocaleText, content);
         }
         const { source: outputCode, map: outputMap } = outputSource.sourceAndMap();

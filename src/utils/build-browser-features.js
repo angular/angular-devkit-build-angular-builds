@@ -38,13 +38,9 @@ class BuildBrowserFeatures {
         // n: feature is unavailable
         // a: feature is partially supported
         // x: feature is prefixed
-        const criteria = [
-            'y',
-            'a',
-        ];
+        const criteria = ['y', 'a'];
         const data = caniuse_lite_1.feature(caniuse_lite_1.features[featureId]);
-        return !this.supportedBrowsers
-            .some(browser => {
+        return !this.supportedBrowsers.some((browser) => {
             const [agentId, version] = browser.split(' ');
             const browserData = data.stats[agentId];
             const featureStatus = (browserData && browserData[version]);

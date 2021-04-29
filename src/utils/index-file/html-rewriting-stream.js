@@ -14,7 +14,7 @@ async function htmlRewritingStream(content) {
     const rewriter = new (await Promise.resolve().then(() => require('parse5-html-rewriting-stream')))();
     return {
         rewriter,
-        transformedContent: new Promise(resolve => {
+        transformedContent: new Promise((resolve) => {
             new stream_1.Readable({
                 encoding: 'utf8',
                 read() {

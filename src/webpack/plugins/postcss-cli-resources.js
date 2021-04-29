@@ -13,7 +13,7 @@ const path = require("path");
 const url = require("url");
 function wrapUrl(url) {
     let wrappedUrl;
-    const hasSingleQuotes = url.indexOf('\'') >= 0;
+    const hasSingleQuotes = url.indexOf("'") >= 0;
     if (hasSingleQuotes) {
         wrappedUrl = `"${url}"`;
     }
@@ -74,8 +74,10 @@ function default_1(options) {
                     reject(err);
                     return;
                 }
-                let outputPath = loader_utils_1.interpolateName({ resourcePath: result }, filename(result), { content, context: loader.context || loader.rootContext })
-                    .replace(/\\|\//g, '-');
+                let outputPath = loader_utils_1.interpolateName({ resourcePath: result }, filename(result), {
+                    content,
+                    context: loader.context || loader.rootContext,
+                }).replace(/\\|\//g, '-');
                 if (resourcesOutputPath) {
                     outputPath = path.posix.join(resourcesOutputPath, outputPath);
                 }
@@ -111,9 +113,9 @@ function default_1(options) {
             let modified = false;
             // We want to load it relative to the file that imports
             const inputFile = decl.source && decl.source.input.file;
-            const context = inputFile && path.dirname(inputFile) || loader.context;
+            const context = (inputFile && path.dirname(inputFile)) || loader.context;
             // tslint:disable-next-line:no-conditional-assignment
-            while (match = urlRegex.exec(value)) {
+            while ((match = urlRegex.exec(value))) {
                 const originalUrl = match[1] || match[2] || match[3];
                 let processedUrl;
                 try {

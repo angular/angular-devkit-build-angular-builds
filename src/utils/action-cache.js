@@ -29,9 +29,7 @@ class BundleActionCache {
     }
     generateIntegrityValue(content) {
         const algorithm = this.integrityAlgorithm || 'sha1';
-        const codeHash = crypto_1.createHash(algorithm)
-            .update(content)
-            .digest('base64');
+        const codeHash = crypto_1.createHash(algorithm).update(content).digest('base64');
         return `${algorithm}-${codeHash}`;
     }
     generateBaseCacheKey(content) {
@@ -97,7 +95,7 @@ class BundleActionCache {
         return cacheEntries;
     }
     async getCachedBundleResult(action) {
-        const entries = action.cacheKeys && await this.getCacheEntries(action.cacheKeys);
+        const entries = action.cacheKeys && (await this.getCacheEntries(action.cacheKeys));
         if (!entries) {
             return null;
         }

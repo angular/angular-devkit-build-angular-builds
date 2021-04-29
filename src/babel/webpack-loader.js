@@ -53,7 +53,8 @@ exports.default = babel_loader_1.custom(() => {
                     customOptions.forceES5 = !/\.tsx?$/.test(this.resourcePath);
                 }
                 else if (esTarget >= typescript_1.ScriptTarget.ES2017) {
-                    customOptions.forceAsyncTransformation = !/[\\\/][_f]?esm2015[\\\/]/.test(this.resourcePath) && source.includes('async');
+                    customOptions.forceAsyncTransformation =
+                        !/[\\\/][_f]?esm2015[\\\/]/.test(this.resourcePath) && source.includes('async');
                 }
                 shouldProcess || (shouldProcess = customOptions.forceAsyncTransformation || customOptions.forceES5);
             }
@@ -88,7 +89,7 @@ exports.default = babel_loader_1.custom(() => {
                 // Workaround for https://github.com/babel/babel-loader/pull/896 is available
                 // Delete once the above PR is released
                 // tslint:disable-next-line: no-any
-                inputSourceMap: (configuration.options.inputSourceMap || false),
+                inputSourceMap: configuration.options.inputSourceMap || false,
                 presets: [
                     ...(configuration.options.presets || []),
                     [

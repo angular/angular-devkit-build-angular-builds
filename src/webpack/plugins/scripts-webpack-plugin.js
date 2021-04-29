@@ -34,7 +34,7 @@ class ScriptsWebpackPlugin {
                         reject(error);
                         return;
                     }
-                    resolve((entry && typeof entry !== 'string') ? entry.safeTime : undefined);
+                    resolve(entry && typeof entry !== 'string' ? entry.safeTime : undefined);
                 });
             });
             if (!scriptTime || scriptTime > this._lastBuildTime) {
@@ -64,9 +64,9 @@ class ScriptsWebpackPlugin {
             return;
         }
         const scripts = this.options.scripts
-            .filter(script => !!script)
-            .map(script => path.resolve(this.options.basePath || '', script));
-        compiler.hooks.thisCompilation.tap('scripts-webpack-plugin', compilation => {
+            .filter((script) => !!script)
+            .map((script) => path.resolve(this.options.basePath || '', script));
+        compiler.hooks.thisCompilation.tap('scripts-webpack-plugin', (compilation) => {
             compilation.hooks.additionalAssets.tapPromise('scripts-webpack-plugin', async () => {
                 if (await this.shouldSkip(compilation, scripts)) {
                     if (this._cachedOutput) {
@@ -75,7 +75,7 @@ class ScriptsWebpackPlugin {
                     addDependencies(compilation, scripts);
                     return;
                 }
-                const sourceGetters = scripts.map(fullPath => {
+                const sourceGetters = scripts.map((fullPath) => {
                     return new Promise((resolve, reject) => {
                         compilation.inputFileSystem.readFile(fullPath, (err, data) => {
                             var _a;
@@ -102,7 +102,7 @@ class ScriptsWebpackPlugin {
                 });
                 const sources = await Promise.all(sourceGetters);
                 const concatSource = new webpack_1.sources.ConcatSource();
-                sources.forEach(source => {
+                sources.forEach((source) => {
                     concatSource.add(source);
                     concatSource.add('\n;');
                 });

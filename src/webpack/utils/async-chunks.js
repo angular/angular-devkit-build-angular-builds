@@ -24,7 +24,8 @@ function markAsyncChunksNonInitial(webpackStats, extraEntryPoints) {
         .filter((entryPoint) => !entryPoint.inject)
         .flatMap((entryPoint) => entryPoints[entryPoint.bundleName].chunks);
     // Find chunks for each ID.
-    const asyncChunks = asyncChunkIds.map((chunkId) => {
+    const asyncChunks = asyncChunkIds
+        .map((chunkId) => {
         const chunk = chunks.find((chunk) => chunk.id === chunkId);
         if (!chunk) {
             throw new Error(`Failed to find chunk (${chunkId}) in set:\n${JSON.stringify(chunks)}`);

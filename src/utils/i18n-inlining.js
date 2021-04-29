@@ -72,7 +72,7 @@ async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPat
                 glob: '**/*',
                 input: emittedPath,
                 output: '',
-                ignore: [...processedFiles].map(f => path.relative(emittedPath, f)),
+                ignore: [...processedFiles].map((f) => path.relative(emittedPath, f)),
             },
         ], outputPaths, '');
     }

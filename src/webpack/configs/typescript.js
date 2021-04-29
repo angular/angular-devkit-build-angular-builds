@@ -75,9 +75,7 @@ function getTypeScriptConfig(wco) {
                 },
             ],
         },
-        plugins: [
-            createIvyPlugin(wco, aot, tsConfigPath),
-        ],
+        plugins: [createIvyPlugin(wco, aot, tsConfigPath)],
     };
 }
 exports.getTypeScriptConfig = getTypeScriptConfig;

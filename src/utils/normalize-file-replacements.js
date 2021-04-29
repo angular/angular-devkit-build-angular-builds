@@ -20,8 +20,7 @@ function normalizeFileReplacements(fileReplacements, root) {
     if (fileReplacements.length === 0) {
         return [];
     }
-    const normalizedReplacement = fileReplacements
-        .map(replacement => normalizeFileReplacement(replacement, root));
+    const normalizedReplacement = fileReplacements.map((replacement) => normalizeFileReplacement(replacement, root));
     for (const { replace, with: replacementWith } of normalizedReplacement) {
         if (!fs_1.existsSync(core_1.getSystemPath(replacementWith))) {
             throw new MissingFileReplacementException(core_1.getSystemPath(replacementWith));
