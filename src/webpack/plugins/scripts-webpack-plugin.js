@@ -21,7 +21,6 @@ class ScriptsWebpackPlugin {
     constructor(options) {
         this.options = options;
     }
-    // tslint:disable-next-line: no-any
     async shouldSkip(compilation, scripts) {
         if (this._lastBuildTime == undefined) {
             this._lastBuildTime = Date.now();
@@ -55,7 +54,7 @@ class ScriptsWebpackPlugin {
         chunk.addGroup(entrypoint);
         compilation.entrypoints.set(this.options.name, entrypoint);
         compilation.chunks.add(chunk);
-        // tslint:disable-next-line: no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         compilation.assets[filename] = source;
         compilation.hooks.chunkAsset.call(chunk, filename);
     }
@@ -107,7 +106,9 @@ class ScriptsWebpackPlugin {
                     concatSource.add('\n;');
                 });
                 const combinedSource = new webpack_1.sources.CachedSource(concatSource);
-                const filename = loader_utils_1.interpolateName({ resourcePath: 'scripts.js' }, this.options.filename, { content: combinedSource.source() });
+                const filename = loader_utils_1.interpolateName({ resourcePath: 'scripts.js' }, this.options.filename, {
+                    content: combinedSource.source(),
+                });
                 const output = { filename, source: combinedSource };
                 this._insertOutput(compilation, output);
                 this._cachedOutput = output;

@@ -76,7 +76,7 @@ async function process(options) {
             filename,
             // using false ensures that babel will NOT search and process sourcemap comments (large memory usage)
             // The types do not include the false option even though it is valid
-            // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             inputSourceMap: false,
             babelrc: false,
             configFile: false,
@@ -139,7 +139,6 @@ async function mergeSourceMaps(inputCode, inputSourceMap, resultCode, resultSour
     }
     // SourceMapSource produces high-quality sourcemaps
     // Final sourcemap will always be available when providing the input sourcemaps
-    // tslint:disable-next-line: no-non-null-assertion
     const finalSourceMap = new SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
     return finalSourceMap;
 }
@@ -261,10 +260,10 @@ async function terserMangle(code, options = {}) {
             {
                 asObject: true,
                 // typings don't include asObject option
-                // tslint:disable-next-line: no-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
             },
     });
-    // tslint:disable-next-line: no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const outputCode = minifyOutput.code;
     let outputMap;
     if (options.map && minifyOutput.map) {
@@ -363,26 +362,20 @@ async function createI18nPlugins(locale, translation, missingTranslation, should
     const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
     const diagnostics = new localizeDiag.Diagnostics();
     if (shouldInline) {
-        const es2015 = await Promise.resolve().then(() => require(
-        // tslint:disable-next-line: trailing-comma
-        '@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'));
+        const es2015 = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'));
         plugins.push(
-        // tslint:disable-next-line: no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}), {
             missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
         }));
-        const es5 = await Promise.resolve().then(() => require(
-        // tslint:disable-next-line: trailing-comma
-        '@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
+        const es5 = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
         plugins.push(
-        // tslint:disable-next-line: no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         es5.makeEs5TranslatePlugin(diagnostics, (translation || {}), {
             missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
         }));
     }
-    const inlineLocale = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
-    '@angular/localize/src/tools/src/translate/source_files/locale_plugin'));
+    const inlineLocale = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/translate/source_files/locale_plugin'));
     plugins.push(inlineLocale.makeLocalePlugin(locale));
     if (localeDataContent) {
         plugins.push({
@@ -438,7 +431,7 @@ async function inlineLocales(options) {
     const inputMap = options.map && JSON.parse(options.map);
     for (const locale of i18n.inlineLocales) {
         const isSourceLocale = locale === i18n.sourceLocale;
-        // tslint:disable-next-line: no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const translations = isSourceLocale ? {} : i18n.locales[locale].translation || {};
         let localeDataContent;
         if (options.setLocale) {
@@ -453,7 +446,7 @@ async function inlineLocales(options) {
             filename: options.filename,
             // using false ensures that babel will NOT search and process sourcemap comments (large memory usage)
             // The types do not include the false option even though it is valid
-            // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             inputSourceMap: false,
             babelrc: false,
             configFile: false,
@@ -495,11 +488,11 @@ async function inlineLocalesDirect(ast, options) {
     }
     for (const locale of i18n.inlineLocales) {
         const content = new ReplaceSource(inputMap
-            ? // tslint:disable-next-line: no-any
+            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 new SourceMapSource(options.code, options.filename, inputMap)
             : new OriginalSource(options.code, options.filename));
         const isSourceLocale = locale === i18n.sourceLocale;
-        // tslint:disable-next-line: no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const translations = isSourceLocale ? {} : i18n.locales[locale].translation || {};
         for (const position of positions) {
             const translated = utils.translate(diagnostics, translations, position.messageParts, position.expressions, isSourceLocale ? 'ignore' : options.missingTranslation || 'warning');
@@ -562,9 +555,9 @@ function findLocalizePositions(ast, options, utils) {
                     utils.isGlobalIdentifier(callee)) {
                     const [messageParts, expressions] = unwrapLocalizeCall(path, utils);
                     positions.push({
-                        // tslint:disable-next-line: no-non-null-assertion
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         start: path.node.start,
-                        // tslint:disable-next-line: no-non-null-assertion
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         end: path.node.end,
                         messageParts,
                         expressions,
@@ -579,9 +572,9 @@ function findLocalizePositions(ast, options, utils) {
                 if (core_1.types.isIdentifier(path.node.tag) && path.node.tag.name === localizeName) {
                     const [messageParts, expressions] = unwrapTemplateLiteral(path, utils);
                     positions.push({
-                        // tslint:disable-next-line: no-non-null-assertion
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         start: path.node.start,
-                        // tslint:disable-next-line: no-non-null-assertion
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         end: path.node.end,
                         messageParts,
                         expressions,
@@ -609,7 +602,7 @@ async function loadLocaleData(path, optimize, es5) {
     const transformResult = await core_1.transformAsync(content, {
         filename: path,
         // The types do not include the false option even though it is valid
-        // tslint:disable-next-line: no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         inputSourceMap: false,
         babelrc: false,
         configFile: false,

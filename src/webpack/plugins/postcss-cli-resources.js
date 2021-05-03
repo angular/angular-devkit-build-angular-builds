@@ -114,7 +114,7 @@ function default_1(options) {
             // We want to load it relative to the file that imports
             const inputFile = decl.source && decl.source.input.file;
             const context = (inputFile && path.dirname(inputFile)) || loader.context;
-            // tslint:disable-next-line:no-conditional-assignment
+            // eslint-disable-next-line no-cond-assign
             while ((match = urlRegex.exec(value))) {
                 const originalUrl = match[1] || match[2] || match[3];
                 let processedUrl;

@@ -8,7 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.executeOnceAndFetch = void 0;
-const node_fetch_1 = require("node-fetch"); // tslint:disable-line:no-implicit-dependencies
+const node_fetch_1 = require("node-fetch"); // eslint-disable-line import/no-extraneous-dependencies
 const operators_1 = require("rxjs/operators");
 const url_1 = require("url");
 async function executeOnceAndFetch(harness, url, options) {

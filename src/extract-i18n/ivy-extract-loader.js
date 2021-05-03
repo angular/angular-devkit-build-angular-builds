@@ -12,8 +12,9 @@ const loader_utils_1 = require("loader-utils");
 const nodePath = require("path");
 function localizeExtractLoader(content, 
 // Source map types are broken in the webpack type definitions
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 map) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const loaderContext = this;
     // Casts are needed to workaround the loader-utils typings limited support for option values
     const options = loader_utils_1.getOptions(this);
@@ -22,7 +23,7 @@ map) {
         // level 2 is warnings
         level: 2,
         debug(...args) {
-            // tslint:disable-next-line: no-console
+            // eslint-disable-next-line no-console
             console.debug(...args);
         },
         info(...args) {
@@ -68,9 +69,9 @@ map) {
             return nodePath.dirname(path);
         },
     };
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const extractor = new extraction_1.MessageExtractor(filesystem, logger, {
-        // tslint:disable-next-line: no-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         basePath: this.rootContext,
         useSourceMaps: !!map,
     });

@@ -9,7 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DedupeModuleResolvePlugin = void 0;
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getResourceData(resolveData) {
     const { descriptionFileData, relativePath } = resolveData.createData.resourceResolveData;
     return {

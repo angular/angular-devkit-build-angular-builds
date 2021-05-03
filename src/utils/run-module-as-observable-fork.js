@@ -13,7 +13,7 @@ const path_1 = require("path");
 const rxjs_1 = require("rxjs");
 const treeKill = require('tree-kill');
 function runModuleAsObservableFork(cwd, modulePath, exportName, 
-// tslint:disable-next-line:no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 args) {
     return new rxjs_1.Observable((obs) => {
         const workerPath = path_1.resolve(__dirname, './run-module-worker.js');

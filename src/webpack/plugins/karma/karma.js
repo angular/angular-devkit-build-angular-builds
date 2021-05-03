@@ -113,7 +113,6 @@ const init = (config, emitter) => {
         // we can override the file watcher instead.
         webpackConfig.plugins.unshift({
             apply: (compiler) => {
-                // tslint:disable-line:no-any
                 compiler.hooks.afterEnvironment.tap('karma', () => {
                     compiler.watchFileSystem = { watch: () => { } };
                 });

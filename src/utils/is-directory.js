@@ -8,7 +8,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isDirectory = void 0;
-// tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 const fs = require("fs");
 function isDirectory(path) {

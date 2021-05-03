@@ -8,7 +8,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stripBom = void 0;
-// tslint:disable
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 // Strip BOM from file data.
 // https://stackoverflow.com/questions/24356713

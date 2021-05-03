@@ -39,7 +39,7 @@ function execute(options, context, transforms = {}) {
         context.logger.warn(`Option 'bundleDependencies' string value is deprecated since version 9. Use a boolean value instead.`);
     }
     if (!options.bundleDependencies && tsConfig.options.enableIvy) {
-        // tslint:disable-next-line: no-implicit-dependencies
+        // eslint-disable-next-line import/no-extraneous-dependencies
         const { __processed_by_ivy_ngcc__, main = '' } = require('@angular/core/package.json');
         if (!__processed_by_ivy_ngcc__ ||
             !__processed_by_ivy_ngcc__.main ||

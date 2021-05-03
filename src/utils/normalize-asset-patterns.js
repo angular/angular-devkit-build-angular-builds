@@ -32,7 +32,7 @@ function normalizeAssetPatterns(assetPatterns, root, projectRoot, maybeSourceRoo
             if (!resolvedAssetPath.startsWith(resolvedSourceRoot)) {
                 throw new MissingAssetSourceRootException(assetPattern);
             }
-            let glob, input, output;
+            let glob, input;
             let isDirectory = false;
             try {
                 isDirectory = fs_1.statSync(core_1.getSystemPath(resolvedAssetPath)).isDirectory();
@@ -53,7 +53,7 @@ function normalizeAssetPatterns(assetPatterns, root, projectRoot, maybeSourceRoo
                 input = core_1.dirname(assetPath);
             }
             // Output directory for both is the relative path from source root to input.
-            output = core_1.relative(resolvedSourceRoot, core_1.resolve(root, input));
+            const output = core_1.relative(resolvedSourceRoot, core_1.resolve(root, input));
             // Return the asset pattern in object format.
             return { glob, input, output };
         }

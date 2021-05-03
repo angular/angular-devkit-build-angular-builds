@@ -122,9 +122,9 @@ function execute(options, context, transforms = {}) {
         // Pass onto Karma to emit BuildEvents.
         (_a = karmaConfig.buildWebpack) !== null && _a !== void 0 ? _a : (karmaConfig.buildWebpack = {});
         if (typeof karmaConfig.buildWebpack === 'object') {
-            // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (_b = (_d = karmaConfig.buildWebpack).failureCb) !== null && _b !== void 0 ? _b : (_d.failureCb = () => subscriber.next({ success: false }));
-            // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (_c = (_e = karmaConfig.buildWebpack).successCb) !== null && _c !== void 0 ? _c : (_e.successCb = () => subscriber.next({ success: true }));
         }
         // Complete the observable once the Karma server returns.
