@@ -151,7 +151,6 @@ function getStylesConfig(wco) {
                 }),
                 ...extraPostcssPlugins,
                 postcssPresetEnv({
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     browsers: supportedBrowsers,
                     autoprefixer: true,
                     stage: 3,
