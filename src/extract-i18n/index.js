@@ -42,46 +42,34 @@ function getI18nOutfile(format) {
 async function getSerializer(format, sourceLocale, basePath, useLegacyIds, diagnostics) {
     switch (format) {
         case schema_2.Format.Xmb:
-            const { XmbTranslationSerializer } = await Promise.resolve().then(() => require(
-            // tslint:disable-next-line: trailing-comma
-            '@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer'));
-            // tslint:disable-next-line: no-any
+            const { XmbTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer'));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return new XmbTranslationSerializer(basePath, useLegacyIds);
         case schema_2.Format.Xlf:
         case schema_2.Format.Xlif:
         case schema_2.Format.Xliff:
-            const { Xliff1TranslationSerializer } = await Promise.resolve().then(() => require(
-            // tslint:disable-next-line: trailing-comma
-            '@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer'));
-            // tslint:disable-next-line: no-any
+            const { Xliff1TranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer'));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return new Xliff1TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
         case schema_2.Format.Xlf2:
         case schema_2.Format.Xliff2:
-            const { Xliff2TranslationSerializer } = await Promise.resolve().then(() => require(
-            // tslint:disable-next-line: trailing-comma
-            '@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer'));
-            // tslint:disable-next-line: no-any
+            const { Xliff2TranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer'));
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return new Xliff2TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
         case schema_2.Format.Json:
-            const { SimpleJsonTranslationSerializer } = await Promise.resolve().then(() => require(
-            // tslint:disable-next-line: trailing-comma
-            '@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer'));
+            const { SimpleJsonTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer'));
             return new SimpleJsonTranslationSerializer(sourceLocale);
         case schema_2.Format.LegacyMigrate:
-            const { LegacyMessageIdMigrationSerializer } = await Promise.resolve().then(() => require(
-            // tslint:disable-next-line: trailing-comma
-            '@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer'));
+            const { LegacyMessageIdMigrationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer'));
             return new LegacyMessageIdMigrationSerializer(diagnostics);
         case schema_2.Format.Arb:
-            const { ArbTranslationSerializer } = await Promise.resolve().then(() => require(
-            // tslint:disable-next-line: trailing-comma
-            '@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer'));
+            const { ArbTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer'));
             const fileSystem = {
                 relative(from, to) {
                     return path.relative(from, to);
                 },
             };
-            // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return new ArbTranslationSerializer(sourceLocale, basePath, fileSystem);
     }
 }
@@ -207,9 +195,7 @@ async function execute(options, context, transforms) {
         return webpackResult;
     }
     const basePath = config.context || projectRoot;
-    const { checkDuplicateMessages } = await Promise.resolve().then(() => require(
-    // tslint:disable-next-line: trailing-comma
-    '@angular/localize/src/tools/src/extract/duplicates'));
+    const { checkDuplicateMessages } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/duplicates'));
     // The filesystem is used to create a relative path for each file
     // from the basePath.  This relative path is then used in the error message.
     const checkFileSystem = {
@@ -218,9 +204,9 @@ async function execute(options, context, transforms) {
         },
     };
     const diagnostics = checkDuplicateMessages(
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     checkFileSystem, ivyMessages, 'warning', 
-    // tslint:disable-next-line: no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     basePath);
     if (diagnostics.messages.length > 0) {
         context.logger.warn(diagnostics.formatDiagnostics(''));

@@ -24,7 +24,7 @@ const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
 const stats_1 = require("../utils/stats");
 const TerserPlugin = require('terser-webpack-plugin');
-// tslint:disable-next-line:no-big-function
+// eslint-disable-next-line max-lines-per-function
 function getCommonConfig(wco) {
     var _a;
     const { root, projectRoot, buildOptions, tsConfig } = wco;
@@ -128,7 +128,7 @@ function getCommonConfig(wco) {
     if (buildOptions.assets.length) {
         const copyWebpackPluginPatterns = buildOptions.assets.map((asset) => {
             // Resolve input paths relative to workspace root and add slash at the end.
-            // tslint:disable-next-line: prefer-const
+            // eslint-disable-next-line prefer-const
             let { input, output, ignore = [], glob } = asset;
             input = path.resolve(root, input).replace(/\\/g, '/');
             input = input.endsWith('/') ? input : input + '/';

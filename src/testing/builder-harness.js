@@ -145,15 +145,15 @@ class BuilderHarness {
         context.logger.subscribe((e) => logs.push(e));
         return this.schemaRegistry.compile(this.builderInfo.optionSchema).pipe(operators_1.mergeMap((validator) => validator(targetOptions)), operators_1.map((validationResult) => validationResult.data), operators_1.mergeMap((data) => convertBuilderOutputToObservable(this.builderHandler(data, context))), operators_1.map((buildResult) => ({ result: buildResult, error: undefined })), operators_1.catchError((error) => {
             if (outputLogsOnException) {
-                // tslint:disable-next-line: no-console
+                // eslint-disable-next-line no-console
                 console.error(logs.map((entry) => entry.message).join('\n'));
-                // tslint:disable-next-line: no-console
+                // eslint-disable-next-line no-console
                 console.error(error);
             }
             return rxjs_1.of({ result: undefined, error });
         }), operators_1.map(({ result, error }) => {
             if (outputLogsOnFailure && (result === null || result === void 0 ? void 0 : result.success) === false && logs.length > 0) {
-                // tslint:disable-next-line: no-console
+                // eslint-disable-next-line no-console
                 console.error(logs.map((entry) => entry.message).join('\n'));
             }
             // Capture current logs and clear for next
@@ -163,6 +163,7 @@ class BuilderHarness {
         }), operators_1.finalize(() => {
             this.watcherNotifier = undefined;
             for (const teardown of context.teardowns) {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 teardown();
             }
         }));

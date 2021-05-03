@@ -50,7 +50,6 @@ async function updateWebdriver() {
       Update webdriver-manager manually and run 'ng e2e --no-webdriver-update' instead.
     `);
     }
-    // tslint:disable-next-line:max-line-length no-implicit-dependencies
     const webdriverUpdate = await Promise.resolve().then(() => require(path));
     // const webdriverUpdate = await import(path) as typeof import ('webdriver-manager/built/lib/cmds/update');
     // run `webdriver-manager update --standalone false --gecko false --quiet`

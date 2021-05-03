@@ -52,7 +52,7 @@ const devServerBuildOverriddenKeys = [
  *
  * @experimental Direct usage of this function is considered experimental.
  */
-// tslint:disable-next-line: no-big-function
+// eslint-disable-next-line max-lines-per-function
 function serveWebpackBrowser(options, context, transforms = {}) {
     // Check Angular version.
     const { logger, workspaceRoot } = context;
@@ -106,7 +106,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             // This is needed because we cannot use the inline option directly in the config
             // because of the SuppressExtractedTextChunksWebpackPlugin
             // Consider not using SuppressExtractedTextChunksWebpackPlugin when liveReload is enable.
-            // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             webpackDevServer.addDevServerEntrypoints(config, {
                 ...config.devServer,
                 inline: true,

@@ -39,7 +39,7 @@ class OptimizeCssWebpackPlugin {
                     return;
                 }
                 let content;
-                // tslint:disable-next-line: no-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 let map;
                 if (this._options.sourceMap && asset.sourceAndMap) {
                     const sourceAndMap = asset.sourceAndMap({});
@@ -73,7 +73,7 @@ class OptimizeCssWebpackPlugin {
                 try {
                     const output = await new Promise((resolve, reject) => {
                         // @types/cssnano are not up to date with version 5.
-                        // tslint:disable-next-line: no-any
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         cssNano(cssNanoOptions)
                             .process(content, postCssOptions)
                             .then(resolve)
@@ -96,6 +96,7 @@ class OptimizeCssWebpackPlugin {
                     return;
                 }
             });
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
             return Promise.all(actions).then(() => { });
         });
     }

@@ -113,7 +113,7 @@ function generateBuildStats(hash, time, colors) {
     return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
 function statsToString(json, 
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 statsConfig, bundleState) {
     var _a, _b;
     if (!((_a = json.chunks) === null || _a === void 0 ? void 0 : _a.length)) {
@@ -178,7 +178,7 @@ exports.IGNORE_WARNINGS = [
     // https://github.com/webpack-contrib/source-map-loader/blob/b2de4249c7431dd8432da607e08f0f65e9d64219/src/index.js#L83
     /Failed to parse source map from/,
 ];
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function statsWarningsToString(json, statsConfig) {
     const colors = statsConfig.colors;
     const c = (x) => (colors ? color_1.colors.reset.cyan(x) : x);
@@ -211,7 +211,7 @@ function statsWarningsToString(json, statsConfig) {
     return output ? '\n' + output : output;
 }
 exports.statsWarningsToString = statsWarningsToString;
-// tslint:disable-next-line: no-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function statsErrorsToString(json, statsConfig) {
     const colors = statsConfig.colors;
     const c = (x) => (colors ? color_1.colors.reset.cyan(x) : x);

@@ -11,8 +11,8 @@ exports.CommonJsUsageWarnPlugin = void 0;
 const path_1 = require("path");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 // Webpack doesn't export these so the deep imports can potentially break.
-const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
+const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
 class CommonJsUsageWarnPlugin {
     constructor(options = {}) {
         this.options = options;
@@ -64,7 +64,6 @@ class CommonJsUsageWarnPlugin {
                         // Only show warnings for modules from main entrypoint.
                         // And if the issuer request is not from 'webpack-dev-server', as 'webpack-dev-server'
                         // will require CommonJS libraries for live reloading such as 'sockjs-node'.
-                        // tslint:disable-next-line: no-any
                         if (mainIssuer && mainModules.has(mainIssuer)) {
                             const warning = `${(_b = issuer) === null || _b === void 0 ? void 0 : _b.userRequest} depends on '${rawRequest}'. ` +
                                 'CommonJS or AMD dependencies can cause optimization bailouts.\n' +

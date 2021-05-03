@@ -98,7 +98,7 @@ async function initialize(options, context, differentialLoadingNeeded, webpackCo
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
-// tslint:disable-next-line: no-big-function
+// eslint-disable-next-line max-lines-per-function
 function buildWebpackBrowser(options, context, transforms = {}) {
     var _a;
     const root = core_1.normalize(context.workspaceRoot);
@@ -124,9 +124,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             isDifferentialLoadingNeeded,
             target,
         };
-    }), 
-    // tslint:disable-next-line: no-big-function
-    operators_1.switchMap(({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target, }) => {
+    }), operators_1.switchMap(
+    // eslint-disable-next-line max-lines-per-function
+    ({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target, }) => {
         const normalizedOptimization = utils_1.normalizeOptimization(options.optimization);
         return build_webpack_1.runWebpack(config, context, {
             webpackFactory: require('webpack'),
@@ -137,7 +137,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     }
                 }),
         }).pipe(
-        // tslint:disable-next-line: no-big-function
+        // eslint-disable-next-line max-lines-per-function
         operators_1.concatMap(async (buildEvent) => {
             var _a, _b, _c, _d, _e, _f, _g, _h;
             const spinner = new spinner_1.Spinner();
@@ -233,7 +233,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                         seen.add(file.file);
                         if (file.name === 'vendor' || (!mainChunkId && file.name === 'main')) {
-                            // tslint:disable-next-line: no-non-null-assertion
+                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             mainChunkId = file.id.toString();
                         }
                         // All files at this point except ES5 polyfills are module scripts
@@ -268,7 +268,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             code,
                             map,
                             // id is always present for non-assets
-                            // tslint:disable-next-line: no-non-null-assertion
+                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                             name: file.id,
                             runtime: file.file.startsWith('runtime'),
                             ignoreOriginal: es5Polyfills,

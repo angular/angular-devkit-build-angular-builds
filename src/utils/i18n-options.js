@@ -126,7 +126,7 @@ async function configureI18nBuild(context, options) {
     if (!localeDataBasePath) {
         throw new Error(`Unable to find locale data within '@angular/common'. Please ensure '@angular/common' is installed.`);
     }
-    // Load locale data and translations (if present)
+    // Load locale data and translations (if present)
     let loader;
     const usedFormats = new Set();
     for (const [locale, desc] of Object.entries(i18n.locales)) {
