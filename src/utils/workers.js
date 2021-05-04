@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.maxWorkers = void 0;
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -8,6 +6,8 @@ exports.maxWorkers = void 0;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.maxWorkers = void 0;
 const os_1 = require("os");
 /**
  * Use CPU count -1 with limit to 7 for workers not to clog the system.

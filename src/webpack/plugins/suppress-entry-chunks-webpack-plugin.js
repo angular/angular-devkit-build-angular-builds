@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SuppressExtractedTextChunksWebpackPlugin = void 0;
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -8,6 +6,8 @@ exports.SuppressExtractedTextChunksWebpackPlugin = void 0;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SuppressExtractedTextChunksWebpackPlugin = void 0;
 /**
  * Remove .js files from entry points consisting entirely of stylesheets.
  * To be used together with mini-css-extract-plugin.

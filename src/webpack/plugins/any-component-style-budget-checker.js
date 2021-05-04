@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnyComponentStyleBudgetChecker = void 0;
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -8,6 +6,8 @@ exports.AnyComponentStyleBudgetChecker = void 0;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AnyComponentStyleBudgetChecker = void 0;
 const path = require("path");
 const webpack_1 = require("webpack");
 const schema_1 = require("../../browser/schema");

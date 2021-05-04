@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.IndexHtmlGenerator = void 0;
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -8,6 +6,8 @@ exports.IndexHtmlGenerator = void 0;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.IndexHtmlGenerator = void 0;
 const fs = require("fs");
 const path_1 = require("path");
 const strip_bom_1 = require("../strip-bom");
