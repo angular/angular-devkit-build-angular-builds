@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizeFileReplacements = exports.MissingFileReplacementException = void 0;
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -8,6 +6,8 @@ exports.normalizeFileReplacements = exports.MissingFileReplacementException = vo
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.normalizeFileReplacements = exports.MissingFileReplacementException = void 0;
 const core_1 = require("@angular-devkit/core");
 const fs_1 = require("fs");
 class MissingFileReplacementException extends core_1.BaseException {

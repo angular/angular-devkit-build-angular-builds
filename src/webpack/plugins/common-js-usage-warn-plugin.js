@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommonJsUsageWarnPlugin = void 0;
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -8,6 +6,8 @@ exports.CommonJsUsageWarnPlugin = void 0;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CommonJsUsageWarnPlugin = void 0;
 const path_1 = require("path");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 // Webpack doesn't export these so the deep imports can potentially break.

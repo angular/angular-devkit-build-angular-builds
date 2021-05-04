@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.assetNameTemplateFactory = exports.getWatchOptions = exports.isPolyfillsEntry = exports.getEsVersionForFileName = exports.getSourceMapDevTool = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -8,6 +6,8 @@ exports.assetNameTemplateFactory = exports.getWatchOptions = exports.isPolyfills
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.assetNameTemplateFactory = exports.getWatchOptions = exports.isPolyfillsEntry = exports.getEsVersionForFileName = exports.getSourceMapDevTool = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
 const core_1 = require("@angular-devkit/core");
 const path = require("path");
 const typescript_1 = require("typescript");
