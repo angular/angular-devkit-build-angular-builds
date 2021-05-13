@@ -390,10 +390,6 @@ function getCommonConfig(wco) {
                 ...extraRules,
             ],
         },
-        experiments: {
-            syncWebAssembly: true,
-            asyncWebAssembly: true,
-        },
         cache: !!buildOptions.watch &&
             !environment_options_1.cachingDisabled && {
             type: 'memory',
