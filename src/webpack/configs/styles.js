@@ -63,7 +63,7 @@ function getStylesConfig(wco) {
     // use includePaths from appConfig
     const includePaths = (_c = (_b = (_a = buildOptions.stylePreprocessorOptions) === null || _a === void 0 ? void 0 : _a.includePaths) === null || _b === void 0 ? void 0 : _b.map((p) => path.resolve(root, p))) !== null && _c !== void 0 ? _c : [];
     // Process global styles.
-    const { entryPoints, noInjectNames, paths: globalStylePaths } = resolveGlobalStyles(buildOptions.styles, root, !!buildOptions.preserveSymlinks);
+    const { entryPoints, noInjectNames, paths: globalStylePaths, } = resolveGlobalStyles(buildOptions.styles, root, !!buildOptions.preserveSymlinks);
     if (noInjectNames.length > 0) {
         // Add plugin to remove hashes from lazy styles.
         extraPlugins.push(new plugins_1.RemoveHashPlugin({ chunkNames: noInjectNames, hashFormat }));
