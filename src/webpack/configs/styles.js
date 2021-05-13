@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStylesConfig = void 0;
 const fs = require("fs");
 const path = require("path");
+const sass_service_1 = require("../../sass/sass-service");
 const build_browser_features_1 = require("../../utils/build-browser-features");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
@@ -78,7 +79,7 @@ function getStylesConfig(wco) {
             `To opt-out of the deprecated behaviour and start using 'sass' uninstall 'node-sass'.`);
     }
     catch {
-        sassImplementation = require('sass');
+        sassImplementation = new sass_service_1.SassWorkerImplementation();
     }
     const assetNameTemplate = helpers_1.assetNameTemplateFactory(hashFormat);
     const extraPostcssPlugins = [];
@@ -232,6 +233,8 @@ function getStylesConfig(wco) {
                         implementation: sassImplementation,
                         sourceMap: true,
                         sassOptions: {
+                            // Prevent use of `fibers` package as it no longer works in newer Node.js versions
+                            fiber: false,
                             // bootstrap-sass requires a minimum precision of 8
                             precision: 8,
                             includePaths,
