@@ -12,6 +12,7 @@ const core_1 = require("@angular-devkit/core");
 const path = require("path");
 const textTable = require("text-table");
 const color_1 = require("../../utils/color");
+const stats_1 = require("../configs/stats");
 function formatSize(size) {
     if (size <= 0) {
         return '0 bytes';
@@ -259,13 +260,7 @@ function createWebpackLoggingCallback(verbose, logger) {
         if (verbose) {
             logger.info(stats.toString(config.stats));
         }
-        webpackStatsLogger(logger, stats.toJson({
-            errors: true,
-            warnings: true,
-            builtAt: true,
-            assets: true,
-            chunks: true,
-        }), config);
+        webpackStatsLogger(logger, stats.toJson(stats_1.getWebpackStatsConfig(false)), config);
     };
 }
 exports.createWebpackLoggingCallback = createWebpackLoggingCallback;
