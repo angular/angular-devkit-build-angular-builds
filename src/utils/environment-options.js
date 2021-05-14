@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.profilingEnabled = exports.cachingBasePath = exports.cachingDisabled = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
+exports.maxWorkers = exports.profilingEnabled = exports.cachingBasePath = exports.cachingDisabled = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
 const path = require("path");
 function isDisabled(variable) {
     return variable === '0' || variable.toLowerCase() === 'false';
@@ -72,3 +72,14 @@ exports.cachingBasePath = (() => {
 // Build profiling
 const profilingVariable = process.env['NG_BUILD_PROFILING'];
 exports.profilingEnabled = isPresent(profilingVariable) && isEnabled(profilingVariable);
+/**
+ * Some environments, like CircleCI which use Docker report a number of CPUs by the host and not the count of available.
+ * This cause `Error: Call retries were exceeded` errors when trying to use them.
+ *
+ * @see https://github.com/nodejs/node/issues/28762
+ * @see https://github.com/webpack-contrib/terser-webpack-plugin/issues/143
+ * @see https://ithub.com/angular/angular-cli/issues/16860#issuecomment-588828079
+ *
+ */
+const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
+exports.maxWorkers = isPresent(maxWorkersVariable) ? +maxWorkersVariable : 4;

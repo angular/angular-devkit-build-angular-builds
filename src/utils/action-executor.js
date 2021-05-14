@@ -13,7 +13,7 @@ const os = require("os");
 const path = require("path");
 const v8_1 = require("v8");
 const action_cache_1 = require("./action-cache");
-const workers_1 = require("./workers");
+const environment_options_1 = require("./environment-options");
 let workerFile = require.resolve('./process-bundle');
 workerFile =
     path.extname(workerFile) === '.ts' ? require.resolve('./process-bundle-bootstrap') : workerFile;
@@ -36,7 +36,7 @@ class BundleActionExecutor {
         return (this.largeWorker = new jest_worker_1.default(workerFile, {
             exposedMethods: ['process', 'inlineLocales'],
             setupArgs: [[...v8_1.serialize(this.workerOptions)]],
-            numWorkers: workers_1.maxWorkers,
+            numWorkers: environment_options_1.maxWorkers,
         }));
     }
     ensureSmall() {

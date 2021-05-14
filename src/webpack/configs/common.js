@@ -23,7 +23,6 @@ const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
 const stats_1 = require("../utils/stats");
-const TerserPlugin = require('terser-webpack-plugin');
 // eslint-disable-next-line max-lines-per-function
 function getCommonConfig(wco) {
     var _a;
@@ -235,13 +234,29 @@ function getCommonConfig(wco) {
     }
     const extraMinimizers = [];
     if (stylesOptimization.minify) {
-        extraMinimizers.push(new plugins_1.OptimizeCssWebpackPlugin({
-            sourceMap: stylesSourceMap,
+        const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+        extraMinimizers.push(new CssMinimizerPlugin({
             // component styles retain their original file name
-            test: (file) => /\.(?:css|scss|sass|less|styl)$/.test(file),
+            test: /\.(?:css|scss|sass|less|styl)$/,
+            parallel: environment_options_1.maxWorkers,
+            minify: [CssMinimizerPlugin.cssnanoMinify],
+            minimizerOptions: {
+                preset: [
+                    'default',
+                    {
+                        // Disable SVG optimizations, as this can cause optimizations which are not compatible in all browsers.
+                        svgo: false,
+                        // Disable `calc` optimizations, due to several issues. #16910, #16875, #17890
+                        calc: false,
+                        // Disable CSS rules sorted due to several issues #20693, https://github.com/ionic-team/ionic-framework/issues/23266 and https://github.com/cssnano/cssnano/issues/1054
+                        cssDeclarationSorter: false,
+                    },
+                ],
+            },
         }));
     }
     if (scriptsOptimization) {
+        const TerserPlugin = require('terser-webpack-plugin');
         const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT, } = require('@angular/compiler-cli');
         const angularGlobalDefinitions = buildOptions.aot
             ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT
@@ -286,7 +301,7 @@ function getCommonConfig(wco) {
         const globalScriptsNames = globalScriptsByBundleName.map((s) => s.bundleName);
         extraMinimizers.push(new TerserPlugin({
             sourceMap: scriptsSourceMap,
-            parallel: utils_1.maxWorkers,
+            parallel: environment_options_1.maxWorkers,
             cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
             exclude: globalScriptsNames,
@@ -296,7 +311,7 @@ function getCommonConfig(wco) {
         // They are shared between ES2015 & ES5 outputs so must support ES5.
         new TerserPlugin({
             sourceMap: scriptsSourceMap,
-            parallel: utils_1.maxWorkers,
+            parallel: environment_options_1.maxWorkers,
             cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
             include: globalScriptsNames,

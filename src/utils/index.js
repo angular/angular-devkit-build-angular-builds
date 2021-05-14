@@ -27,4 +27,3 @@ __exportStar(require("./normalize-source-maps"), exports);
 __exportStar(require("./normalize-optimization"), exports);
 __exportStar(require("./normalize-builder-schema"), exports);
 __exportStar(require("./url"), exports);
-__exportStar(require("./workers"), exports);

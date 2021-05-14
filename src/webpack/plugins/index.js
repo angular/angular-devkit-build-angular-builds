@@ -7,12 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PostcssCliResources = exports.CommonJsUsageWarnPlugin = exports.DedupeModuleResolvePlugin = exports.RemoveHashPlugin = exports.SuppressExtractedTextChunksWebpackPlugin = exports.ScriptsWebpackPlugin = exports.OptimizeCssWebpackPlugin = exports.AnyComponentStyleBudgetChecker = void 0;
+exports.PostcssCliResources = exports.CommonJsUsageWarnPlugin = exports.DedupeModuleResolvePlugin = exports.RemoveHashPlugin = exports.SuppressExtractedTextChunksWebpackPlugin = exports.ScriptsWebpackPlugin = exports.AnyComponentStyleBudgetChecker = void 0;
 // Exports the webpack plugins we use internally.
 var any_component_style_budget_checker_1 = require("./any-component-style-budget-checker");
 Object.defineProperty(exports, "AnyComponentStyleBudgetChecker", { enumerable: true, get: function () { return any_component_style_budget_checker_1.AnyComponentStyleBudgetChecker; } });
-var optimize_css_webpack_plugin_1 = require("./optimize-css-webpack-plugin");
-Object.defineProperty(exports, "OptimizeCssWebpackPlugin", { enumerable: true, get: function () { return optimize_css_webpack_plugin_1.OptimizeCssWebpackPlugin; } });
 var scripts_webpack_plugin_1 = require("./scripts-webpack-plugin");
 Object.defineProperty(exports, "ScriptsWebpackPlugin", { enumerable: true, get: function () { return scripts_webpack_plugin_1.ScriptsWebpackPlugin; } });
 var suppress_entry_chunks_webpack_plugin_1 = require("./suppress-entry-chunks-webpack-plugin");
