@@ -170,6 +170,7 @@ async function execute(options, context, transforms) {
         partials.push({
             plugins: [
                 new webpack.NormalModuleReplacementPlugin(/\.(css|scss|sass|styl|less)$/, path.join(__dirname, 'empty-export-default.js')),
+                new webpack.NormalModuleReplacementPlugin(/^angular-resource:\/\//, path.join(__dirname, 'empty-export-default.js')),
             ],
         });
         return partials;
