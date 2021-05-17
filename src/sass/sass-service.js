@@ -9,6 +9,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SassWorkerImplementation = void 0;
 const worker_threads_1 = require("worker_threads");
+const environment_options_1 = require("../utils/environment-options");
+/**
+ * The maximum number of Workers that will be created to execute render requests.
+ */
+const MAX_RENDER_WORKERS = environment_options_1.maxWorkers;
 /**
  * A Sass renderer implementation that provides an interface that can be used by Webpack's
  * `sass-loader`. The implementation uses a Worker thread to perform the Sass rendering
@@ -17,8 +22,11 @@ const worker_threads_1 = require("worker_threads");
  */
 class SassWorkerImplementation {
     constructor() {
+        this.workers = [];
+        this.availableWorkers = [];
         this.requests = new Map();
         this.idCounter = 1;
+        this.nextWorkerIndex = 0;
     }
     /**
      * Provides information about the Sass implementation.
@@ -47,12 +55,22 @@ class SassWorkerImplementation {
         if (functions && Object.keys(functions).length > 0) {
             throw new Error('Sass custom functions are not supported.');
         }
-        if (!this.worker) {
-            this.worker = this.createWorker();
+        let workerIndex = this.availableWorkers.pop();
+        if (workerIndex === undefined) {
+            if (this.workers.length < MAX_RENDER_WORKERS) {
+                workerIndex = this.workers.length;
+                this.workers.push(this.createWorker());
+            }
+            else {
+                workerIndex = this.nextWorkerIndex++;
+                if (this.nextWorkerIndex >= this.workers.length) {
+                    this.nextWorkerIndex = 0;
+                }
+            }
         }
-        const request = this.createRequest(callback, importer);
+        const request = this.createRequest(workerIndex, callback, importer);
         this.requests.set(request.id, request);
-        this.worker.postMessage({
+        this.workers[workerIndex].postMessage({
             id: request.id,
             hasImporter: !!importer,
             options: serializableOptions,
@@ -66,8 +84,9 @@ class SassWorkerImplementation {
      * is only needed if early cleanup is needed.
      */
     close() {
-        var _a;
-        (_a = this.worker) === null || _a === void 0 ? void 0 : _a.terminate();
+        for (const worker of this.workers) {
+            void worker.terminate();
+        }
         this.requests.clear();
     }
     createWorker() {
@@ -84,6 +103,7 @@ class SassWorkerImplementation {
                 return;
             }
             this.requests.delete(response.id);
+            this.availableWorkers.push(request.workerIndex);
             if (response.result) {
                 // The results are expected to be Node.js `Buffer` objects but will each be transferred as
                 // a Uint8Array that does not have the expected `toString` behavior of a `Buffer`.
@@ -143,9 +163,10 @@ class SassWorkerImplementation {
         }
         return result;
     }
-    createRequest(callback, importer) {
+    createRequest(workerIndex, callback, importer) {
         return {
             id: this.idCounter++,
+            workerIndex,
             callback,
             importers: !importer || Array.isArray(importer) ? importer : [importer],
         };

@@ -17,9 +17,11 @@ declare type RenderCallback = (error?: SassException, result?: Result) => void;
  * the worker which can be up to two times faster than the asynchronous variant.
  */
 export declare class SassWorkerImplementation {
-    private worker?;
+    private readonly workers;
+    private readonly availableWorkers;
     private readonly requests;
     private idCounter;
+    private nextWorkerIndex;
     /**
      * Provides information about the Sass implementation.
      * This mimics enough of the `dart-sass` value to be used with the `sass-loader`.
