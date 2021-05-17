@@ -33,6 +33,7 @@ function getCommonConfig(wco) {
     const entryPoints = {};
     // determine hashing format
     const hashFormat = helpers_1.getOutputHashFormat(buildOptions.outputHashing || 'none');
+    const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);
     const targetInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, buildOptions.differentialLoadingNeeded);
     if (buildOptions.main) {
         const mainPath = path.resolve(root, buildOptions.main);
@@ -41,7 +42,6 @@ function getCommonConfig(wco) {
     const differentialLoadingMode = buildOptions.differentialLoadingNeeded && !buildOptions.watch;
     if (platform !== 'server') {
         if (differentialLoadingMode || tsConfig.options.target === typescript_1.ScriptTarget.ES5) {
-            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);
             if (buildBrowserFeatures.isEs5SupportNeeded()) {
                 const polyfillsChunkName = 'polyfills-es5';
                 entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
@@ -300,9 +300,7 @@ function getCommonConfig(wco) {
         };
         const globalScriptsNames = globalScriptsByBundleName.map((s) => s.bundleName);
         extraMinimizers.push(new TerserPlugin({
-            sourceMap: scriptsSourceMap,
             parallel: environment_options_1.maxWorkers,
-            cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
             exclude: globalScriptsNames,
             terserOptions,
@@ -310,9 +308,7 @@ function getCommonConfig(wco) {
         // Script bundles are fully optimized here in one step since they are never downleveled.
         // They are shared between ES2015 & ES5 outputs so must support ES5.
         new TerserPlugin({
-            sourceMap: scriptsSourceMap,
             parallel: environment_options_1.maxWorkers,
-            cache: !environment_options_1.cachingDisabled && cache_path_1.findCachePath('terser-webpack'),
             extractComments: false,
             include: globalScriptsNames,
             terserOptions: {
