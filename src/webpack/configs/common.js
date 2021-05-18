@@ -348,7 +348,6 @@ function getCommonConfig(wco) {
         context: root,
         entry: entryPoints,
         output: {
-            clean: buildOptions.deleteOutputPath,
             path: path.resolve(root, buildOptions.outputPath),
             publicPath: (_a = buildOptions.deployUrl) !== null && _a !== void 0 ? _a : '',
             filename: ({ chunk }) => {
