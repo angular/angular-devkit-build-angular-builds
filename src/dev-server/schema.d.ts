@@ -84,7 +84,8 @@ export interface Schema {
      */
     progress?: boolean;
     /**
-     * Proxy configuration file.
+     * Proxy configuration file. For more information, see
+     * https://angular.io/guide/build#proxying-to-a-backend-server.
      */
     proxyConfig?: string;
     /**
