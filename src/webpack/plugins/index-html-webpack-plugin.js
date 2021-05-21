@@ -40,7 +40,7 @@ class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
             const moduleFiles = [];
             try {
                 for (const [entryName, entrypoint] of this.compilation.entrypoints) {
-                    const entryFiles = (_a = entrypoint === null || entrypoint === void 0 ? void 0 : entrypoint.getFiles()) === null || _a === void 0 ? void 0 : _a.map((f) => ({
+                    const entryFiles = (_a = entrypoint === null || entrypoint === void 0 ? void 0 : entrypoint.getFiles()) === null || _a === void 0 ? void 0 : _a.filter((f) => !f.endsWith('.hot-update.js')).map((f) => ({
                         name: entryName,
                         file: f,
                         extension: path_1.extname(f),
