@@ -56,6 +56,7 @@ function getBrowserConfig(wco) {
             : 'web',
         output: {
             crossOriginLoading,
+            trustedTypes: 'angular#bundler',
         },
         optimization: {
             runtimeChunk: 'single',
