@@ -12,6 +12,7 @@ const fs = require("fs");
 const path = require("path");
 const sass_service_1 = require("../../sass/sass-service");
 const build_browser_features_1 = require("../../utils/build-browser-features");
+const environment_options_1 = require("../../utils/environment-options");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
 function resolveGlobalStyles(styleEntrypoints, root, preserveSymlinks) {
@@ -343,10 +344,45 @@ function getStylesConfig(wco) {
             ],
         });
     }
+    const extraMinimizers = [];
+    if (buildOptions.optimization.styles.minify) {
+        const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+        const minimizerOptions = {
+            preset: [
+                'default',
+                {
+                    // Disable SVG optimizations, as this can cause optimizations which are not compatible in all browsers.
+                    svgo: false,
+                    // Disable `calc` optimizations, due to several issues. #16910, #16875, #17890
+                    calc: false,
+                    // Disable CSS rules sorted due to several issues #20693, https://github.com/ionic-team/ionic-framework/issues/23266 and https://github.com/cssnano/cssnano/issues/1054
+                    cssDeclarationSorter: false,
+                },
+            ],
+        };
+        const globalBundlesRegExp = new RegExp(`^(${Object.keys(entryPoints).join('|')})(\.[0-9a-f]{20})?.css$`);
+        extraMinimizers.push(new CssMinimizerPlugin({
+            // Component styles retain their original file name
+            test: /\.(?:css|scss|sass|less|styl)$/,
+            parallel: false,
+            exclude: globalBundlesRegExp,
+            minify: [CssMinimizerPlugin.cssnanoMinify],
+            minimizerOptions,
+        }), new CssMinimizerPlugin({
+            test: /\.css$/,
+            include: globalBundlesRegExp,
+            parallel: environment_options_1.maxWorkers,
+            minify: [CssMinimizerPlugin.cssnanoMinify],
+            minimizerOptions,
+        }));
+    }
     return {
         entry: entryPoints,
         module: {
             rules: [...fileLanguageRules, ...inlineLanguageRules],
+        },
+        optimization: {
+            minimizer: extraMinimizers,
         },
         plugins: extraPlugins,
     };
