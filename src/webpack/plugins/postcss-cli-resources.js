@@ -83,7 +83,7 @@ function default_1(options) {
                 }
                 loader.addDependency(result);
                 if (emitFile) {
-                    loader.emitFile(outputPath, content, undefined);
+                    loader.emitFile(outputPath, content, undefined, { sourceFilename: result });
                 }
                 let outputUrl = outputPath.replace(/\\/g, '/');
                 if (hash || search) {
