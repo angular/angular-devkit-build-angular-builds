@@ -150,6 +150,7 @@ async function execute(options, context, transforms) {
             configs_1.getCommonConfig(wco),
             configs_1.getBrowserConfig(wco),
             configs_1.getTypeScriptConfig(wco),
+            configs_1.getWorkerConfig(wco),
             configs_1.getStatsConfig(wco),
         ];
         // Add Ivy application file extractor support
