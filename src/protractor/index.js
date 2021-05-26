@@ -64,6 +64,7 @@ async function updateWebdriver() {
  * @experimental Direct usage of this function is considered experimental.
  */
 async function execute(options, context) {
+    context.logger.warn('Protractor has been deprecated including its support in the Angular CLI. For additional information and alternatives, please see https://github.com/angular/protractor/issues/5502.');
     // ensure that only one of these options is used
     if (options.devServerTarget && options.baseUrl) {
         throw new Error(core_1.tags.stripIndents `

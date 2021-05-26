@@ -133,7 +133,8 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             logger.warn(core_1.tags.stripIndents `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
       See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
         }
-        if (options.host &&
+        if (!options.disableHostCheck &&
+            options.host &&
             !/^127\.\d+\.\d+\.\d+/g.test(options.host) &&
             options.host !== 'localhost') {
             logger.warn(core_1.tags.stripIndent `
