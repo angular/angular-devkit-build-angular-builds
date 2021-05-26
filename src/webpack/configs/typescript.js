@@ -37,20 +37,20 @@ function createIvyPlugin(wco, aot, tsconfig) {
             fileReplacements[core_1.getSystemPath(replacement.replace)] = core_1.getSystemPath(replacement.with);
         }
     }
-    let inlineStyleMimeType;
+    let inlineStyleFileExtension;
     switch (buildOptions.inlineStyleLanguage) {
         case 'less':
-            inlineStyleMimeType = 'text/x-less';
+            inlineStyleFileExtension = 'less';
             break;
         case 'sass':
-            inlineStyleMimeType = 'text/x-sass';
+            inlineStyleFileExtension = 'sass';
             break;
         case 'scss':
-            inlineStyleMimeType = 'text/x-scss';
+            inlineStyleFileExtension = 'scss';
             break;
         case 'css':
         default:
-            inlineStyleMimeType = 'text/css';
+            inlineStyleFileExtension = 'css';
             break;
     }
     return new webpack_1.AngularWebpackPlugin({
@@ -59,7 +59,7 @@ function createIvyPlugin(wco, aot, tsconfig) {
         fileReplacements,
         jitMode: !aot,
         emitNgModuleScope: !optimize,
-        inlineStyleMimeType,
+        inlineStyleFileExtension,
     });
 }
 function getTypeScriptConfig(wco) {
