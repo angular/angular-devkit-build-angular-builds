@@ -199,7 +199,7 @@ function getCommonConfig(wco) {
                 compiler.hooks.done.tapPromise('angular-cli-stats', async (stats) => {
                     const { stringifyStream } = await Promise.resolve().then(() => require('@discoveryjs/json-ext'));
                     const data = stats.toJson('verbose');
-                    const statsOutputPath = path.join(root, buildOptions.outputPath, 'stats.json');
+                    const statsOutputPath = path.resolve(root, buildOptions.outputPath, 'stats.json');
                     try {
                         await fs_1.promises.mkdir(path.dirname(statsOutputPath), { recursive: true });
                         await new Promise((resolve, reject) => stringifyStream(data)
