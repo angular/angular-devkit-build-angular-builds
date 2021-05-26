@@ -42,8 +42,6 @@ worker_threads_1.parentPort.on('message', (message) => {
         worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({ id, result });
     }
     catch (error) {
-        // Needed because V8 will only serialize the message and stack properties of an Error instance.
-        const { formatted, file, line, column, message, stack } = error;
-        worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({ id, error: { formatted, file, line, column, message, stack } });
+        worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({ id, error });
     }
 });
