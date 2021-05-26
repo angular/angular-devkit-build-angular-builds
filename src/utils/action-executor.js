@@ -33,7 +33,7 @@ class BundleActionExecutor {
             return this.largeWorker;
         }
         // larger files are processed in a separate process to limit memory usage in the main process
-        return (this.largeWorker = new jest_worker_1.Worker(workerFile, {
+        return (this.largeWorker = new jest_worker_1.default(workerFile, {
             exposedMethods: ['process', 'inlineLocales'],
             setupArgs: [[...v8_1.serialize(this.workerOptions)]],
             numWorkers: environment_options_1.maxWorkers,
@@ -45,7 +45,7 @@ class BundleActionExecutor {
         }
         // small files are processed in a limited number of threads to improve speed
         // The limited number also prevents a large increase in memory usage for an otherwise short operation
-        return (this.smallWorker = new jest_worker_1.Worker(workerFile, {
+        return (this.smallWorker = new jest_worker_1.default(workerFile, {
             exposedMethods: ['process', 'inlineLocales'],
             setupArgs: [this.workerOptions],
             numWorkers: os.cpus().length < 2 ? 1 : 2,
