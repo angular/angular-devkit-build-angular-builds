@@ -35,6 +35,31 @@ function getCommonConfig(wco) {
     const hashFormat = helpers_1.getOutputHashFormat(buildOptions.outputHashing || 'none');
     const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);
     const targetInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, buildOptions.differentialLoadingNeeded);
+    if (buildOptions.progress) {
+        const spinner = new spinner_1.Spinner();
+        spinner.start(`Generating ${platform} application bundles (phase: setup)...`);
+        let previousPercentage;
+        extraPlugins.push(new webpack_1.ProgressPlugin({
+            handler: (percentage, message) => {
+                if (previousPercentage === 1 && percentage !== 0) {
+                    // In some scenarios in Webpack 5 percentage goes from 1 back to 0.99.
+                    // Ex: 0.99 -> 1 -> 0.99 -> 1
+                    // This causes the "complete" message to be displayed multiple times.
+                    return;
+                }
+                switch (percentage) {
+                    case 1:
+                        spinner.succeed(`${platform.replace(/^\w/, (s) => s.toUpperCase())} application bundle generation complete.`);
+                        break;
+                    case 0:
+                    default:
+                        spinner.text = `Generating ${platform} application bundles (phase: ${message})...`;
+                        break;
+                }
+                previousPercentage = percentage;
+            },
+        }));
+    }
     if (buildOptions.main) {
         const mainPath = path.resolve(root, buildOptions.main);
         entryPoints['main'] = [mainPath];
@@ -159,32 +184,6 @@ function getCommonConfig(wco) {
         });
         extraPlugins.push(new CopyWebpackPlugin({
             patterns: copyWebpackPluginPatterns,
-        }));
-    }
-    if (buildOptions.progress) {
-        const spinner = new spinner_1.Spinner();
-        let previousPercentage;
-        extraPlugins.push(new webpack_1.ProgressPlugin({
-            handler: (percentage, message) => {
-                if (previousPercentage === 1 && percentage !== 0) {
-                    // In some scenarios in Webpack 5 percentage goes from 1 back to 0.99.
-                    // Ex: 0.99 -> 1 -> 0.99 -> 1
-                    // This causes the "complete" message to be displayed multiple times.
-                    return;
-                }
-                switch (percentage) {
-                    case 0:
-                        spinner.start(`Generating ${platform} application bundles...`);
-                        break;
-                    case 1:
-                        spinner.succeed(`${platform.replace(/^\w/, (s) => s.toUpperCase())} application bundle generation complete.`);
-                        break;
-                    default:
-                        spinner.text = `Generating ${platform} application bundles (phase: ${message})...`;
-                        break;
-                }
-                previousPercentage = percentage;
-            },
         }));
     }
     if (buildOptions.showCircularDependencies) {
