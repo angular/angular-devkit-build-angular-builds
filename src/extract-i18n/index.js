@@ -167,16 +167,11 @@ async function execute(options, context, transforms) {
                 ],
             },
         });
-        // Replace all stylesheets with empty content
+        // Replace all stylesheets with an empty default export
         partials.push({
-            module: {
-                rules: [
-                    {
-                        test: /\.(css|scss|sass|styl|less)$/,
-                        loader: require.resolve('./empty-loader'),
-                    },
-                ],
-            },
+            plugins: [
+                new webpack.NormalModuleReplacementPlugin(/\.(css|scss|sass|styl|less)$/, path.join(__dirname, 'empty-export-default.js')),
+            ],
         });
         return partials;
     });
