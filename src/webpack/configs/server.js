@@ -34,6 +34,14 @@ function getServerConfig(wco) {
         output: {
             libraryTarget: 'commonjs',
         },
+        module: {
+            parser: {
+                javascript: {
+                    worker: false,
+                    url: false,
+                },
+            },
+        },
         plugins: [
             // Fixes Critical dependency: the request of a dependency is an expression
             new webpack_1.ContextReplacementPlugin(/@?hapi(\\|\/)/),

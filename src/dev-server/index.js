@@ -84,11 +84,47 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             overrides.outputHashing = schema_1.OutputHashing.None;
             logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
         }
+        if (options.hmr) {
+            logger.warn(core_1.tags.stripIndents `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
+      See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
+        }
+        if (!options.disableHostCheck &&
+            options.host &&
+            !/^127\.\d+\.\d+\.\d+/g.test(options.host) &&
+            options.host !== 'localhost') {
+            logger.warn(core_1.tags.stripIndent `
+        Warning: This is a simple server for use in testing or debugging Angular applications
+        locally. It hasn't been reviewed for security issues.
+
+        Binding this server to an open connection can result in compromising your application or
+        computer. Using a different host than the one passed to the "--host" flag might result in
+        websocket connection issues. You might need to use "--disableHostCheck" if that's the
+        case.
+      `);
+        }
+        if (options.disableHostCheck) {
+            logger.warn(core_1.tags.oneLine `
+        Warning: Running a server with --disable-host-check is a security risk.
+        See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a
+        for more information.
+      `);
+        }
         // Webpack's live reload functionality adds the `strip-ansi` package which is commonJS
         (_b = rawBrowserOptions.allowedCommonJsDependencies) !== null && _b !== void 0 ? _b : (rawBrowserOptions.allowedCommonJsDependencies = []);
         rawBrowserOptions.allowedCommonJsDependencies.push('strip-ansi');
         const browserName = await context.getBuilderNameForTarget(browserTarget);
         const browserOptions = (await context.validateOptions({ ...rawBrowserOptions, ...overrides }, browserName));
+        const { styles, scripts } = utils_1.normalizeOptimization(browserOptions.optimization);
+        if (scripts || styles.minify) {
+            logger.error(core_1.tags.stripIndents `
+        ****************************************************************************************
+        This is a simple server for use in testing or debugging Angular applications locally.
+        It hasn't been reviewed for security issues.
+
+        DON'T USE IT FOR PRODUCTION!
+        ****************************************************************************************
+      `);
+        }
         const { config, projectRoot, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(browserOptions, context, (wco) => [
             configs_1.getDevServerConfig(wco),
             configs_1.getCommonConfig(wco),
@@ -129,31 +165,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 }
             }
         }
-        if (options.hmr) {
-            logger.warn(core_1.tags.stripIndents `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
-      See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
-        }
-        if (!options.disableHostCheck &&
-            options.host &&
-            !/^127\.\d+\.\d+\.\d+/g.test(options.host) &&
-            options.host !== 'localhost') {
-            logger.warn(core_1.tags.stripIndent `
-        Warning: This is a simple server for use in testing or debugging Angular applications
-        locally. It hasn't been reviewed for security issues.
-
-        Binding this server to an open connection can result in compromising your application or
-        computer. Using a different host than the one passed to the "--host" flag might result in
-        websocket connection issues. You might need to use "--disableHostCheck" if that's the
-        case.
-      `);
-        }
-        if (options.disableHostCheck) {
-            logger.warn(core_1.tags.oneLine `
-        Warning: Running a server with --disable-host-check is a security risk.
-        See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a
-        for more information.
-      `);
-        }
         let locale;
         if (i18n.shouldInline) {
             // Dev-server only supports one locale
@@ -186,7 +197,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         };
     }
     return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, projectRoot, locale }) => {
-        const normalizedOptimization = utils_1.normalizeOptimization(browserOptions.optimization);
         if (browserOptions.index) {
             const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
             const { options: compilerOptions } = read_tsconfig_1.readTsconfig(tsConfig, workspaceRoot);
@@ -207,21 +217,11 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 deployUrl: browserOptions.deployUrl,
                 sri: browserOptions.subresourceIntegrity,
                 postTransform: transforms.indexHtml,
-                optimization: normalizedOptimization,
+                optimization: utils_1.normalizeOptimization(browserOptions.optimization),
                 WOFFSupportNeeded: !buildBrowserFeatures.isFeatureSupported('woff2'),
                 crossOrigin: browserOptions.crossOrigin,
                 lang: locale,
             }));
-        }
-        if (normalizedOptimization.scripts || normalizedOptimization.styles.minify) {
-            logger.error(core_1.tags.stripIndents `
-          ****************************************************************************************
-          This is a simple server for use in testing or debugging Angular applications locally.
-          It hasn't been reviewed for security issues.
-
-          DON'T USE IT FOR PRODUCTION!
-          ****************************************************************************************
-        `);
         }
         return build_webpack_1.runWebpackDevServer(webpackConfig, context, {
             logging: transforms.logging || stats_1.createWebpackLoggingCallback(!!options.verbose, logger),
