@@ -13,16 +13,11 @@ export declare function getWebpackStatsConfig(verbose?: boolean): {
     timings: boolean;
     chunks: boolean;
     builtAt: boolean;
-    chunkModules: boolean;
-    children: boolean;
-    modules: boolean;
-    reasons: boolean;
     warnings: boolean;
     errors: boolean;
     assets: boolean;
-    version: boolean;
-    errorDetails: boolean;
-    moduleTrace: boolean;
+    ids: boolean;
+    entrypoints: boolean;
 };
 export declare function getStatsConfig(wco: WebpackConfigOptions): {
     stats: {
@@ -32,15 +27,10 @@ export declare function getStatsConfig(wco: WebpackConfigOptions): {
         timings: boolean;
         chunks: boolean;
         builtAt: boolean;
-        chunkModules: boolean;
-        children: boolean;
-        modules: boolean;
-        reasons: boolean;
         warnings: boolean;
         errors: boolean;
         assets: boolean;
-        version: boolean;
-        errorDetails: boolean;
-        moduleTrace: boolean;
+        ids: boolean;
+        entrypoints: boolean;
     };
 };
