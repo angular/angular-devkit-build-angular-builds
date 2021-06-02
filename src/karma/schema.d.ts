@@ -167,7 +167,7 @@ export interface SourceMapClass {
  */
 export interface StylePreprocessorOptions {
     /**
-     * Paths to include. Paths will be resolved to project root.
+     * Paths to include. Paths will be resolved to workspace root.
      */
     includePaths?: string[];
 }
