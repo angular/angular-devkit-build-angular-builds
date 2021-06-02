@@ -134,7 +134,7 @@ class SassWorkerImplementation {
                 request.callback(response.error);
             }
         });
-        mainImporterPort.on('message', ({ id, url, prev }) => {
+        mainImporterPort.on('message', ({ id, url, prev, fromImport, }) => {
             const request = this.requests.get(id);
             if (!(request === null || request === void 0 ? void 0 : request.importers)) {
                 mainImporterPort.postMessage(null);
@@ -142,7 +142,7 @@ class SassWorkerImplementation {
                 Atomics.notify(importerSignal, 0);
                 return;
             }
-            this.processImporters(request.importers, url, prev)
+            this.processImporters(request.importers, url, prev, fromImport)
                 .then((result) => {
                 mainImporterPort.postMessage(result);
             })
@@ -158,12 +158,12 @@ class SassWorkerImplementation {
         mainImporterPort.unref();
         return worker;
     }
-    async processImporters(importers, url, prev) {
+    async processImporters(importers, url, prev, fromImport) {
         let result = null;
         for (const importer of importers) {
             result = await new Promise((resolve) => {
                 // Importers can be both sync and async
-                const innerResult = importer(url, prev, resolve);
+                const innerResult = importer.call({ fromImport }, url, prev, resolve);
                 if (innerResult !== undefined) {
                     resolve(innerResult);
                 }
