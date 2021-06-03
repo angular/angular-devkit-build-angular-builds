@@ -16,6 +16,7 @@ export declare function getWebpackStatsConfig(verbose?: boolean): {
     warnings: boolean;
     errors: boolean;
     assets: boolean;
+    cachedAssets: boolean;
     ids: boolean;
     entrypoints: boolean;
 };
@@ -30,6 +31,7 @@ export declare function getStatsConfig(wco: WebpackConfigOptions): {
         warnings: boolean;
         errors: boolean;
         assets: boolean;
+        cachedAssets: boolean;
         ids: boolean;
         entrypoints: boolean;
     };

@@ -18,6 +18,7 @@ const webpackOutputOptions = {
     warnings: true,
     errors: true,
     assets: true,
+    cachedAssets: true,
     // Needed for markAsyncChunksNonInitial.
     ids: true,
     entrypoints: true,
