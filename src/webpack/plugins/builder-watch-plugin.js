@@ -68,7 +68,8 @@ class BuilderWatchFileSystem {
                         }
                     }
                 }
-                callback(undefined, new Map(timeInfo), new Map(timeInfo), new Set([...fileChanges, ...directoryChanges, ...missingChanges]), removals);
+                const timeInfoMap = new Map(timeInfo);
+                callback(undefined, timeInfoMap, timeInfoMap, new Set([...fileChanges, ...directoryChanges, ...missingChanges]), removals);
             });
         });
         return {
@@ -76,12 +77,6 @@ class BuilderWatchFileSystem {
                 watcher.close();
             },
             pause() { },
-            getFileTimestamps() {
-                return timeInfo.toTimestamps();
-            },
-            getContextTimestamps() {
-                return timeInfo.toTimestamps();
-            },
             getFileTimeInfoEntries() {
                 return new Map(timeInfo);
             },

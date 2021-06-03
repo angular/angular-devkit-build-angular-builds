@@ -19,8 +19,6 @@ export interface BuilderWatcherFactory {
 export interface WebpackWatcher {
     close(): void;
     pause(): void;
-    getFileTimestamps(): Map<string, number>;
-    getContextTimestamps(): Map<string, number>;
     getFileTimeInfoEntries(): Map<string, {
         safeTime: number;
         timestamp: number;
