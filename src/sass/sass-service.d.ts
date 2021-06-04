@@ -41,9 +41,6 @@ export declare class SassWorkerImplementation {
     /**
      * Shutdown the Sass render worker.
      * Executing this method will stop any pending render requests.
-     *
-     * The worker is unreferenced upon creation and will not block application exit. This method
-     * is only needed if early cleanup is needed.
      */
     close(): void;
     private createWorker;
