@@ -28,7 +28,8 @@ exports.default = babel_loader_1.custom(() => {
         inputSourceMap: false,
     });
     return {
-        async customOptions({ i18n, scriptTarget, aot, ...rawOptions }, { source }) {
+        async customOptions({ i18n, scriptTarget, aot, optimize, ...rawOptions }, { source }) {
+            var _a, _b;
             // Must process file if plugins are added
             let shouldProcess = Array.isArray(rawOptions.plugins) && rawOptions.plugins.length > 0;
             const customOptions = {
@@ -65,6 +66,19 @@ exports.default = babel_loader_1.custom(() => {
                 customOptions.i18n = i18n;
                 shouldProcess = true;
             }
+            if (optimize) {
+                const angularPackage = /[\\\/]node_modules[\\\/]@angular[\\\/]/.test(this.resourcePath);
+                customOptions.optimize = {
+                    // Angular packages provide additional tested side effects guarantees and can use
+                    // otherwise unsafe optimizations.
+                    looseEnums: angularPackage,
+                    pureTopLevel: angularPackage,
+                    // JavaScript modules that are marked as side effect free are considered to have
+                    // no decorators that contain non-local effects.
+                    wrapDecorators: !!((_b = (_a = this._module) === null || _a === void 0 ? void 0 : _a.factoryMeta) === null || _b === void 0 ? void 0 : _b.sideEffectFree),
+                };
+                shouldProcess = true;
+            }
             // Add provided loader options to default base options
             const loaderOptions = {
                 ...baseOptions,
@@ -84,12 +98,27 @@ exports.default = babel_loader_1.custom(() => {
             return { custom: customOptions, loader: loaderOptions };
         },
         config(configuration, { customOptions }) {
+            var _a;
+            const plugins = (_a = configuration.options.plugins) !== null && _a !== void 0 ? _a : [];
+            if (customOptions.optimize) {
+                if (customOptions.optimize.pureTopLevel) {
+                    plugins.push(require('./plugins/pure-toplevel-functions').default);
+                }
+                plugins.push(require('./plugins/elide-angular-metadata').default, [
+                    require('./plugins/adjust-typescript-enums').default,
+                    { loose: customOptions.optimize.looseEnums },
+                ], [
+                    require('./plugins/adjust-static-class-members').default,
+                    { wrapDecorators: customOptions.optimize.wrapDecorators },
+                ]);
+            }
             return {
                 ...configuration.options,
                 // Workaround for https://github.com/babel/babel-loader/pull/896 is available
                 // Delete once the above PR is released
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 inputSourceMap: configuration.options.inputSourceMap || false,
+                plugins,
                 presets: [
                     ...(configuration.options.presets || []),
                     [

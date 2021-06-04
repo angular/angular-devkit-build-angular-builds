@@ -219,7 +219,7 @@ function getCommonConfig(wco) {
         });
     }
     let buildOptimizerUseRule = [];
-    if (buildOptions.buildOptimizer) {
+    if (buildOptions.buildOptimizer && wco.scriptTarget < typescript_1.ScriptTarget.ES2015) {
         extraPlugins.push(new build_optimizer_1.BuildOptimizerWebpackPlugin());
         buildOptimizerUseRule = [
             {
@@ -370,6 +370,7 @@ function getCommonConfig(wco) {
                                 cacheDirectory: cache_path_1.findCachePath('babel-webpack'),
                                 scriptTarget: wco.scriptTarget,
                                 aot: buildOptions.aot,
+                                optimize: buildOptions.buildOptimizer && wco.scriptTarget >= typescript_1.ScriptTarget.ES2015,
                             },
                         },
                         ...buildOptimizerUseRule,
