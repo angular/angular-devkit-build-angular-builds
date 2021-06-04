@@ -81,6 +81,13 @@ function getStylesConfig(wco) {
     }
     catch {
         sassImplementation = new sass_service_1.SassWorkerImplementation();
+        extraPlugins.push({
+            apply(compiler) {
+                compiler.hooks.shutdown.tap('sass-worker', () => {
+                    sassImplementation === null || sassImplementation === void 0 ? void 0 : sassImplementation.close();
+                });
+            },
+        });
     }
     const assetNameTemplate = helpers_1.assetNameTemplateFactory(hashFormat);
     const extraPostcssPlugins = [];
