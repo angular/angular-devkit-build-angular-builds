@@ -12,7 +12,6 @@ const core_1 = require("@angular-devkit/core");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const rimraf = require("rimraf");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
 const load_translations_1 = require("./load-translations");
 function normalizeTranslationFileOption(option, locale, expectObjectInError) {
@@ -197,7 +196,7 @@ async function configureI18nBuild(context, options) {
         // Remove temporary directory used for i18n processing
         process.on('exit', () => {
             try {
-                rimraf.sync(tempPath);
+                fs.rmdirSync(tempPath, { recursive: true, maxRetries: 3 });
             }
             catch { }
         });
