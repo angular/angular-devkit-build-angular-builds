@@ -32,7 +32,7 @@ function generateBundleStats(info) {
     const size = typeof info.size === 'number' ? info.size : '-';
     const files = (_b = (_a = info.files) === null || _a === void 0 ? void 0 : _a.filter((f) => !f.endsWith('.map')).map((f) => path.basename(f)).join(', ')) !== null && _b !== void 0 ? _b : '';
     const names = ((_c = info.names) === null || _c === void 0 ? void 0 : _c.length) ? info.names.join(', ') : '-';
-    const initial = !!(info.entry || info.initial);
+    const initial = !!info.initial;
     const chunkType = info.chunkType || 'unknown';
     return {
         chunkType,

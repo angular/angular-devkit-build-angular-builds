@@ -21,7 +21,6 @@ export declare function generateBundleStats(info: {
     size?: number;
     files?: string[];
     names?: string[];
-    entry?: boolean;
     initial?: boolean;
     rendered?: boolean;
     chunkType?: ChunkType;
