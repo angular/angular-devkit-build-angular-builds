@@ -25,7 +25,7 @@ const helpers_1 = require("../utils/helpers");
 const stats_1 = require("../utils/stats");
 // eslint-disable-next-line max-lines-per-function
 function getCommonConfig(wco) {
-    var _a;
+    var _a, _b;
     const { root, projectRoot, buildOptions, tsConfig } = wco;
     const { platform = 'browser', sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, } = buildOptions;
     const extraPlugins = [];
@@ -322,9 +322,9 @@ function getCommonConfig(wco) {
         context: root,
         entry: entryPoints,
         output: {
-            clean: buildOptions.deleteOutputPath,
+            clean: (_a = buildOptions.deleteOutputPath) !== null && _a !== void 0 ? _a : true,
             path: path.resolve(root, buildOptions.outputPath),
-            publicPath: (_a = buildOptions.deployUrl) !== null && _a !== void 0 ? _a : '',
+            publicPath: (_b = buildOptions.deployUrl) !== null && _b !== void 0 ? _b : '',
             filename: ({ chunk }) => {
                 if ((chunk === null || chunk === void 0 ? void 0 : chunk.name) === 'polyfills-es5') {
                     return `polyfills-es5${hashFormat.chunk}.js`;

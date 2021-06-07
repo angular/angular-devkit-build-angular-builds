@@ -224,7 +224,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             }));
         }
         return build_webpack_1.runWebpackDevServer(webpackConfig, context, {
-            logging: transforms.logging || stats_1.createWebpackLoggingCallback(!!options.verbose, logger),
+            logging: transforms.logging || stats_1.createWebpackLoggingCallback(browserOptions, logger),
             webpackFactory: require('webpack'),
             webpackDevServerFactory: require('webpack-dev-server'),
         }).pipe(operators_1.concatMap(async (buildEvent, index) => {
