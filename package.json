@@ -6,10 +6,10 @@
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#d13a86610",
-    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#d13a86610",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#d13a86610",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#d13a86610",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#c52f7a2dd",
+    "@angular-devkit/build-optimizer": "github:angular/angular-devkit-build-optimizer-builds#c52f7a2dd",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#c52f7a2dd",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#c52f7a2dd",
     "@babel/core": "7.14.3",
     "@babel/generator": "7.14.3",
     "@babel/helper-annotate-as-pure": "7.12.13",
@@ -20,7 +20,7 @@
     "@babel/template": "7.12.13",
     "@discoveryjs/json-ext": "0.5.3",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#d13a86610",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#c52f7a2dd",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.2",
     "browserslist": "^4.9.1",
@@ -72,7 +72,7 @@
     "webpack": "5.38.1",
     "webpack-dev-middleware": "5.0.0",
     "webpack-dev-server": "3.11.2",
-    "webpack-merge": "5.7.3",
+    "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "1.5.2"
   },
   "peerDependencies": {
