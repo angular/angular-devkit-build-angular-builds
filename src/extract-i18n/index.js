@@ -118,7 +118,7 @@ async function execute(options, context, transforms) {
     const i18n = i18n_options_1.createI18nOptions(metadata);
     let useLegacyIds = true;
     const ivyMessages = [];
-    const { config, projectRoot } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext({
+    const builderOptions = {
         ...browserOptions,
         optimization: false,
         sourceMap: {
@@ -138,7 +138,8 @@ async function execute(options, context, transforms) {
         subresourceIntegrity: false,
         outputHashing: schema_1.OutputHashing.None,
         namedChunks: true,
-    }, context, (wco) => {
+    };
+    const { config, projectRoot } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(builderOptions, context, (wco) => {
         var _a;
         if (wco.tsConfig.options.enableIvy === false) {
             context.logger.warn('Ivy extraction enabled but application is not Ivy enabled. Extraction may fail.');
@@ -187,7 +188,7 @@ async function execute(options, context, transforms) {
         };
     }
     const webpackResult = await build_webpack_1.runWebpack((await ((_a = transforms === null || transforms === void 0 ? void 0 : transforms.webpackConfiguration) === null || _a === void 0 ? void 0 : _a.call(transforms, config))) || config, context, {
-        logging: stats_1.createWebpackLoggingCallback(false, context.logger),
+        logging: stats_1.createWebpackLoggingCallback(builderOptions, context.logger),
         webpackFactory: webpack,
     }).toPromise();
     // Set the outputPath to the extraction output location for downstream consumers

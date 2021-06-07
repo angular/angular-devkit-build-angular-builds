@@ -87,13 +87,13 @@ class SassWorkerImplementation {
     /**
      * Shutdown the Sass render worker.
      * Executing this method will stop any pending render requests.
-     *
-     * The worker is unreferenced upon creation and will not block application exit. This method
-     * is only needed if early cleanup is needed.
      */
     close() {
         for (const worker of this.workers) {
-            void worker.terminate();
+            try {
+                void worker.terminate();
+            }
+            catch { }
         }
         this.requests.clear();
     }
@@ -154,7 +154,6 @@ class SassWorkerImplementation {
                 Atomics.notify(importerSignal, 0);
             });
         });
-        worker.unref();
         mainImporterPort.unref();
         return worker;
     }

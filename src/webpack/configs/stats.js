@@ -15,16 +15,13 @@ const webpackOutputOptions = {
     timings: true,
     chunks: true,
     builtAt: true,
-    chunkModules: false,
-    children: false,
-    modules: false,
-    reasons: false,
     warnings: true,
     errors: true,
     assets: true,
-    version: false,
-    errorDetails: false,
-    moduleTrace: false,
+    cachedAssets: true,
+    // Needed for markAsyncChunksNonInitial.
+    ids: true,
+    entrypoints: true,
 };
 const verboseWebpackOutputOptions = {
     // The verbose output will most likely be piped to a file, so colors just mess it up.
@@ -39,8 +36,8 @@ const verboseWebpackOutputOptions = {
     errorDetails: true,
     moduleTrace: true,
     logging: 'verbose',
+    modulesSpace: Infinity,
 };
-verboseWebpackOutputOptions['modulesSpace'] = Infinity;
 function getWebpackStatsConfig(verbose = false) {
     return verbose
         ? { ...webpackOutputOptions, ...verboseWebpackOutputOptions }
