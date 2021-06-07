@@ -13,8 +13,6 @@ const path = require("path");
 const textTable = require("text-table");
 const color_1 = require("../../utils/color");
 const stats_1 = require("../configs/stats");
-const async_chunks_1 = require("./async-chunks");
-const helpers_1 = require("./helpers");
 function formatSize(size) {
     if (size <= 0) {
         return '0 bytes';
@@ -257,22 +255,12 @@ function statsHasWarnings(json) {
     return !!(((_a = json.warnings) === null || _a === void 0 ? void 0 : _a.length) || ((_b = json.children) === null || _b === void 0 ? void 0 : _b.some((c) => { var _a; return (_a = c.warnings) === null || _a === void 0 ? void 0 : _a.length; })));
 }
 exports.statsHasWarnings = statsHasWarnings;
-function createWebpackLoggingCallback(options, logger) {
-    const { verbose = false, scripts = [], styles = [] } = options;
-    const extraEntryPoints = [
-        ...helpers_1.normalizeExtraEntryPoints(styles, 'styles'),
-        ...helpers_1.normalizeExtraEntryPoints(scripts, 'scripts'),
-    ];
+function createWebpackLoggingCallback(verbose, logger) {
     return (stats, config) => {
         if (verbose) {
             logger.info(stats.toString(config.stats));
         }
-        const rawStats = stats.toJson(stats_1.getWebpackStatsConfig(false));
-        const webpackStats = {
-            ...rawStats,
-            chunks: async_chunks_1.markAsyncChunksNonInitial(rawStats, extraEntryPoints),
-        };
-        webpackStatsLogger(logger, webpackStats, config);
+        webpackStatsLogger(logger, stats.toJson(stats_1.getWebpackStatsConfig(false)), config);
     };
 }
 exports.createWebpackLoggingCallback = createWebpackLoggingCallback;
