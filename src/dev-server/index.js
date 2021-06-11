@@ -17,7 +17,6 @@ const operators_1 = require("rxjs/operators");
 const ts = require("typescript");
 const url = require("url");
 const webpackDevServer = require("webpack-dev-server");
-const browser_1 = require("../browser");
 const schema_1 = require("../browser/schema");
 const utils_1 = require("../utils");
 const cache_path_1 = require("../utils/cache-path");
@@ -131,8 +130,8 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             configs_1.getBrowserConfig(wco),
             configs_1.getStylesConfig(wco),
             configs_1.getStatsConfig(wco),
-            browser_1.getAnalyticsConfig(wco, context),
-            browser_1.getCompilerConfig(wco),
+            configs_1.getAnalyticsConfig(wco, context),
+            configs_1.getTypeScriptConfig(wco),
             browserOptions.webWorkerTsConfig ? configs_1.getWorkerConfig(wco) : {},
         ], devServerOptions);
         if (!config.devServer) {

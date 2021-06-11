@@ -63,20 +63,22 @@ function createIvyPlugin(wco, aot, tsconfig) {
     });
 }
 function getTypeScriptConfig(wco) {
-    const { buildOptions, tsConfigPath } = wco;
-    const aot = !!buildOptions.aot;
-    ensureIvy(wco);
-    return {
-        module: {
-            rules: [
-                {
-                    test: /\.[jt]sx?$/,
-                    loader: webpack_1.AngularWebpackLoaderPath,
-                },
-            ],
-        },
-        plugins: [createIvyPlugin(wco, aot, tsConfigPath)],
-    };
+    const { buildOptions: { aot = false, main, polyfills }, tsConfigPath, } = wco;
+    if (main || polyfills) {
+        ensureIvy(wco);
+        return {
+            module: {
+                rules: [
+                    {
+                        test: /\.[jt]sx?$/,
+                        loader: webpack_1.AngularWebpackLoaderPath,
+                    },
+                ],
+            },
+            plugins: [createIvyPlugin(wco, aot, tsConfigPath)],
+        };
+    }
+    return {};
 }
 exports.getTypeScriptConfig = getTypeScriptConfig;
 function getTypescriptWorkerPlugin(wco, workerTsConfigPath) {

@@ -11,7 +11,6 @@ import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
-import { WebpackConfigOptions } from '../utils/build-options';
 import { IndexHtmlTransform } from '../utils/index-file/index-html-generator';
 import { Schema as BrowserBuilderSchema } from './schema';
 /**
@@ -25,8 +24,6 @@ export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
      */
     outputPath: string;
 };
-export declare function getAnalyticsConfig(wco: WebpackConfigOptions, context: BuilderContext): webpack.Configuration;
-export declare function getCompilerConfig(wco: WebpackConfigOptions): webpack.Configuration;
 /**
  * @experimental Direct usage of this function is considered experimental.
  */

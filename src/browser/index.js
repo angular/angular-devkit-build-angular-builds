@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildWebpackBrowser = exports.getCompilerConfig = exports.getAnalyticsConfig = void 0;
+exports.buildWebpackBrowser = void 0;
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
@@ -33,37 +33,10 @@ const spinner_1 = require("../utils/spinner");
 const version_1 = require("../utils/version");
 const webpack_browser_config_1 = require("../utils/webpack-browser-config");
 const configs_1 = require("../webpack/configs");
-const analytics_1 = require("../webpack/plugins/analytics");
 const async_chunks_1 = require("../webpack/utils/async-chunks");
 const helpers_1 = require("../webpack/utils/helpers");
 const stats_1 = require("../webpack/utils/stats");
 const cacheDownlevelPath = environment_options_1.cachingDisabled ? undefined : cache_path_1.findCachePath('angular-build-dl');
-function getAnalyticsConfig(wco, context) {
-    if (context.analytics) {
-        // If there's analytics, add our plugin. Otherwise no need to slow down the build.
-        let category = 'build';
-        if (context.builder) {
-            // We already vetted that this is a "safe" package, otherwise the analytics would be noop.
-            category =
-                context.builder.builderName.split(':')[1] || context.builder.builderName || 'build';
-        }
-        // The category is the builder name if it's an angular builder.
-        return {
-            plugins: [
-                new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category, !!wco.tsConfig.options.enableIvy),
-            ],
-        };
-    }
-    return {};
-}
-exports.getAnalyticsConfig = getAnalyticsConfig;
-function getCompilerConfig(wco) {
-    if (wco.buildOptions.main || wco.buildOptions.polyfills) {
-        return configs_1.getTypeScriptConfig(wco);
-    }
-    return {};
-}
-exports.getCompilerConfig = getCompilerConfig;
 async function initialize(options, context, differentialLoadingNeeded, webpackConfigurationTransform) {
     var _a, _b;
     const originalOutputPath = options.outputPath;
@@ -74,8 +47,8 @@ async function initialize(options, context, differentialLoadingNeeded, webpackCo
         configs_1.getBrowserConfig(wco),
         configs_1.getStylesConfig(wco),
         configs_1.getStatsConfig(wco),
-        getAnalyticsConfig(wco, context),
-        getCompilerConfig(wco),
+        configs_1.getAnalyticsConfig(wco, context),
+        configs_1.getTypeScriptConfig(wco),
         wco.buildOptions.webWorkerTsConfig ? configs_1.getWorkerConfig(wco) : {},
     ], { differentialLoadingNeeded });
     // Validate asset option values if processed directly
