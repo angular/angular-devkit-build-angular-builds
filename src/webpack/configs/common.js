@@ -22,7 +22,6 @@ const spinner_1 = require("../../utils/spinner");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
-const stats_1 = require("../utils/stats");
 // eslint-disable-next-line max-lines-per-function
 function getCommonConfig(wco) {
     var _a, _b;
@@ -340,7 +339,15 @@ function getCommonConfig(wco) {
         performance: {
             hints: false,
         },
-        ignoreWarnings: stats_1.IGNORE_WARNINGS,
+        ignoreWarnings: [
+            // Webpack 5+ has no facility to disable this warning.
+            // System.import is used in @angular/core for deprecated string-form lazy routes
+            /System.import\(\) is deprecated and will be removed soon/i,
+            // https://github.com/webpack-contrib/source-map-loader/blob/b2de4249c7431dd8432da607e08f0f65e9d64219/src/index.js#L83
+            /Failed to parse source map from/,
+            // https://github.com/webpack-contrib/postcss-loader/blob/bd261875fdf9c596af4ffb3a1a73fe3c549befda/src/index.js#L153-L158
+            /Add postcss as project dependency/,
+        ],
         module: {
             // Show an error for missing exports instead of a warning.
             strictExportPresence: true,
