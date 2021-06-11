@@ -12,7 +12,7 @@ const glob = require("glob");
 const path = require("path");
 const helpers_1 = require("../utils/helpers");
 function getTestConfig(wco) {
-    const { buildOptions: { codeCoverage, codeCoverageExclude, main, sourceMap }, root, sourceRoot, } = wco;
+    const { buildOptions: { codeCoverage, codeCoverageExclude, main, sourceMap, webWorkerTsConfig }, root, sourceRoot, } = wco;
     const extraRules = [];
     const extraPlugins = [];
     if (codeCoverage) {
@@ -47,6 +47,14 @@ function getTestConfig(wco) {
         },
         module: {
             rules: extraRules,
+            parser: webWorkerTsConfig === undefined
+                ? undefined
+                : {
+                    javascript: {
+                        worker: false,
+                        url: false,
+                    },
+                },
         },
         plugins: extraPlugins,
         optimization: {
