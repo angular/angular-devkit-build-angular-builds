@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.maxWorkers = exports.profilingEnabled = exports.cachingBasePath = exports.cachingDisabled = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
+exports.maxWorkers = exports.profilingEnabled = exports.persistentBuildCacheEnabled = exports.cachingBasePath = exports.cachingDisabled = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
 const path = require("path");
 function isDisabled(variable) {
     return variable === '0' || variable.toLowerCase() === 'false';
@@ -69,6 +69,11 @@ exports.cachingBasePath = (() => {
     }
     return cacheVariable;
 })();
+// Persistent build cache
+const persistentBuildCacheVariable = process.env['NG_PERSISTENT_BUILD_CACHE'];
+exports.persistentBuildCacheEnabled = !exports.cachingDisabled &&
+    isPresent(persistentBuildCacheVariable) &&
+    isEnabled(persistentBuildCacheVariable);
 // Build profiling
 const profilingVariable = process.env['NG_BUILD_PROFILING'];
 exports.profilingEnabled = isPresent(profilingVariable) && isEnabled(profilingVariable);

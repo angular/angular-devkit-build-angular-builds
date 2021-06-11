@@ -115,6 +115,10 @@ function generateBuildStats(hash, time, colors) {
     const w = (x) => (colors ? color_1.colors.bold.white(x) : x);
     return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
+// We use this cache because we can have multiple builders running in the same process,
+// where each builder has different output path.
+// Ideally, we should create the logging callback as a factory, but that would need a refactoring.
+const runsCache = new Set();
 function statsToString(json, 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 statsConfig, bundleState) {
@@ -127,8 +131,11 @@ statsConfig, bundleState) {
     const changedChunksStats = bundleState !== null && bundleState !== void 0 ? bundleState : [];
     let unchangedChunkNumber = 0;
     if (!(bundleState === null || bundleState === void 0 ? void 0 : bundleState.length)) {
+        const isFirstRun = !runsCache.has(json.outputPath || '');
         for (const chunk of json.chunks) {
-            if (!chunk.rendered) {
+            // During first build we want to display unchanged chunks
+            // but unchanged cached chunks are always marked as not rendered.
+            if (!isFirstRun && !chunk.rendered) {
                 continue;
             }
             const assets = (_b = json.assets) === null || _b === void 0 ? void 0 : _b.filter((asset) => { var _a; return (_a = chunk.files) === null || _a === void 0 ? void 0 : _a.includes(asset.name); });
@@ -136,6 +143,7 @@ statsConfig, bundleState) {
             changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }));
         }
         unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
+        runsCache.add(json.outputPath || '');
     }
     // Sort chunks by size in descending order
     changedChunksStats.sort((a, b) => {

@@ -9,7 +9,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCommonConfig = void 0;
 const build_optimizer_1 = require("@angular-devkit/build-optimizer");
+const compiler_cli_1 = require("@angular/compiler-cli");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const crypto_1 = require("crypto");
 const fs_1 = require("fs");
 const path = require("path");
 const typescript_1 = require("typescript");
@@ -230,10 +232,9 @@ function getCommonConfig(wco) {
     const extraMinimizers = [];
     if (scriptsOptimization) {
         const TerserPlugin = require('terser-webpack-plugin');
-        const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT, } = require('@angular/compiler-cli');
         const angularGlobalDefinitions = buildOptions.aot
-            ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT
-            : GLOBAL_DEFS_FOR_TERSER;
+            ? compiler_cli_1.GLOBAL_DEFS_FOR_TERSER_WITH_AOT
+            : compiler_cli_1.GLOBAL_DEFS_FOR_TERSER;
         // TODO: Investigate why this fails for some packages: wco.supportES2015 ? 6 : 5;
         const terserEcma = 5;
         const terserOptions = {
@@ -390,11 +391,7 @@ function getCommonConfig(wco) {
             syncWebAssembly: true,
             asyncWebAssembly: true,
         },
-        cache: !!buildOptions.watch &&
-            !environment_options_1.cachingDisabled && {
-            type: 'memory',
-            maxGenerations: 1,
-        },
+        cache: getCacheSettings(wco, buildBrowserFeatures.supportedBrowsers),
         optimization: {
             minimizer: extraMinimizers,
             moduleIds: 'deterministic',
@@ -411,3 +408,31 @@ function getCommonConfig(wco) {
     };
 }
 exports.getCommonConfig = getCommonConfig;
+function getCacheSettings(wco, supportedBrowsers) {
+    if (environment_options_1.persistentBuildCacheEnabled) {
+        const packageVersion = require('../../../package.json').version;
+        return {
+            type: 'filesystem',
+            cacheDirectory: cache_path_1.findCachePath('angular-webpack'),
+            maxMemoryGenerations: 1,
+            // We use the versions and build options as the cache name. The Webpack configurations are too
+            // dynamic and shared among different build types: test, build and serve.
+            // None of which are "named".
+            name: crypto_1.createHash('sha1')
+                .update(compiler_cli_1.VERSION.full)
+                .update(packageVersion)
+                .update(wco.projectRoot)
+                .update(JSON.stringify(wco.tsConfig))
+                .update(JSON.stringify(wco.buildOptions))
+                .update(supportedBrowsers.join(''))
+                .digest('base64'),
+        };
+    }
+    if (wco.buildOptions.watch && !environment_options_1.cachingDisabled) {
+        return {
+            type: 'memory',
+            maxGenerations: 1,
+        };
+    }
+    return false;
+}

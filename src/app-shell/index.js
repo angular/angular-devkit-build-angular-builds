@@ -111,9 +111,10 @@ async function _appShellBuilder(options, context) {
     });
     let spinner;
     try {
+        // Using `.result` instead of `.output` causes Webpack FS cache not to be created.
         const [browserResult, serverResult] = await Promise.all([
-            browserTargetRun.result,
-            serverTargetRun.result,
+            browserTargetRun.output.toPromise(),
+            serverTargetRun.output.toPromise(),
         ]);
         if (browserResult.success === false || browserResult.baseOutputPath === undefined) {
             return browserResult;
@@ -132,8 +133,8 @@ async function _appShellBuilder(options, context) {
         return { success: false, error: err.message };
     }
     finally {
-        // Just be good citizens and stop those jobs.
-        await Promise.all([browserTargetRun.stop(), serverTargetRun.stop()]);
+        // workaround for [tsetse] All Promises in async functions must either be awaited or used in an expression.
+        const _ = Promise.all([browserTargetRun.stop(), serverTargetRun.stop()]);
     }
 }
 exports.default = architect_1.createBuilder(_appShellBuilder);
