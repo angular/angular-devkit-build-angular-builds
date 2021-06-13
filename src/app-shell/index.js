@@ -6,11 +6,30 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
-const fs = require("fs");
-const path = require("path");
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 const utils_1 = require("../utils");
 const inline_critical_css_1 = require("../utils/index-file/inline-critical-css");
 const service_worker_1 = require("../utils/service-worker");
@@ -24,7 +43,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
     // Initialize zone.js
     const root = context.workspaceRoot;
     const zonePackage = require.resolve('zone.js', { paths: [root] });
-    await Promise.resolve().then(() => require(zonePackage));
+    await Promise.resolve().then(() => __importStar(require(zonePackage)));
     const projectName = context.target && context.target.project;
     if (!projectName) {
         throw new Error('The builder requires a target.');
@@ -43,7 +62,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
         const browserIndexOutputPath = path.join(outputPath, 'index.html');
         const indexHtml = await fs.promises.readFile(browserIndexOutputPath, 'utf8');
         const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult, localeDirectory);
-        const { AppServerModule, renderModule } = await Promise.resolve().then(() => require(serverBundlePath));
+        const { AppServerModule, renderModule } = await Promise.resolve().then(() => __importStar(require(serverBundlePath)));
         const renderModuleFn = renderModule;
         if (!(renderModuleFn && AppServerModule)) {
             throw new Error(`renderModule method and/or AppServerModule were not exported from: ${serverBundlePath}.`);

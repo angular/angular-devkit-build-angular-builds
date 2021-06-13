@@ -6,10 +6,32 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const path = require("path");
-const glob = require("glob");
-const webpack = require("webpack");
+const path = __importStar(require("path"));
+const glob = __importStar(require("glob"));
+const webpack_1 = __importDefault(require("webpack"));
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const stats_1 = require("../../utils/stats");
 const node_1 = require("@angular-devkit/core/node");
@@ -122,7 +144,7 @@ const init = (config, emitter) => {
     // Files need to be served from a custom path for Karma.
     webpackConfig.output.path = `/${KARMA_APPLICATION_PATH}/`;
     webpackConfig.output.publicPath = `/${KARMA_APPLICATION_PATH}/`;
-    const compiler = webpack(webpackConfig, (error, stats) => {
+    const compiler = webpack_1.default(webpackConfig, (error, stats) => {
         var _a;
         if (error) {
             throw error;

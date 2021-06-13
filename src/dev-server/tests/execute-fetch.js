@@ -6,9 +6,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.executeOnceAndFetch = void 0;
-const node_fetch_1 = require("node-fetch"); // eslint-disable-line import/no-extraneous-dependencies
+const node_fetch_1 = __importDefault(require("node-fetch")); // eslint-disable-line import/no-extraneous-dependencies
 const operators_1 = require("rxjs/operators");
 const url_1 = require("url");
 async function executeOnceAndFetch(harness, url, options) {

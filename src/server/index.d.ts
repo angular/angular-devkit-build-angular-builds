@@ -8,7 +8,7 @@
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
-import * as webpack from 'webpack';
+import webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import { Schema as ServerBuilderOptions } from './schema';
 /**

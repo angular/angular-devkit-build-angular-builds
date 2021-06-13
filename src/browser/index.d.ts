@@ -9,7 +9,7 @@ import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
-import * as webpack from 'webpack';
+import webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import { IndexHtmlTransform } from '../utils/index-file/index-html-generator';
 import { Schema as BrowserBuilderSchema } from './schema';

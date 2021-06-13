@@ -6,10 +6,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getKeywords = void 0;
 const core_1 = require("@babel/core");
-const helper_annotate_as_pure_1 = require("@babel/helper-annotate-as-pure");
+const helper_annotate_as_pure_1 = __importDefault(require("@babel/helper-annotate-as-pure"));
 /**
  * The name of the Typescript decorator helper function created by the TypeScript compiler.
  */

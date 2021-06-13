@@ -6,17 +6,39 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.inlineLocales = exports.createI18nPlugins = exports.process = exports.setup = void 0;
 const core_1 = require("@babel/core");
-const template_1 = require("@babel/template");
-const cacache = require("cacache");
+const template_1 = __importDefault(require("@babel/template"));
+const cacache = __importStar(require("cacache"));
 const crypto_1 = require("crypto");
-const fs = require("fs");
-const path = require("path");
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 const source_map_1 = require("source-map");
 const terser_1 = require("terser");
-const v8 = require("v8");
+const v8 = __importStar(require("v8"));
 const webpack_1 = require("webpack");
 const environment_options_1 = require("./environment-options");
 const { ConcatSource, OriginalSource, ReplaceSource, SourceMapSource } = webpack_1.sources;
@@ -359,23 +381,23 @@ function createIifeWrapperPlugin() {
 const USE_LOCALIZE_PLUGINS = false;
 async function createI18nPlugins(locale, translation, missingTranslation, shouldInline, localeDataContent) {
     const plugins = [];
-    const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
+    const localizeDiag = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/diagnostics')));
     const diagnostics = new localizeDiag.Diagnostics();
     if (shouldInline) {
-        const es2015 = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'));
+        const es2015 = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin')));
         plugins.push(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}), {
             missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
         }));
-        const es5 = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'));
+        const es5 = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin')));
         plugins.push(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         es5.makeEs5TranslatePlugin(diagnostics, (translation || {}), {
             missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
         }));
     }
-    const inlineLocale = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/translate/source_files/locale_plugin'));
+    const inlineLocale = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/locale_plugin')));
     plugins.push(inlineLocale.makeLocalePlugin(locale));
     if (localeDataContent) {
         plugins.push({
@@ -472,9 +494,9 @@ async function inlineLocalesDirect(ast, options) {
     if (!i18n || i18n.inlineLocales.size === 0) {
         return { file: options.filename, diagnostics: [], count: 0 };
     }
-    const { default: generate } = await Promise.resolve().then(() => require('@babel/generator'));
-    const utils = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/source_file_utils'));
-    const localizeDiag = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/diagnostics'));
+    const { default: generate } = await Promise.resolve().then(() => __importStar(require('@babel/generator')));
+    const utils = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/source_file_utils')));
+    const localizeDiag = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/diagnostics')));
     const diagnostics = new localizeDiag.Diagnostics();
     const positions = findLocalizePositions(ast, options, utils);
     if (positions.length === 0 && !options.setLocale) {

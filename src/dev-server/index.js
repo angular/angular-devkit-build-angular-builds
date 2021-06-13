@@ -6,17 +6,39 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serveWebpackBrowser = void 0;
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
-const path = require("path");
+const path = __importStar(require("path"));
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
-const ts = require("typescript");
-const url = require("url");
-const webpackDevServer = require("webpack-dev-server");
+const ts = __importStar(require("typescript"));
+const url = __importStar(require("url"));
+const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
 const schema_1 = require("../browser/schema");
 const utils_1 = require("../utils");
 const cache_path_1 = require("../utils/cache-path");
@@ -141,7 +163,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             // This is needed because we cannot use the inline option directly in the config
             // because of the SuppressExtractedTextChunksWebpackPlugin
             // Consider not using SuppressExtractedTextChunksWebpackPlugin when liveReload is enable.
-            webpackDevServer.addDevServerEntrypoints(config, {
+            webpack_dev_server_1.default.addDevServerEntrypoints(config, {
                 ...config.devServer,
                 inline: true,
             });
@@ -245,7 +267,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             ` +
                     '\n');
                 if (options.open) {
-                    const open = await Promise.resolve().then(() => require('open'));
+                    const open = (await Promise.resolve().then(() => __importStar(require('open')))).default;
                     await open(serverAddress);
                 }
             }

@@ -6,13 +6,35 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = void 0;
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
-const fs = require("fs");
-const path = require("path");
-const webpack = require("webpack");
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
+const webpack_1 = __importDefault(require("webpack"));
 const schema_1 = require("../browser/schema");
 const i18n_options_1 = require("../utils/i18n-options");
 const version_1 = require("../utils/version");
@@ -42,28 +64,28 @@ function getI18nOutfile(format) {
 async function getSerializer(format, sourceLocale, basePath, useLegacyIds, diagnostics) {
     switch (format) {
         case schema_2.Format.Xmb:
-            const { XmbTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer'));
+            const { XmbTranslationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer')));
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return new XmbTranslationSerializer(basePath, useLegacyIds);
         case schema_2.Format.Xlf:
         case schema_2.Format.Xlif:
         case schema_2.Format.Xliff:
-            const { Xliff1TranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer'));
+            const { Xliff1TranslationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer')));
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return new Xliff1TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
         case schema_2.Format.Xlf2:
         case schema_2.Format.Xliff2:
-            const { Xliff2TranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer'));
+            const { Xliff2TranslationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer')));
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return new Xliff2TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
         case schema_2.Format.Json:
-            const { SimpleJsonTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer'));
+            const { SimpleJsonTranslationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer')));
             return new SimpleJsonTranslationSerializer(sourceLocale);
         case schema_2.Format.LegacyMigrate:
-            const { LegacyMessageIdMigrationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer'));
+            const { LegacyMessageIdMigrationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer')));
             return new LegacyMessageIdMigrationSerializer(diagnostics);
         case schema_2.Format.Arb:
-            const { ArbTranslationSerializer } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer'));
+            const { ArbTranslationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer')));
             const fileSystem = {
                 relative(from, to) {
                     return path.relative(from, to);
@@ -193,7 +215,7 @@ async function execute(options, context, transforms) {
     }
     const webpackResult = await build_webpack_1.runWebpack((await ((_a = transforms === null || transforms === void 0 ? void 0 : transforms.webpackConfiguration) === null || _a === void 0 ? void 0 : _a.call(transforms, config))) || config, context, {
         logging: stats_1.createWebpackLoggingCallback(builderOptions, context.logger),
-        webpackFactory: webpack,
+        webpackFactory: webpack_1.default,
     }).toPromise();
     // Set the outputPath to the extraction output location for downstream consumers
     webpackResult.outputPath = outFile;
@@ -202,7 +224,7 @@ async function execute(options, context, transforms) {
         return webpackResult;
     }
     const basePath = config.context || projectRoot;
-    const { checkDuplicateMessages } = await Promise.resolve().then(() => require('@angular/localize/src/tools/src/extract/duplicates'));
+    const { checkDuplicateMessages } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/duplicates')));
     // The filesystem is used to create a relative path for each file
     // from the basePath.  This relative path is then used in the error message.
     const checkFileSystem = {

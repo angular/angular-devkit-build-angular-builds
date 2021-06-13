@@ -6,10 +6,29 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getIndexInputFile = exports.getIndexOutputFile = exports.generateBrowserWebpackConfigFromContext = exports.generateI18nBrowserWebpackConfigFromContext = exports.generateWebpackConfig = void 0;
 const core_1 = require("@angular-devkit/core");
-const path = require("path");
+const path = __importStar(require("path"));
 const webpack_1 = require("webpack");
 const webpack_merge_1 = require("webpack-merge");
 const utils_1 = require("../utils");
@@ -23,7 +42,7 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
     }
     const tsConfigPath = path.resolve(workspaceRoot, options.tsConfig);
     const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
-    const ts = await Promise.resolve().then(() => require('typescript'));
+    const ts = await Promise.resolve().then(() => __importStar(require('typescript')));
     const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES5;
     const buildOptions = { ...options, ...extraBuildOptions };
     const wco = {

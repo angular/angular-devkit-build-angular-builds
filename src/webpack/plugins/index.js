@@ -6,6 +6,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostcssCliResources = exports.CommonJsUsageWarnPlugin = exports.DedupeModuleResolvePlugin = exports.RemoveHashPlugin = exports.SuppressExtractedTextChunksWebpackPlugin = exports.ScriptsWebpackPlugin = exports.AnyComponentStyleBudgetChecker = void 0;
 // Exports the webpack plugins we use internally.
@@ -22,4 +25,4 @@ Object.defineProperty(exports, "DedupeModuleResolvePlugin", { enumerable: true, 
 var common_js_usage_warn_plugin_1 = require("./common-js-usage-warn-plugin");
 Object.defineProperty(exports, "CommonJsUsageWarnPlugin", { enumerable: true, get: function () { return common_js_usage_warn_plugin_1.CommonJsUsageWarnPlugin; } });
 var postcss_cli_resources_1 = require("./postcss-cli-resources");
-Object.defineProperty(exports, "PostcssCliResources", { enumerable: true, get: function () { return postcss_cli_resources_1.default; } });
+Object.defineProperty(exports, "PostcssCliResources", { enumerable: true, get: function () { return __importDefault(postcss_cli_resources_1).default; } });

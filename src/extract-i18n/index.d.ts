@@ -8,7 +8,7 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuildResult } from '@angular-devkit/build-webpack';
 import { JsonObject } from '@angular-devkit/core';
-import * as webpack from 'webpack';
+import webpack from 'webpack';
 import { ExecutionTransformer } from '../transforms';
 import { Schema } from './schema';
 export declare type ExtractI18nBuilderOptions = Schema & JsonObject;

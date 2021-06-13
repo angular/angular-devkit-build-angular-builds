@@ -6,14 +6,36 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.copyAssets = void 0;
-const fs = require("fs");
-const glob = require("glob");
-const path = require("path");
+const fs = __importStar(require("fs"));
+const glob_1 = __importDefault(require("glob"));
+const path = __importStar(require("path"));
 const copy_file_1 = require("./copy-file");
 function globAsync(pattern, options) {
-    return new Promise((resolve, reject) => glob(pattern, options, (e, m) => (e ? reject(e) : resolve(m))));
+    return new Promise((resolve, reject) => glob_1.default(pattern, options, (e, m) => (e ? reject(e) : resolve(m))));
 }
 async function copyAssets(entries, basePaths, root, changed) {
     const defaultIgnore = ['.gitkeep', '**/.DS_Store', '**/Thumbs.db'];

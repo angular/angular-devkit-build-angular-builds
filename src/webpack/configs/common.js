@@ -6,14 +6,36 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCommonConfig = void 0;
 const build_optimizer_1 = require("@angular-devkit/build-optimizer");
 const compiler_cli_1 = require("@angular/compiler-cli");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
+const copy_webpack_plugin_1 = __importDefault(require("copy-webpack-plugin"));
 const crypto_1 = require("crypto");
 const fs_1 = require("fs");
-const path = require("path");
+const path = __importStar(require("path"));
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
 const utils_1 = require("../../utils");
@@ -180,7 +202,7 @@ function getCommonConfig(wco) {
                 },
             };
         });
-        extraPlugins.push(new CopyWebpackPlugin({
+        extraPlugins.push(new copy_webpack_plugin_1.default({
             patterns: copyWebpackPluginPatterns,
         }));
     }
@@ -194,7 +216,7 @@ function getCommonConfig(wco) {
         extraPlugins.push(new (class {
             apply(compiler) {
                 compiler.hooks.done.tapPromise('angular-cli-stats', async (stats) => {
-                    const { stringifyStream } = await Promise.resolve().then(() => require('@discoveryjs/json-ext'));
+                    const { stringifyStream } = await Promise.resolve().then(() => __importStar(require('@discoveryjs/json-ext')));
                     const data = stats.toJson('verbose');
                     const statsOutputPath = path.resolve(root, buildOptions.outputPath, 'stats.json');
                     try {
