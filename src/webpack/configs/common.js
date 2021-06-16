@@ -355,7 +355,7 @@ function getCommonConfig(wco) {
                     return `[name]${targetInFileName}${hashFormat.chunk}.js`;
                 }
             },
-            chunkFilename: `[id]${targetInFileName}${hashFormat.chunk}.js`,
+            chunkFilename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
         },
         watch: buildOptions.watch,
         watchOptions: helpers_1.getWatchOptions(buildOptions.poll),
