@@ -69,7 +69,7 @@ async function initialize(options, context, differentialLoadingNeeded, webpackCo
     const originalOutputPath = options.outputPath;
     // Assets are processed directly by the builder except when watching
     const adjustedOptions = options.watch ? options : { ...options, assets: [] };
-    const { config, projectRoot, projectSourceRoot, i18n, } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, (wco) => [
+    const { config, projectRoot, projectSourceRoot, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, (wco) => [
         configs_1.getCommonConfig(wco),
         configs_1.getBrowserConfig(wco),
         configs_1.getStylesConfig(wco),
@@ -544,12 +544,10 @@ function assertNever(input) {
     throw new Error(`Unexpected call to assertNever() with input: ${JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
 }
 function generateBundleInfoStats(bundle, chunk, chunkType) {
-    var _a;
     return stats_1.generateBundleStats({
         size: bundle.size,
         files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
         names: chunk === null || chunk === void 0 ? void 0 : chunk.names,
-        entry: !!((_a = chunk === null || chunk === void 0 ? void 0 : chunk.names) === null || _a === void 0 ? void 0 : _a.includes('runtime')),
         initial: !!(chunk === null || chunk === void 0 ? void 0 : chunk.initial),
         rendered: true,
         chunkType,

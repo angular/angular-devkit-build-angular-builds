@@ -10,9 +10,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTestConfig = void 0;
 const glob = require("glob");
 const path = require("path");
+const typescript_1 = require("typescript");
 const helpers_1 = require("../utils/helpers");
 function getTestConfig(wco) {
-    const { buildOptions: { codeCoverage, codeCoverageExclude, main, sourceMap }, root, sourceRoot, } = wco;
+    const { buildOptions: { codeCoverage, codeCoverageExclude, main, sourceMap, webWorkerTsConfig }, root, sourceRoot, } = wco;
     const extraRules = [];
     const extraPlugins = [];
     if (codeCoverage) {
@@ -38,6 +39,7 @@ function getTestConfig(wco) {
     }
     return {
         mode: 'development',
+        target: wco.tsConfig.options.target === typescript_1.ScriptTarget.ES5 ? ['web', 'es5'] : 'web',
         resolve: {
             mainFields: ['es2015', 'browser', 'module', 'main'],
         },
@@ -47,6 +49,14 @@ function getTestConfig(wco) {
         },
         module: {
             rules: extraRules,
+            parser: webWorkerTsConfig === undefined
+                ? undefined
+                : {
+                    javascript: {
+                        worker: false,
+                        url: false,
+                    },
+                },
         },
         plugins: extraPlugins,
         optimization: {
