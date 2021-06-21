@@ -24,7 +24,7 @@ async function initialize(options, root) {
  * @experimental Direct usage of this function is considered experimental.
  */
 function execute(options, context) {
-    return rxjs_1.from(initialize(options, context.workspaceRoot)).pipe(operators_1.switchMap((packager) => (options.watch ? packager.watch() : packager.build())), operators_1.mapTo({ success: true }));
+    return rxjs_1.from(initialize(options, context.workspaceRoot)).pipe(operators_1.switchMap((packager) => (options.watch ? packager.watch() : packager.build())), operators_1.mapTo({ success: true }), operators_1.catchError((err) => rxjs_1.of({ success: false, error: err.message })));
 }
 exports.execute = execute;
 exports.default = architect_1.createBuilder(execute);

@@ -50,13 +50,13 @@ function getTestConfig(wco) {
         module: {
             rules: extraRules,
             parser: webWorkerTsConfig === undefined
-                ? undefined
-                : {
+                ? {
                     javascript: {
                         worker: false,
                         url: false,
                     },
-                },
+                }
+                : undefined,
         },
         plugins: extraPlugins,
         optimization: {
