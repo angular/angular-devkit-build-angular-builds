@@ -99,10 +99,9 @@ function default_1(api, options) {
     let needRuntimeTransform = false;
     if ((_a = options.angularLinker) === null || _a === void 0 ? void 0 : _a.shouldLink) {
         // Babel currently is synchronous so import cannot be used
-        const { createEs2015LinkerPlugin } = require('@angular/compiler-cli/linker/babel');
+        const { createEs2015LinkerPlugin, } = require('@angular/compiler-cli/linker/babel');
         plugins.push(createEs2015LinkerPlugin({
             linkerJitMode: options.angularLinker.jitMode,
-            sourceMapping: options.angularLinker.sourcemap,
             logger: createNgtscLogger(options.diagnosticReporter),
             fileSystem: {
                 resolve: path.resolve,
