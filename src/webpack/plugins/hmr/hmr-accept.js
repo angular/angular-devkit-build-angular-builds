@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+// eslint-disable-next-line import/no-extraneous-dependencies
 const core_1 = require("@angular/core");
 const operators_1 = require("rxjs/operators");
 function default_1(mod) {
