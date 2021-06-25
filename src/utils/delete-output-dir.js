@@ -18,6 +18,8 @@ function deleteOutputDir(root, outputPath) {
     if (resolvedOutputPath === root) {
         throw new Error('Output path MUST not be project root directory!');
     }
-    fs_1.rmdirSync(resolvedOutputPath, { recursive: true, maxRetries: 3 });
+    if (fs_1.existsSync(resolvedOutputPath)) {
+        fs_1.rmdirSync(resolvedOutputPath, {recursive: true, maxRetries: 3});
+    }
 }
 exports.deleteOutputDir = deleteOutputDir;
