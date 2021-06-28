@@ -334,7 +334,7 @@ export interface OptimizationClass {
 export declare type FontsUnion = boolean | FontsClass;
 export interface FontsClass {
     /**
-     * Reduce render blocking requests by inlining external Google fonts and icons CSS
+     * Reduce render blocking requests by inlining external Google Fonts and Adobe Fonts CSS
      * definitions in the application's HTML index file. This option requires internet access.
      * `HTTPS_PROXY` environment variable can be used to specify a proxy server.
      */
