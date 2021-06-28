@@ -29,7 +29,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.inlineLocales = exports.createI18nPlugins = exports.process = void 0;
+exports.inlineLocales = exports.createI18nPlugins = exports.process = exports.setup = void 0;
 const core_1 = require("@babel/core");
 const template_1 = __importDefault(require("@babel/template"));
 const cacache = __importStar(require("cacache"));
@@ -38,14 +38,22 @@ const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const source_map_1 = require("source-map");
 const terser_1 = require("terser");
-const worker_threads_1 = require("worker_threads");
+const v8 = __importStar(require("v8"));
+const webpack_1 = require("webpack");
 const environment_options_1 = require("./environment-options");
-// Lazy loaded webpack-sources object
-// Webpack is only imported if needed during the processing
-let webpackSources;
+const { ConcatSource, OriginalSource, ReplaceSource, SourceMapSource } = webpack_1.sources;
 // If code size is larger than 500KB, consider lower fidelity but faster sourcemap merge
 const FAST_SOURCEMAP_THRESHOLD = 500 * 1024;
-const { cachePath, i18n } = (worker_threads_1.workerData || {});
+let cachePath;
+let i18n;
+function setup(data) {
+    const options = Array.isArray(data)
+        ? v8.deserialize(Buffer.from(data))
+        : data;
+    cachePath = options.cachePath;
+    i18n = options.i18n;
+}
+exports.setup = setup;
 async function cachePut(content, key, integrity) {
     if (cachePath && key) {
         await cacache.put(cachePath, key, content, {
@@ -151,13 +159,9 @@ async function mergeSourceMaps(inputCode, inputSourceMap, resultCode, resultSour
     if (fast) {
         return mergeSourceMapsFast(inputSourceMap, resultSourceMap);
     }
-    // Load Webpack only when needed
-    if (webpackSources === undefined) {
-        webpackSources = (await Promise.resolve().then(() => __importStar(require('webpack')))).sources;
-    }
     // SourceMapSource produces high-quality sourcemaps
     // Final sourcemap will always be available when providing the input sourcemaps
-    const finalSourceMap = new webpackSources.SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
+    const finalSourceMap = new SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
     return finalSourceMap;
 }
 async function mergeSourceMapsFast(first, second) {
@@ -504,11 +508,6 @@ async function inlineLocalesDirect(ast, options) {
     if (inputMap) {
         delete inputMap.sourceRoot;
     }
-    // Load Webpack only when needed
-    if (webpackSources === undefined) {
-        webpackSources = (await Promise.resolve().then(() => __importStar(require('webpack')))).sources;
-    }
-    const { ConcatSource, OriginalSource, ReplaceSource, SourceMapSource } = webpackSources;
     for (const locale of i18n.inlineLocales) {
         const content = new ReplaceSource(inputMap
             ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -527,7 +526,7 @@ async function inlineLocalesDirect(ast, options) {
         if (options.setLocale) {
             const setLocaleText = `var $localize=Object.assign(void 0===$localize?{}:$localize,{locale:"${locale}"});\n`;
             // If locale data is provided, load it and prepend to file
-            let localeDataSource;
+            let localeDataSource = null;
             const localeDataPath = i18n.locales[locale] && i18n.locales[locale].dataPath;
             if (localeDataPath) {
                 const localeDataContent = await loadLocaleData(localeDataPath, true, options.es5);

@@ -14,7 +14,5 @@ export declare class InlineFontsProcessor {
     constructor(options: InlineFontsOptions);
     process(content: string): Promise<string>;
     private getResponse;
-    private processHref;
-    private getFontProviderDetails;
-    private createNormalizedUrl;
+    private processHrefs;
 }

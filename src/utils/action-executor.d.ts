@@ -9,13 +9,18 @@ import { I18nOptions } from './i18n-options';
 import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
 export declare class BundleActionExecutor {
     private workerOptions;
-    private workerPool?;
+    private readonly sizeThreshold;
+    private largeWorker?;
+    private smallWorker?;
     private cache?;
     constructor(workerOptions: {
         cachePath?: string;
         i18n: I18nOptions;
-    }, integrityAlgorithm?: string);
-    private ensureWorkerPool;
+    }, integrityAlgorithm?: string, sizeThreshold?: number);
+    private static executeMethod;
+    private ensureLarge;
+    private ensureSmall;
+    private executeAction;
     process(action: ProcessBundleOptions): Promise<ProcessBundleResult>;
     processAll(actions: Iterable<ProcessBundleOptions>): AsyncIterable<ProcessBundleResult>;
     inline(action: InlineOptions): Promise<{
