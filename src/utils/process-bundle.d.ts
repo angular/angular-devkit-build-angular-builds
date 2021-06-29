@@ -7,7 +7,6 @@
  */
 /// <reference types="packages/angular_devkit/build_angular/src/babel-bazel" />
 import { PluginObj } from '@babel/core';
-import { I18nOptions } from './i18n-options';
 export interface ProcessBundleOptions {
     filename: string;
     code: string;
@@ -47,10 +46,6 @@ export declare const enum CacheKey {
     DownlevelCode = 2,
     DownlevelMap = 3
 }
-export declare function setup(data: number[] | {
-    cachePath: string;
-    i18n: I18nOptions;
-}): void;
 export declare function process(options: ProcessBundleOptions): Promise<ProcessBundleResult>;
 export declare function createI18nPlugins(locale: string, translation: unknown | undefined, missingTranslation: 'error' | 'warning' | 'ignore', shouldInline: boolean, localeDataContent?: string): Promise<{
     diagnostics: import("@angular/localize/src/tools/src/diagnostics").Diagnostics;
