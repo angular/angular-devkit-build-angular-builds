@@ -288,12 +288,19 @@ function getCommonConfig(wco) {
     return {
         mode: scriptsOptimization || stylesOptimization.minify ? 'production' : 'development',
         devtool: false,
+        target: [
+            platform === 'server' ? 'node' : 'web',
+            tsConfig.options.target === typescript_1.ScriptTarget.ES5 ||
+                (platform !== 'server' && buildBrowserFeatures.isEs5SupportNeeded())
+                ? 'es5'
+                : 'es2015',
+        ],
         profile: buildOptions.statsJson,
         resolve: {
             roots: [projectRoot],
             extensions: ['.ts', '.tsx', '.mjs', '.js'],
             symlinks: !buildOptions.preserveSymlinks,
-            modules: [wco.tsConfig.options.baseUrl || projectRoot, 'node_modules'],
+            modules: [tsConfig.options.baseUrl || projectRoot, 'node_modules'],
         },
         resolveLoader: {
             symlinks: !buildOptions.preserveSymlinks,
