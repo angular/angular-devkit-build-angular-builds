@@ -135,7 +135,7 @@ function default_1(api, options) {
     }
     if (options.forceAsyncTransformation) {
         // Always transform async/await to support Zone.js
-        plugins.push(require('@babel/plugin-transform-async-to-generator').default, require('@babel/plugin-proposal-async-generator-functions').default);
+        plugins.push(require('@babel/plugin-transform-async-to-generator').default);
         needRuntimeTransform = true;
     }
     if (needRuntimeTransform) {
