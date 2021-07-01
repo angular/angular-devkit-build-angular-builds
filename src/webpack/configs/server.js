@@ -30,7 +30,6 @@ function getServerConfig(wco) {
         resolve: {
             mainFields: ['es2015', 'main', 'module'],
         },
-        target: 'node',
         output: {
             libraryTarget: 'commonjs',
         },
