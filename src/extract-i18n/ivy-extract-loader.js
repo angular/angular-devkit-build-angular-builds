@@ -27,16 +27,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const extraction_1 = require("@angular/localize/src/tools/src/extract/extraction");
-const loader_utils_1 = require("loader-utils");
 const nodePath = __importStar(require("path"));
-function localizeExtractLoader(content, 
-// Source map types are broken in the webpack type definitions
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-map) {
+function localizeExtractLoader(content, map) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const loaderContext = this;
-    // Casts are needed to workaround the loader-utils typings limited support for option values
-    const options = loader_utils_1.getOptions(this);
+    const options = this.getOptions();
     // Setup a Webpack-based logger instance
     const logger = {
         // level 2 is warnings
@@ -46,19 +41,20 @@ map) {
             console.debug(...args);
         },
         info(...args) {
-            loaderContext.emitWarning(args.join(''));
+            loaderContext.emitWarning(new Error(args.join('')));
         },
         warn(...args) {
-            loaderContext.emitWarning(args.join(''));
+            loaderContext.emitWarning(new Error(args.join('')));
         },
         error(...args) {
-            loaderContext.emitError(args.join(''));
+            loaderContext.emitError(new Error(args.join('')));
         },
     };
     let filename = loaderContext.resourcePath;
-    if (map === null || map === void 0 ? void 0 : map.file) {
+    const mapObject = typeof map === 'string' ? JSON.parse(map) : map;
+    if (mapObject === null || mapObject === void 0 ? void 0 : mapObject.file) {
         // The extractor's internal sourcemap handling expects the filenames to match
-        filename = nodePath.join(loaderContext.context, map.file);
+        filename = nodePath.join(loaderContext.context, mapObject.file);
     }
     // Setup a virtual file system instance for the extractor
     // * MessageExtractor itself uses readFile, relative and resolve
