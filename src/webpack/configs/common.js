@@ -418,7 +418,7 @@ function getCacheSettings(wco, supportedBrowsers) {
                 .update(JSON.stringify(wco.tsConfig))
                 .update(JSON.stringify(wco.buildOptions))
                 .update(supportedBrowsers.join(''))
-                .digest('hex'),
+                .digest('base64'),
         };
     }
     if (wco.buildOptions.watch && !environment_options_1.cachingDisabled) {
