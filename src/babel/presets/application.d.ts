@@ -15,7 +15,6 @@ export interface ApplicationPresetOptions {
     angularLinker?: {
         shouldLink: boolean;
         jitMode: boolean;
-        sourcemap: boolean;
     };
     forceES5?: boolean;
     forceAsyncTransformation?: boolean;
