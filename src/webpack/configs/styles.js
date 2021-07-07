@@ -210,7 +210,6 @@ function getStylesConfig(wco) {
     const postCss = require('postcss');
     const postCssLoaderPath = require.resolve('postcss-loader');
     const componentStyleLoaders = [
-        { loader: require.resolve('raw-loader') },
         {
             loader: postCssLoaderPath,
             options: {
@@ -389,6 +388,7 @@ function getStylesConfig(wco) {
                             {
                                 exclude: globalStylePaths,
                                 use: componentStyleLoaders,
+                                type: 'asset/source',
                             },
                             // Global styles are only defined global styles
                             {
