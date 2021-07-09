@@ -30,13 +30,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.inlineLocales = exports.createI18nPlugins = exports.process = void 0;
-const remapping_1 = __importDefault(require("@ampproject/remapping"));
 const core_1 = require("@babel/core");
 const template_1 = __importDefault(require("@babel/template"));
 const cacache = __importStar(require("cacache"));
 const crypto_1 = require("crypto");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const source_map_1 = require("source-map");
 const terser_1 = require("terser");
 const worker_threads_1 = require("worker_threads");
 const environment_options_1 = require("./environment-options");
@@ -54,7 +54,6 @@ async function cachePut(content, key, integrity) {
     }
 }
 async function process(options) {
-    var _a;
     if (!options.cacheKeys) {
         options.cacheKeys = [];
     }
@@ -72,6 +71,9 @@ async function process(options) {
     const downlevelFilename = filename.replace(/\-(es20\d{2}|esnext)/, '-es5');
     const downlevel = !options.optimizeOnly;
     const sourceCode = options.code;
+    const sourceMap = options.map ? JSON.parse(options.map) : undefined;
+    let downlevelCode;
+    let downlevelMap;
     if (downlevel) {
         const { supportedBrowsers: targets = [] } = options;
         // todo: revisit this in version 10, when we update our defaults browserslist
@@ -111,15 +113,26 @@ async function process(options) {
             ],
             minified: environment_options_1.allowMinify && !!options.optimize,
             compact: !environment_options_1.shouldBeautify && !!options.optimize,
-            sourceMaps: !!options.map,
+            sourceMaps: !!sourceMap,
         });
         if (!transformResult || !transformResult.code) {
             throw new Error(`Unknown error occurred processing bundle for "${options.filename}".`);
         }
+        downlevelCode = transformResult.code;
+        if (sourceMap && transformResult.map) {
+            // String length is used as an estimate for byte length
+            const fastSourceMaps = sourceCode.length > FAST_SOURCEMAP_THRESHOLD;
+            downlevelMap = await mergeSourceMaps(sourceCode, sourceMap, downlevelCode, transformResult.map, filename, 
+            // When not optimizing, the sourcemaps are significantly less complex
+            // and can use the higher fidelity merge
+            !!options.optimize && fastSourceMaps);
+        }
+    }
+    if (downlevelCode) {
         result.downlevel = await processBundle({
             ...options,
-            code: transformResult.code,
-            downlevelMap: (_a = transformResult.map) !== null && _a !== void 0 ? _a : undefined,
+            code: downlevelCode,
+            map: downlevelMap,
             filename: path.join(basePath, downlevelFilename),
             isOriginal: false,
         });
@@ -133,46 +146,117 @@ async function process(options) {
     return result;
 }
 exports.process = process;
+async function mergeSourceMaps(inputCode, inputSourceMap, resultCode, resultSourceMap, filename, fast = false) {
+    // Webpack 5 terser sourcemaps currently fail merging with the high-quality method
+    if (fast) {
+        return mergeSourceMapsFast(inputSourceMap, resultSourceMap);
+    }
+    // Load Webpack only when needed
+    if (webpackSources === undefined) {
+        webpackSources = (await Promise.resolve().then(() => __importStar(require('webpack')))).sources;
+    }
+    // SourceMapSource produces high-quality sourcemaps
+    // Final sourcemap will always be available when providing the input sourcemaps
+    const finalSourceMap = new webpackSources.SourceMapSource(resultCode, filename, resultSourceMap, inputCode, inputSourceMap, true).map();
+    return finalSourceMap;
+}
+async function mergeSourceMapsFast(first, second) {
+    const sourceRoot = first.sourceRoot;
+    const generator = new source_map_1.SourceMapGenerator();
+    // sourcemap package adds the sourceRoot to all position source paths if not removed
+    delete first.sourceRoot;
+    await source_map_1.SourceMapConsumer.with(first, null, (originalConsumer) => {
+        return source_map_1.SourceMapConsumer.with(second, null, (newConsumer) => {
+            newConsumer.eachMapping((mapping) => {
+                if (mapping.originalLine === null) {
+                    return;
+                }
+                const originalPosition = originalConsumer.originalPositionFor({
+                    line: mapping.originalLine,
+                    column: mapping.originalColumn,
+                });
+                if (originalPosition.line === null ||
+                    originalPosition.column === null ||
+                    originalPosition.source === null) {
+                    return;
+                }
+                generator.addMapping({
+                    generated: {
+                        line: mapping.generatedLine,
+                        column: mapping.generatedColumn,
+                    },
+                    name: originalPosition.name || undefined,
+                    original: {
+                        line: originalPosition.line,
+                        column: originalPosition.column,
+                    },
+                    source: originalPosition.source,
+                });
+            });
+        });
+    });
+    const map = generator.toJSON();
+    map.file = second.file;
+    map.sourceRoot = sourceRoot;
+    // Add source content if present
+    if (first.sourcesContent) {
+        // Source content array is based on index of sources
+        const sourceContentMap = new Map();
+        for (let i = 0; i < first.sources.length; i++) {
+            // make paths "absolute" so they can be compared (`./a.js` and `a.js` are equivalent)
+            sourceContentMap.set(path.resolve('/', first.sources[i]), i);
+        }
+        map.sourcesContent = [];
+        for (let i = 0; i < map.sources.length; i++) {
+            const contentIndex = sourceContentMap.get(path.resolve('/', map.sources[i]));
+            if (contentIndex === undefined) {
+                map.sourcesContent.push('');
+            }
+            else {
+                map.sourcesContent.push(first.sourcesContent[contentIndex]);
+            }
+        }
+    }
+    // Put the sourceRoot back
+    if (sourceRoot) {
+        first.sourceRoot = sourceRoot;
+    }
+    return map;
+}
 async function processBundle(options) {
-    const { optimize, isOriginal, code, map, downlevelMap, filename: filepath, hiddenSourceMaps, cacheKeys = [], integrityAlgorithm, } = options;
+    const { optimize, isOriginal, code, map, filename: filepath, hiddenSourceMaps, cacheKeys = [], integrityAlgorithm, } = options;
+    const rawMap = typeof map === 'string' ? JSON.parse(map) : map;
     const filename = path.basename(filepath);
-    let resultCode = code;
-    let optimizeResult;
+    let result;
+    if (rawMap) {
+        rawMap.file = filename;
+    }
     if (optimize) {
-        optimizeResult = await terserMangle(code, {
+        result = await terserMangle(code, {
             filename,
-            sourcemap: !!map,
+            map: rawMap,
             compress: !isOriginal,
             ecma: isOriginal ? 2015 : 5,
         });
-        resultCode = optimizeResult.code;
+    }
+    else {
+        result = {
+            map: rawMap,
+            code,
+        };
     }
     let mapContent;
-    if (map) {
+    if (result.map) {
         if (!hiddenSourceMaps) {
-            resultCode += `\n//# sourceMappingURL=${filename}.map`;
+            result.code += `\n//# sourceMappingURL=${filename}.map`;
         }
-        const partialSourcemaps = [];
-        if (optimizeResult && optimizeResult.map) {
-            partialSourcemaps.push(optimizeResult.map);
-        }
-        if (downlevelMap) {
-            partialSourcemaps.push(downlevelMap);
-        }
-        if (partialSourcemaps.length > 0) {
-            partialSourcemaps.push(map);
-            const fullSourcemap = remapping_1.default(partialSourcemaps, () => null);
-            mapContent = JSON.stringify(fullSourcemap);
-        }
-        else {
-            mapContent = map;
-        }
+        mapContent = JSON.stringify(result.map);
         await cachePut(mapContent, cacheKeys[isOriginal ? 1 /* OriginalMap */ : 3 /* DownlevelMap */]);
         fs.writeFileSync(filepath + '.map', mapContent);
     }
-    const fileResult = createFileEntry(filepath, resultCode, mapContent, integrityAlgorithm);
-    await cachePut(resultCode, cacheKeys[isOriginal ? 0 /* OriginalCode */ : 2 /* DownlevelCode */], fileResult.integrity);
-    fs.writeFileSync(filepath, resultCode);
+    const fileResult = createFileEntry(filepath, result.code, mapContent, integrityAlgorithm);
+    await cachePut(result.code, cacheKeys[isOriginal ? 0 /* OriginalCode */ : 2 /* DownlevelCode */], fileResult.integrity);
+    fs.writeFileSync(filepath, result.code);
     return fileResult;
 }
 async function terserMangle(code, options = {}) {
@@ -190,7 +274,7 @@ async function terserMangle(code, options = {}) {
             beautify: environment_options_1.shouldBeautify,
             wrap_func_args: false,
         },
-        sourceMap: !!options.sourcemap &&
+        sourceMap: !!options.map &&
             {
                 asObject: true,
                 // typings don't include asObject option
@@ -198,7 +282,12 @@ async function terserMangle(code, options = {}) {
             },
     });
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return { code: minifyOutput.code, map: minifyOutput.map };
+    const outputCode = minifyOutput.code;
+    let outputMap;
+    if (options.map && minifyOutput.map) {
+        outputMap = await mergeSourceMaps(code, options.map, outputCode, minifyOutput.map, options.filename || '0', code.length > FAST_SOURCEMAP_THRESHOLD);
+    }
+    return { code: outputCode, map: outputMap };
 }
 function createFileEntry(filename, code, map, integrityAlgorithm) {
     return {
@@ -357,6 +446,7 @@ async function inlineLocales(options) {
         return inlineLocalesDirect(ast, options);
     }
     const diagnostics = [];
+    const inputMap = options.map && JSON.parse(options.map);
     for (const locale of i18n.inlineLocales) {
         const isSourceLocale = locale === i18n.sourceLocale;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -380,7 +470,7 @@ async function inlineLocales(options) {
             configFile: false,
             plugins,
             compact: !environment_options_1.shouldBeautify,
-            sourceMaps: !!options.map,
+            sourceMaps: !!inputMap,
         });
         diagnostics.push(...localeDiagnostics.messages);
         if (!transformResult || !transformResult.code) {
@@ -388,8 +478,8 @@ async function inlineLocales(options) {
         }
         const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
         fs.writeFileSync(outputPath, transformResult.code);
-        if (options.map && transformResult.map) {
-            const outputMap = remapping_1.default([transformResult.map, options.map], () => null);
+        if (inputMap && transformResult.map) {
+            const outputMap = await mergeSourceMaps(options.code, inputMap, transformResult.code, transformResult.map, options.filename, options.code.length > FAST_SOURCEMAP_THRESHOLD);
             fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
         }
     }
@@ -408,7 +498,7 @@ async function inlineLocalesDirect(ast, options) {
     if (positions.length === 0 && !options.setLocale) {
         return inlineCopyOnly(options);
     }
-    const inputMap = !!options.map && JSON.parse(options.map);
+    const inputMap = options.map && JSON.parse(options.map);
     // Cleanup source root otherwise it will be added to each source entry
     const mapSourceRoot = inputMap && inputMap.sourceRoot;
     if (inputMap) {
@@ -421,7 +511,8 @@ async function inlineLocalesDirect(ast, options) {
     const { ConcatSource, OriginalSource, ReplaceSource, SourceMapSource } = webpackSources;
     for (const locale of i18n.inlineLocales) {
         const content = new ReplaceSource(inputMap
-            ? new SourceMapSource(options.code, options.filename, inputMap)
+            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                new SourceMapSource(options.code, options.filename, inputMap)
             : new OriginalSource(options.code, options.filename));
         const isSourceLocale = locale === i18n.sourceLocale;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

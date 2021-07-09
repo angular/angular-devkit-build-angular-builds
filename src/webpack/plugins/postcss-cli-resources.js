@@ -102,7 +102,6 @@ function default_1(options) {
                 }
                 loader.addDependency(result);
                 if (emitFile) {
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     loader.emitFile(outputPath, content, undefined, { sourceFilename: result });
                 }
                 let outputUrl = outputPath.replace(/\\/g, '/');
@@ -142,7 +141,7 @@ function default_1(options) {
                     processedUrl = await process(originalUrl, context, resourceCache);
                 }
                 catch (err) {
-                    loader.emitError(decl.error(err.message, { word: originalUrl }));
+                    loader.emitError(decl.error(err.message, { word: originalUrl }).toString());
                     continue;
                 }
                 if (lastIndex < match.index) {

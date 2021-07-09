@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { ScriptTarget } from 'typescript';
-import type { Compiler } from 'webpack';
 /**
  * The options used to configure the {@link JavaScriptOptimizerPlugin}.
  */
@@ -55,5 +54,5 @@ export interface JavaScriptOptimizerOptions {
 export declare class JavaScriptOptimizerPlugin {
     options: Partial<JavaScriptOptimizerOptions>;
     constructor(options?: Partial<JavaScriptOptimizerOptions>);
-    apply(compiler: Compiler): void;
+    apply(compiler: import('webpack').Compiler): void;
 }

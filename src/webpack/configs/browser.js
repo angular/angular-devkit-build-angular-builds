@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBrowserConfig = void 0;
+const typescript_1 = require("typescript");
 const utils_1 = require("../../utils");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
@@ -50,6 +51,9 @@ function getBrowserConfig(wco) {
         resolve: {
             mainFields: ['es2015', 'browser', 'module', 'main'],
         },
+        target: wco.tsConfig.options.target === typescript_1.ScriptTarget.ES5 || buildBrowserFeatures.isEs5SupportNeeded()
+            ? ['web', 'es5']
+            : 'web',
         output: {
             crossOriginLoading,
             trustedTypes: 'angular#bundler',
