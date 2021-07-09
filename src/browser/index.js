@@ -462,6 +462,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             crossOrigin: options.crossOrigin,
                             postTransform: transforms.indexHtml,
                         });
+                        let hasErrors = false;
                         for (const [locale, outputPath] of outputPaths.entries()) {
                             try {
                                 const { content, warnings, errors } = await indexHtmlGenerator.process({
@@ -476,7 +477,10 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 if (warnings.length || errors.length) {
                                     spinner.stop();
                                     warnings.forEach((m) => context.logger.warn(m));
-                                    errors.forEach((m) => context.logger.error(m));
+                                    errors.forEach((m) => {
+                                        context.logger.error(m);
+                                        hasErrors = true;
+                                    });
                                     spinner.start();
                                 }
                                 const indexOutput = path.join(outputPath, webpack_browser_config_1.getIndexOutputFile(options.index));
@@ -488,7 +492,13 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 return { success: false, error: mapErrorToMessage(error) };
                             }
                         }
-                        spinner.succeed('Index html generation complete.');
+                        if (hasErrors) {
+                            spinner.fail('Index html generation failed.');
+                            return { success: false };
+                        }
+                        else {
+                            spinner.succeed('Index html generation complete.');
+                        }
                     }
                     if (options.serviceWorker) {
                         spinner.start('Generating service worker...');
