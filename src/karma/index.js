@@ -78,7 +78,7 @@ async function initialize(options, context, webpackConfigurationTransformer) {
  */
 function execute(options, context, transforms = {}) {
     // Check Angular version.
-    version_1.assertCompatibleAngularVersion(context.workspaceRoot);
+    version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
     let singleRun;
     if (options.watch !== undefined) {
         singleRun = !options.watch;
