@@ -22,18 +22,6 @@ function getBrowserConfig(wco) {
             hashFuncNames: ['sha384'],
         }));
     }
-    if (extractLicenses) {
-        const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
-        extraPlugins.push(new LicenseWebpackPlugin({
-            stats: {
-                warnings: false,
-                errors: false,
-            },
-            perChunkOutput: false,
-            outputFilename: '3rdpartylicenses.txt',
-            skipChildCompilers: true,
-        }));
-    }
     if (scriptsSourceMap || stylesSourceMap) {
         extraPlugins.push(helpers_1.getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, buildOptions.differentialLoadingNeeded && !buildOptions.watch ? true : hiddenSourceMap, false));
     }

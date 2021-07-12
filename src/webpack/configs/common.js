@@ -212,6 +212,18 @@ function getCommonConfig(wco) {
             exclude: /[\\\/]node_modules[\\\/]/,
         }));
     }
+    if (buildOptions.extractLicenses) {
+        const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
+        extraPlugins.push(new LicenseWebpackPlugin({
+            stats: {
+                warnings: false,
+                errors: false,
+            },
+            perChunkOutput: false,
+            outputFilename: '3rdpartylicenses.txt',
+            skipChildCompilers: true,
+        }));
+    }
     if (buildOptions.statsJson) {
         extraPlugins.push(new (class {
             apply(compiler) {
