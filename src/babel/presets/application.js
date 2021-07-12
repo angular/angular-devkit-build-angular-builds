@@ -102,7 +102,8 @@ function default_1(api, options) {
         const { createEs2015LinkerPlugin } = require('@angular/compiler-cli/linker/babel');
         plugins.push(createEs2015LinkerPlugin({
             linkerJitMode: options.angularLinker.jitMode,
-            sourceMapping: options.angularLinker.sourcemap,
+            // This is a workaround until https://github.com/angular/angular/issues/42769 is fixed.
+            sourceMapping: false,
             logger: createNgtscLogger(options.diagnosticReporter),
             fileSystem: {
                 resolve: path.resolve,

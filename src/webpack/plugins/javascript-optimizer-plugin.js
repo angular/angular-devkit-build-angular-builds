@@ -42,18 +42,34 @@ class JavaScriptOptimizerPlugin {
                 stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
             }, async (compilationAssets) => {
                 const scriptsToOptimize = [];
+                const cache = compilation.options.cache && compilation.getCache('JavaScriptOptimizerPlugin');
                 // Analyze the compilation assets for scripts that require optimization
                 for (const assetName of Object.keys(compilationAssets)) {
-                    if (assetName.endsWith('.js')) {
-                        const scriptAsset = compilation.getAsset(assetName);
-                        if (scriptAsset && !scriptAsset.info.minimized) {
-                            const { source, map } = scriptAsset.source.sourceAndMap();
-                            scriptsToOptimize.push({
-                                name: scriptAsset.name,
-                                code: typeof source === 'string' ? source : source.toString(),
-                                map,
-                            });
+                    if (!assetName.endsWith('.js')) {
+                        continue;
+                    }
+                    const scriptAsset = compilation.getAsset(assetName);
+                    if (scriptAsset && !scriptAsset.info.minimized) {
+                        const { source: scriptAssetSource, name } = scriptAsset;
+                        let cacheItem;
+                        if (cache) {
+                            const eTag = cache.getLazyHashedEtag(scriptAssetSource);
+                            cacheItem = cache.getItemCache(name, eTag);
+                            const cachedOutput = await cacheItem.getPromise();
+                            if (cachedOutput) {
+                                compilation.updateAsset(name, cachedOutput.source, {
+                                    minimized: true,
+                                });
+                                continue;
+                            }
                         }
+                        const { source, map } = scriptAssetSource.sourceAndMap();
+                        scriptsToOptimize.push({
+                            name: scriptAsset.name,
+                            code: typeof source === 'string' ? source : source.toString(),
+                            map,
+                            cacheItem,
+                        });
                     }
                 }
                 if (scriptsToOptimize.length === 0) {
@@ -95,17 +111,11 @@ class JavaScriptOptimizerPlugin {
                 const workerPool = new piscina_1.default({
                     filename: workerPath,
                     maxThreads: MAX_OPTIMIZE_WORKERS,
-                    env: {
-                        ...process.env,
-                        // Workaround for `TypeError [Error]: Cannot read property 'workerPort' of undefined`
-                        // See: https://github.com/evanw/esbuild/commit/aa8b9ce8d462378f0f06ac52e83f6c32332dde38
-                        ESBUILD_WORKER_THREADS: '0',
-                    },
                 });
                 // Enqueue script optimization tasks and update compilation assets as the tasks complete
                 try {
                     const tasks = [];
-                    for (const { name, code, map } of scriptsToOptimize) {
+                    for (const { name, code, map, cacheItem } of scriptsToOptimize) {
                         tasks.push(workerPool
                             .run({
                             asset: {
@@ -116,14 +126,13 @@ class JavaScriptOptimizerPlugin {
                             options: optimizeOptions,
                         })
                             .then(({ code, name, map }) => {
-                            let optimizedAsset;
-                            if (map) {
-                                optimizedAsset = new SourceMapSource(code, name, map);
-                            }
-                            else {
-                                optimizedAsset = new OriginalSource(code, name);
-                            }
+                            const optimizedAsset = map
+                                ? new SourceMapSource(code, name, map)
+                                : new OriginalSource(code, name);
                             compilation.updateAsset(name, optimizedAsset, { minimized: true });
+                            return cacheItem === null || cacheItem === void 0 ? void 0 : cacheItem.storePromise({
+                                source: optimizedAsset,
+                            });
                         }, (error) => {
                             const optimizationError = new compiler.webpack.WebpackError(`Optimization error [${name}]: ${error.stack || error.message}`);
                             compilation.errors.push(optimizationError);

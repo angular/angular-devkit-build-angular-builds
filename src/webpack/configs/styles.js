@@ -210,7 +210,6 @@ function getStylesConfig(wco) {
     const postCss = require('postcss');
     const postCssLoaderPath = require.resolve('postcss-loader');
     const componentStyleLoaders = [
-        { loader: require.resolve('raw-loader') },
         {
             loader: postCssLoaderPath,
             options: {
@@ -254,6 +253,9 @@ function getStylesConfig(wco) {
                     calc: false,
                     // Disable CSS rules sorted due to several issues #20693, https://github.com/ionic-team/ionic-framework/issues/23266 and https://github.com/cssnano/cssnano/issues/1054
                     cssDeclarationSorter: false,
+                    // Workaround for Critters as it doesn't work when `@media all {}` is minified to `@media {}`.
+                    // TODO: Remove once they move to postcss.
+                    minifyParams: !buildOptions.optimization.styles.inlineCritical,
                 },
             ],
         };
@@ -302,6 +304,9 @@ function getStylesConfig(wco) {
                             // Ex: /* autoprefixer grid: autoplace */
                             // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
                             outputStyle: 'expanded',
+                            // Silences compiler warnings from 3rd party stylesheets
+                            quietDeps: !buildOptions.verbose,
+                            verbose: buildOptions.verbose,
                         },
                     },
                 },
@@ -332,6 +337,9 @@ function getStylesConfig(wco) {
                             // Ex: /* autoprefixer grid: autoplace */
                             // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
                             outputStyle: 'expanded',
+                            // Silences compiler warnings from 3rd party stylesheets
+                            quietDeps: !buildOptions.verbose,
+                            verbose: buildOptions.verbose,
                         },
                     },
                 },
@@ -383,6 +391,7 @@ function getStylesConfig(wco) {
                             {
                                 exclude: globalStylePaths,
                                 use: componentStyleLoaders,
+                                type: 'asset/source',
                             },
                             // Global styles are only defined global styles
                             {

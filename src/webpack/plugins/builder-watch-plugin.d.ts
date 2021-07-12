@@ -16,33 +16,8 @@ export interface BuilderWatcherFactory {
         close(): void;
     };
 }
-export interface WebpackWatcher {
-    close(): void;
-    pause(): void;
-    getFileTimeInfoEntries(): Map<string, {
-        safeTime: number;
-        timestamp: number;
-    }>;
-    getContextTimeInfoEntries(): Map<string, {
-        safeTime: number;
-        timestamp: number;
-    }>;
-}
-declare type WatchCallback = (error: Error | undefined, files: Map<string, {
-    safeTime: number;
-    timestamp: number;
-}>, contexts: Map<string, {
-    safeTime: number;
-    timestamp: number;
-}>, changes: Set<string>, removals: Set<string>) => void;
-export interface WebpackWatchFileSystem {
-    watch(files: Iterable<string>, directories: Iterable<string>, missing: Iterable<string>, startTime: number, options: {}, callback: WatchCallback, callbackUndelayed: (file: string, time: number) => void): WebpackWatcher;
-}
 export declare class BuilderWatchPlugin {
     private readonly watcherFactory;
     constructor(watcherFactory: BuilderWatcherFactory);
-    apply(compiler: Compiler & {
-        watchFileSystem: unknown;
-    }): void;
+    apply(compiler: Compiler): void;
 }
-export {};

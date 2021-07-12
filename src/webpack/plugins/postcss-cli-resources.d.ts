@@ -14,7 +14,7 @@ export interface PostcssCliResourcesOptions {
     /** CSS is extracted to a `.css` or is embedded in a `.js` file. */
     extracted?: boolean;
     filename: (resourcePath: string) => string;
-    loader: any;
+    loader: import('webpack').LoaderContext<unknown>;
     emitFile: boolean;
 }
 export declare const postcss = true;

@@ -24,4 +24,4 @@ export declare const SingleTestTransformLoader: string;
  * Then it adds import statements for each file in the files options
  * array to import them directly, and thus run the tests there.
  */
-export default function loader(this: any, source: string): string;
+export default function loader(this: import('webpack').LoaderContext<SingleTestTransformLoaderOptions>, source: string): string;

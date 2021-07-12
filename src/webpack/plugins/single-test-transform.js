@@ -9,7 +9,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SingleTestTransformLoader = void 0;
 const core_1 = require("@angular-devkit/core");
-const loader_utils_1 = require("loader-utils");
 const path_1 = require("path");
 exports.SingleTestTransformLoader = __filename;
 /**
@@ -27,7 +26,7 @@ exports.SingleTestTransformLoader = __filename;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function loader(source) {
-    const { files = [], logger = console } = loader_utils_1.getOptions(this);
+    const { files = [], logger = console } = this.getOptions();
     // signal the user that expected content is not present.
     if (!source.includes('require.context(')) {
         logger.error(core_1.tags.stripIndent `The 'include' option requires that the 'main' file for tests includes the below line:
