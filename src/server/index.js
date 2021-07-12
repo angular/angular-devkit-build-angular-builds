@@ -48,7 +48,7 @@ const stats_1 = require("../webpack/utils/stats");
 function execute(options, context, transforms = {}) {
     const root = context.workspaceRoot;
     // Check Angular version.
-    version_1.assertCompatibleAngularVersion(root, context.logger);
+    version_1.assertCompatibleAngularVersion(root);
     const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, root);
     const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
     const baseOutputPath = path.resolve(root, options.outputPath);
