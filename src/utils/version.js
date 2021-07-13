@@ -8,9 +8,10 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assertCompatibleAngularVersion = void 0;
+/* eslint-disable no-console */
 const core_1 = require("@angular-devkit/core");
 const semver_1 = require("semver");
-function assertCompatibleAngularVersion(projectRoot, logger) {
+function assertCompatibleAngularVersion(projectRoot) {
     let angularCliPkgJson;
     let angularPkgJson;
     let rxjsPkgJson;
@@ -22,13 +23,13 @@ function assertCompatibleAngularVersion(projectRoot, logger) {
         rxjsPkgJson = require(rxjsPackagePath);
     }
     catch {
-        logger.error(core_1.tags.stripIndents `
+        console.error(core_1.tags.stripIndents `
       You seem to not be depending on "@angular/core" and/or "rxjs". This is an error.
     `);
         process.exit(2);
     }
     if (!(angularPkgJson && angularPkgJson['version'] && rxjsPkgJson && rxjsPkgJson['version'])) {
-        logger.error(core_1.tags.stripIndents `
+        console.error(core_1.tags.stripIndents `
       Cannot determine versions of "@angular/core" and/or "rxjs".
       This likely means your local installation is broken. Please reinstall your packages.
     `);
@@ -57,7 +58,7 @@ function assertCompatibleAngularVersion(projectRoot, logger) {
     // of both 8 and 9.
     const supportedAngularSemver = `^${cliMajor}.0.0-next || >=${cliMajor}.0.0 <${cliMajor + 1}.0.0`;
     if (!semver_1.satisfies(angularVersion, supportedAngularSemver, { includePrerelease: true })) {
-        logger.error(core_1.tags.stripIndents `
+        console.error(core_1.tags.stripIndents `
         This version of CLI is only compatible with Angular versions ${supportedAngularSemver},
         but Angular version ${angularVersion} was found instead.
 

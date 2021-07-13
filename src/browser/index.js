@@ -101,7 +101,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
     let outputPaths;
     // Check Angular version.
-    version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
+    version_1.assertCompatibleAngularVersion(context.workspaceRoot);
     return rxjs_1.from(context.getProjectMetadata(projectName)).pipe(operators_1.switchMap(async (projectMetadata) => {
         var _a;
         const sysProjectRoot = core_1.getSystemPath(core_1.resolve(core_1.normalize(context.workspaceRoot), core_1.normalize((_a = projectMetadata.root) !== null && _a !== void 0 ? _a : '')));

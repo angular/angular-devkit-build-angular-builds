@@ -122,7 +122,7 @@ class NoEmitPlugin {
 async function execute(options, context, transforms) {
     var _a;
     // Check Angular version.
-    version_1.assertCompatibleAngularVersion(context.workspaceRoot, context.logger);
+    version_1.assertCompatibleAngularVersion(context.workspaceRoot);
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
     const browserOptions = await context.validateOptions(await context.getTargetOptions(browserTarget), await context.getBuilderNameForTarget(browserTarget));
     const format = normalizeFormatOption(options);
