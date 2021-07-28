@@ -170,7 +170,7 @@ function getCommonConfig(wco) {
     }
     // process asset entries
     if (buildOptions.assets.length) {
-        const copyWebpackPluginPatterns = buildOptions.assets.map((asset) => {
+        const copyWebpackPluginPatterns = buildOptions.assets.map((asset, index) => {
             // Resolve input paths relative to workspace root and add slash at the end.
             // eslint-disable-next-line prefer-const
             let { input, output, ignore = [], glob } = asset;
@@ -200,6 +200,7 @@ function getCommonConfig(wco) {
                         ...ignore,
                     ].map((i) => path.posix.join(input, i)),
                 },
+                priority: index,
             };
         });
         extraPlugins.push(new copy_webpack_plugin_1.default({
