@@ -44,11 +44,9 @@ const cacheFontsPath = environment_options_1.cachingDisabled
 const packageVersion = require('../../../package.json').version;
 const SUPPORTED_PROVIDERS = {
     'fonts.googleapis.com': {
-        seperateRequestForWOFF: true,
         preconnectUrl: 'https://fonts.gstatic.com',
     },
     'use.typekit.net': {
-        seperateRequestForWOFF: false,
         preconnectUrl: 'https://use.typekit.net',
     },
 };
@@ -146,9 +144,9 @@ class InlineFontsProcessor {
         });
         return transformedContent;
     }
-    async getResponse(url, userAgent) {
+    async getResponse(url) {
         var _a;
-        const key = `${packageVersion}|${url}|${userAgent}`;
+        const key = `${packageVersion}|${url}`;
         if (cacheFontsPath) {
             const entry = await cacache.get.info(cacheFontsPath, key);
             if (entry) {
@@ -167,7 +165,7 @@ class InlineFontsProcessor {
                 agent,
                 rejectUnauthorized: false,
                 headers: {
-                    'user-agent': userAgent,
+                    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36',
                 },
             }, (res) => {
                 if (res.statusCode !== 200) {
@@ -189,12 +187,7 @@ class InlineFontsProcessor {
         if (!provider) {
             return undefined;
         }
-        // The order IE -> Chrome is important as otherwise Chrome will load woff1.
-        let cssContent = '';
-        if (this.options.WOFFSupportNeeded && provider.seperateRequestForWOFF) {
-            cssContent += await this.getResponse(url, "Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11. 0) like Gecko" /* IE */);
-        }
-        cssContent += await this.getResponse(url, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36" /* Chrome */);
+        let cssContent = await this.getResponse(url);
         if (this.options.minify) {
             cssContent = cssContent
                 // Comments.

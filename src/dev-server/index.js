@@ -239,7 +239,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 sri: browserOptions.subresourceIntegrity,
                 postTransform: transforms.indexHtml,
                 optimization: utils_1.normalizeOptimization(browserOptions.optimization),
-                WOFFSupportNeeded: !buildBrowserFeatures.isFeatureSupported('woff2'),
                 crossOrigin: browserOptions.crossOrigin,
                 lang: locale,
             }));

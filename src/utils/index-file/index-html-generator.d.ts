@@ -23,7 +23,6 @@ export interface IndexHtmlGeneratorOptions {
     postTransform?: IndexHtmlTransform;
     crossOrigin?: CrossOriginValue;
     optimization?: NormalizedOptimizationOptions;
-    WOFFSupportNeeded: boolean;
 }
 export declare type IndexHtmlTransform = (content: string) => Promise<string>;
 export interface IndexHtmlTransformResult {
