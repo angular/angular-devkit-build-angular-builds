@@ -8,12 +8,11 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBrowserConfig = void 0;
-const utils_1 = require("../../utils");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
 function getBrowserConfig(wco) {
     const { buildOptions } = wco;
-    const { crossOrigin = 'none', subresourceIntegrity, extractLicenses, vendorChunk, commonChunk, allowedCommonJsDependencies, } = buildOptions;
+    const { crossOrigin = 'none', subresourceIntegrity, vendorChunk, commonChunk, allowedCommonJsDependencies, } = buildOptions;
     const extraPlugins = [];
     const { styles: stylesSourceMap, scripts: scriptsSourceMap, hidden: hiddenSourceMap, } = buildOptions.sourceMap;
     if (subresourceIntegrity) {
@@ -32,7 +31,6 @@ function getBrowserConfig(wco) {
     else if (crossOrigin !== 'none') {
         crossOriginLoading = crossOrigin;
     }
-    const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(wco.projectRoot);
     return {
         devtool: false,
         resolve: {

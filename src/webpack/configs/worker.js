@@ -11,16 +11,12 @@ exports.getWorkerConfig = void 0;
 const path_1 = require("path");
 const typescript_1 = require("./typescript");
 function getWorkerConfig(wco) {
-    const { buildOptions } = wco;
-    if (!buildOptions.webWorkerTsConfig) {
+    const { webWorkerTsConfig } = wco.buildOptions;
+    if (!webWorkerTsConfig) {
         return {};
     }
-    if (typeof buildOptions.webWorkerTsConfig != 'string') {
-        throw new Error('The `webWorkerTsConfig` must be a string.');
-    }
-    const workerTsConfigPath = path_1.resolve(wco.root, buildOptions.webWorkerTsConfig);
     return {
-        plugins: [typescript_1.getTypescriptWorkerPlugin(wco, workerTsConfigPath)],
+        plugins: [typescript_1.getTypescriptWorkerPlugin(wco, path_1.resolve(wco.root, webWorkerTsConfig))],
     };
 }
 exports.getWorkerConfig = getWorkerConfig;
