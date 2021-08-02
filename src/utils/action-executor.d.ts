@@ -6,18 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { I18nOptions } from './i18n-options';
-import { InlineOptions, ProcessBundleOptions, ProcessBundleResult } from './process-bundle';
+import { InlineOptions } from './process-bundle';
 export declare class BundleActionExecutor {
     private workerOptions;
     private workerPool?;
-    private cache?;
     constructor(workerOptions: {
-        cachePath?: string;
         i18n: I18nOptions;
-    }, integrityAlgorithm?: string);
+    });
     private ensureWorkerPool;
-    process(action: ProcessBundleOptions): Promise<ProcessBundleResult>;
-    processAll(actions: Iterable<ProcessBundleOptions>): AsyncIterable<ProcessBundleResult>;
     inline(action: InlineOptions): Promise<{
         file: string;
         diagnostics: {

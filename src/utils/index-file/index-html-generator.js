@@ -102,7 +102,6 @@ function inlineFontsPlugin({ options }) {
     var _a;
     const inlineFontsProcessor = new inline_fonts_1.InlineFontsProcessor({
         minify: (_a = options.optimization) === null || _a === void 0 ? void 0 : _a.styles.minify,
-        WOFFSupportNeeded: options.WOFFSupportNeeded,
     });
     return async (html) => inlineFontsProcessor.process(html);
 }

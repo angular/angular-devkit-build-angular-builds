@@ -58,7 +58,6 @@ function getCommonConfig(wco) {
     // determine hashing format
     const hashFormat = helpers_1.getOutputHashFormat(buildOptions.outputHashing || 'none');
     const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);
-    const targetInFileName = helpers_1.getEsVersionForFileName(tsConfig.options.target, buildOptions.differentialLoadingNeeded);
     if (buildOptions.progress) {
         const spinner = new spinner_1.Spinner();
         spinner.start(`Generating ${platform} application bundles (phase: setup)...`);
@@ -85,22 +84,15 @@ function getCommonConfig(wco) {
         const mainPath = path.resolve(root, buildOptions.main);
         entryPoints['main'] = [mainPath];
     }
-    const differentialLoadingMode = buildOptions.differentialLoadingNeeded && !buildOptions.watch;
     if (platform !== 'server') {
-        if (differentialLoadingMode || tsConfig.options.target === typescript_1.ScriptTarget.ES5) {
-            if (buildBrowserFeatures.isEs5SupportNeeded()) {
-                const polyfillsChunkName = 'polyfills-es5';
-                entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
-                if (!buildOptions.aot) {
-                    if (differentialLoadingMode) {
-                        entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'jit-polyfills.js'));
-                    }
-                    entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
-                }
-                // If not performing a full differential build the polyfills need to be added to ES5 bundle
-                if (buildOptions.polyfills) {
-                    entryPoints[polyfillsChunkName].push(path.resolve(root, buildOptions.polyfills));
-                }
+        if (buildBrowserFeatures.isEs5SupportNeeded()) {
+            const polyfillsChunkName = 'polyfills-es5';
+            entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
+            if (!buildOptions.aot) {
+                entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
+            }
+            if (buildOptions.polyfills) {
+                entryPoints[polyfillsChunkName].push(path.resolve(root, buildOptions.polyfills));
             }
         }
         if (buildOptions.polyfills) {
@@ -336,10 +328,10 @@ function getCommonConfig(wco) {
                     return `polyfills-es5${hashFormat.chunk}.js`;
                 }
                 else {
-                    return `[name]${targetInFileName}${hashFormat.chunk}.js`;
+                    return `[name]${hashFormat.chunk}.js`;
                 }
             },
-            chunkFilename: `[name]${targetInFileName}${hashFormat.chunk}.js`,
+            chunkFilename: `[name]${hashFormat.chunk}.js`,
         },
         watch: buildOptions.watch,
         watchOptions: helpers_1.getWatchOptions(buildOptions.poll),

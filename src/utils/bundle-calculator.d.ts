@@ -7,7 +7,6 @@
  */
 import { StatsCompilation } from 'webpack';
 import { Budget } from '../browser/schema';
-import { ProcessBundleResult } from '../utils/process-bundle';
 interface Threshold {
     limit: number;
     type: ThresholdType;
@@ -22,7 +21,7 @@ export declare enum ThresholdSeverity {
     Error = "error"
 }
 export declare function calculateThresholds(budget: Budget): IterableIterator<Threshold>;
-export declare function checkBudgets(budgets: Budget[], webpackStats: StatsCompilation, processResults: ProcessBundleResult[]): IterableIterator<{
+export declare function checkBudgets(budgets: Budget[], webpackStats: StatsCompilation): IterableIterator<{
     severity: ThresholdSeverity;
     message: string;
 }>;
