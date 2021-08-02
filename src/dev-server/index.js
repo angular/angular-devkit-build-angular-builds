@@ -36,7 +36,6 @@ const core_1 = require("@angular-devkit/core");
 const path = __importStar(require("path"));
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
-const ts = __importStar(require("typescript"));
 const url = __importStar(require("url"));
 const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
 const schema_1 = require("../browser/schema");
@@ -217,23 +216,17 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             locale,
         };
     }
-    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, projectRoot, locale }) => {
+    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, locale }) => {
         if (browserOptions.index) {
-            const { scripts = [], styles = [], baseHref, tsConfig } = browserOptions;
-            const { options: compilerOptions } = read_tsconfig_1.readTsconfig(tsConfig, workspaceRoot);
-            const target = compilerOptions.target || ts.ScriptTarget.ES5;
-            const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);
+            const { scripts = [], styles = [], baseHref } = browserOptions;
             const entrypoints = package_chunk_sort_1.generateEntryPoints({ scripts, styles });
-            const moduleEntrypoints = buildBrowserFeatures.isDifferentialLoadingNeeded(target)
-                ? package_chunk_sort_1.generateEntryPoints({ scripts: [], styles })
-                : [];
             webpackConfig.plugins = [...(webpackConfig.plugins || [])];
             webpackConfig.plugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({
                 indexPath: path.resolve(workspaceRoot, webpack_browser_config_1.getIndexInputFile(browserOptions.index)),
                 outputPath: webpack_browser_config_1.getIndexOutputFile(browserOptions.index),
                 baseHref,
                 entrypoints,
-                moduleEntrypoints,
+                moduleEntrypoints: [],
                 noModuleEntrypoints: ['polyfills-es5'],
                 deployUrl: browserOptions.deployUrl,
                 sri: browserOptions.subresourceIntegrity,

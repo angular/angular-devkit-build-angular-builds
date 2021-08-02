@@ -36,12 +36,9 @@ const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const typescript_1 = require("typescript");
 const utils_1 = require("../utils");
-const action_executor_1 = require("../utils/action-executor");
 const bundle_calculator_1 = require("../utils/bundle-calculator");
-const cache_path_1 = require("../utils/cache-path");
 const color_1 = require("../utils/color");
 const copy_assets_1 = require("../utils/copy-assets");
-const environment_options_1 = require("../utils/environment-options");
 const i18n_inlining_1 = require("../utils/i18n-inlining");
 const index_html_generator_1 = require("../utils/index-file/index-html-generator");
 const output_paths_1 = require("../utils/output-paths");
@@ -55,8 +52,7 @@ const configs_1 = require("../webpack/configs");
 const async_chunks_1 = require("../webpack/utils/async-chunks");
 const helpers_1 = require("../webpack/utils/helpers");
 const stats_1 = require("../webpack/utils/stats");
-const cacheDownlevelPath = environment_options_1.cachingDisabled ? undefined : cache_path_1.findCachePath('angular-build-dl');
-async function initialize(options, context, differentialLoadingNeeded, webpackConfigurationTransform) {
+async function initialize(options, context, webpackConfigurationTransform) {
     var _a, _b;
     const originalOutputPath = options.outputPath;
     // Assets are processed directly by the builder except when watching
@@ -69,7 +65,7 @@ async function initialize(options, context, differentialLoadingNeeded, webpackCo
         configs_1.getAnalyticsConfig(wco, context),
         configs_1.getTypeScriptConfig(wco),
         wco.buildOptions.webWorkerTsConfig ? configs_1.getWorkerConfig(wco) : {},
-    ], { differentialLoadingNeeded });
+    ]);
     // Validate asset option values if processed directly
     if (((_a = options.assets) === null || _a === void 0 ? void 0 : _a.length) && !((_b = adjustedOptions.assets) === null || _b === void 0 ? void 0 : _b.length)) {
         utils_1.normalizeAssetPatterns(options.assets, core_1.normalize(context.workspaceRoot), core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)).forEach(({ output }) => {
@@ -108,17 +104,15 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         const { options: compilerOptions } = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
         const target = compilerOptions.target || typescript_1.ScriptTarget.ES5;
         const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(sysProjectRoot);
-        const isDifferentialLoadingNeeded = buildBrowserFeatures.isDifferentialLoadingNeeded(target);
         checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
         return {
-            ...(await initialize(options, context, isDifferentialLoadingNeeded, transforms.webpackConfiguration)),
+            ...(await initialize(options, context, transforms.webpackConfiguration)),
             buildBrowserFeatures,
-            isDifferentialLoadingNeeded,
             target,
         };
     }), operators_1.switchMap(
     // eslint-disable-next-line max-lines-per-function
-    ({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, isDifferentialLoadingNeeded, target, }) => {
+    ({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, target }) => {
         const normalizedOptimization = utils_1.normalizeOptimization(options.optimization);
         return build_webpack_1.runWebpack(config, context, {
             webpackFactory: require('webpack'),
@@ -131,7 +125,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         }).pipe(
         // eslint-disable-next-line max-lines-per-function
         operators_1.concatMap(async (buildEvent) => {
-            var _a, _b, _c, _d, _e, _f, _g, _h;
+            var _a, _b, _c, _d, _e;
             const spinner = new spinner_1.Spinner();
             spinner.enabled = options.progress !== false;
             const { success, emittedFiles = [], outputPath: webpackOutputPath } = buildEvent;
@@ -160,271 +154,28 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 return { success };
             }
             else {
-                const processResults = [];
-                const bundleInfoStats = [];
                 outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
-                let noModuleFiles;
                 let moduleFiles;
-                let files;
                 const scriptsEntryPointName = helpers_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map((x) => x.bundleName);
-                if (isDifferentialLoadingNeeded && options.watch) {
-                    moduleFiles = emittedFiles;
-                    files = moduleFiles.filter((x) => x.extension === '.css' || (x.name && scriptsEntryPointName.includes(x.name)));
-                    if (i18n.shouldInline) {
-                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, webpackOutputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
-                        if (!success) {
-                            return { success: false };
-                        }
-                    }
-                }
-                else if (isDifferentialLoadingNeeded) {
-                    moduleFiles = [];
-                    noModuleFiles = [];
-                    // Common options for all bundle process actions
-                    const sourceMapOptions = utils_1.normalizeSourceMaps(options.sourceMap || false);
-                    const actionOptions = {
-                        optimize: normalizedOptimization.scripts,
-                        sourceMaps: sourceMapOptions.scripts,
-                        hiddenSourceMaps: sourceMapOptions.hidden,
-                        vendorSourceMaps: sourceMapOptions.vendor,
-                        integrityAlgorithm: options.subresourceIntegrity ? 'sha384' : undefined,
-                    };
-                    let mainChunkId;
-                    const actions = [];
-                    let workerReplacements;
-                    const seen = new Set();
-                    for (const file of emittedFiles) {
-                        // Assets are not processed nor injected into the index
-                        if (file.asset) {
-                            // WorkerPlugin adds worker files to assets
-                            if (file.file.endsWith('.worker.js')) {
-                                if (!workerReplacements) {
-                                    workerReplacements = [];
-                                }
-                                workerReplacements.push([
-                                    file.file,
-                                    file.file.replace(/\-(es20\d{2}|esnext)/, '-es5'),
-                                ]);
-                            }
-                            else {
-                                continue;
-                            }
-                        }
-                        // Scripts and non-javascript files are not processed
-                        if (file.extension !== '.js' ||
-                            (file.name && scriptsEntryPointName.includes(file.name))) {
-                            if (files === undefined) {
-                                files = [];
-                            }
-                            files.push(file);
-                            continue;
-                        }
-                        // Ignore already processed files; emittedFiles can contain duplicates
-                        if (seen.has(file.file)) {
-                            continue;
-                        }
-                        seen.add(file.file);
-                        if (file.name === 'vendor' || (!mainChunkId && file.name === 'main')) {
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            mainChunkId = file.id.toString();
-                        }
-                        // All files at this point except ES5 polyfills are module scripts
-                        const es5Polyfills = file.file.startsWith('polyfills-es5');
-                        if (!es5Polyfills) {
-                            moduleFiles.push(file);
-                        }
-                        // Retrieve the content/map for the file
-                        // NOTE: Additional future optimizations will read directly from memory
-                        let filename = path.join(webpackOutputPath, file.file);
-                        const code = fs.readFileSync(filename, 'utf8');
-                        let map;
-                        if (actionOptions.sourceMaps) {
-                            try {
-                                map = fs.readFileSync(filename + '.map', 'utf8');
-                                if (es5Polyfills) {
-                                    fs.unlinkSync(filename + '.map');
-                                }
-                            }
-                            catch { }
-                        }
-                        if (es5Polyfills) {
-                            fs.unlinkSync(filename);
-                            filename = filename.replace(/\-es20\d{2}/, '');
-                        }
-                        const es2015Polyfills = file.file.startsWith('polyfills-es20');
-                        // Record the bundle processing action
-                        // The runtime chunk gets special processing for lazy loaded files
-                        actions.push({
-                            ...actionOptions,
-                            filename,
-                            code,
-                            map,
-                            // id is always present for non-assets
-                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                            name: file.id,
-                            runtime: file.file.startsWith('runtime'),
-                            ignoreOriginal: es5Polyfills,
-                            optimizeOnly: es2015Polyfills,
-                        });
-                        // ES2015 polyfills are only optimized; optimization check was performed above
-                        if (es2015Polyfills) {
-                            continue;
-                        }
-                        // Add the newly created ES5 bundles to the index as nomodule scripts
-                        const newFilename = es5Polyfills
-                            ? file.file.replace(/\-es20\d{2}/, '')
-                            : file.file.replace(/\-(es20\d{2}|esnext)/, '-es5');
-                        noModuleFiles.push({ ...file, file: newFilename });
-                    }
-                    const processActions = [];
-                    let processRuntimeAction;
-                    for (const action of actions) {
-                        // If SRI is enabled always process the runtime bundle
-                        // Lazy route integrity values are stored in the runtime bundle
-                        if (action.integrityAlgorithm && action.runtime) {
-                            processRuntimeAction = action;
-                        }
-                        else {
-                            processActions.push({ replacements: workerReplacements, ...action });
-                        }
-                    }
-                    const executor = new action_executor_1.BundleActionExecutor({ cachePath: cacheDownlevelPath, i18n }, options.subresourceIntegrity ? 'sha384' : undefined);
-                    // Execute the bundle processing actions
-                    try {
-                        spinner.start('Generating ES5 bundles for differential loading...');
-                        for await (const result of executor.processAll(processActions)) {
-                            processResults.push(result);
-                        }
-                        // Runtime must be processed after all other files
-                        if (processRuntimeAction) {
-                            const runtimeOptions = {
-                                ...processRuntimeAction,
-                                runtimeData: processResults,
-                                supportedBrowsers: buildBrowserFeatures.supportedBrowsers,
-                            };
-                            processResults.push(await Promise.resolve().then(() => __importStar(require('../utils/process-bundle'))).then((m) => m.process(runtimeOptions)));
-                        }
-                        spinner.succeed('ES5 bundle generation complete.');
-                        if (i18n.shouldInline) {
-                            spinner.start('Generating localized bundles...');
-                            const inlineActions = [];
-                            const processedFiles = new Set();
-                            for (const result of processResults) {
-                                if (result.original) {
-                                    inlineActions.push({
-                                        filename: path.basename(result.original.filename),
-                                        code: fs.readFileSync(result.original.filename, 'utf8'),
-                                        map: result.original.map &&
-                                            fs.readFileSync(result.original.map.filename, 'utf8'),
-                                        outputPath: baseOutputPath,
-                                        es5: false,
-                                        missingTranslation: options.i18nMissingTranslation,
-                                        setLocale: result.name === mainChunkId,
-                                    });
-                                    processedFiles.add(result.original.filename);
-                                    if (result.original.map) {
-                                        processedFiles.add(result.original.map.filename);
-                                    }
-                                }
-                                if (result.downlevel) {
-                                    inlineActions.push({
-                                        filename: path.basename(result.downlevel.filename),
-                                        code: fs.readFileSync(result.downlevel.filename, 'utf8'),
-                                        map: result.downlevel.map &&
-                                            fs.readFileSync(result.downlevel.map.filename, 'utf8'),
-                                        outputPath: baseOutputPath,
-                                        es5: true,
-                                        missingTranslation: options.i18nMissingTranslation,
-                                        setLocale: result.name === mainChunkId,
-                                    });
-                                    processedFiles.add(result.downlevel.filename);
-                                    if (result.downlevel.map) {
-                                        processedFiles.add(result.downlevel.map.filename);
-                                    }
-                                }
-                            }
-                            let hasErrors = false;
-                            try {
-                                for await (const result of executor.inlineAll(inlineActions)) {
-                                    if (options.verbose) {
-                                        context.logger.info(`Localized "${result.file}" [${result.count} translation(s)].`);
-                                    }
-                                    for (const diagnostic of result.diagnostics) {
-                                        spinner.stop();
-                                        if (diagnostic.type === 'error') {
-                                            hasErrors = true;
-                                            context.logger.error(diagnostic.message);
-                                        }
-                                        else {
-                                            context.logger.warn(diagnostic.message);
-                                        }
-                                        spinner.start();
-                                    }
-                                }
-                                // Copy any non-processed files into the output locations
-                                await copy_assets_1.copyAssets([
-                                    {
-                                        glob: '**/*',
-                                        input: webpackOutputPath,
-                                        output: '',
-                                        ignore: [...processedFiles].map((f) => path.relative(webpackOutputPath, f)),
-                                    },
-                                ], Array.from(outputPaths.values()), '');
-                            }
-                            catch (err) {
-                                spinner.fail('Localized bundle generation failed.');
-                                return { success: false, error: mapErrorToMessage(err) };
-                            }
-                            if (hasErrors) {
-                                spinner.fail('Localized bundle generation failed.');
-                            }
-                            else {
-                                spinner.succeed('Localized bundle generation complete.');
-                            }
-                            if (hasErrors) {
-                                return { success: false };
-                            }
-                        }
-                    }
-                    finally {
-                        executor.stop();
-                    }
-                    for (const result of processResults) {
-                        const chunk = (_a = webpackStats.chunks) === null || _a === void 0 ? void 0 : _a.find((chunk) => { var _a; return ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()) === result.name; });
-                        if (result.original) {
-                            bundleInfoStats.push(generateBundleInfoStats(result.original, chunk, 'modern'));
-                        }
-                        if (result.downlevel) {
-                            bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk, 'legacy'));
-                        }
-                    }
-                    const unprocessedChunks = ((_b = webpackStats.chunks) === null || _b === void 0 ? void 0 : _b.filter((chunk) => !processResults.find((result) => { var _a; return ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()) === result.name; }))) || [];
-                    for (const chunk of unprocessedChunks) {
-                        const asset = (_c = webpackStats.assets) === null || _c === void 0 ? void 0 : _c.find((a) => { var _a; return a.name === ((_a = chunk.files) === null || _a === void 0 ? void 0 : _a[0]); });
-                        bundleInfoStats.push(stats_1.generateBundleStats({ ...chunk, size: asset === null || asset === void 0 ? void 0 : asset.size }));
-                    }
-                }
-                else {
-                    files = emittedFiles.filter((x) => x.name !== 'polyfills-es5');
-                    noModuleFiles = emittedFiles.filter((x) => x.name === 'polyfills-es5');
-                    if (i18n.shouldInline) {
-                        const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, webpackOutputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
-                        if (!success) {
-                            return { success: false };
-                        }
+                const files = emittedFiles.filter((x) => x.name !== 'polyfills-es5');
+                const noModuleFiles = emittedFiles.filter((x) => x.name === 'polyfills-es5');
+                if (i18n.shouldInline) {
+                    const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, webpackOutputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
+                    if (!success) {
+                        return { success: false };
                     }
                 }
                 // Check for budget errors and display them to the user.
                 const budgets = options.budgets;
                 if (budgets === null || budgets === void 0 ? void 0 : budgets.length) {
-                    const budgetFailures = bundle_calculator_1.checkBudgets(budgets, webpackStats, processResults);
+                    const budgetFailures = bundle_calculator_1.checkBudgets(budgets, webpackStats);
                     for (const { severity, message } of budgetFailures) {
                         switch (severity) {
                             case bundle_calculator_1.ThresholdSeverity.Warning:
-                                (_d = webpackStats.warnings) === null || _d === void 0 ? void 0 : _d.push({ message });
+                                (_a = webpackStats.warnings) === null || _a === void 0 ? void 0 : _a.push({ message });
                                 break;
                             case bundle_calculator_1.ThresholdSeverity.Error:
-                                (_e = webpackStats.errors) === null || _e === void 0 ? void 0 : _e.push({ message });
+                                (_b = webpackStats.errors) === null || _b === void 0 ? void 0 : _b.push({ message });
                                 break;
                             default:
                                 assertNever(severity);
@@ -434,7 +185,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 const buildSuccess = success && !stats_1.statsHasErrors(webpackStats);
                 if (buildSuccess) {
                     // Copy assets
-                    if (!options.watch && ((_f = options.assets) === null || _f === void 0 ? void 0 : _f.length)) {
+                    if (!options.watch && ((_c = options.assets) === null || _c === void 0 ? void 0 : _c.length)) {
                         spinner.start('Copying assets...');
                         try {
                             await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), Array.from(outputPaths.values()), context.workspaceRoot);
@@ -448,8 +199,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     if (options.index) {
                         spinner.start('Generating index html...');
                         const entrypoints = package_chunk_sort_1.generateEntryPoints({
-                            scripts: (_g = options.scripts) !== null && _g !== void 0 ? _g : [],
-                            styles: (_h = options.styles) !== null && _h !== void 0 ? _h : [],
+                            scripts: (_d = options.scripts) !== null && _d !== void 0 ? _d : [],
+                            styles: (_e = options.styles) !== null && _e !== void 0 ? _e : [],
                         });
                         const indexHtmlGenerator = new index_html_generator_1.IndexHtmlGenerator({
                             indexPath: path.join(context.workspaceRoot, webpack_browser_config_1.getIndexInputFile(options.index)),
@@ -512,7 +263,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         spinner.succeed('Service worker generation complete.');
                     }
                 }
-                stats_1.webpackStatsLogger(context.logger, webpackStats, config, bundleInfoStats);
+                stats_1.webpackStatsLogger(context.logger, webpackStats, config);
                 return { success: buildSuccess };
             }
         }), operators_1.map((event) => ({
@@ -542,16 +293,6 @@ function mapErrorToMessage(error) {
 }
 function assertNever(input) {
     throw new Error(`Unexpected call to assertNever() with input: ${JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
-}
-function generateBundleInfoStats(bundle, chunk, chunkType) {
-    return stats_1.generateBundleStats({
-        size: bundle.size,
-        files: bundle.map ? [bundle.filename, bundle.map.filename] : [bundle.filename],
-        names: chunk === null || chunk === void 0 ? void 0 : chunk.names,
-        initial: !!(chunk === null || chunk === void 0 ? void 0 : chunk.initial),
-        rendered: true,
-        chunkType,
-    });
 }
 function mapEmittedFilesToFileInfo(files = []) {
     const filteredFiles = [];
