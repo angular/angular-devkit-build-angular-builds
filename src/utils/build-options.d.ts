@@ -59,6 +59,7 @@ export interface BuildOptions {
     fileReplacements: NormalizedFileReplacement[];
     inlineStyleLanguage?: InlineStyleLanguage;
     allowedCommonJsDependencies?: string[];
+    differentialLoadingNeeded?: boolean;
 }
 export interface WebpackTestOptions extends BuildOptions {
     codeCoverage?: boolean;

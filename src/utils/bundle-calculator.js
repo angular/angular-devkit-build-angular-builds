@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkThresholds = exports.checkBudgets = exports.calculateThresholds = exports.ThresholdSeverity = void 0;
+const path_1 = require("path");
 const schema_1 = require("../browser/schema");
 const stats_1 = require("../webpack/utils/stats");
 var ThresholdType;
@@ -20,6 +21,11 @@ var ThresholdSeverity;
     ThresholdSeverity["Warning"] = "warning";
     ThresholdSeverity["Error"] = "error";
 })(ThresholdSeverity = exports.ThresholdSeverity || (exports.ThresholdSeverity = {}));
+var DifferentialBuildType;
+(function (DifferentialBuildType) {
+    DifferentialBuildType["ORIGINAL"] = "original";
+    DifferentialBuildType["DOWNLEVEL"] = "downlevel";
+})(DifferentialBuildType || (DifferentialBuildType = {}));
 function* calculateThresholds(budget) {
     if (budget.maximumWarning) {
         yield {
@@ -78,7 +84,7 @@ exports.calculateThresholds = calculateThresholds;
 /**
  * Calculates the sizes for bundles in the budget type provided.
  */
-function calculateSizes(budget, stats) {
+function calculateSizes(budget, stats, processResults) {
     if (budget.type === schema_1.Type.AnyComponentStyle) {
         // Component style size information is not available post-build, this must
         // be checked mid-build via the `AnyComponentStyleBudgetChecker` plugin.
@@ -100,33 +106,49 @@ function calculateSizes(budget, stats) {
     if (!assets) {
         throw new Error('Webpack stats output did not include asset information.');
     }
-    const calculator = new ctor(budget, chunks, assets);
+    const calculator = new ctor(budget, chunks, assets, processResults);
     return calculator.calculate();
 }
 class Calculator {
-    constructor(budget, chunks, assets) {
+    constructor(budget, chunks, assets, processResults) {
         this.budget = budget;
         this.chunks = chunks;
         this.assets = assets;
+        this.processResults = processResults;
     }
     /** Calculates the size of the given chunk for the provided build type. */
-    calculateChunkSize(chunk) {
-        // No differential builds, get the chunk size by summing its assets.
-        if (!chunk.files) {
-            return 0;
+    calculateChunkSize(chunk, buildType) {
+        // Look for a process result containing different builds for this chunk.
+        const processResult = this.processResults.find((processResult) => { var _a; return processResult.name === ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()); });
+        if (processResult) {
+            // Found a differential build, use the correct size information.
+            const processResultFile = getDifferentialBuildResult(processResult, buildType);
+            return (processResultFile && processResultFile.size) || 0;
         }
-        return chunk.files
-            .filter((file) => !file.endsWith('.map'))
-            .map((file) => {
-            const asset = this.assets.find((asset) => asset.name === file);
-            if (!asset) {
-                throw new Error(`Could not find asset for file: ${file}`);
+        else {
+            // No differential builds, get the chunk size by summing its assets.
+            if (!chunk.files) {
+                return 0;
             }
-            return asset.size;
-        })
-            .reduce((l, r) => l + r, 0);
+            return chunk.files
+                .filter((file) => !file.endsWith('.map'))
+                .map((file) => {
+                const asset = this.assets.find((asset) => asset.name === file);
+                if (!asset) {
+                    throw new Error(`Could not find asset for file: ${file}`);
+                }
+                return asset.size;
+            })
+                .reduce((l, r) => l + r, 0);
+        }
     }
     getAssetSize(asset) {
+        if (asset.name.endsWith('.js')) {
+            const processResult = this.processResults.find((processResult) => processResult.original && path_1.basename(processResult.original.filename) === asset.name);
+            if (processResult === null || processResult === void 0 ? void 0 : processResult.original) {
+                return processResult.original.size;
+            }
+        }
         return asset.size;
     }
 }
@@ -139,11 +161,24 @@ class BundleCalculator extends Calculator {
         if (!budgetName) {
             return [];
         }
-        const size = this.chunks
-            .filter((chunk) => { var _a; return (_a = chunk === null || chunk === void 0 ? void 0 : chunk.names) === null || _a === void 0 ? void 0 : _a.includes(budgetName); })
-            .map((chunk) => this.calculateChunkSize(chunk))
-            .reduce((l, r) => l + r, 0);
-        return [{ size, label: `bundle ${this.budget.name}` }];
+        const buildTypeLabels = getBuildTypeLabels(this.processResults);
+        // The chunk may or may not have differential builds. Compute the size for
+        // each then check afterwards if they are all the same.
+        const buildSizes = Object.values(DifferentialBuildType).map((buildType) => {
+            const size = this.chunks
+                .filter((chunk) => { var _a; return (_a = chunk === null || chunk === void 0 ? void 0 : chunk.names) === null || _a === void 0 ? void 0 : _a.includes(budgetName); })
+                .map((chunk) => this.calculateChunkSize(chunk, buildType))
+                .reduce((l, r) => l + r, 0);
+            return { size, label: `bundle ${this.budget.name}-${buildTypeLabels[buildType]}` };
+        });
+        // If this bundle was not actually generated by a differential build, then
+        // merge the results into a single value.
+        if (allEquivalent(buildSizes.map((buildSize) => buildSize.size))) {
+            return mergeDifferentialBuildSizes(buildSizes, budgetName);
+        }
+        else {
+            return buildSizes;
+        }
     }
 }
 /**
@@ -151,15 +186,24 @@ class BundleCalculator extends Calculator {
  */
 class InitialCalculator extends Calculator {
     calculate() {
-        return [
-            {
-                label: `bundle initial`,
+        const buildTypeLabels = getBuildTypeLabels(this.processResults);
+        const buildSizes = Object.values(DifferentialBuildType).map((buildType) => {
+            return {
+                label: `bundle initial-${buildTypeLabels[buildType]}`,
                 size: this.chunks
                     .filter((chunk) => chunk.initial)
-                    .map((chunk) => this.calculateChunkSize(chunk))
+                    .map((chunk) => this.calculateChunkSize(chunk, buildType))
                     .reduce((l, r) => l + r, 0),
-            },
-        ];
+            };
+        });
+        // If this bundle was not actually generated by a differential build, then
+        // merge the results into a single value.
+        if (allEquivalent(buildSizes.map((buildSize) => buildSize.size))) {
+            return mergeDifferentialBuildSizes(buildSizes, 'initial');
+        }
+        else {
+            return buildSizes;
+        }
     }
 }
 /**
@@ -241,11 +285,11 @@ function calculateBytes(input, baseline, factor = 1) {
     }
     return baselineBytes + value * factor;
 }
-function* checkBudgets(budgets, webpackStats) {
+function* checkBudgets(budgets, webpackStats, processResults) {
     // Ignore AnyComponentStyle budgets as these are handled in `AnyComponentStyleBudgetChecker`.
     const computableBudgets = budgets.filter((budget) => budget.type !== schema_1.Type.AnyComponentStyle);
     for (const budget of computableBudgets) {
-        const sizes = calculateSizes(budget, webpackStats);
+        const sizes = calculateSizes(budget, webpackStats, processResults);
         for (const { size, label } of sizes) {
             yield* checkThresholds(calculateThresholds(budget), size, label);
         }
@@ -284,3 +328,47 @@ function* checkThresholds(thresholds, size, label) {
     }
 }
 exports.checkThresholds = checkThresholds;
+/** Returns the {@link ProcessBundleFile} for the given {@link DifferentialBuildType}. */
+function getDifferentialBuildResult(processResult, buildType) {
+    switch (buildType) {
+        case DifferentialBuildType.ORIGINAL:
+            return processResult.original || null;
+        case DifferentialBuildType.DOWNLEVEL:
+            return processResult.downlevel || null;
+    }
+}
+/**
+ * Merges the given differential builds into a single, non-differential value.
+ *
+ * Preconditions: All the sizes should be equivalent, or else they represent
+ * differential builds.
+ */
+function mergeDifferentialBuildSizes(buildSizes, mergeLabel) {
+    if (buildSizes.length === 0) {
+        return [];
+    }
+    // Only one size.
+    return [
+        {
+            label: mergeLabel,
+            size: buildSizes[0].size,
+        },
+    ];
+}
+/** Returns whether or not all items in the list are equivalent to each other. */
+function allEquivalent(items) {
+    return new Set(items).size < 2;
+}
+function getBuildTypeLabels(processResults) {
+    var _a, _b, _c;
+    const fileNameSuffixRegExp = /\-(es20\d{2}|esnext)\./;
+    const originalFileName = (_b = (_a = processResults.find(({ original }) => (original === null || original === void 0 ? void 0 : original.filename) && fileNameSuffixRegExp.test(original.filename))) === null || _a === void 0 ? void 0 : _a.original) === null || _b === void 0 ? void 0 : _b.filename;
+    let originalSuffix;
+    if (originalFileName) {
+        originalSuffix = (_c = fileNameSuffixRegExp.exec(originalFileName)) === null || _c === void 0 ? void 0 : _c[1];
+    }
+    return {
+        [DifferentialBuildType.DOWNLEVEL]: 'es5',
+        [DifferentialBuildType.ORIGINAL]: originalSuffix || 'es2015',
+    };
+}

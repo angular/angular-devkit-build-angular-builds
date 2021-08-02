@@ -22,7 +22,7 @@ function getBrowserConfig(wco) {
         }));
     }
     if (scriptsSourceMap || stylesSourceMap) {
-        extraPlugins.push(helpers_1.getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, hiddenSourceMap, false));
+        extraPlugins.push(helpers_1.getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, buildOptions.differentialLoadingNeeded && !buildOptions.watch ? true : hiddenSourceMap, false));
     }
     let crossOriginLoading = false;
     if (subresourceIntegrity && crossOrigin === 'none') {
