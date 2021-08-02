@@ -447,6 +447,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     }
                     if (options.index) {
                         spinner.start('Generating index html...');
+                        const WOFFSupportNeeded = !buildBrowserFeatures.isFeatureSupported('woff2');
                         const entrypoints = package_chunk_sort_1.generateEntryPoints({
                             scripts: (_g = options.scripts) !== null && _g !== void 0 ? _g : [],
                             styles: (_h = options.styles) !== null && _h !== void 0 ? _h : [],
@@ -456,6 +457,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             entrypoints,
                             deployUrl: options.deployUrl,
                             sri: options.subresourceIntegrity,
+                            WOFFSupportNeeded,
                             optimization: normalizedOptimization,
                             crossOrigin: options.crossOrigin,
                             postTransform: transforms.indexHtml,

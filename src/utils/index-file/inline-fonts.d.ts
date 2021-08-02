@@ -7,6 +7,7 @@
  */
 export interface InlineFontsOptions {
     minify?: boolean;
+    WOFFSupportNeeded: boolean;
 }
 export declare class InlineFontsProcessor {
     private options;
