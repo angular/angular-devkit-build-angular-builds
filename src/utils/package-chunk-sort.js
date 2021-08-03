@@ -20,7 +20,6 @@ function generateEntryPoints(appConfig) {
     };
     const entryPoints = [
         'runtime',
-        'polyfills-es5',
         'polyfills',
         'sw-register',
         ...extraEntryPoints(appConfig.styles, 'styles'),

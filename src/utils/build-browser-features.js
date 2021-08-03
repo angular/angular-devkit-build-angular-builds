@@ -19,12 +19,6 @@ class BuildBrowserFeatures {
         this.supportedBrowsers = browserslist_1.default(undefined, { path: this.projectRoot });
     }
     /**
-     * True, when one or more browsers requires ES5 support
-     */
-    isEs5SupportNeeded() {
-        return !this.isFeatureSupported('es6-module');
-    }
-    /**
      * True, when a browser feature is supported partially or fully.
      */
     isFeatureSupported(featureId) {

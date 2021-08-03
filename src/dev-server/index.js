@@ -227,7 +227,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 baseHref,
                 entrypoints,
                 moduleEntrypoints: [],
-                noModuleEntrypoints: ['polyfills-es5'],
+                noModuleEntrypoints: [],
                 deployUrl: browserOptions.deployUrl,
                 sri: browserOptions.subresourceIntegrity,
                 postTransform: transforms.indexHtml,

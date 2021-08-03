@@ -157,8 +157,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
                 let moduleFiles;
                 const scriptsEntryPointName = helpers_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map((x) => x.bundleName);
-                const files = emittedFiles.filter((x) => x.name !== 'polyfills-es5');
-                const noModuleFiles = emittedFiles.filter((x) => x.name === 'polyfills-es5');
                 if (i18n.shouldInline) {
                     const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, webpackOutputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
                     if (!success) {
@@ -219,8 +217,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                     // i18nLocale is used when Ivy is disabled
                                     lang: locale || undefined,
                                     outputPath,
-                                    files: mapEmittedFilesToFileInfo(files),
-                                    noModuleFiles: mapEmittedFilesToFileInfo(noModuleFiles),
+                                    files: mapEmittedFilesToFileInfo(emittedFiles),
+                                    noModuleFiles: [],
                                     moduleFiles: mapEmittedFilesToFileInfo(moduleFiles),
                                 });
                                 if (warnings.length || errors.length) {

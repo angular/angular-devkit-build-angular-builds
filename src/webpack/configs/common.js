@@ -85,16 +85,6 @@ function getCommonConfig(wco) {
         entryPoints['main'] = [mainPath];
     }
     if (platform !== 'server') {
-        if (buildBrowserFeatures.isEs5SupportNeeded()) {
-            const polyfillsChunkName = 'polyfills-es5';
-            entryPoints[polyfillsChunkName] = [path.join(__dirname, '..', 'es5-polyfills.js')];
-            if (!buildOptions.aot) {
-                entryPoints[polyfillsChunkName].push(path.join(__dirname, '..', 'es5-jit-polyfills.js'));
-            }
-            if (buildOptions.polyfills) {
-                entryPoints[polyfillsChunkName].push(path.resolve(root, buildOptions.polyfills));
-            }
-        }
         if (buildOptions.polyfills) {
             const projectPolyfills = path.resolve(root, buildOptions.polyfills);
             if (entryPoints['polyfills']) {
@@ -105,7 +95,7 @@ function getCommonConfig(wco) {
             }
         }
         if (!buildOptions.aot) {
-            const jitPolyfills = path.join(__dirname, '..', 'jit-polyfills.js');
+            const jitPolyfills = 'core-js/proposals/reflect-metadata';
             if (entryPoints['polyfills']) {
                 entryPoints['polyfills'].push(jitPolyfills);
             }
@@ -295,10 +285,7 @@ function getCommonConfig(wco) {
         devtool: false,
         target: [
             platform === 'server' ? 'node' : 'web',
-            tsConfig.options.target === typescript_1.ScriptTarget.ES5 ||
-                (platform !== 'server' && buildBrowserFeatures.isEs5SupportNeeded())
-                ? 'es5'
-                : 'es2015',
+            tsConfig.options.target === typescript_1.ScriptTarget.ES5 ? 'es5' : 'es2015',
         ],
         profile: buildOptions.statsJson,
         resolve: {
@@ -323,14 +310,7 @@ function getCommonConfig(wco) {
             clean: (_a = buildOptions.deleteOutputPath) !== null && _a !== void 0 ? _a : true,
             path: path.resolve(root, buildOptions.outputPath),
             publicPath: (_b = buildOptions.deployUrl) !== null && _b !== void 0 ? _b : '',
-            filename: ({ chunk }) => {
-                if ((chunk === null || chunk === void 0 ? void 0 : chunk.name) === 'polyfills-es5') {
-                    return `polyfills-es5${hashFormat.chunk}.js`;
-                }
-                else {
-                    return `[name]${hashFormat.chunk}.js`;
-                }
-            },
+            filename: `[name]${hashFormat.chunk}.js`,
             chunkFilename: `[name]${hashFormat.chunk}.js`,
         },
         watch: buildOptions.watch,

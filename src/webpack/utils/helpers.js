@@ -107,7 +107,7 @@ function getEsVersionForFileName(scriptTarget, esVersionInFileName = false) {
 }
 exports.getEsVersionForFileName = getEsVersionForFileName;
 function isPolyfillsEntry(name) {
-    return name === 'polyfills' || name === 'polyfills-es5';
+    return name === 'polyfills';
 }
 exports.isPolyfillsEntry = isPolyfillsEntry;
 function getWatchOptions(poll) {
