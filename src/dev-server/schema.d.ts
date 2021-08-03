@@ -47,11 +47,6 @@ export interface Schema {
      */
     hmr?: boolean;
     /**
-     * Show a warning when the --hmr option is enabled.
-     * @deprecated No longer has an effect.
-     */
-    hmrWarning?: boolean;
-    /**
      * Host to listen on.
      */
     host?: string;
@@ -98,11 +93,6 @@ export interface Schema {
      * The pathname where the app will be served.
      */
     servePath?: string;
-    /**
-     * Show a warning when deploy-url/base-href use unsupported serve path values.
-     * @deprecated No longer has an effect.
-     */
-    servePathDefaultWarning?: boolean;
     /**
      * Output source maps for scripts and styles. For more information, see
      * https://angular.io/guide/workspace-config#source-map-configuration.

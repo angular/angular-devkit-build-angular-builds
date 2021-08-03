@@ -190,14 +190,12 @@ function getStylesConfig(wco) {
         // Inline all sourcemap types except hidden ones, which are the same as no sourcemaps
         // for component css.
         !buildOptions.sourceMap.hidden);
-    if (buildOptions.extractCss) {
-        // extract global css from js files into own css file.
-        extraPlugins.push(new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }));
-        if (!buildOptions.hmr) {
-            // don't remove `.js` files for `.css` when we are using HMR these contain HMR accept codes.
-            // suppress empty .js files in css only entry points.
-            extraPlugins.push(new plugins_1.SuppressExtractedTextChunksWebpackPlugin());
-        }
+    // extract global css from js files into own css file.
+    extraPlugins.push(new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }));
+    if (!buildOptions.hmr) {
+        // don't remove `.js` files for `.css` when we are using HMR these contain HMR accept codes.
+        // suppress empty .js files in css only entry points.
+        extraPlugins.push(new plugins_1.SuppressExtractedTextChunksWebpackPlugin());
     }
     const postCss = require('postcss');
     const postCssLoaderPath = require.resolve('postcss-loader');
@@ -211,11 +209,9 @@ function getStylesConfig(wco) {
         },
     ];
     const globalStyleLoaders = [
-        buildOptions.extractCss
-            ? {
-                loader: MiniCssExtractPlugin.loader,
-            }
-            : require.resolve('style-loader'),
+        {
+            loader: MiniCssExtractPlugin.loader,
+        },
         {
             loader: require.resolve('css-loader'),
             options: {
@@ -227,7 +223,7 @@ function getStylesConfig(wco) {
             loader: postCssLoaderPath,
             options: {
                 implementation: postCss,
-                postcssOptions: postcssOptionsCreator(false, buildOptions.extractCss),
+                postcssOptions: postcssOptionsCreator(false, true),
                 sourceMap: !!cssSourceMap,
             },
         },

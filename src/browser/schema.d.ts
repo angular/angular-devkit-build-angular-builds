@@ -44,12 +44,6 @@ export interface Schema {
      */
     deployUrl?: string;
     /**
-     * Extract CSS from global styles into '.css' files instead of '.js'.
-     * @deprecated Deprecated since version 11.0. No longer required to disable CSS extraction
-     * for HMR.
-     */
-    extractCss?: boolean;
-    /**
      * Extract all licenses in a separate file.
      */
     extractLicenses?: boolean;
