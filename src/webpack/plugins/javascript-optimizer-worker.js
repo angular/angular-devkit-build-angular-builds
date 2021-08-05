@@ -40,7 +40,9 @@ async function default_1({ asset, options }) {
         if (terserResult.map) {
             partialSourcemaps.unshift(terserResult.map);
         }
-        partialSourcemaps.push(asset.map);
+        if (asset.map) {
+            partialSourcemaps.push(asset.map);
+        }
         fullSourcemap = remapping_1.default(partialSourcemaps, () => null);
     }
     return { name: asset.name, code: terserResult.code, map: fullSourcemap };
