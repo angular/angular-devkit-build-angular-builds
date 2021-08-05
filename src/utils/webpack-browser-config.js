@@ -73,15 +73,15 @@ async function generateI18nBrowserWebpackConfigFromContext(options, context, web
             }
             if (Array.isArray(config.resolve.alias)) {
                 config.resolve.alias.push({
-                    name: '@angular/localize/init',
-                    alias: false,
+                    alias: '@angular/localize/init',
+                    name: require.resolve('./empty.js'),
                 });
             }
             else {
                 if (!config.resolve.alias) {
                     config.resolve.alias = {};
                 }
-                config.resolve.alias['@angular/localize/init'] = false;
+                config.resolve.alias['@angular/localize/init'] = require.resolve('./empty.js');
             }
         }
         // Update file hashes to include translation file content

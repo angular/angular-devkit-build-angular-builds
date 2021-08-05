@@ -41,6 +41,7 @@ const webpack_1 = require("webpack");
 const utils_1 = require("../../utils");
 const cache_path_1 = require("../../utils/cache-path");
 const environment_options_1 = require("../../utils/environment-options");
+const find_up_1 = require("../../utils/find-up");
 const spinner_1 = require("../../utils/spinner");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const plugins_1 = require("../plugins");
@@ -295,6 +296,13 @@ function getCommonConfig(wco) {
         },
         resolveLoader: {
             symlinks: !buildOptions.preserveSymlinks,
+            modules: [
+                // Allow loaders to be in a node_modules nested inside the devkit/build-angular package.
+                // This is important in case loaders do not get hoisted.
+                // If this file moves to another location, alter potentialNodeModules as well.
+                'node_modules',
+                ...find_up_1.findAllNodeModules(__dirname, projectRoot),
+            ],
         },
         context: root,
         entry: entryPoints,
