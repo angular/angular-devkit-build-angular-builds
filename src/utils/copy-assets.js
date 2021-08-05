@@ -33,7 +33,6 @@ exports.copyAssets = void 0;
 const fs = __importStar(require("fs"));
 const glob_1 = __importDefault(require("glob"));
 const path = __importStar(require("path"));
-const copy_file_1 = require("./copy-file");
 function globAsync(pattern, options) {
     return new Promise((resolve, reject) => glob_1.default(pattern, options, (e, m) => (e ? reject(e) : resolve(m))));
 }
@@ -64,7 +63,7 @@ async function copyAssets(entries, basePaths, root, changed) {
                     }
                     directoryExists.add(dir);
                 }
-                copy_file_1.copyFile(src, dest);
+                fs.copyFileSync(src, dest, fs.constants.COPYFILE_FICLONE);
             }
         }
     }
