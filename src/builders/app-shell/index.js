@@ -30,10 +30,10 @@ const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-const utils_1 = require("../utils");
-const inline_critical_css_1 = require("../utils/index-file/inline-critical-css");
-const service_worker_1 = require("../utils/service-worker");
-const spinner_1 = require("../utils/spinner");
+const utils_1 = require("../../utils");
+const inline_critical_css_1 = require("../../utils/index-file/inline-critical-css");
+const service_worker_1 = require("../../utils/service-worker");
+const spinner_1 = require("../../utils/spinner");
 async function _renderUniversal(options, context, browserResult, serverResult, spinner) {
     // Get browser target options.
     const browserTarget = architect_1.targetFromTargetString(options.browserTarget);

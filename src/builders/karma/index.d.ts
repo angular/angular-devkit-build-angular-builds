@@ -9,7 +9,7 @@ import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { ConfigOptions } from 'karma';
 import { Observable } from 'rxjs';
 import * as webpack from 'webpack';
-import { ExecutionTransformer } from '../transforms';
+import { ExecutionTransformer } from '../../transforms';
 import { Schema as KarmaBuilderOptions } from './schema';
 export declare type KarmaConfigOptions = ConfigOptions & {
     buildWebpack?: unknown;

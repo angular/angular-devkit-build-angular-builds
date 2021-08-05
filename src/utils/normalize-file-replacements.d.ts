@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException, Path } from '@angular-devkit/core';
-import { FileReplacement } from '../browser/schema';
+import { FileReplacement } from '../builders/browser/schema';
 export declare class MissingFileReplacementException extends BaseException {
     constructor(path: String);
 }

@@ -8,7 +8,7 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { logging } from '@angular-devkit/core';
 import { Configuration } from 'webpack';
-import { Schema as BrowserBuilderSchema } from '../browser/schema';
+import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
 import { NormalizedBrowserBuilderSchema } from '../utils';
 import { WebpackConfigOptions } from '../utils/build-options';
 import { I18nOptions } from './i18n-options';

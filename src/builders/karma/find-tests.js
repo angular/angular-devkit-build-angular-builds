@@ -30,7 +30,7 @@ exports.findTests = void 0;
 const fs_1 = require("fs");
 const glob = __importStar(require("glob"));
 const path_1 = require("path");
-const is_directory_1 = require("../utils/is-directory");
+const is_directory_1 = require("../../utils/is-directory");
 // go through all patterns and find unique list of files
 function findTests(patterns, cwd, workspaceRoot) {
     return patterns.reduce((files, pattern) => {

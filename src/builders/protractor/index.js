@@ -31,7 +31,7 @@ const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
 const url = __importStar(require("url"));
-const utils_1 = require("../utils");
+const utils_1 = require("../../utils");
 function runProtractor(root, options) {
     const additionalProtractorConfig = {
         baseUrl: options.baseUrl,

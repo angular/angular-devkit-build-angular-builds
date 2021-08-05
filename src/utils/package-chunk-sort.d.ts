@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ExtraEntryPoint } from '../browser/schema';
+import { ExtraEntryPoint } from '../builders/browser/schema';
 export declare function generateEntryPoints(appConfig: {
     styles: ExtraEntryPoint[];
     scripts: ExtraEntryPoint[];

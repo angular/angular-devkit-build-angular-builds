@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Path } from '@angular-devkit/core';
-import { AssetPatternClass, Schema as BrowserBuilderSchema, SourceMapClass } from '../browser/schema';
+import { AssetPatternClass, Schema as BrowserBuilderSchema, SourceMapClass } from '../builders/browser/schema';
 import { BuildOptions } from './build-options';
 import { NormalizedFileReplacement } from './normalize-file-replacements';
 import { NormalizedOptimizationOptions } from './normalize-optimization';

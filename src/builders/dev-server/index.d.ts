@@ -10,8 +10,8 @@ import { DevServerBuildOutput, WebpackLoggingCallback } from '@angular-devkit/bu
 import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import webpack from 'webpack';
-import { ExecutionTransformer } from '../transforms';
-import { IndexHtmlTransform } from '../utils/index-file/index-html-generator';
+import { ExecutionTransformer } from '../../transforms';
+import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { Schema } from './schema';
 export declare type DevServerBuilderOptions = Schema & json.JsonObject;
 /**

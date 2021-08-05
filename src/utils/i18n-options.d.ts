@@ -7,8 +7,8 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
-import { Schema as BrowserBuilderSchema } from '../browser/schema';
-import { Schema as ServerBuilderSchema } from '../server/schema';
+import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
+import { Schema as ServerBuilderSchema } from '../builders/server/schema';
 export interface I18nOptions {
     inlineLocales: Set<string>;
     sourceLocale: string;

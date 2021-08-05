@@ -34,14 +34,14 @@ const path = __importStar(require("path"));
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const typescript_1 = require("typescript");
-const utils_1 = require("../utils");
-const i18n_inlining_1 = require("../utils/i18n-inlining");
-const output_paths_1 = require("../utils/output-paths");
-const read_tsconfig_1 = require("../utils/read-tsconfig");
-const version_1 = require("../utils/version");
-const webpack_browser_config_1 = require("../utils/webpack-browser-config");
-const configs_1 = require("../webpack/configs");
-const stats_1 = require("../webpack/utils/stats");
+const utils_1 = require("../../utils");
+const i18n_inlining_1 = require("../../utils/i18n-inlining");
+const output_paths_1 = require("../../utils/output-paths");
+const read_tsconfig_1 = require("../../utils/read-tsconfig");
+const version_1 = require("../../utils/version");
+const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
+const configs_1 = require("../../webpack/configs");
+const stats_1 = require("../../webpack/utils/stats");
 /**
  * @experimental Direct usage of this function is considered experimental.
  */

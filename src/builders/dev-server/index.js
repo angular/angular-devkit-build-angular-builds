@@ -38,18 +38,18 @@ const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const url = __importStar(require("url"));
 const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
+const utils_1 = require("../../utils");
+const cache_path_1 = require("../../utils/cache-path");
+const check_port_1 = require("../../utils/check-port");
+const color_1 = require("../../utils/color");
+const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
+const read_tsconfig_1 = require("../../utils/read-tsconfig");
+const version_1 = require("../../utils/version");
+const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
+const configs_1 = require("../../webpack/configs");
+const index_html_webpack_plugin_1 = require("../../webpack/plugins/index-html-webpack-plugin");
+const stats_1 = require("../../webpack/utils/stats");
 const schema_1 = require("../browser/schema");
-const utils_1 = require("../utils");
-const cache_path_1 = require("../utils/cache-path");
-const check_port_1 = require("../utils/check-port");
-const color_1 = require("../utils/color");
-const package_chunk_sort_1 = require("../utils/package-chunk-sort");
-const read_tsconfig_1 = require("../utils/read-tsconfig");
-const version_1 = require("../utils/version");
-const webpack_browser_config_1 = require("../utils/webpack-browser-config");
-const configs_1 = require("../webpack/configs");
-const index_html_webpack_plugin_1 = require("../webpack/plugins/index-html-webpack-plugin");
-const stats_1 = require("../webpack/utils/stats");
 const devServerBuildOverriddenKeys = [
     'watch',
     'optimization',
@@ -305,7 +305,7 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
         enforce: 'post',
         use: [
             {
-                loader: require.resolve('../babel/webpack-loader'),
+                loader: require.resolve('../../babel/webpack-loader'),
                 options: {
                     cacheDirectory: cache_path_1.findCachePath('babel-dev-server-i18n'),
                     cacheIdentifier: JSON.stringify({

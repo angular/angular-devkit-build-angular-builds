@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BaseException, Path } from '@angular-devkit/core';
-import { AssetPattern, AssetPatternClass } from '../browser/schema';
+import { AssetPattern, AssetPatternClass } from '../builders/browser/schema';
 export declare class MissingAssetSourceRootException extends BaseException {
     constructor(path: String);
 }

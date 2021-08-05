@@ -29,7 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AnyComponentStyleBudgetChecker = void 0;
 const path = __importStar(require("path"));
 const webpack_1 = require("webpack");
-const schema_1 = require("../../browser/schema");
+const schema_1 = require("../../builders/browser/schema");
 const bundle_calculator_1 = require("../../utils/bundle-calculator");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';

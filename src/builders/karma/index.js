@@ -32,11 +32,11 @@ const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
+const version_1 = require("../../utils/version");
+const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
+const configs_1 = require("../../webpack/configs");
+const single_test_transform_1 = require("../../webpack/plugins/single-test-transform");
 const schema_1 = require("../browser/schema");
-const version_1 = require("../utils/version");
-const webpack_browser_config_1 = require("../utils/webpack-browser-config");
-const configs_1 = require("../webpack/configs");
-const single_test_transform_1 = require("../webpack/plugins/single-test-transform");
 const find_tests_1 = require("./find-tests");
 async function initialize(options, context, webpackConfigurationTransformer) {
     const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(

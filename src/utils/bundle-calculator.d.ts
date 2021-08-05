@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { StatsCompilation } from 'webpack';
-import { Budget } from '../browser/schema';
+import { Budget } from '../builders/browser/schema';
 interface Threshold {
     limit: number;
     type: ThresholdType;

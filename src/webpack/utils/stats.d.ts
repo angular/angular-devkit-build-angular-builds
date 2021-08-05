@@ -8,7 +8,7 @@
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { logging } from '@angular-devkit/core';
 import { Configuration, StatsCompilation } from 'webpack';
-import { Schema as BrowserBuilderOptions } from '../../browser/schema';
+import { Schema as BrowserBuilderOptions } from '../../builders/browser/schema';
 export declare function formatSize(size: number): string;
 export declare type BundleStatsData = [files: string, names: string, size: number | string];
 export declare type ChunkType = 'modern' | 'legacy' | 'unknown';
