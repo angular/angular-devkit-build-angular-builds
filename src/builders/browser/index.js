@@ -107,12 +107,11 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
         return {
             ...(await initialize(options, context, transforms.webpackConfiguration)),
-            buildBrowserFeatures,
             target,
         };
     }), operators_1.switchMap(
     // eslint-disable-next-line max-lines-per-function
-    ({ config, projectRoot, projectSourceRoot, i18n, buildBrowserFeatures, target }) => {
+    ({ config, projectRoot, projectSourceRoot, i18n, target }) => {
         const normalizedOptimization = utils_1.normalizeOptimization(options.optimization);
         return build_webpack_1.runWebpack(config, context, {
             webpackFactory: require('webpack'),
@@ -122,9 +121,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         context.logger.info(stats.toString(config.stats));
                     }
                 }),
-        }).pipe(
-        // eslint-disable-next-line max-lines-per-function
-        operators_1.concatMap(async (buildEvent) => {
+        }).pipe(operators_1.concatMap(async (buildEvent) => {
             var _a, _b, _c, _d, _e;
             const spinner = new spinner_1.Spinner();
             spinner.enabled = options.progress !== false;
@@ -155,7 +152,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             }
             else {
                 outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
-                let moduleFiles;
                 const scriptsEntryPointName = helpers_1.normalizeExtraEntryPoints(options.scripts || [], 'scripts').map((x) => x.bundleName);
                 if (i18n.shouldInline) {
                     const success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), scriptsEntryPointName, webpackOutputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
@@ -218,8 +214,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                     lang: locale || undefined,
                                     outputPath,
                                     files: mapEmittedFilesToFileInfo(emittedFiles),
-                                    noModuleFiles: [],
-                                    moduleFiles: mapEmittedFilesToFileInfo(moduleFiles),
                                 });
                                 if (warnings.length || errors.length) {
                                     spinner.stop();

@@ -7,6 +7,7 @@
  */
 export declare type LoadOutputFileFunctionType = (file: string) => Promise<string>;
 export declare type CrossOriginValue = 'none' | 'anonymous' | 'use-credentials';
+export declare type Entrypoint = [name: string, isModule: boolean];
 export interface AugmentIndexHtmlOptions {
     html: string;
     baseHref?: string;
@@ -15,13 +16,9 @@ export interface AugmentIndexHtmlOptions {
     /** crossorigin attribute setting of elements that provide CORS support */
     crossOrigin?: CrossOriginValue;
     files: FileInfo[];
-    /** Files that should be added using 'nomodule'. */
-    noModuleFiles?: FileInfo[];
-    /** Files that should be added using 'module'. */
-    moduleFiles?: FileInfo[];
     loadOutputFile: LoadOutputFileFunctionType;
     /** Used to sort the inseration of files in the HTML file */
-    entrypoints: string[];
+    entrypoints: Entrypoint[];
     /** Used to set the document default locale */
     lang?: string;
 }

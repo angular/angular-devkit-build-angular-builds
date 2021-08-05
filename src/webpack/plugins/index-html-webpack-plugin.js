@@ -33,35 +33,22 @@ class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
             }, callback);
         });
         const callback = async (assets) => {
-            var _a;
-            // Get all files for selected entrypoints
             const files = [];
-            const noModuleFiles = [];
-            const moduleFiles = [];
             try {
-                for (const [entryName, entrypoint] of this.compilation.entrypoints) {
-                    const entryFiles = (_a = entrypoint === null || entrypoint === void 0 ? void 0 : entrypoint.getFiles()) === null || _a === void 0 ? void 0 : _a.filter((f) => !f.endsWith('.hot-update.js')).map((f) => ({
-                        name: entryName,
-                        file: f,
-                        extension: path_1.extname(f),
-                    }));
-                    if (!entryFiles) {
-                        continue;
-                    }
-                    if (this.options.noModuleEntrypoints.includes(entryName)) {
-                        noModuleFiles.push(...entryFiles);
-                    }
-                    else if (this.options.moduleEntrypoints.includes(entryName)) {
-                        moduleFiles.push(...entryFiles);
-                    }
-                    else {
-                        files.push(...entryFiles);
+                for (const chunk of this.compilation.chunks) {
+                    for (const file of chunk.files) {
+                        if (file.endsWith('.hot-update.js')) {
+                            continue;
+                        }
+                        files.push({
+                            name: chunk.name,
+                            file,
+                            extension: path_1.extname(file),
+                        });
                     }
                 }
                 const { content, warnings, errors } = await this.process({
                     files,
-                    noModuleFiles,
-                    moduleFiles,
                     outputPath: path_1.dirname(this.options.outputPath),
                     baseHref: this.options.baseHref,
                     lang: this.options.lang,

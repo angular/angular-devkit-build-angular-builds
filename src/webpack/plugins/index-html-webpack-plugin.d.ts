@@ -7,9 +7,7 @@
  */
 import { Compilation, Compiler } from 'webpack';
 import { IndexHtmlGenerator, IndexHtmlGeneratorOptions, IndexHtmlGeneratorProcessOptions } from '../../utils/index-file/index-html-generator';
-export interface IndexHtmlWebpackPluginOptions extends IndexHtmlGeneratorOptions, Omit<IndexHtmlGeneratorProcessOptions, 'files' | 'noModuleFiles' | 'moduleFiles'> {
-    noModuleEntrypoints: string[];
-    moduleEntrypoints: string[];
+export interface IndexHtmlWebpackPluginOptions extends IndexHtmlGeneratorOptions, Omit<IndexHtmlGeneratorProcessOptions, 'files'> {
 }
 export declare class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
     readonly options: IndexHtmlWebpackPluginOptions;

@@ -6,7 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { ExtraEntryPoint } from '../builders/browser/schema';
-export declare function generateEntryPoints(appConfig: {
+export declare type EntryPointsType = [name: string, isModule: boolean];
+export declare function generateEntryPoints(options: {
     styles: ExtraEntryPoint[];
     scripts: ExtraEntryPoint[];
-}): string[];
+    isHMREnabled?: boolean;
+}): EntryPointsType[];

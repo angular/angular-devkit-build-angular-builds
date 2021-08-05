@@ -17,23 +17,23 @@ const html_rewriting_stream_1 = require("./html-rewriting-stream");
  * bundles for differential serving.
  */
 async function augmentIndexHtml(params) {
-    const { loadOutputFile, files, noModuleFiles = [], moduleFiles = [], entrypoints, sri, deployUrl = '', lang, baseHref, html, } = params;
+    const { loadOutputFile, files, entrypoints, sri, deployUrl = '', lang, baseHref, html } = params;
     let { crossOrigin = 'none' } = params;
     if (sri && crossOrigin === 'none') {
         crossOrigin = 'anonymous';
     }
     const stylesheets = new Set();
-    const scripts = new Set();
-    // Sort files in the order we want to insert them by entrypoint and dedupes duplicates
-    const mergedFiles = [...moduleFiles, ...noModuleFiles, ...files];
-    for (const entrypoint of entrypoints) {
-        for (const { extension, file, name } of mergedFiles) {
-            if (name !== entrypoint) {
+    const scripts = new Map();
+    // Sort files in the order we want to insert them by entrypoint
+    for (const [entrypoint, isModule] of entrypoints) {
+        for (const { extension, file, name } of files) {
+            if (name !== entrypoint || scripts.has(file) || stylesheets.has(file)) {
                 continue;
             }
             switch (extension) {
                 case '.js':
-                    scripts.add(file);
+                    // Also, non entrypoints need to be loaded as no module as they can contain problematic code.
+                    scripts.set(file, isModule);
                     break;
                 case '.css':
                     stylesheets.add(file);
@@ -42,47 +42,32 @@ async function augmentIndexHtml(params) {
         }
     }
     let scriptTags = [];
-    for (const script of scripts) {
-        const attrs = [`src="${deployUrl}${script}"`];
-        if (crossOrigin !== 'none') {
-            attrs.push(`crossorigin="${crossOrigin}"`);
-        }
-        // We want to include nomodule or module when a file is not common amongs all
-        // such as runtime.js
-        const scriptPredictor = ({ file }) => file === script;
-        if (!files.some(scriptPredictor)) {
-            // in some cases for differential loading file with the same name is available in both
-            // nomodule and module such as scripts.js
-            // we shall not add these attributes if that's the case
-            const isNoModuleType = noModuleFiles.some(scriptPredictor);
-            const isModuleType = moduleFiles.some(scriptPredictor);
-            if (isNoModuleType && !isModuleType) {
-                attrs.push('nomodule', 'defer');
-            }
-            else if (isModuleType && !isNoModuleType) {
-                attrs.push('type="module"');
-            }
-            else {
-                attrs.push('defer');
-            }
+    for (const [src, isModule] of scripts) {
+        const attrs = [`src="${deployUrl}${src}"`];
+        // This is also need for non entry-points as they may contain problematic code.
+        if (isModule) {
+            attrs.push('type="module"');
         }
         else {
             attrs.push('defer');
         }
+        if (crossOrigin !== 'none') {
+            attrs.push(`crossorigin="${crossOrigin}"`);
+        }
         if (sri) {
-            const content = await loadOutputFile(script);
+            const content = await loadOutputFile(src);
             attrs.push(generateSriAttributes(content));
         }
         scriptTags.push(`<script ${attrs.join(' ')}></script>`);
     }
     let linkTags = [];
-    for (const stylesheet of stylesheets) {
-        const attrs = [`rel="stylesheet"`, `href="${deployUrl}${stylesheet}"`];
+    for (const src of stylesheets) {
+        const attrs = [`rel="stylesheet"`, `href="${deployUrl}${src}"`];
         if (crossOrigin !== 'none') {
             attrs.push(`crossorigin="${crossOrigin}"`);
         }
         if (sri) {
-            const content = await loadOutputFile(stylesheet);
+            const content = await loadOutputFile(src);
             attrs.push(generateSriAttributes(content));
         }
         linkTags.push(`<link ${attrs.join(' ')}>`);

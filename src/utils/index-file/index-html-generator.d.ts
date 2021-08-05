@@ -6,20 +6,18 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { NormalizedOptimizationOptions } from '../normalize-optimization';
-import { CrossOriginValue, FileInfo } from './augment-index-html';
+import { CrossOriginValue, Entrypoint, FileInfo } from './augment-index-html';
 export interface IndexHtmlGeneratorProcessOptions {
     lang: string | undefined;
     baseHref: string | undefined;
     outputPath: string;
     files: FileInfo[];
-    noModuleFiles: FileInfo[];
-    moduleFiles: FileInfo[];
 }
 export interface IndexHtmlGeneratorOptions {
     indexPath: string;
     deployUrl?: string;
     sri?: boolean;
-    entrypoints: string[];
+    entrypoints: Entrypoint[];
     postTransform?: IndexHtmlTransform;
     crossOrigin?: CrossOriginValue;
     optimization?: NormalizedOptimizationOptions;

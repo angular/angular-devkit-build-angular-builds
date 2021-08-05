@@ -9,27 +9,24 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateEntryPoints = void 0;
 const helpers_1 = require("../webpack/utils/helpers");
-function generateEntryPoints(appConfig) {
+function generateEntryPoints(options) {
     // Add all styles/scripts, except lazy-loaded ones.
     const extraEntryPoints = (extraEntryPoints, defaultBundleName) => {
         const entryPoints = helpers_1.normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName)
             .filter((entry) => entry.inject)
             .map((entry) => entry.bundleName);
         // remove duplicates
-        return [...new Set(entryPoints)];
+        return [...new Set(entryPoints)].map((f) => [f, false]);
     };
     const entryPoints = [
-        'runtime',
-        'polyfills',
-        'sw-register',
-        ...extraEntryPoints(appConfig.styles, 'styles'),
-        ...extraEntryPoints(appConfig.scripts, 'scripts'),
-        'vendor',
-        'main',
+        ['runtime', !options.isHMREnabled],
+        ['polyfills', true],
+        ...extraEntryPoints(options.styles, 'styles'),
+        ...extraEntryPoints(options.scripts, 'scripts'),
+        ['vendor', true],
+        ['main', true],
     ];
-    const duplicates = [
-        ...new Set(entryPoints.filter((x) => entryPoints.indexOf(x) !== entryPoints.lastIndexOf(x))),
-    ];
+    const duplicates = entryPoints.filter(([name]) => entryPoints[0].indexOf(name) !== entryPoints[0].lastIndexOf(name));
     if (duplicates.length > 0) {
         throw new Error(`Multiple bundles have been named the same: '${duplicates.join(`', '`)}'.`);
     }

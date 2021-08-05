@@ -82,7 +82,7 @@ exports.IndexHtmlGenerator = IndexHtmlGenerator;
 function augmentIndexHtmlPlugin(generator) {
     const { deployUrl, crossOrigin, sri = false, entrypoints } = generator.options;
     return async (html, options) => {
-        const { lang, baseHref, outputPath = '', noModuleFiles, files, moduleFiles } = options;
+        const { lang, baseHref, outputPath = '', files } = options;
         return augment_index_html_1.augmentIndexHtml({
             html,
             baseHref,
@@ -92,8 +92,6 @@ function augmentIndexHtmlPlugin(generator) {
             lang,
             entrypoints,
             loadOutputFile: (filePath) => generator.readAsset(path_1.join(outputPath, filePath)),
-            noModuleFiles,
-            moduleFiles,
             files,
         });
     };

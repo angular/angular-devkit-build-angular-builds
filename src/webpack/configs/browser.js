@@ -39,6 +39,7 @@ function getBrowserConfig(wco) {
         output: {
             crossOriginLoading,
             trustedTypes: 'angular#bundler',
+            scriptType: 'module',
         },
         optimization: {
             runtimeChunk: 'single',

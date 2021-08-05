@@ -217,17 +217,23 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         };
     }
     return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, locale }) => {
+        var _a, _b;
         if (browserOptions.index) {
             const { scripts = [], styles = [], baseHref } = browserOptions;
-            const entrypoints = package_chunk_sort_1.generateEntryPoints({ scripts, styles });
-            webpackConfig.plugins = [...(webpackConfig.plugins || [])];
+            const entrypoints = package_chunk_sort_1.generateEntryPoints({
+                scripts,
+                styles,
+                // The below is needed as otherwise HMR for CSS will break.
+                // styles.js and runtime.js needs to be loaded as a non-module scripts as otherwise `document.currentScript` will be null.
+                // https://github.com/webpack-contrib/mini-css-extract-plugin/blob/90445dd1d81da0c10b9b0e8a17b417d0651816b8/src/hmr/hotModuleReplacement.js#L39
+                isHMREnabled: (_a = webpackConfig.devServer) === null || _a === void 0 ? void 0 : _a.hot,
+            });
+            (_b = webpackConfig.plugins) !== null && _b !== void 0 ? _b : (webpackConfig.plugins = []);
             webpackConfig.plugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({
                 indexPath: path.resolve(workspaceRoot, webpack_browser_config_1.getIndexInputFile(browserOptions.index)),
                 outputPath: webpack_browser_config_1.getIndexOutputFile(browserOptions.index),
                 baseHref,
                 entrypoints,
-                moduleEntrypoints: [],
-                noModuleEntrypoints: [],
                 deployUrl: browserOptions.deployUrl,
                 sri: browserOptions.subresourceIntegrity,
                 postTransform: transforms.indexHtml,
