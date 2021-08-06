@@ -73,7 +73,9 @@ function canWrapProperty(propertyName, assignmentValue) {
     const { leadingComments } = assignmentValue.node;
     if (leadingComments === null || leadingComments === void 0 ? void 0 : leadingComments.some(
     // `@pureOrBreakMyCode` is used by closure and is present in Angular code
-    ({ value }) => value.includes('#__PURE__') || value.includes('@pureOrBreakMyCode'))) {
+    ({ value }) => value.includes('@__PURE__') ||
+        value.includes('#__PURE__') ||
+        value.includes('@pureOrBreakMyCode'))) {
         return true;
     }
     return assignmentValue.isPure();
