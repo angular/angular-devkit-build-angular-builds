@@ -9,19 +9,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const sass_1 = require("sass");
 const worker_threads_1 = require("worker_threads");
-if (!worker_threads_1.parentPort) {
+if (!worker_threads_1.parentPort || !worker_threads_1.workerData) {
     throw new Error('Sass worker must be executed as a Worker.');
 }
 // The importer variables are used to proxy import requests to the main thread
-let { workerImporterPort, importerSignal } = (worker_threads_1.workerData || {});
-worker_threads_1.parentPort.on('message', (message) => {
-    // The init message is only needed to support Node.js < 12.17 and can be removed once support is dropped
-    if (message.init) {
-        workerImporterPort = message.workerImporterPort;
-        importerSignal = message.importerSignal;
-        return;
-    }
-    const { id, hasImporter, options } = message;
+const { workerImporterPort, importerSignal } = worker_threads_1.workerData;
+worker_threads_1.parentPort.on('message', ({ id, hasImporter, options }) => {
     try {
         if (hasImporter) {
             // When a custom importer function is present, the importer request must be proxied

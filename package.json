@@ -7,9 +7,9 @@
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "1.0.1",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#3ba13f467",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#3ba13f467",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#3ba13f467",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#019614b9e",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#019614b9e",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#019614b9e",
     "@babel/core": "7.15.0",
     "@babel/generator": "7.15.0",
     "@babel/helper-annotate-as-pure": "7.14.5",
@@ -21,7 +21,7 @@
     "@babel/template": "7.14.5",
     "@discoveryjs/json-ext": "0.5.3",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#3ba13f467",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#019614b9e",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.2",
     "browserslist": "^4.9.1",
@@ -116,7 +116,7 @@
     "url": "https://github.com/angular/angular-cli.git"
   },
   "engines": {
-    "node": "^12.14.1 || >=14.0.0",
+    "node": "^12.20.0 || >=14.0.0",
     "npm": "^6.11.0 || ^7.5.6",
     "yarn": ">= 1.13.0"
   },
