@@ -43,7 +43,6 @@ const i18n_inlining_1 = require("../../utils/i18n-inlining");
 const index_html_generator_1 = require("../../utils/index-file/index-html-generator");
 const output_paths_1 = require("../../utils/output-paths");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
-const read_tsconfig_1 = require("../../utils/read-tsconfig");
 const service_worker_1 = require("../../utils/service-worker");
 const spinner_1 = require("../../utils/spinner");
 const version_1 = require("../../utils/version");
@@ -57,7 +56,7 @@ async function initialize(options, context, webpackConfigurationTransform) {
     const originalOutputPath = options.outputPath;
     // Assets are processed directly by the builder except when watching
     const adjustedOptions = options.watch ? options : { ...options, assets: [] };
-    const { config, projectRoot, projectSourceRoot, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, (wco) => [
+    const { config, projectRoot, projectSourceRoot, i18n, target } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(adjustedOptions, context, (wco) => [
         configs_1.getCommonConfig(wco),
         configs_1.getBrowserConfig(wco),
         configs_1.getStylesConfig(wco),
@@ -81,7 +80,7 @@ async function initialize(options, context, webpackConfigurationTransform) {
     if (options.deleteOutputPath) {
         utils_1.deleteOutputDir(context.workspaceRoot, originalOutputPath);
     }
-    return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
+    return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n, target };
 }
 /**
  * @experimental Direct usage of this function is considered experimental.
@@ -101,14 +100,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     return rxjs_1.from(context.getProjectMetadata(projectName)).pipe(operators_1.switchMap(async (projectMetadata) => {
         var _a;
         const sysProjectRoot = core_1.getSystemPath(core_1.resolve(core_1.normalize(context.workspaceRoot), core_1.normalize((_a = projectMetadata.root) !== null && _a !== void 0 ? _a : '')));
-        const { options: compilerOptions } = read_tsconfig_1.readTsconfig(options.tsConfig, context.workspaceRoot);
-        const target = compilerOptions.target || typescript_1.ScriptTarget.ES5;
         const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(sysProjectRoot);
         checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
-        return {
-            ...(await initialize(options, context, transforms.webpackConfiguration)),
-            target,
-        };
+        return initialize(options, context, transforms.webpackConfiguration);
     }), operators_1.switchMap(
     // eslint-disable-next-line max-lines-per-function
     ({ config, projectRoot, projectSourceRoot, i18n, target }) => {

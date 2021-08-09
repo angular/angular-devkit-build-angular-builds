@@ -37,7 +37,6 @@ const typescript_1 = require("typescript");
 const utils_1 = require("../../utils");
 const i18n_inlining_1 = require("../../utils/i18n-inlining");
 const output_paths_1 = require("../../utils/output-paths");
-const read_tsconfig_1 = require("../../utils/read-tsconfig");
 const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const configs_1 = require("../../webpack/configs");
@@ -49,15 +48,13 @@ function execute(options, context, transforms = {}) {
     const root = context.workspaceRoot;
     // Check Angular version.
     version_1.assertCompatibleAngularVersion(root);
-    const tsConfig = read_tsconfig_1.readTsconfig(options.tsConfig, root);
-    const target = tsConfig.options.target || typescript_1.ScriptTarget.ES5;
     const baseOutputPath = path.resolve(root, options.outputPath);
     let outputPaths;
     if (typeof options.bundleDependencies === 'string') {
         options.bundleDependencies = options.bundleDependencies === 'all';
         context.logger.warn(`Option 'bundleDependencies' string value is deprecated since version 9. Use a boolean value instead.`);
     }
-    if (!options.bundleDependencies && tsConfig.options.enableIvy) {
+    if (!options.bundleDependencies) {
         // eslint-disable-next-line import/no-extraneous-dependencies
         const { __processed_by_ivy_ngcc__, main = '' } = require('@angular/core/package.json');
         if (!__processed_by_ivy_ngcc__ ||
@@ -70,7 +67,7 @@ function execute(options, context, transforms = {}) {
     `);
         }
     }
-    return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.concatMap(({ config, i18n }) => {
+    return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.concatMap(({ config, i18n, target }) => {
         return build_webpack_1.runWebpack(config, context, {
             webpackFactory: require('webpack'),
             logging: (stats, config) => {
@@ -107,7 +104,7 @@ exports.execute = execute;
 exports.default = architect_1.createBuilder(execute);
 async function initialize(options, context, webpackConfigurationTransform) {
     const originalOutputPath = options.outputPath;
-    const { config, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext({
+    const { config, i18n, target } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext({
         ...options,
         buildOptimizer: false,
         aot: true,
@@ -126,5 +123,5 @@ async function initialize(options, context, webpackConfigurationTransform) {
     if (options.deleteOutputPath) {
         utils_1.deleteOutputDir(context.workspaceRoot, originalOutputPath);
     }
-    return { config: transformedConfig || config, i18n };
+    return { config: transformedConfig || config, i18n, target };
 }

@@ -43,7 +43,6 @@ const cache_path_1 = require("../../utils/cache-path");
 const check_port_1 = require("../../utils/check-port");
 const color_1 = require("../../utils/color");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
-const read_tsconfig_1 = require("../../utils/read-tsconfig");
 const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const configs_1 = require("../../webpack/configs");
@@ -197,14 +196,10 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         let webpackConfig = config;
         // If a locale is defined, setup localization
         if (locale) {
-            // Only supported with Ivy
-            const tsConfig = read_tsconfig_1.readTsconfig(browserOptions.tsConfig, workspaceRoot);
-            if (tsConfig.options.enableIvy !== false) {
-                if (i18n.inlineLocales.size > 1) {
-                    throw new Error('The development server only supports localizing a single locale per build.');
-                }
-                await setupLocalize(locale, i18n, browserOptions, webpackConfig);
+            if (i18n.inlineLocales.size > 1) {
+                throw new Error('The development server only supports localizing a single locale per build.');
             }
+            await setupLocalize(locale, i18n, browserOptions, webpackConfig);
         }
         if (transforms.webpackConfiguration) {
             webpackConfig = await transforms.webpackConfiguration(webpackConfig);

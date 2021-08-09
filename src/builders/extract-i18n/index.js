@@ -163,9 +163,6 @@ async function execute(options, context, transforms) {
     };
     const { config, projectRoot } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(builderOptions, context, (wco) => {
         var _a;
-        if (wco.tsConfig.options.enableIvy === false) {
-            context.logger.warn('Ivy extraction enabled but application is not Ivy enabled. Extraction may fail.');
-        }
         // Default value for legacy message ids is currently true
         useLegacyIds = (_a = wco.tsConfig.options.enableI18nLegacyMessageIdFormat) !== null && _a !== void 0 ? _a : true;
         const partials = [

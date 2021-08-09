@@ -29,6 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getIndexInputFile = exports.getIndexOutputFile = exports.generateBrowserWebpackConfigFromContext = exports.generateI18nBrowserWebpackConfigFromContext = exports.generateWebpackConfig = void 0;
 const core_1 = require("@angular-devkit/core");
 const path = __importStar(require("path"));
+const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
 const webpack_merge_1 = require("webpack-merge");
 const utils_1 = require("../utils");
@@ -63,7 +64,11 @@ exports.generateWebpackConfig = generateWebpackConfig;
 async function generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, extraBuildOptions = {}) {
     var _a;
     const { buildOptions, i18n } = await i18n_options_1.configureI18nBuild(context, options);
-    const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, webpackPartialGenerator, extraBuildOptions);
+    let target = typescript_1.ScriptTarget.ES5;
+    const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, (wco) => {
+        target = wco.scriptTarget;
+        return webpackPartialGenerator(wco);
+    }, extraBuildOptions);
     const config = result.config;
     if (i18n.shouldInline) {
         // Remove localize "polyfill" if in AOT mode
@@ -97,7 +102,7 @@ async function generateI18nBrowserWebpackConfigFromContext(options, context, web
             },
         });
     }
-    return { ...result, i18n };
+    return { ...result, i18n, target };
 }
 exports.generateI18nBrowserWebpackConfigFromContext = generateI18nBrowserWebpackConfigFromContext;
 async function generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, extraBuildOptions = {}) {
