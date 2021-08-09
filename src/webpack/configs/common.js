@@ -30,6 +30,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCommonConfig = void 0;
+const build_optimizer_1 = require("@angular-devkit/build-optimizer");
 const compiler_cli_1 = require("@angular/compiler-cli");
 const copy_webpack_plugin_1 = __importDefault(require("copy-webpack-plugin"));
 const crypto_1 = require("crypto");
@@ -245,6 +246,16 @@ function getCommonConfig(wco) {
             },
         });
     }
+    let buildOptimizerUseRule = [];
+    if (buildOptions.buildOptimizer && wco.scriptTarget < typescript_1.ScriptTarget.ES2015) {
+        extraPlugins.push(new build_optimizer_1.BuildOptimizerWebpackPlugin());
+        buildOptimizerUseRule = [
+            {
+                loader: build_optimizer_1.buildOptimizerLoaderPath,
+                options: { sourceMap: scriptsSourceMap },
+            },
+        ];
+    }
     const extraMinimizers = [];
     if (scriptsOptimization) {
         const globalScriptsNames = globalScriptsByBundleName.map((s) => s.bundleName);
@@ -347,9 +358,10 @@ function getCommonConfig(wco) {
                                 cacheDirectory: cache_path_1.findCachePath('babel-webpack'),
                                 scriptTarget: wco.scriptTarget,
                                 aot: buildOptions.aot,
-                                optimize: buildOptions.buildOptimizer,
+                                optimize: buildOptions.buildOptimizer && wco.scriptTarget >= typescript_1.ScriptTarget.ES2015,
                             },
                         },
+                        ...buildOptimizerUseRule,
                     ],
                 },
                 ...extraRules,

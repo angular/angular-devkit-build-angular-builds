@@ -50,7 +50,8 @@ exports.default = babel_loader_1.custom(() => {
             const esTarget = scriptTarget;
             if (esTarget !== undefined) {
                 if (esTarget < typescript_1.ScriptTarget.ES2015) {
-                    customOptions.forceES5 = true;
+                    // TypeScript files will have already been downlevelled
+                    customOptions.forceES5 = !/\.tsx?$/.test(this.resourcePath);
                 }
                 else if (esTarget >= typescript_1.ScriptTarget.ES2017) {
                     customOptions.forceAsyncTransformation =
