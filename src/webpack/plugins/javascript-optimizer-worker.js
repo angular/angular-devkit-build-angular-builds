@@ -14,20 +14,40 @@ const remapping_1 = __importDefault(require("@ampproject/remapping"));
 const esbuild_1 = require("esbuild");
 const terser_1 = require("terser");
 async function default_1({ asset, options }) {
+    var _a;
     // esbuild is used as a first pass
-    const esbuildResult = await esbuild_1.transform(asset.code, {
-        minifyIdentifiers: !options.keepNames,
-        minifySyntax: true,
-        // NOTE: Disabling whitespace ensures unused pure annotations are kept
-        minifyWhitespace: false,
-        pure: ['forwardRef'],
-        legalComments: options.removeLicenses ? 'none' : 'inline',
-        sourcefile: asset.name,
-        sourcemap: options.sourcemap && 'external',
-        define: options.define,
-        keepNames: options.keepNames,
-        target: `es${options.target}`,
-    });
+    let esbuildResult;
+    try {
+        esbuildResult = await esbuild_1.transform(asset.code, {
+            minifyIdentifiers: !options.keepNames,
+            minifySyntax: true,
+            // NOTE: Disabling whitespace ensures unused pure annotations are kept
+            minifyWhitespace: false,
+            pure: ['forwardRef'],
+            legalComments: options.removeLicenses ? 'none' : 'inline',
+            sourcefile: asset.name,
+            sourcemap: options.sourcemap && 'external',
+            define: options.define,
+            keepNames: options.keepNames,
+            target: `es${options.target}`,
+        });
+    }
+    catch (error) {
+        const failure = error;
+        // If esbuild fails with only ES5 support errors, fallback to just terser.
+        // This will only happen if ES5 is the output target and a global script contains ES2015+ syntax.
+        // In that case, the global script is technically already invalid for the target environment but
+        // this is and has been considered a configuration issue. Global scripts must be compatible with
+        // the target environment.
+        if ((_a = failure.errors) === null || _a === void 0 ? void 0 : _a.every((error) => error.text.includes('to the configured target environment ("es5") is not supported yet'))) {
+            esbuildResult = {
+                code: asset.code,
+            };
+        }
+        else {
+            throw error;
+        }
+    }
     // terser is used as a second pass
     const terserResult = await optimizeWithTerser(asset.name, esbuildResult.code, options.sourcemap, options.target, options.advanced);
     // Merge intermediate sourcemaps with input sourcemap if enabled
