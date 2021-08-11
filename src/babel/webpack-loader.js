@@ -53,7 +53,11 @@ exports.default = babel_loader_1.custom(() => {
                     // TypeScript files will have already been downlevelled
                     customOptions.forceES5 = !/\.tsx?$/.test(this.resourcePath);
                 }
-                else if (esTarget >= typescript_1.ScriptTarget.ES2017) {
+                else if (esTarget >= typescript_1.ScriptTarget.ES2017 || /\.[cm]?js$/.test(this.resourcePath)) {
+                    // Application code (TS files) will only contain native async if target is ES2017+.
+                    // However, third-party libraries can regardless of the target option.
+                    // APF packages with code in [f]esm2015 directories is downlevelled to ES2015 and
+                    // will not have native async.
                     customOptions.forceAsyncTransformation =
                         !/[\\\/][_f]?esm2015[\\\/]/.test(this.resourcePath) && source.includes('async');
                 }
