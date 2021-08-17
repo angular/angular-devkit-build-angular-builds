@@ -31,8 +31,8 @@ const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const sass_service_1 = require("../../sass/sass-service");
 const build_browser_features_1 = require("../../utils/build-browser-features");
+const environment_options_1 = require("../../utils/environment-options");
 const plugins_1 = require("../plugins");
-const css_optimizer_plugin_1 = require("../plugins/css-optimizer-plugin");
 const helpers_1 = require("../utils/helpers");
 function resolveGlobalStyles(styleEntrypoints, root, preserveSymlinks) {
     const entryPoints = {};
@@ -228,6 +228,62 @@ function getStylesConfig(wco) {
             },
         },
     ];
+    const extraMinimizers = [];
+    if (buildOptions.optimization.styles.minify) {
+        const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+        const esbuild = require('esbuild');
+        const cssnanoOptions = {
+            preset: [
+                'default',
+                {
+                    // Disable SVG optimizations, as this can cause optimizations which are not compatible in all browsers.
+                    svgo: false,
+                    // Disable `calc` optimizations, due to several issues. #16910, #16875, #17890
+                    calc: false,
+                    // Disable CSS rules sorted due to several issues #20693, https://github.com/ionic-team/ionic-framework/issues/23266 and https://github.com/cssnano/cssnano/issues/1054
+                    cssDeclarationSorter: false,
+                    // Workaround for Critters as it doesn't work when `@media all {}` is minified to `@media {}`.
+                    // TODO: Remove once they move to postcss.
+                    minifyParams: !buildOptions.optimization.styles.inlineCritical,
+                },
+            ],
+        };
+        const globalBundlesRegExp = new RegExp(`^(${Object.keys(entryPoints).join('|')})(\.[0-9a-f]{20})?.css$`);
+        extraMinimizers.push(
+        // Component styles use esbuild which is faster and generates smaller files on average.
+        // esbuild does not yet support style sourcemaps but component style sourcemaps are not
+        // supported by the CLI when style minify is enabled.
+        new CssMinimizerPlugin({
+            // Component styles retain their original file name
+            test: /\.(?:css|scss|sass|less|styl)$/,
+            exclude: globalBundlesRegExp,
+            parallel: false,
+            minify: async (data) => {
+                const [[sourcefile, input]] = Object.entries(data);
+                const { code, warnings } = await esbuild.transform(input, {
+                    loader: 'css',
+                    minify: true,
+                    sourcefile,
+                });
+                return {
+                    code,
+                    warnings: warnings.length > 0
+                        ? await esbuild.formatMessages(warnings, { kind: 'warning' })
+                        : [],
+                };
+            },
+        }), 
+        // Global styles use cssnano since sourcemap support is required even when minify
+        // is enabled. Once esbuild supports style sourcemaps this can be changed.
+        // esbuild stylesheet source map support issue: https://github.com/evanw/esbuild/issues/519
+        new CssMinimizerPlugin({
+            test: /\.css$/,
+            include: globalBundlesRegExp,
+            parallel: environment_options_1.maxWorkers,
+            minify: [CssMinimizerPlugin.cssnanoMinify],
+            minimizerOptions: cssnanoOptions,
+        }));
+    }
     const styleLanguages = [
         {
             extensions: ['css'],
@@ -358,7 +414,7 @@ function getStylesConfig(wco) {
             })),
         },
         optimization: {
-            minimizer: buildOptions.optimization.styles.minify ? [new css_optimizer_plugin_1.CssOptimizerPlugin()] : undefined,
+            minimizer: extraMinimizers,
         },
         plugins: extraPlugins,
     };
