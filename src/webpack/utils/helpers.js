@@ -26,10 +26,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.assetNameTemplateFactory = exports.getWatchOptions = exports.isPolyfillsEntry = exports.getEsVersionForFileName = exports.getSourceMapDevTool = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
-const core_1 = require("@angular-devkit/core");
+exports.assetNameTemplateFactory = exports.getWatchOptions = exports.isPolyfillsEntry = exports.getSourceMapDevTool = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
 const path = __importStar(require("path"));
-const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
 function getOutputHashFormat(option, length = 20) {
     const hashFormats = {
@@ -63,7 +61,7 @@ function normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName) {
         }
         else if (!inject) {
             // Lazy entry points use the file name as bundle name.
-            bundleName = core_1.basename(core_1.normalize(entry.input.replace(/\.(js|css|scss|sass|less|styl)$/i, '')));
+            bundleName = path.parse(entry.input).name;
         }
         else {
             bundleName = defaultBundleName;
@@ -93,19 +91,6 @@ function getSourceMapDevTool(scriptsSourceMap, stylesSourceMap, hiddenSourceMap 
     });
 }
 exports.getSourceMapDevTool = getSourceMapDevTool;
-/**
- * Returns an ES version file suffix to differentiate between various builds.
- */
-function getEsVersionForFileName(scriptTarget, esVersionInFileName = false) {
-    if (!esVersionInFileName || scriptTarget === undefined) {
-        return '';
-    }
-    if (scriptTarget === typescript_1.ScriptTarget.ESNext) {
-        return '-esnext';
-    }
-    return '-' + typescript_1.ScriptTarget[scriptTarget].toLowerCase();
-}
-exports.getEsVersionForFileName = getEsVersionForFileName;
 function isPolyfillsEntry(name) {
     return name === 'polyfills';
 }
