@@ -21,7 +21,7 @@ function markAsyncChunksNonInitial(webpackStats, extraEntryPoints) {
     // depended upon in Webpack, thus any extra entry point with `inject: false`,
     // **cannot** be loaded in main bundle.
     const asyncChunkIds = extraEntryPoints
-        .filter((entryPoint) => !entryPoint.inject)
+        .filter((entryPoint) => !entryPoint.inject && entryPoints[entryPoint.bundleName])
         .flatMap((entryPoint) => { var _a; return (_a = entryPoints[entryPoint.bundleName].chunks) === null || _a === void 0 ? void 0 : _a.filter((n) => n !== 'runtime'); });
     // Find chunks for each ID.
     const asyncChunks = asyncChunkIds.map((chunkId) => {
