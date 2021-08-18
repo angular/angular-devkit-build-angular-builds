@@ -6,6 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { Compiler } from 'webpack';
+export interface CssOptimizerPluginOptions {
+    supportedBrowsers?: string[];
+}
 /**
  * A Webpack plugin that provides CSS optimization capabilities.
  *
@@ -13,7 +16,9 @@ import type { Compiler } from 'webpack';
  * code output.
  */
 export declare class CssOptimizerPlugin {
-    constructor();
+    private targets;
+    constructor(options?: CssOptimizerPluginOptions);
     apply(compiler: Compiler): void;
     private addWarnings;
+    private transformSupportedBrowsersToTargets;
 }

@@ -358,7 +358,13 @@ function getStylesConfig(wco) {
             })),
         },
         optimization: {
-            minimizer: buildOptions.optimization.styles.minify ? [new css_optimizer_plugin_1.CssOptimizerPlugin()] : undefined,
+            minimizer: buildOptions.optimization.styles.minify
+                ? [
+                    new css_optimizer_plugin_1.CssOptimizerPlugin({
+                        supportedBrowsers,
+                    }),
+                ]
+                : undefined,
         },
         plugins: extraPlugins,
     };

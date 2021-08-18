@@ -21,7 +21,11 @@ const PLUGIN_NAME = 'angular-css-optimizer';
  * code output.
  */
 class CssOptimizerPlugin {
-    constructor() { }
+    constructor(options) {
+        if (options === null || options === void 0 ? void 0 : options.supportedBrowsers) {
+            this.targets = this.transformSupportedBrowsersToTargets(options.supportedBrowsers);
+        }
+    }
     apply(compiler) {
         const { OriginalSource, SourceMapSource } = compiler.webpack.sources;
         compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
@@ -66,6 +70,7 @@ class CssOptimizerPlugin {
                         minify: true,
                         sourcemap: !!inputMap && 'external',
                         sourcefile: asset.name,
+                        target: this.targets,
                     });
                     await this.addWarnings(compilation, warnings);
                     const optimizedAsset = map
@@ -86,6 +91,18 @@ class CssOptimizerPlugin {
                 webpack_diagnostics_1.addWarning(compilation, warning);
             }
         }
+    }
+    transformSupportedBrowsersToTargets(supportedBrowsers) {
+        const transformed = [];
+        // https://esbuild.github.io/api/#target
+        const esBuildSupportedBrowsers = new Set(['safari', 'firefox', 'edge', 'chrome', 'ios']);
+        for (const browser of supportedBrowsers) {
+            const [browserName, version] = browser.split(' ');
+            if (esBuildSupportedBrowsers.has(browserName)) {
+                transformed.push(browserName + version);
+            }
+        }
+        return transformed.length ? transformed : undefined;
     }
 }
 exports.CssOptimizerPlugin = CssOptimizerPlugin;
