@@ -55,9 +55,7 @@ function generateBundleStats(info) {
     const files = (_b = (_a = info.files) === null || _a === void 0 ? void 0 : _a.filter((f) => !f.endsWith('.map')).map((f) => path.basename(f)).join(', ')) !== null && _b !== void 0 ? _b : '';
     const names = ((_c = info.names) === null || _c === void 0 ? void 0 : _c.length) ? info.names.join(', ') : '-';
     const initial = !!info.initial;
-    const chunkType = info.chunkType || 'unknown';
     return {
-        chunkType,
         initial,
         stats: [files, names, size],
     };
@@ -70,10 +68,8 @@ function generateBuildStatsTable(data, colors, showTotalSize) {
     const dim = (x) => (colors ? color_1.colors.dim(x) : x);
     const changedEntryChunksStats = [];
     const changedLazyChunksStats = [];
-    let initialModernTotalSize = 0;
-    let initialLegacyTotalSize = 0;
-    let modernFileSuffix;
-    for (const { initial, stats, chunkType } of data) {
+    let initialTotalSize = 0;
+    for (const { initial, stats } of data) {
         const [files, names, size] = stats;
         const data = [
             g(files),
@@ -83,22 +79,7 @@ function generateBuildStatsTable(data, colors, showTotalSize) {
         if (initial) {
             changedEntryChunksStats.push(data);
             if (typeof size === 'number') {
-                switch (chunkType) {
-                    case 'modern':
-                        initialModernTotalSize += size;
-                        if (!modernFileSuffix) {
-                            const match = files.match(/-(es20\d{2}|esnext)/);
-                            modernFileSuffix = match === null || match === void 0 ? void 0 : match[1].toString().toUpperCase();
-                        }
-                        break;
-                    case 'legacy':
-                        initialLegacyTotalSize += size;
-                        break;
-                    default:
-                        initialModernTotalSize += size;
-                        initialLegacyTotalSize += size;
-                        break;
-                }
+                initialTotalSize += size;
             }
         }
         else {
@@ -111,12 +92,7 @@ function generateBuildStatsTable(data, colors, showTotalSize) {
         bundleInfo.push(['Initial Chunk Files', 'Names', 'Size'].map(bold), ...changedEntryChunksStats);
         if (showTotalSize) {
             bundleInfo.push([]);
-            if (initialModernTotalSize === initialLegacyTotalSize) {
-                bundleInfo.push([' ', 'Initial Total', formatSize(initialModernTotalSize)].map(bold));
-            }
-            else {
-                bundleInfo.push([' ', 'Initial ES5 Total', formatSize(initialLegacyTotalSize)].map(bold), [' ', `Initial ${modernFileSuffix} Total`, formatSize(initialModernTotalSize)].map(bold));
-            }
+            bundleInfo.push([' ', 'Initial Total', formatSize(initialTotalSize)].map(bold));
         }
     }
     // Seperator

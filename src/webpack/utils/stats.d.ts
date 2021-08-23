@@ -11,11 +11,9 @@ import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../builders/browser/schema';
 export declare function formatSize(size: number): string;
 export declare type BundleStatsData = [files: string, names: string, size: number | string];
-export declare type ChunkType = 'modern' | 'legacy' | 'unknown';
 export interface BundleStats {
     initial: boolean;
     stats: BundleStatsData;
-    chunkType: ChunkType;
 }
 export declare function generateBundleStats(info: {
     size?: number;
@@ -23,7 +21,6 @@ export declare function generateBundleStats(info: {
     names?: string[];
     initial?: boolean;
     rendered?: boolean;
-    chunkType?: ChunkType;
 }): BundleStats;
 export declare function statsWarningsToString(json: StatsCompilation, statsConfig: any): string;
 export declare function statsErrorsToString(json: StatsCompilation, statsConfig: any): string;
