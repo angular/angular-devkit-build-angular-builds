@@ -191,7 +191,7 @@ function getCommonConfig(wco) {
     if (buildOptions.showCircularDependencies) {
         const CircularDependencyPlugin = require('circular-dependency-plugin');
         extraPlugins.push(new CircularDependencyPlugin({
-            exclude: /[\\\/]node_modules[\\\/]/,
+            exclude: /[\\/]node_modules[\\/]/,
         }));
     }
     if (buildOptions.extractLicenses) {
@@ -303,21 +303,21 @@ function getCommonConfig(wco) {
                 {
                     // Mark files inside `@angular/core` as using SystemJS style dynamic imports.
                     // Removing this will cause deprecation warnings to appear.
-                    test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
+                    test: /[/\\]@angular[/\\]core[/\\].+\.js$/,
                     parser: { system: true },
                 },
                 {
                     // Mark files inside `rxjs/add` as containing side effects.
                     // If this is fixed upstream and the fixed version becomes the minimum
                     // supported version, this can be removed.
-                    test: /[\/\\]rxjs[\/\\]add[\/\\].+\.js$/,
+                    test: /[/\\]rxjs[/\\]add[/\\].+\.js$/,
                     sideEffects: true,
                 },
                 {
                     test: /\.[cm]?js$|\.tsx?$/,
                     // The below is needed due to a bug in `@babel/runtime`. See: https://github.com/babel/babel/issues/12824
                     resolve: { fullySpecified: false },
-                    exclude: [/[\/\\](?:core-js|\@babel|tslib|web-animations-js)[\/\\]/],
+                    exclude: [/[/\\](?:core-js|@babel|tslib|web-animations-js)[/\\]/],
                     use: [
                         {
                             loader: require.resolve('../../babel/webpack-loader'),
@@ -347,7 +347,7 @@ function getCommonConfig(wco) {
         plugins: [
             // Always replace the context for the System.import in angular/core to prevent warnings.
             // https://github.com/angular/angular/issues/11580
-            new webpack_1.ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)/, path.join(projectRoot, '$_lazy_route_resources'), {}),
+            new webpack_1.ContextReplacementPlugin(/@angular[\\/]core[\\/]/, path.join(projectRoot, '$_lazy_route_resources'), {}),
             new plugins_1.DedupeModuleResolvePlugin({ verbose: buildOptions.verbose }),
             ...extraPlugins,
         ],
