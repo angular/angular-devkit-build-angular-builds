@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBrowserConfig = void 0;
+const webpack_subresource_integrity_1 = require("webpack-subresource-integrity");
 const plugins_1 = require("../plugins");
 const helpers_1 = require("../utils/helpers");
 function getBrowserConfig(wco) {
@@ -16,8 +17,7 @@ function getBrowserConfig(wco) {
     const extraPlugins = [];
     const { styles: stylesSourceMap, scripts: scriptsSourceMap, hidden: hiddenSourceMap, } = buildOptions.sourceMap;
     if (subresourceIntegrity) {
-        const SubresourceIntegrityPlugin = require('webpack-subresource-integrity');
-        extraPlugins.push(new SubresourceIntegrityPlugin({
+        extraPlugins.push(new webpack_subresource_integrity_1.SubresourceIntegrityPlugin({
             hashFuncNames: ['sha384'],
         }));
     }
