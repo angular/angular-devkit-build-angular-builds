@@ -25,9 +25,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serveWebpackBrowser = void 0;
 const architect_1 = require("@angular-devkit/architect");
@@ -37,7 +34,6 @@ const path = __importStar(require("path"));
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const url = __importStar(require("url"));
-const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
 const utils_1 = require("../../utils");
 const cache_path_1 = require("../../utils/cache-path");
 const check_port_1 = require("../../utils/check-port");
@@ -157,33 +153,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         if (!config.devServer) {
             throw new Error('Webpack Dev Server configuration was not set.');
         }
-        if (options.liveReload && !options.hmr) {
-            // This is needed because we cannot use the inline option directly in the config
-            // because of the SuppressExtractedTextChunksWebpackPlugin
-            // Consider not using SuppressExtractedTextChunksWebpackPlugin when liveReload is enable.
-            webpack_dev_server_1.default.addDevServerEntrypoints(config, {
-                ...config.devServer,
-                inline: true,
-            });
-            // Remove live-reload code from all entrypoints but not main.
-            // Otherwise this will break SuppressExtractedTextChunksWebpackPlugin because
-            // 'addDevServerEntrypoints' adds addional entry-points to all entries.
-            if (config.entry &&
-                typeof config.entry === 'object' &&
-                !Array.isArray(config.entry) &&
-                config.entry.main) {
-                for (const [key, value] of Object.entries(config.entry)) {
-                    if (key === 'main' || !Array.isArray(value)) {
-                        continue;
-                    }
-                    const webpackClientScriptIndex = value.findIndex((x) => x.includes('webpack-dev-server/client/index.js'));
-                    if (webpackClientScriptIndex >= 0) {
-                        // Remove the webpack-dev-server/client script from array.
-                        value.splice(webpackClientScriptIndex, 1);
-                    }
-                }
-            }
-        }
         let locale;
         if (i18n.shouldInline) {
             // Dev-server only supports one locale
@@ -221,7 +190,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 // The below is needed as otherwise HMR for CSS will break.
                 // styles.js and runtime.js needs to be loaded as a non-module scripts as otherwise `document.currentScript` will be null.
                 // https://github.com/webpack-contrib/mini-css-extract-plugin/blob/90445dd1d81da0c10b9b0e8a17b417d0651816b8/src/hmr/hotModuleReplacement.js#L39
-                isHMREnabled: (_a = webpackConfig.devServer) === null || _a === void 0 ? void 0 : _a.hot,
+                isHMREnabled: !!((_a = webpackConfig.devServer) === null || _a === void 0 ? void 0 : _a.hot),
             });
             (_b = webpackConfig.plugins) !== null && _b !== void 0 ? _b : (webpackConfig.plugins = []);
             webpackConfig.plugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({
@@ -242,13 +211,13 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             webpackFactory: require('webpack'),
             webpackDevServerFactory: require('webpack-dev-server'),
         }).pipe(operators_1.concatMap(async (buildEvent, index) => {
-            var _a;
+            var _a, _b;
             // Resolve serve address.
             const serverAddress = url.format({
                 protocol: options.ssl ? 'https' : 'http',
                 hostname: options.host === '0.0.0.0' ? 'localhost' : options.host,
-                pathname: (_a = webpackConfig.devServer) === null || _a === void 0 ? void 0 : _a.publicPath,
                 port: buildEvent.port,
+                pathname: (_b = (_a = webpackConfig.devServer) === null || _a === void 0 ? void 0 : _a.devMiddleware) === null || _b === void 0 ? void 0 : _b.publicPath,
             });
             if (index === 0) {
                 logger.info('\n' +

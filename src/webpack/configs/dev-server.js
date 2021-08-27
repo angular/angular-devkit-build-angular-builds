@@ -31,28 +31,19 @@ const core_1 = require("@angular-devkit/core");
 const fs_1 = require("fs");
 const path_1 = require("path");
 const url = __importStar(require("url"));
-const utils_1 = require("../../utils");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const hmr_loader_1 = require("../plugins/hmr/hmr-loader");
-const helpers_1 = require("../utils/helpers");
 function getDevServerConfig(wco) {
-    var _a;
-    const { buildOptions: { optimization, host, port, index, headers, poll, ssl, hmr, main, disableHostCheck, liveReload, allowedHosts, watch, proxyConfig, }, logger, root, } = wco;
+    const { buildOptions: { host, port, index, headers, watch, hmr, main, liveReload, proxyConfig }, logger, root, } = wco;
     const servePath = buildServePath(wco.buildOptions, logger);
-    const { styles: stylesOptimization, scripts: scriptsOptimization } = utils_1.normalizeOptimization(optimization);
+    const extraRules = [];
+    if (hmr) {
+        extraRules.push({
+            loader: hmr_loader_1.HmrLoader,
+            include: [main].map((p) => path_1.resolve(wco.root, p)),
+        });
+    }
     const extraPlugins = [];
-    // Resolve public host and client address.
-    let publicHost = wco.buildOptions.publicHost;
-    if (publicHost) {
-        if (!/^\w+:\/\//.test(publicHost)) {
-            publicHost = `${ssl ? 'https' : 'http'}://${publicHost}`;
-        }
-        const parsedHost = url.parse(publicHost);
-        publicHost = (_a = parsedHost.host) !== null && _a !== void 0 ? _a : undefined;
-    }
-    else {
-        publicHost = '0.0.0.0:0';
-    }
     if (!watch) {
         // There's no option to turn off file watching in webpack-dev-server, but
         // we can override the file watcher instead.
@@ -66,13 +57,7 @@ function getDevServerConfig(wco) {
             },
         });
     }
-    const extraRules = [];
-    if (hmr) {
-        extraRules.push({
-            loader: hmr_loader_1.HmrLoader,
-            include: [main].map((p) => path_1.resolve(wco.root, p)),
-        });
-    }
+    const webSocketPath = path_1.posix.join(servePath, 'ws');
     return {
         plugins: extraPlugins,
         module: {
@@ -86,7 +71,7 @@ function getDevServerConfig(wco) {
                 ...headers,
             },
             historyApiFallback: !!index && {
-                index: `${servePath}/${webpack_browser_config_1.getIndexOutputFile(index)}`,
+                index: path_1.posix.join(servePath, webpack_browser_config_1.getIndexOutputFile(index)),
                 disableDotRule: true,
                 htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
                 rewrites: [
@@ -96,29 +81,30 @@ function getDevServerConfig(wco) {
                     },
                 ],
             },
-            sockPath: path_1.posix.join(servePath, 'sockjs-node'),
-            stats: false,
-            compress: stylesOptimization.minify || scriptsOptimization,
-            watchOptions: helpers_1.getWatchOptions(poll),
-            https: getSslConfig(root, wco.buildOptions),
-            overlay: {
-                errors: !(stylesOptimization.minify || scriptsOptimization),
-                warnings: false,
+            webSocketServer: {
+                options: {
+                    path: webSocketPath,
+                },
             },
-            public: publicHost,
-            allowedHosts,
-            disableHostCheck,
-            // This should always be true, but at the moment this breaks 'SuppressExtractedTextChunksWebpackPlugin'
-            // because it will include addition JS in the styles.js.
-            inline: hmr,
-            publicPath: servePath,
+            compress: false,
+            static: false,
+            https: getSslConfig(root, wco.buildOptions),
+            allowedHosts: getAllowedHostsConfig(wco.buildOptions),
+            devMiddleware: {
+                publicPath: servePath,
+                stats: false,
+            },
             liveReload,
-            injectClient: liveReload,
-            hotOnly: hmr && !liveReload,
-            hot: hmr,
+            hot: hmr && !liveReload ? 'only' : hmr,
             proxy: addProxyConfig(root, proxyConfig),
-            contentBase: false,
-            logLevel: 'error',
+            client: {
+                logging: 'info',
+                webSocketURL: getPublicHostOptions(wco.buildOptions, webSocketPath),
+                overlay: {
+                    errors: true,
+                    warnings: false,
+                },
+            },
         },
     };
 }
@@ -207,4 +193,24 @@ function findDefaultServePath(baseHref, deployUrl) {
     }
     // Join together baseHref and deployUrl
     return `${normalizedBaseHref}${deployUrl || ''}`;
+}
+function getAllowedHostsConfig(options) {
+    var _a;
+    if (options.disableHostCheck) {
+        return 'all';
+    }
+    else if ((_a = options.allowedHosts) === null || _a === void 0 ? void 0 : _a.length) {
+        return options.allowedHosts;
+    }
+    return undefined;
+}
+function getPublicHostOptions(options, webSocketPath) {
+    let publicHost = options.publicHost;
+    if (publicHost) {
+        if (!/^\w+:\/\//.test(publicHost)) {
+            publicHost = `https://${publicHost}`;
+        }
+        publicHost = url.parse(publicHost).host;
+    }
+    return `auto://${publicHost || '0.0.0.0:0'}${webSocketPath}`;
 }

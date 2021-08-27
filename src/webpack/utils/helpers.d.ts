@@ -18,5 +18,5 @@ export declare type NormalizedEntryPoint = Required<ExtraEntryPointClass>;
 export declare function normalizeExtraEntryPoints(extraEntryPoints: ExtraEntryPoint[], defaultBundleName: string): NormalizedEntryPoint[];
 export declare function getSourceMapDevTool(scriptsSourceMap: boolean | undefined, stylesSourceMap: boolean | undefined, hiddenSourceMap?: boolean, inlineSourceMap?: boolean): SourceMapDevToolPlugin;
 export declare function isPolyfillsEntry(name: string): boolean;
-export declare function getWatchOptions(poll: number | undefined): Configuration['watchOptions'];
+export declare function getWatchOptions(poll: number | undefined): NonNullable<Configuration['watchOptions']>;
 export declare function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath: string) => string;

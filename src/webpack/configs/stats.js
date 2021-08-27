@@ -46,6 +46,8 @@ function getWebpackStatsConfig(verbose = false) {
 exports.getWebpackStatsConfig = getWebpackStatsConfig;
 function getStatsConfig(wco) {
     const verbose = !!wco.buildOptions.verbose;
-    return { stats: getWebpackStatsConfig(verbose) };
+    return {
+        stats: getWebpackStatsConfig(verbose),
+    };
 }
 exports.getStatsConfig = getStatsConfig;
