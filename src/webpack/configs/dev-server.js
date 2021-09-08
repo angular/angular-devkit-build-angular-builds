@@ -98,7 +98,7 @@ function getDevServerConfig(wco) {
             },
             sockPath: path_1.posix.join(servePath, 'sockjs-node'),
             stats: false,
-            compress: stylesOptimization.minify || scriptsOptimization,
+            compress: false,
             watchOptions: helpers_1.getWatchOptions(poll),
             https: getSslConfig(root, wco.buildOptions),
             overlay: {
