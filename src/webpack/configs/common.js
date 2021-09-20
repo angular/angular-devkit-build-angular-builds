@@ -30,7 +30,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCommonConfig = void 0;
-const compiler_cli_1 = require("@angular/compiler-cli");
 const copy_webpack_plugin_1 = __importDefault(require("copy-webpack-plugin"));
 const crypto_1 = require("crypto");
 const fs_1 = require("fs");
@@ -46,13 +45,23 @@ const plugins_1 = require("../plugins");
 const javascript_optimizer_plugin_1 = require("../plugins/javascript-optimizer-plugin");
 const helpers_1 = require("../utils/helpers");
 // eslint-disable-next-line max-lines-per-function
-function getCommonConfig(wco) {
+async function getCommonConfig(wco) {
     var _a, _b;
     const { root, projectRoot, buildOptions, tsConfig } = wco;
     const { platform = 'browser', sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, } = buildOptions;
     const extraPlugins = [];
     const extraRules = [];
     const entryPoints = {};
+    // This uses a dynamic import to load `@angular/compiler-cli` which may be ESM.
+    // CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
+    // will currently, unconditionally downlevel dynamic import into a require call.
+    // require calls cannot load ESM code and will result in a runtime error. To workaround
+    // this, a Function constructor is used to prevent TypeScript from changing the dynamic import.
+    // Once TypeScript provides support for keeping the dynamic import this workaround can
+    // be dropped.
+    const compilerCliModule = await new Function(`return import('@angular/compiler-cli');`)();
+    // If it is not ESM then the values needed will be stored in the `default` property.
+    const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT, VERSION: NG_VERSION, } = (compilerCliModule.GLOBAL_DEFS_FOR_TERSER ? compilerCliModule : compilerCliModule.default);
     // determine hashing format
     const hashFormat = helpers_1.getOutputHashFormat(buildOptions.outputHashing || 'none');
     const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);
@@ -248,7 +257,7 @@ function getCommonConfig(wco) {
     const extraMinimizers = [];
     if (scriptsOptimization) {
         extraMinimizers.push(new javascript_optimizer_plugin_1.JavaScriptOptimizerPlugin({
-            define: buildOptions.aot ? compiler_cli_1.GLOBAL_DEFS_FOR_TERSER_WITH_AOT : compiler_cli_1.GLOBAL_DEFS_FOR_TERSER,
+            define: buildOptions.aot ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT : GLOBAL_DEFS_FOR_TERSER,
             sourcemap: scriptsSourceMap,
             target: wco.scriptTarget,
             keepNames: !environment_options_1.allowMangle || platform === 'server',
@@ -340,7 +349,7 @@ function getCommonConfig(wco) {
         infrastructureLogging: {
             level: buildOptions.verbose ? 'verbose' : 'error',
         },
-        cache: getCacheSettings(wco, buildBrowserFeatures.supportedBrowsers),
+        cache: getCacheSettings(wco, buildBrowserFeatures.supportedBrowsers, NG_VERSION.full),
         optimization: {
             minimizer: extraMinimizers,
             moduleIds: 'deterministic',
@@ -357,7 +366,7 @@ function getCommonConfig(wco) {
     };
 }
 exports.getCommonConfig = getCommonConfig;
-function getCacheSettings(wco, supportedBrowsers) {
+function getCacheSettings(wco, supportedBrowsers, angularVersion) {
     if (environment_options_1.persistentBuildCacheEnabled) {
         const packageVersion = require('../../../package.json').version;
         return {
@@ -368,7 +377,7 @@ function getCacheSettings(wco, supportedBrowsers) {
             // dynamic and shared among different build types: test, build and serve.
             // None of which are "named".
             name: crypto_1.createHash('sha1')
-                .update(compiler_cli_1.VERSION.full)
+                .update(angularVersion)
                 .update(packageVersion)
                 .update(wco.projectRoot)
                 .update(JSON.stringify(wco.tsConfig))

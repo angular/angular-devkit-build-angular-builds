@@ -42,7 +42,7 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
         throw new Error(`The 'buildOptimizer' option cannot be used without 'aot'.`);
     }
     const tsConfigPath = path.resolve(workspaceRoot, options.tsConfig);
-    const tsConfig = read_tsconfig_1.readTsconfig(tsConfigPath);
+    const tsConfig = await read_tsconfig_1.readTsconfig(tsConfigPath);
     const ts = await Promise.resolve().then(() => __importStar(require('typescript')));
     const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES5;
     const buildOptions = { ...options, ...extraBuildOptions };
@@ -57,7 +57,8 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
         scriptTarget,
     };
     wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
-    const webpackConfig = webpack_merge_1.merge(webpackPartialGenerator(wco));
+    const partials = await Promise.all(webpackPartialGenerator(wco));
+    const webpackConfig = webpack_merge_1.merge(partials);
     return webpackConfig;
 }
 exports.generateWebpackConfig = generateWebpackConfig;

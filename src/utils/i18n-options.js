@@ -132,7 +132,7 @@ async function configureI18nBuild(context, options) {
         throw new Error('The builder requires a target.');
     }
     const buildOptions = { ...options };
-    const tsConfig = read_tsconfig_1.readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
+    const tsConfig = await read_tsconfig_1.readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
     const metadata = await context.getProjectMetadata(context.target);
     const i18n = createI18nOptions(metadata, buildOptions.localize);
     // No additional processing needed if no inlining requested and no source locale defined.

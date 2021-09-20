@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ParsedConfiguration } from '@angular/compiler-cli';
+import type { ParsedConfiguration } from '@angular/compiler-cli';
 /**
  * Reads and parses a given TsConfig file.
  *
@@ -13,4 +13,4 @@ import { ParsedConfiguration } from '@angular/compiler-cli';
  * @param workspaceRoot - workspaceRoot root location when provided
  * it will resolve 'tsconfigPath' from this path.
  */
-export declare function readTsconfig(tsconfigPath: string, workspaceRoot?: string): ParsedConfiguration;
+export declare function readTsconfig(tsconfigPath: string, workspaceRoot?: string): Promise<ParsedConfiguration>;
