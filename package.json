@@ -7,9 +7,9 @@
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "1.0.1",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#b99371eec",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#b99371eec",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#b99371eec",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#0d76bf04b",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#0d76bf04b",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#0d76bf04b",
     "@babel/core": "7.15.5",
     "@babel/generator": "7.15.4",
     "@babel/helper-annotate-as-pure": "7.15.4",
@@ -21,7 +21,7 @@
     "@babel/template": "7.15.4",
     "@discoveryjs/json-ext": "0.5.5",
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#b99371eec",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#0d76bf04b",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.2",
     "browserslist": "^4.9.1",
@@ -32,7 +32,7 @@
     "core-js": "3.18.0",
     "critters": "0.0.10",
     "css-loader": "6.3.0",
-    "esbuild": "0.12.29",
+    "esbuild-wasm": "0.12.29",
     "find-cache-dir": "3.3.2",
     "glob": "7.1.7",
     "https-proxy-agent": "5.0.0",
@@ -71,6 +71,9 @@
     "webpack-dev-server": "4.2.1",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.0.0"
+  },
+  "optionalDependencies": {
+    "esbuild": "0.12.28"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^13.0.0 || ^13.0.0-next",
