@@ -33,6 +33,7 @@ const sass_service_1 = require("../../sass/sass-service");
 const build_browser_features_1 = require("../../utils/build-browser-features");
 const environment_options_1 = require("../../utils/environment-options");
 const plugins_1 = require("../plugins");
+const esbuild_executor_1 = require("../plugins/esbuild-executor");
 const helpers_1 = require("../utils/helpers");
 function resolveGlobalStyles(styleEntrypoints, root, preserveSymlinks) {
     const entryPoints = {};
@@ -243,7 +244,7 @@ function getStylesConfig(wco) {
     const extraMinimizers = [];
     if (buildOptions.optimization.styles.minify) {
         const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-        const esbuild = require('esbuild');
+        const esbuild = new esbuild_executor_1.EsbuildExecutor();
         const cssnanoOptions = {
             preset: [
                 'default',

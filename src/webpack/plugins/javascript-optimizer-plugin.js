@@ -14,6 +14,7 @@ exports.JavaScriptOptimizerPlugin = void 0;
 const piscina_1 = __importDefault(require("piscina"));
 const typescript_1 = require("typescript");
 const environment_options_1 = require("../../utils/environment-options");
+const esbuild_executor_1 = require("./esbuild-executor");
 /**
  * The maximum number of Workers that will be created to execute optimize tasks.
  */
@@ -105,6 +106,10 @@ class JavaScriptOptimizerPlugin {
                     target,
                     removeLicenses: this.options.removeLicenses,
                     advanced: this.options.advanced,
+                    // Perform a single native esbuild support check.
+                    // This removes the need for each worker to perform the check which would
+                    // otherwise require spawning a separate process per worker.
+                    alwaysUseWasm: !esbuild_executor_1.EsbuildExecutor.hasNativeSupport(),
                 };
                 // Sort scripts so larger scripts start first - worker pool uses a FIFO queue
                 scriptsToOptimize.sort((a, b) => a.code.length - b.code.length);

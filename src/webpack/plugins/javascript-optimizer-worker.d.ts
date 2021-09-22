@@ -13,22 +13,64 @@ interface OptimizeRequest {
      * The options to use when optimizing.
      */
     options: {
+        /**
+         * Controls advanced optimizations.
+         * Currently these are only terser related:
+         * * terser compress passes are set to 2
+         * * terser pure_getters option is enabled
+         */
         advanced: boolean;
+        /**
+         * Specifies the string tokens that should be replaced with a defined value.
+         */
         define?: Record<string, string>;
+        /**
+         * Controls whether class, function, and variable names should be left intact
+         * throughout the output code.
+         */
         keepNames: boolean;
+        /**
+         * Controls whether license text is removed from the output code.
+         * Within the CLI, this option is linked to the license extraction functionality.
+         */
         removeLicenses: boolean;
+        /**
+         * Controls whether source maps should be generated.
+         */
         sourcemap: boolean;
+        /**
+         * Specifies the target ECMAScript version for the output code.
+         */
         target: 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020;
+        /**
+         * Controls whether esbuild should only use the WASM-variant instead of trying to
+         * use the native variant. Some platforms may not support the native-variant and
+         * this option allows one support test to be conducted prior to all the workers starting.
+         */
+        alwaysUseWasm: boolean;
     };
     /**
      * The JavaScript asset to optimize.
      */
     asset: {
+        /**
+         * The name of the JavaScript asset (typically the filename).
+         */
         name: string;
+        /**
+         * The source content of the JavaScript asset.
+         */
         code: string;
+        /**
+         * The source map of the JavaScript asset, if available.
+         * This map is merged with all intermediate source maps during optimization.
+         */
         map: object;
     };
 }
+/**
+ * Handles optimization requests sent from the main thread via the `JavaScriptOptimizerPlugin`.
+ */
 export default function ({ asset, options }: OptimizeRequest): Promise<{
     name: string;
     code: string;
