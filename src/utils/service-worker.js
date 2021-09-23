@@ -32,6 +32,7 @@ const crypto = __importStar(require("crypto"));
 const fs_1 = require("fs");
 const path = __importStar(require("path"));
 const stream_1 = require("stream");
+const load_esm_1 = require("./load-esm");
 class CliFilesystem {
     constructor(base) {
         this.base = base;
@@ -105,8 +106,11 @@ async function augmentAppWithServiceWorker(projectRoot, appRoot, outputPath, bas
             throw error;
         }
     }
+    // Load ESM `@angular/service-worker/config` using the TypeScript dynamic import workaround.
+    // Once TypeScript provides support for keeping the dynamic import this workaround can be
+    // changed to a direct dynamic import.
+    const GeneratorConstructor = (await load_esm_1.loadEsmModule(swConfigPath)).Generator;
     // Generate the manifest
-    const GeneratorConstructor = require(swConfigPath).Generator;
     const generator = new GeneratorConstructor(new CliFilesystem(distPath), baseHref);
     const output = await generator.process(config);
     // Write the manifest

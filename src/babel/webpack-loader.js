@@ -7,16 +7,31 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const linker_1 = require("@angular/compiler-cli/linker");
 const babel_loader_1 = require("babel-loader");
 const typescript_1 = require("typescript");
-function requiresLinking(path, source) {
+const load_esm_1 = require("../utils/load-esm");
+/**
+ * Cached instance of the compiler-cli linker's needsLinking function.
+ */
+let needsLinking;
+/**
+ * Cached instance of the compiler-cli linker's Babel plugin factory function.
+ */
+let linkerPluginCreator;
+async function requiresLinking(path, source) {
     // @angular/core and @angular/compiler will cause false positives
     // Also, TypeScript files do not require linking
     if (/[\\/]@angular[\\/](?:compiler|core)|\.tsx?$/.test(path)) {
         return false;
     }
-    return linker_1.needsLinking(path, source);
+    if (!needsLinking) {
+        // Load ESM `@angular/compiler-cli/linker` using the TypeScript dynamic import workaround.
+        // Once TypeScript provides support for keeping the dynamic import this workaround can be
+        // changed to a direct dynamic import.
+        const linkerModule = await load_esm_1.loadEsmModule('@angular/compiler-cli/linker');
+        needsLinking = linkerModule.needsLinking;
+    }
+    return needsLinking(path, source);
 }
 exports.default = babel_loader_1.custom(() => {
     const baseOptions = Object.freeze({
@@ -40,9 +55,17 @@ exports.default = babel_loader_1.custom(() => {
             };
             // Analyze file for linking
             if (await requiresLinking(this.resourcePath, source)) {
+                if (!linkerPluginCreator) {
+                    // Load ESM `@angular/compiler-cli/linker/babel` using the TypeScript dynamic import workaround.
+                    // Once TypeScript provides support for keeping the dynamic import this workaround can be
+                    // changed to a direct dynamic import.
+                    const linkerBabelModule = await load_esm_1.loadEsmModule('@angular/compiler-cli/linker/babel');
+                    linkerPluginCreator = linkerBabelModule.createEs2015LinkerPlugin;
+                }
                 customOptions.angularLinker = {
                     shouldLink: true,
                     jitMode: aot !== true,
+                    linkerPluginCreator,
                 };
                 shouldProcess = true;
             }

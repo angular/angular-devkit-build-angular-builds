@@ -39,6 +39,7 @@ const webpack_1 = require("webpack");
 const utils_1 = require("../../utils");
 const cache_path_1 = require("../../utils/cache-path");
 const environment_options_1 = require("../../utils/environment-options");
+const load_esm_1 = require("../../utils/load-esm");
 const spinner_1 = require("../../utils/spinner");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const plugins_1 = require("../plugins");
@@ -52,15 +53,12 @@ async function getCommonConfig(wco) {
     const extraPlugins = [];
     const extraRules = [];
     const entryPoints = {};
-    // This uses a dynamic import to load `@angular/compiler-cli` which may be ESM.
-    // CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
-    // will currently, unconditionally downlevel dynamic import into a require call.
-    // require calls cannot load ESM code and will result in a runtime error. To workaround
-    // this, a Function constructor is used to prevent TypeScript from changing the dynamic import.
-    // Once TypeScript provides support for keeping the dynamic import this workaround can
-    // be dropped.
-    const compilerCliModule = await new Function(`return import('@angular/compiler-cli');`)();
+    // Load ESM `@angular/compiler-cli` using the TypeScript dynamic import workaround.
+    // Once TypeScript provides support for keeping the dynamic import this workaround can be
+    // changed to a direct dynamic import.
+    const compilerCliModule = await load_esm_1.loadEsmModule('@angular/compiler-cli');
     // If it is not ESM then the values needed will be stored in the `default` property.
+    // TODO_ESM: This can be removed once `@angular/compiler-cli` is ESM only.
     const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT, VERSION: NG_VERSION, } = (compilerCliModule.GLOBAL_DEFS_FOR_TERSER ? compilerCliModule : compilerCliModule.default);
     // determine hashing format
     const hashFormat = helpers_1.getOutputHashFormat(buildOptions.outputHashing || 'none');

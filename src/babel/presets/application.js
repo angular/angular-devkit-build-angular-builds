@@ -98,9 +98,7 @@ function default_1(api, options) {
     const plugins = [];
     let needRuntimeTransform = false;
     if ((_a = options.angularLinker) === null || _a === void 0 ? void 0 : _a.shouldLink) {
-        // Babel currently is synchronous so import cannot be used
-        const { createEs2015LinkerPlugin } = require('@angular/compiler-cli/linker/babel');
-        plugins.push(createEs2015LinkerPlugin({
+        plugins.push(options.angularLinker.linkerPluginCreator({
             linkerJitMode: options.angularLinker.jitMode,
             // This is a workaround until https://github.com/angular/angular/issues/42769 is fixed.
             sourceMapping: false,

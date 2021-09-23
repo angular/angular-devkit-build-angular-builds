@@ -15,6 +15,7 @@ export interface ApplicationPresetOptions {
     angularLinker?: {
         shouldLink: boolean;
         jitMode: boolean;
+        linkerPluginCreator: typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin;
     };
     forceES5?: boolean;
     forceAsyncTransformation?: boolean;
