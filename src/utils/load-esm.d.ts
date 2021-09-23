@@ -5,6 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <reference types="node" />
+import { URL } from 'url';
 /**
  * This uses a dynamic import to load a module which may be ESM.
  * CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
@@ -17,4 +19,4 @@
  * @param modulePath The path of the module to load.
  * @returns A Promise that resolves to the dynamically imported module.
  */
-export declare function loadEsmModule<T>(modulePath: string): Promise<T>;
+export declare function loadEsmModule<T>(modulePath: string | URL): Promise<T>;
