@@ -8,7 +8,7 @@
 import { logging } from '@angular-devkit/core';
 import * as webpack from 'webpack';
 import { WebpackConfigOptions, WebpackDevServerOptions } from '../../utils/build-options';
-export declare function getDevServerConfig(wco: WebpackConfigOptions<WebpackDevServerOptions>): webpack.Configuration;
+export declare function getDevServerConfig(wco: WebpackConfigOptions<WebpackDevServerOptions>): Promise<webpack.Configuration>;
 /**
  * Resolve and build a URL _path_ that will be the root of the server. This resolved base href and
  * deploy URL from the browser options and returns a path from the root.
