@@ -37,30 +37,61 @@ const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const worker_threads_1 = require("worker_threads");
 const environment_options_1 = require("./environment-options");
+const load_esm_1 = require("./load-esm");
 // Lazy loaded webpack-sources object
 // Webpack is only imported if needed during the processing
 let webpackSources;
 const { i18n } = (worker_threads_1.workerData || {});
+/**
+ * Internal flag to enable the direct usage of the `@angular/localize` translation plugins.
+ * Their usage is currently several times slower than the string manipulation method.
+ * Future work to optimize the plugins should enable plugin usage as the default.
+ */
 const USE_LOCALIZE_PLUGINS = false;
+/**
+ * Cached instance of the `@angular/localize/tools` module.
+ * This is used to remove the need to repeatedly import the module per file translation.
+ */
+let localizeToolsModule;
+/**
+ * Attempts to load the `@angular/localize/tools` module containing the functionality to
+ * perform the file translations.
+ * This module must be dynamically loaded as it is an ESM module and this file is CommonJS.
+ */
+async function loadLocalizeTools() {
+    if (localizeToolsModule !== undefined) {
+        return;
+    }
+    // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
+    // This provides interim compatibility while the framework is transitioned to bundled ESM packages.
+    // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+    try {
+        // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
+        // Once TypeScript provides support for keeping the dynamic import this workaround can be
+        // changed to a direct dynamic import.
+        localizeToolsModule = await load_esm_1.loadEsmModule('@angular/localize/tools');
+    }
+    catch { }
+}
 async function createI18nPlugins(locale, translation, missingTranslation, shouldInline, localeDataContent) {
     const plugins = [];
-    const localizeDiag = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/diagnostics')));
+    const localizeDiag = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/diagnostics'))));
     const diagnostics = new localizeDiag.Diagnostics();
     if (shouldInline) {
-        const es2015 = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin')));
+        const es2015 = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'))));
         plugins.push(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}), {
             missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
         }));
-        const es5 = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin')));
+        const es5 = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'))));
         plugins.push(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         es5.makeEs5TranslatePlugin(diagnostics, (translation || {}), {
             missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
         }));
     }
-    const inlineLocale = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/locale_plugin')));
+    const inlineLocale = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/locale_plugin'))));
     plugins.push(inlineLocale.makeLocalePlugin(locale));
     if (localeDataContent) {
         plugins.push({
@@ -87,6 +118,7 @@ async function inlineLocales(options) {
     if (!hasLocalizeName && !options.setLocale) {
         return inlineCopyOnly(options);
     }
+    await loadLocalizeTools();
     let ast;
     try {
         ast = core_1.parseSync(options.code, {
@@ -157,8 +189,8 @@ async function inlineLocalesDirect(ast, options) {
         return { file: options.filename, diagnostics: [], count: 0 };
     }
     const { default: generate } = await Promise.resolve().then(() => __importStar(require('@babel/generator')));
-    const utils = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/source_file_utils')));
-    const localizeDiag = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/diagnostics')));
+    const utils = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/source_file_utils'))));
+    const localizeDiag = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/diagnostics'))));
     const diagnostics = new localizeDiag.Diagnostics();
     const positions = findLocalizePositions(ast, options, utils);
     if (positions.length === 0 && !options.setLocale) {

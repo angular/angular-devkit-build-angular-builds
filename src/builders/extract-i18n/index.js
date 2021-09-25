@@ -36,6 +36,7 @@ const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const webpack_1 = __importDefault(require("webpack"));
 const i18n_options_1 = require("../../utils/i18n-options");
+const load_esm_1 = require("../../utils/load-esm");
 const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const configs_1 = require("../../webpack/configs");
@@ -61,31 +62,31 @@ function getI18nOutfile(format) {
             throw new Error(`Unsupported format "${format}"`);
     }
 }
-async function getSerializer(format, sourceLocale, basePath, useLegacyIds, diagnostics) {
+async function getSerializer(localizeToolsModule, format, sourceLocale, basePath, useLegacyIds, diagnostics) {
     switch (format) {
         case schema_2.Format.Xmb:
-            const { XmbTranslationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer')));
+            const { XmbTranslationSerializer } = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/xmb_translation_serializer'))));
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return new XmbTranslationSerializer(basePath, useLegacyIds);
         case schema_2.Format.Xlf:
         case schema_2.Format.Xlif:
         case schema_2.Format.Xliff:
-            const { Xliff1TranslationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer')));
+            const { Xliff1TranslationSerializer } = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/xliff1_translation_serializer'))));
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return new Xliff1TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
         case schema_2.Format.Xlf2:
         case schema_2.Format.Xliff2:
-            const { Xliff2TranslationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer')));
+            const { Xliff2TranslationSerializer } = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/xliff2_translation_serializer'))));
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return new Xliff2TranslationSerializer(sourceLocale, basePath, useLegacyIds, {});
         case schema_2.Format.Json:
-            const { SimpleJsonTranslationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer')));
+            const { SimpleJsonTranslationSerializer } = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/json_translation_serializer'))));
             return new SimpleJsonTranslationSerializer(sourceLocale);
         case schema_2.Format.LegacyMigrate:
-            const { LegacyMessageIdMigrationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer')));
+            const { LegacyMessageIdMigrationSerializer } = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/legacy_message_id_migration_serializer'))));
             return new LegacyMessageIdMigrationSerializer(diagnostics);
         case schema_2.Format.Arb:
-            const { ArbTranslationSerializer } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer')));
+            const { ArbTranslationSerializer } = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/translation_files/arb_translation_serializer'))));
             const fileSystem = {
                 relative(from, to) {
                     return path.relative(from, to);
@@ -210,6 +211,17 @@ async function execute(options, context, transforms) {
             outputPath: outFile,
         };
     }
+    // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
+    // This provides interim compatibility while the framework is transitioned to bundled ESM packages.
+    // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+    let localizeToolsModule;
+    try {
+        // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
+        // Once TypeScript provides support for keeping the dynamic import this workaround can be
+        // changed to a direct dynamic import.
+        localizeToolsModule = await load_esm_1.loadEsmModule('@angular/localize/tools');
+    }
+    catch { }
     const webpackResult = await build_webpack_1.runWebpack((await ((_a = transforms === null || transforms === void 0 ? void 0 : transforms.webpackConfiguration) === null || _a === void 0 ? void 0 : _a.call(transforms, config))) || config, context, {
         logging: stats_1.createWebpackLoggingCallback(builderOptions, context.logger),
         webpackFactory: webpack_1.default,
@@ -221,7 +233,7 @@ async function execute(options, context, transforms) {
         return webpackResult;
     }
     const basePath = config.context || projectRoot;
-    const { checkDuplicateMessages } = await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/duplicates')));
+    const { checkDuplicateMessages } = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/duplicates'))));
     // The filesystem is used to create a relative path for each file
     // from the basePath.  This relative path is then used in the error message.
     const checkFileSystem = {
@@ -238,7 +250,7 @@ async function execute(options, context, transforms) {
         context.logger.warn(diagnostics.formatDiagnostics(''));
     }
     // Serialize all extracted messages
-    const serializer = await getSerializer(format, i18n.sourceLocale, basePath, useLegacyIds, diagnostics);
+    const serializer = await getSerializer(localizeToolsModule, format, i18n.sourceLocale, basePath, useLegacyIds, diagnostics);
     const content = serializer.serialize(ivyMessages);
     // Ensure directory exists
     const outputPath = path.dirname(outFile);
