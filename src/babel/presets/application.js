@@ -28,9 +28,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-function createI18nDiagnostics(reporter) {
-    // Babel currently is synchronous so import cannot be used
-    const diagnostics = new (require('@angular/localize/src/tools/src/diagnostics').Diagnostics)();
+function createI18nDiagnostics(reporter, 
+// TODO_ESM: Make `localizeToolExports` required once `@angular/localize` is published with the `tools` entry point
+localizeToolExports) {
+    // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+    const diagnosticsCtor = localizeToolExports
+        ? localizeToolExports.Diagnostics
+        : require('@angular/localize/src/tools/src/diagnostics').Diagnostics;
+    const diagnostics = new diagnosticsCtor();
     if (!reporter) {
         return diagnostics;
     }
@@ -61,27 +66,27 @@ function createI18nDiagnostics(reporter) {
     return diagnostics;
 }
 function createI18nPlugins(locale, translation, missingTranslationBehavior, diagnosticReporter, 
-// TODO_ESM: Make `pluginCreators` required once `@angular/localize` is published with the `tools` entry point
-pluginCreators) {
-    const diagnostics = createI18nDiagnostics(diagnosticReporter);
+// TODO_ESM: Make `localizeToolExports` required once `@angular/localize` is published with the `tools` entry point
+localizeToolExports) {
+    const diagnostics = createI18nDiagnostics(diagnosticReporter, localizeToolExports);
     const plugins = [];
     if (translation) {
         const { makeEs2015TranslatePlugin,
         // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-         } = pluginCreators !== null && pluginCreators !== void 0 ? pluginCreators : require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin');
+         } = localizeToolExports !== null && localizeToolExports !== void 0 ? localizeToolExports : require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin');
         plugins.push(makeEs2015TranslatePlugin(diagnostics, translation, {
             missingTranslation: missingTranslationBehavior,
         }));
         const { makeEs5TranslatePlugin,
         // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-         } = pluginCreators !== null && pluginCreators !== void 0 ? pluginCreators : require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin');
+         } = localizeToolExports !== null && localizeToolExports !== void 0 ? localizeToolExports : require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin');
         plugins.push(makeEs5TranslatePlugin(diagnostics, translation, {
             missingTranslation: missingTranslationBehavior,
         }));
     }
     const { makeLocalePlugin,
     // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-     } = pluginCreators !== null && pluginCreators !== void 0 ? pluginCreators : require('@angular/localize/src/tools/src/translate/source_files/locale_plugin');
+     } = localizeToolExports !== null && localizeToolExports !== void 0 ? localizeToolExports : require('@angular/localize/src/tools/src/translate/source_files/locale_plugin');
     plugins.push(makeLocalePlugin(locale));
     return plugins;
 }
@@ -136,8 +141,8 @@ function default_1(api, options) {
         needRuntimeTransform = true;
     }
     if (options.i18n) {
-        const { locale, missingTranslationBehavior, pluginCreators, translation } = options.i18n;
-        const i18nPlugins = createI18nPlugins(locale, translation, missingTranslationBehavior || 'ignore', options.diagnosticReporter, pluginCreators);
+        const { locale, missingTranslationBehavior, localizeToolExports, translation } = options.i18n;
+        const i18nPlugins = createI18nPlugins(locale, translation, missingTranslationBehavior || 'ignore', options.diagnosticReporter, localizeToolExports);
         plugins.push(...i18nPlugins);
     }
     if (options.forceAsyncTransformation) {

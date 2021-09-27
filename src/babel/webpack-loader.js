@@ -19,9 +19,9 @@ let needsLinking;
  */
 let linkerPluginCreator;
 /**
- * Cached instance of the localize Babel plugins factory functions.
+ * Cached instance of the `@angular/localize/tool` exports we rely on.
  */
-let i18nPluginCreators;
+let localizeToolExports;
 async function requiresLinking(path, source) {
     // @angular/core and @angular/compiler will cause false positives
     // Also, TypeScript files do not require linking
@@ -93,24 +93,24 @@ exports.default = babel_loader_1.custom(() => {
             if (i18n &&
                 !/[\\/]@angular[\\/](?:compiler|localize)/.test(this.resourcePath) &&
                 source.includes('$localize')) {
-                // Load the i18n plugin creators from the new `@angular/localize/tools` entry point.
+                // Load the localize tool exports from the new `@angular/localize/tools` entry point.
                 // This may fail during the transition to ESM due to the entry point not yet existing.
                 // During the transition, this will always attempt to load the entry point for each file.
                 // This will only occur during prerelease and will be automatically corrected once the new
                 // entry point exists.
                 // TODO_ESM: Make import failure an error once the `tools` entry point exists.
-                if (i18nPluginCreators === undefined) {
+                if (localizeToolExports === undefined) {
                     // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
                     // Once TypeScript provides support for keeping the dynamic import this workaround can be
                     // changed to a direct dynamic import.
                     try {
-                        i18nPluginCreators = await load_esm_1.loadEsmModule('@angular/localize/tools');
+                        localizeToolExports = await load_esm_1.loadEsmModule('@angular/localize/tools');
                     }
                     catch { }
                 }
                 customOptions.i18n = {
                     ...i18n,
-                    i18nPluginCreators,
+                    localizeToolExports,
                 };
                 shouldProcess = true;
             }
