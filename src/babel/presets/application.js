@@ -60,20 +60,28 @@ function createI18nDiagnostics(reporter) {
     };
     return diagnostics;
 }
-function createI18nPlugins(locale, translation, missingTranslationBehavior, diagnosticReporter) {
+function createI18nPlugins(locale, translation, missingTranslationBehavior, diagnosticReporter, 
+// TODO_ESM: Make `pluginCreators` required once `@angular/localize` is published with the `tools` entry point
+pluginCreators) {
     const diagnostics = createI18nDiagnostics(diagnosticReporter);
     const plugins = [];
     if (translation) {
-        const { makeEs2015TranslatePlugin, } = require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin');
+        const { makeEs2015TranslatePlugin,
+        // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+         } = pluginCreators !== null && pluginCreators !== void 0 ? pluginCreators : require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin');
         plugins.push(makeEs2015TranslatePlugin(diagnostics, translation, {
             missingTranslation: missingTranslationBehavior,
         }));
-        const { makeEs5TranslatePlugin, } = require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin');
+        const { makeEs5TranslatePlugin,
+        // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+         } = pluginCreators !== null && pluginCreators !== void 0 ? pluginCreators : require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin');
         plugins.push(makeEs5TranslatePlugin(diagnostics, translation, {
             missingTranslation: missingTranslationBehavior,
         }));
     }
-    const { makeLocalePlugin, } = require('@angular/localize/src/tools/src/translate/source_files/locale_plugin');
+    const { makeLocalePlugin,
+    // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
+     } = pluginCreators !== null && pluginCreators !== void 0 ? pluginCreators : require('@angular/localize/src/tools/src/translate/source_files/locale_plugin');
     plugins.push(makeLocalePlugin(locale));
     return plugins;
 }
@@ -128,8 +136,8 @@ function default_1(api, options) {
         needRuntimeTransform = true;
     }
     if (options.i18n) {
-        const { locale, missingTranslationBehavior, translation } = options.i18n;
-        const i18nPlugins = createI18nPlugins(locale, translation, missingTranslationBehavior || 'ignore', options.diagnosticReporter);
+        const { locale, missingTranslationBehavior, pluginCreators, translation } = options.i18n;
+        const i18nPlugins = createI18nPlugins(locale, translation, missingTranslationBehavior || 'ignore', options.diagnosticReporter, pluginCreators);
         plugins.push(...i18nPlugins);
     }
     if (options.forceAsyncTransformation) {
