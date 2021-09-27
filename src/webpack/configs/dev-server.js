@@ -143,8 +143,8 @@ function getSslConfig(root, options) {
     const { ssl, sslCert, sslKey } = options;
     if (ssl && sslCert && sslKey) {
         return {
-            key: fs_1.readFileSync(path_1.resolve(root, sslKey), 'utf-8'),
-            cert: fs_1.readFileSync(path_1.resolve(root, sslCert), 'utf-8'),
+            key: path_1.resolve(root, sslKey),
+            cert: path_1.resolve(root, sslCert),
         };
     }
     return ssl;
