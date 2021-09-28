@@ -26,38 +26,38 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const assert_1 = require("assert");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 function createI18nDiagnostics(reporter) {
-    // Babel currently is synchronous so import cannot be used
-    const diagnostics = new (require('@angular/localize/src/tools/src/diagnostics').Diagnostics)();
-    if (!reporter) {
-        return diagnostics;
-    }
-    const baseAdd = diagnostics.add;
-    diagnostics.add = function (type, message, ...args) {
-        if (type !== 'ignore') {
-            baseAdd.call(diagnostics, type, message, ...args);
-            reporter(type, message);
+    const diagnostics = new (class {
+        constructor() {
+            this.messages = [];
+            this.hasErrors = false;
         }
-    };
-    const baseError = diagnostics.error;
-    diagnostics.error = function (message, ...args) {
-        baseError.call(diagnostics, message, ...args);
-        reporter('error', message);
-    };
-    const baseWarn = diagnostics.warn;
-    diagnostics.warn = function (message, ...args) {
-        baseWarn.call(diagnostics, message, ...args);
-        reporter('warning', message);
-    };
-    const baseMerge = diagnostics.merge;
-    diagnostics.merge = function (other, ...args) {
-        baseMerge.call(diagnostics, other, ...args);
-        for (const diagnostic of other.messages) {
-            reporter(diagnostic.type, diagnostic.message);
+        add(type, message) {
+            if (type === 'ignore') {
+                return;
+            }
+            this.messages.push({ type, message });
+            this.hasErrors || (this.hasErrors = type === 'error');
+            reporter === null || reporter === void 0 ? void 0 : reporter(type, message);
         }
-    };
+        error(message) {
+            this.add('error', message);
+        }
+        warn(message) {
+            this.add('warning', message);
+        }
+        merge(other) {
+            for (const diagnostic of other.messages) {
+                this.add(diagnostic.type, diagnostic.message);
+            }
+        }
+        formatDiagnostics() {
+            assert_1.strict.fail('@angular/localize Diagnostics formatDiagnostics should not be called from within babel.');
+        }
+    })();
     return diagnostics;
 }
 function createI18nPlugins(locale, translation, missingTranslationBehavior, diagnosticReporter, 
