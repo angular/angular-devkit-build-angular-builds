@@ -35,7 +35,7 @@ function loader(source) {
         return source;
     }
     const targettedImports = files
-        .map((path) => `require('./${path.replace('.' + path_1.extname(path), '')}');`)
+        .map((path) => `require('./${path.replace('.' + (0, path_1.extname)(path), '')}');`)
         .join('\n');
     const mockedRequireContext = 'Object.assign(() => { }, { keys: () => [], resolve: () => undefined });\n';
     source = source.replace(/require\.context\(.*/, mockedRequireContext + targettedImports);

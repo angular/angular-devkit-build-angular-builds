@@ -50,7 +50,7 @@ async function extract(loaderContext, content, map, options) {
             // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
             // Once TypeScript provides support for keeping the dynamic import this workaround can be
             // changed to a direct dynamic import.
-            const localizeToolsModule = await load_esm_1.loadEsmModule('@angular/localize/tools');
+            const localizeToolsModule = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
             MessageExtractor = localizeToolsModule.MessageExtractor;
         }
         catch {

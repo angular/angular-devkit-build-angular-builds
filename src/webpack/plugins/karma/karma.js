@@ -69,11 +69,11 @@ const init = (config, emitter) => {
             ` be used from within Angular CLI and will not work correctly outside of it.`);
     }
     const options = config.buildWebpack.options;
-    const logger = config.buildWebpack.logger || node_1.createConsoleLogger();
+    const logger = config.buildWebpack.logger || (0, node_1.createConsoleLogger)();
     successCb = config.buildWebpack.successCb;
     failureCb = config.buildWebpack.failureCb;
     // Add a reporter that fixes sourcemap urls.
-    if (index_1.normalizeSourceMaps(options.sourceMap).scripts) {
+    if ((0, index_1.normalizeSourceMaps)(options.sourceMap).scripts) {
         config.reporters.unshift('@angular-devkit/build-angular--sourcemap-reporter');
         // Code taken from https://github.com/tschaub/karma-source-map-support.
         // We can't use it directly because we need to add it conditionally in this file, and karma
@@ -124,7 +124,7 @@ const init = (config, emitter) => {
     // Files need to be served from a custom path for Karma.
     webpackConfig.output.path = `/${KARMA_APPLICATION_PATH}/`;
     webpackConfig.output.publicPath = `/${KARMA_APPLICATION_PATH}/`;
-    const compiler = webpack_1.default(webpackConfig, (error, stats) => {
+    const compiler = (0, webpack_1.default)(webpackConfig, (error, stats) => {
         var _a;
         if (error) {
             throw error;
@@ -137,7 +137,7 @@ const init = (config, emitter) => {
                 errors: true,
                 warnings: true,
             });
-            logger.error(stats_1.statsErrorsToString(statsJson, { colors: true }));
+            logger.error((0, stats_1.statsErrorsToString)(statsJson, { colors: true }));
             // Notify potential listeners of the compile error.
             emitter.emit('compile_error', {
                 errors: (_a = statsJson.errors) === null || _a === void 0 ? void 0 : _a.map((e) => e.message),

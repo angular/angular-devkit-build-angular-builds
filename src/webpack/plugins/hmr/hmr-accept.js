@@ -14,7 +14,7 @@ function default_1(mod) {
     if (!mod['hot']) {
         return;
     }
-    if (!core_1.isDevMode()) {
+    if (!(0, core_1.isDevMode)()) {
         console.error(`[NG HMR] Cannot use HMR when Angular is running in production mode. To prevent production mode, do not call 'enableProdMode()'.`);
         return;
     }
@@ -29,7 +29,7 @@ function default_1(mod) {
             return;
         }
         // Reset JIT compiled components cache
-        core_1.ɵresetCompiledComponents();
+        (0, core_1.ɵresetCompiledComponents)();
         const appRoot = getAppRoot();
         if (!appRoot) {
             return;
@@ -72,7 +72,7 @@ function default_1(mod) {
             }
             // Wait until the application isStable to restore the form values
             newAppRef.isStable
-                .pipe(operators_1.filter((isStable) => !!isStable), operators_1.take(1))
+                .pipe((0, operators_1.filter)((isStable) => !!isStable), (0, operators_1.take)(1))
                 .subscribe(() => restoreFormValues(oldInputs, oldOptions));
         }).observe(bodyElement, {
             attributes: true,

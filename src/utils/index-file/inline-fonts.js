@@ -40,7 +40,7 @@ const environment_options_1 = require("../environment-options");
 const html_rewriting_stream_1 = require("./html-rewriting-stream");
 const cacheFontsPath = environment_options_1.cachingDisabled
     ? undefined
-    : cache_path_1.findCachePath('angular-build-fonts');
+    : (0, cache_path_1.findCachePath)('angular-build-fonts');
 const packageVersion = require('../../../package.json').version;
 const SUPPORTED_PROVIDERS = {
     'fonts.googleapis.com': {
@@ -59,7 +59,7 @@ class InlineFontsProcessor {
         const hrefList = [];
         const existingPreconnect = new Set();
         // Collector link tags with href
-        const { rewriter: collectorStream } = await html_rewriting_stream_1.htmlRewritingStream(content);
+        const { rewriter: collectorStream } = await (0, html_rewriting_stream_1.htmlRewritingStream)(content);
         collectorStream.on('startTag', (tag) => {
             const { tagName, attrs } = tag;
             if (tagName !== 'link') {
@@ -115,7 +115,7 @@ class InlineFontsProcessor {
             return content;
         }
         // Replace link with style tag.
-        const { rewriter, transformedContent } = await html_rewriting_stream_1.htmlRewritingStream(content);
+        const { rewriter, transformedContent } = await (0, html_rewriting_stream_1.htmlRewritingStream)(content);
         rewriter.on('startTag', (tag) => {
             const { tagName, attrs } = tag;
             switch (tagName) {
@@ -156,7 +156,7 @@ class InlineFontsProcessor {
         let agent;
         const httpsProxy = (_a = process.env.HTTPS_PROXY) !== null && _a !== void 0 ? _a : process.env.https_proxy;
         if (httpsProxy) {
-            agent = https_proxy_agent_1.default(httpsProxy);
+            agent = (0, https_proxy_agent_1.default)(httpsProxy);
         }
         const data = await new Promise((resolve, reject) => {
             let rawResponse = '';

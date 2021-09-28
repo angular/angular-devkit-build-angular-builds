@@ -56,12 +56,12 @@ async function getCommonConfig(wco) {
     // Load ESM `@angular/compiler-cli` using the TypeScript dynamic import workaround.
     // Once TypeScript provides support for keeping the dynamic import this workaround can be
     // changed to a direct dynamic import.
-    const compilerCliModule = await load_esm_1.loadEsmModule('@angular/compiler-cli');
+    const compilerCliModule = await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli');
     // If it is not ESM then the values needed will be stored in the `default` property.
     // TODO_ESM: This can be removed once `@angular/compiler-cli` is ESM only.
     const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT, VERSION: NG_VERSION, } = (compilerCliModule.GLOBAL_DEFS_FOR_TERSER ? compilerCliModule : compilerCliModule.default);
     // determine hashing format
-    const hashFormat = helpers_1.getOutputHashFormat(buildOptions.outputHashing || 'none');
+    const hashFormat = (0, helpers_1.getOutputHashFormat)(buildOptions.outputHashing || 'none');
     const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);
     if (buildOptions.progress) {
         const spinner = new spinner_1.Spinner();
@@ -115,10 +115,10 @@ async function getCommonConfig(wco) {
         }));
     }
     // process global scripts
-    const globalScriptsByBundleName = helpers_1.normalizeExtraEntryPoints(buildOptions.scripts, 'scripts').reduce((prev, curr) => {
+    const globalScriptsByBundleName = (0, helpers_1.normalizeExtraEntryPoints)(buildOptions.scripts, 'scripts').reduce((prev, curr) => {
         const { bundleName, inject, input } = curr;
         let resolvedPath = path.resolve(root, input);
-        if (!fs_1.existsSync(resolvedPath)) {
+        if (!(0, fs_1.existsSync)(resolvedPath)) {
             try {
                 resolvedPath = require.resolve(input, { paths: [root] });
             }
@@ -223,12 +223,12 @@ async function getCommonConfig(wco) {
                     try {
                         await fs_1.promises.mkdir(path.dirname(statsOutputPath), { recursive: true });
                         await new Promise((resolve, reject) => stringifyStream(data)
-                            .pipe(fs_1.createWriteStream(statsOutputPath))
+                            .pipe((0, fs_1.createWriteStream)(statsOutputPath))
                             .on('close', resolve)
                             .on('error', reject));
                     }
                     catch (error) {
-                        webpack_diagnostics_1.addError(stats.compilation, `Unable to write stats file: ${error.message || 'unknown error'}`);
+                        (0, webpack_diagnostics_1.addError)(stats.compilation, `Unable to write stats file: ${error.message || 'unknown error'}`);
                     }
                 });
             }
@@ -290,7 +290,7 @@ async function getCommonConfig(wco) {
             chunkFilename: `[name]${hashFormat.chunk}.js`,
         },
         watch: buildOptions.watch,
-        watchOptions: helpers_1.getWatchOptions(buildOptions.poll),
+        watchOptions: (0, helpers_1.getWatchOptions)(buildOptions.poll),
         performance: {
             hints: false,
         },
@@ -329,7 +329,7 @@ async function getCommonConfig(wco) {
                         {
                             loader: require.resolve('../../babel/webpack-loader'),
                             options: {
-                                cacheDirectory: cache_path_1.findCachePath('babel-webpack'),
+                                cacheDirectory: (0, cache_path_1.findCachePath)('babel-webpack'),
                                 scriptTarget: wco.scriptTarget,
                                 aot: buildOptions.aot,
                                 optimize: buildOptions.buildOptimizer,
@@ -369,12 +369,12 @@ function getCacheSettings(wco, supportedBrowsers, angularVersion) {
         const packageVersion = require('../../../package.json').version;
         return {
             type: 'filesystem',
-            cacheDirectory: cache_path_1.findCachePath('angular-webpack'),
+            cacheDirectory: (0, cache_path_1.findCachePath)('angular-webpack'),
             maxMemoryGenerations: 1,
             // We use the versions and build options as the cache name. The Webpack configurations are too
             // dynamic and shared among different build types: test, build and serve.
             // None of which are "named".
-            name: crypto_1.createHash('sha1')
+            name: (0, crypto_1.createHash)('sha1')
                 .update(angularVersion)
                 .update(packageVersion)
                 .update(wco.projectRoot)

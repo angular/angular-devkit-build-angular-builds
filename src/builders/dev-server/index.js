@@ -71,13 +71,13 @@ const devServerBuildOverriddenKeys = [
 function serveWebpackBrowser(options, context, transforms = {}) {
     // Check Angular version.
     const { logger, workspaceRoot } = context;
-    version_1.assertCompatibleAngularVersion(workspaceRoot);
-    const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
+    (0, version_1.assertCompatibleAngularVersion)(workspaceRoot);
+    const browserTarget = (0, architect_1.targetFromTargetString)(options.browserTarget);
     async function setup() {
         var _a, _b;
         // Get the browser configuration from the target name.
         const rawBrowserOptions = (await context.getTargetOptions(browserTarget));
-        options.port = await check_port_1.checkPort((_a = options.port) !== null && _a !== void 0 ? _a : 4200, options.host || 'localhost');
+        options.port = await (0, check_port_1.checkPort)((_a = options.port) !== null && _a !== void 0 ? _a : 4200, options.host || 'localhost');
         // Override options we need to override, if defined.
         const overrides = Object.keys(options)
             .filter((key) => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
@@ -129,7 +129,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         rawBrowserOptions.allowedCommonJsDependencies.push('strip-ansi');
         const browserName = await context.getBuilderNameForTarget(browserTarget);
         const browserOptions = (await context.validateOptions({ ...rawBrowserOptions, ...overrides }, browserName));
-        const { styles, scripts } = utils_1.normalizeOptimization(browserOptions.optimization);
+        const { styles, scripts } = (0, utils_1.normalizeOptimization)(browserOptions.optimization);
         if (scripts || styles.minify) {
             logger.error(core_1.tags.stripIndents `
         ****************************************************************************************
@@ -140,15 +140,15 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         ****************************************************************************************
       `);
         }
-        const { config, projectRoot, i18n } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext(browserOptions, context, (wco) => [
-            configs_1.getDevServerConfig(wco),
-            configs_1.getCommonConfig(wco),
-            configs_1.getBrowserConfig(wco),
-            configs_1.getStylesConfig(wco),
-            configs_1.getStatsConfig(wco),
-            configs_1.getAnalyticsConfig(wco, context),
-            configs_1.getTypeScriptConfig(wco),
-            browserOptions.webWorkerTsConfig ? configs_1.getWorkerConfig(wco) : {},
+        const { config, projectRoot, i18n } = await (0, webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext)(browserOptions, context, (wco) => [
+            (0, configs_1.getDevServerConfig)(wco),
+            (0, configs_1.getCommonConfig)(wco),
+            (0, configs_1.getBrowserConfig)(wco),
+            (0, configs_1.getStylesConfig)(wco),
+            (0, configs_1.getStatsConfig)(wco),
+            (0, configs_1.getAnalyticsConfig)(wco, context),
+            (0, configs_1.getTypeScriptConfig)(wco),
+            browserOptions.webWorkerTsConfig ? (0, configs_1.getWorkerConfig)(wco) : {},
         ], devServerOptions);
         if (!config.devServer) {
             throw new Error('Webpack Dev Server configuration was not set.');
@@ -180,11 +180,11 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             locale,
         };
     }
-    return rxjs_1.from(setup()).pipe(operators_1.switchMap(({ browserOptions, webpackConfig, locale }) => {
+    return (0, rxjs_1.from)(setup()).pipe((0, operators_1.switchMap)(({ browserOptions, webpackConfig, locale }) => {
         var _a, _b;
         if (browserOptions.index) {
             const { scripts = [], styles = [], baseHref } = browserOptions;
-            const entrypoints = package_chunk_sort_1.generateEntryPoints({
+            const entrypoints = (0, package_chunk_sort_1.generateEntryPoints)({
                 scripts,
                 styles,
                 // The below is needed as otherwise HMR for CSS will break.
@@ -194,23 +194,23 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             });
             (_b = webpackConfig.plugins) !== null && _b !== void 0 ? _b : (webpackConfig.plugins = []);
             webpackConfig.plugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({
-                indexPath: path.resolve(workspaceRoot, webpack_browser_config_1.getIndexInputFile(browserOptions.index)),
-                outputPath: webpack_browser_config_1.getIndexOutputFile(browserOptions.index),
+                indexPath: path.resolve(workspaceRoot, (0, webpack_browser_config_1.getIndexInputFile)(browserOptions.index)),
+                outputPath: (0, webpack_browser_config_1.getIndexOutputFile)(browserOptions.index),
                 baseHref,
                 entrypoints,
                 deployUrl: browserOptions.deployUrl,
                 sri: browserOptions.subresourceIntegrity,
                 postTransform: transforms.indexHtml,
-                optimization: utils_1.normalizeOptimization(browserOptions.optimization),
+                optimization: (0, utils_1.normalizeOptimization)(browserOptions.optimization),
                 crossOrigin: browserOptions.crossOrigin,
                 lang: locale,
             }));
         }
-        return build_webpack_1.runWebpackDevServer(webpackConfig, context, {
-            logging: transforms.logging || stats_1.createWebpackLoggingCallback(browserOptions, logger),
+        return (0, build_webpack_1.runWebpackDevServer)(webpackConfig, context, {
+            logging: transforms.logging || (0, stats_1.createWebpackLoggingCallback)(browserOptions, logger),
             webpackFactory: require('webpack'),
             webpackDevServerFactory: require('webpack-dev-server'),
-        }).pipe(operators_1.concatMap(async (buildEvent, index) => {
+        }).pipe((0, operators_1.concatMap)(async (buildEvent, index) => {
             var _a, _b;
             // Resolve serve address.
             const serverAddress = url.format({
@@ -277,7 +277,7 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
             {
                 loader: require.resolve('../../babel/webpack-loader'),
                 options: {
-                    cacheDirectory: cache_path_1.findCachePath('babel-dev-server-i18n'),
+                    cacheDirectory: (0, cache_path_1.findCachePath)('babel-dev-server-i18n'),
                     cacheIdentifier: JSON.stringify({
                         locale,
                         translationIntegrity: localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.files.map((file) => file.integrity),
@@ -297,4 +297,4 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
     }
     rules.push(i18nRule);
 }
-exports.default = architect_1.createBuilder(serveWebpackBrowser);
+exports.default = (0, architect_1.createBuilder)(serveWebpackBrowser);

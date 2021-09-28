@@ -28,7 +28,7 @@ class BuildBrowserFeatures {
             'last 2 iOS major versions',
             'Firefox ESR',
         ];
-        this.supportedBrowsers = browserslist_1.default(undefined, { path: this.projectRoot });
+        this.supportedBrowsers = (0, browserslist_1.default)(undefined, { path: this.projectRoot });
     }
     /**
      * True, when a browser feature is supported partially or fully.
@@ -39,7 +39,7 @@ class BuildBrowserFeatures {
         // a: feature is partially supported
         // x: feature is prefixed
         const criteria = ['y', 'a'];
-        const data = caniuse_lite_1.feature(caniuse_lite_1.features[featureId]);
+        const data = (0, caniuse_lite_1.feature)(caniuse_lite_1.features[featureId]);
         return !this.supportedBrowsers.some((browser) => {
             const [agentId, version] = browser.split(' ');
             const browserData = data.stats[agentId];

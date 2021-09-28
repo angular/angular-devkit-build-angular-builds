@@ -13,12 +13,12 @@ const normalize_file_replacements_1 = require("./normalize-file-replacements");
 const normalize_optimization_1 = require("./normalize-optimization");
 const normalize_source_maps_1 = require("./normalize-source-maps");
 function normalizeBrowserSchema(root, projectRoot, sourceRoot, options) {
-    const normalizedSourceMapOptions = normalize_source_maps_1.normalizeSourceMaps(options.sourceMap || false);
+    const normalizedSourceMapOptions = (0, normalize_source_maps_1.normalizeSourceMaps)(options.sourceMap || false);
     return {
         ...options,
-        assets: normalize_asset_patterns_1.normalizeAssetPatterns(options.assets || [], root, projectRoot, sourceRoot),
-        fileReplacements: normalize_file_replacements_1.normalizeFileReplacements(options.fileReplacements || [], root),
-        optimization: normalize_optimization_1.normalizeOptimization(options.optimization),
+        assets: (0, normalize_asset_patterns_1.normalizeAssetPatterns)(options.assets || [], root, projectRoot, sourceRoot),
+        fileReplacements: (0, normalize_file_replacements_1.normalizeFileReplacements)(options.fileReplacements || [], root),
+        optimization: (0, normalize_optimization_1.normalizeOptimization)(options.optimization),
         sourceMap: normalizedSourceMapOptions,
         preserveSymlinks: options.preserveSymlinks === undefined
             ? process.execArgv.includes('--preserve-symlinks')

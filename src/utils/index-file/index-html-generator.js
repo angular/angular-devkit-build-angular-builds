@@ -47,7 +47,7 @@ class IndexHtmlGenerator {
         this.plugins = [augmentIndexHtmlPlugin(this), ...extraPlugins, postTransformPlugin(this)];
     }
     async process(options) {
-        let content = strip_bom_1.stripBom(await this.readIndex(this.options.indexPath));
+        let content = (0, strip_bom_1.stripBom)(await this.readIndex(this.options.indexPath));
         const warnings = [];
         const errors = [];
         for (const plugin of this.plugins) {
@@ -83,7 +83,7 @@ function augmentIndexHtmlPlugin(generator) {
     const { deployUrl, crossOrigin, sri = false, entrypoints } = generator.options;
     return async (html, options) => {
         const { lang, baseHref, outputPath = '', files } = options;
-        return augment_index_html_1.augmentIndexHtml({
+        return (0, augment_index_html_1.augmentIndexHtml)({
             html,
             baseHref,
             deployUrl,
@@ -91,7 +91,7 @@ function augmentIndexHtmlPlugin(generator) {
             sri,
             lang,
             entrypoints,
-            loadOutputFile: (filePath) => generator.readAsset(path_1.join(outputPath, filePath)),
+            loadOutputFile: (filePath) => generator.readAsset((0, path_1.join)(outputPath, filePath)),
             files,
         });
     };

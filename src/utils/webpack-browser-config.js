@@ -42,7 +42,7 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
         throw new Error(`The 'buildOptimizer' option cannot be used without 'aot'.`);
     }
     const tsConfigPath = path.resolve(workspaceRoot, options.tsConfig);
-    const tsConfig = await read_tsconfig_1.readTsconfig(tsConfigPath);
+    const tsConfig = await (0, read_tsconfig_1.readTsconfig)(tsConfigPath);
     const ts = await Promise.resolve().then(() => __importStar(require('typescript')));
     const scriptTarget = tsConfig.options.target || ts.ScriptTarget.ES5;
     const buildOptions = { ...options, ...extraBuildOptions };
@@ -56,15 +56,15 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
         tsConfigPath,
         scriptTarget,
     };
-    wco.buildOptions.progress = utils_1.defaultProgress(wco.buildOptions.progress);
+    wco.buildOptions.progress = (0, utils_1.defaultProgress)(wco.buildOptions.progress);
     const partials = await Promise.all(webpackPartialGenerator(wco));
-    const webpackConfig = webpack_merge_1.merge(partials);
+    const webpackConfig = (0, webpack_merge_1.merge)(partials);
     return webpackConfig;
 }
 exports.generateWebpackConfig = generateWebpackConfig;
 async function generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, extraBuildOptions = {}) {
     var _a;
-    const { buildOptions, i18n } = await i18n_options_1.configureI18nBuild(context, options);
+    const { buildOptions, i18n } = await (0, i18n_options_1.configureI18nBuild)(context, options);
     let target = typescript_1.ScriptTarget.ES5;
     const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, (wco) => {
         target = wco.scriptTarget;
@@ -111,15 +111,15 @@ async function generateBrowserWebpackConfigFromContext(options, context, webpack
     if (!projectName) {
         throw new Error('The builder requires a target.');
     }
-    const workspaceRoot = core_1.normalize(context.workspaceRoot);
+    const workspaceRoot = (0, core_1.normalize)(context.workspaceRoot);
     const projectMetadata = await context.getProjectMetadata(projectName);
-    const projectRoot = core_1.resolve(workspaceRoot, core_1.normalize(projectMetadata.root || ''));
+    const projectRoot = (0, core_1.resolve)(workspaceRoot, (0, core_1.normalize)(projectMetadata.root || ''));
     const projectSourceRoot = projectMetadata.sourceRoot;
     const sourceRoot = projectSourceRoot
-        ? core_1.resolve(workspaceRoot, core_1.normalize(projectSourceRoot))
+        ? (0, core_1.resolve)(workspaceRoot, (0, core_1.normalize)(projectSourceRoot))
         : undefined;
-    const normalizedOptions = utils_1.normalizeBrowserSchema(workspaceRoot, projectRoot, sourceRoot, options);
-    const config = await generateWebpackConfig(core_1.getSystemPath(workspaceRoot), core_1.getSystemPath(projectRoot), sourceRoot && core_1.getSystemPath(sourceRoot), normalizedOptions, webpackPartialGenerator, context.logger, extraBuildOptions);
+    const normalizedOptions = (0, utils_1.normalizeBrowserSchema)(workspaceRoot, projectRoot, sourceRoot, options);
+    const config = await generateWebpackConfig((0, core_1.getSystemPath)(workspaceRoot), (0, core_1.getSystemPath)(projectRoot), sourceRoot && (0, core_1.getSystemPath)(sourceRoot), normalizedOptions, webpackPartialGenerator, context.logger, extraBuildOptions);
     // If builder watch support is present in the context, add watch plugin
     // This is internal only and currently only used for testing
     const watcherFactory = context.watcherFactory;
@@ -131,8 +131,8 @@ async function generateBrowserWebpackConfigFromContext(options, context, webpack
     }
     return {
         config,
-        projectRoot: core_1.getSystemPath(projectRoot),
-        projectSourceRoot: sourceRoot && core_1.getSystemPath(sourceRoot),
+        projectRoot: (0, core_1.getSystemPath)(projectRoot),
+        projectSourceRoot: sourceRoot && (0, core_1.getSystemPath)(sourceRoot),
     };
 }
 exports.generateBrowserWebpackConfigFromContext = generateBrowserWebpackConfigFromContext;

@@ -24,8 +24,8 @@ class Spinner {
     constructor(text) {
         /** When false, only fail messages will be displayed. */
         this.enabled = true;
-        _Spinner_isTTY.set(this, tty_1.isTTY());
-        this.spinner = ora_1.default({
+        _Spinner_isTTY.set(this, (0, tty_1.isTTY)());
+        this.spinner = (0, ora_1.default)({
             text,
             // The below 2 options are needed because otherwise CTRL+C will be delayed
             // when the underlying process is sync.

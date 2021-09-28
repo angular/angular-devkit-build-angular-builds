@@ -56,15 +56,15 @@ function findMatchingTests(pattern, cwd, relativePathToMain) {
     }
     // special logic when pattern does not look like a glob
     if (!glob.hasMagic(pattern)) {
-        if (is_directory_1.isDirectory(path_1.join(cwd, pattern))) {
+        if ((0, is_directory_1.isDirectory)((0, path_1.join)(cwd, pattern))) {
             pattern = `${pattern}/**/*.spec.@(ts|tsx)`;
         }
         else {
             // see if matching spec file exists
-            const extension = path_1.extname(pattern);
-            const matchingSpec = `${path_1.basename(pattern, extension)}.spec${extension}`;
-            if (fs_1.existsSync(path_1.join(cwd, path_1.dirname(pattern), matchingSpec))) {
-                pattern = path_1.join(path_1.dirname(pattern), matchingSpec).replace(/\\/g, '/');
+            const extension = (0, path_1.extname)(pattern);
+            const matchingSpec = `${(0, path_1.basename)(pattern, extension)}.spec${extension}`;
+            if ((0, fs_1.existsSync)((0, path_1.join)(cwd, (0, path_1.dirname)(pattern), matchingSpec))) {
+                pattern = (0, path_1.join)((0, path_1.dirname)(pattern), matchingSpec).replace(/\\/g, '/');
             }
         }
     }

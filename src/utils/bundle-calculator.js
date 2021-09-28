@@ -259,10 +259,10 @@ function* checkThresholds(thresholds, size, label) {
                 if (size <= threshold.limit) {
                     continue;
                 }
-                const sizeDifference = stats_1.formatSize(size - threshold.limit);
+                const sizeDifference = (0, stats_1.formatSize)(size - threshold.limit);
                 yield {
                     severity: threshold.severity,
-                    message: `${label} exceeded maximum budget. Budget ${stats_1.formatSize(threshold.limit)} was not met by ${sizeDifference} with a total of ${stats_1.formatSize(size)}.`,
+                    message: `${label} exceeded maximum budget. Budget ${(0, stats_1.formatSize)(threshold.limit)} was not met by ${sizeDifference} with a total of ${(0, stats_1.formatSize)(size)}.`,
                 };
                 break;
             }
@@ -270,10 +270,10 @@ function* checkThresholds(thresholds, size, label) {
                 if (size >= threshold.limit) {
                     continue;
                 }
-                const sizeDifference = stats_1.formatSize(threshold.limit - size);
+                const sizeDifference = (0, stats_1.formatSize)(threshold.limit - size);
                 yield {
                     severity: threshold.severity,
-                    message: `${label} failed to meet minimum budget. Budget ${stats_1.formatSize(threshold.limit)} was not met by ${sizeDifference} with a total of ${stats_1.formatSize(size)}.`,
+                    message: `${label} failed to meet minimum budget. Budget ${(0, stats_1.formatSize)(threshold.limit)} was not met by ${sizeDifference} with a total of ${(0, stats_1.formatSize)(size)}.`,
                 };
                 break;
             }

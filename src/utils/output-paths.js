@@ -14,12 +14,12 @@ function ensureOutputPaths(baseOutputPath, i18n) {
     const outputPaths = i18n.shouldInline
         ? [...i18n.inlineLocales].map((l) => [
             l,
-            i18n.flatOutput ? baseOutputPath : path_1.join(baseOutputPath, l),
+            i18n.flatOutput ? baseOutputPath : (0, path_1.join)(baseOutputPath, l),
         ])
         : [['', baseOutputPath]];
     for (const [, outputPath] of outputPaths) {
-        if (!fs_1.existsSync(outputPath)) {
-            fs_1.mkdirSync(outputPath, { recursive: true });
+        if (!(0, fs_1.existsSync)(outputPath)) {
+            (0, fs_1.mkdirSync)(outputPath, { recursive: true });
         }
     }
     return new Map(outputPaths);

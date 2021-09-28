@@ -36,7 +36,7 @@ const service_worker_1 = require("../../utils/service-worker");
 const spinner_1 = require("../../utils/spinner");
 async function _renderUniversal(options, context, browserResult, serverResult, spinner) {
     // Get browser target options.
-    const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
+    const browserTarget = (0, architect_1.targetFromTargetString)(options.browserTarget);
     const rawBrowserOptions = (await context.getTargetOptions(browserTarget));
     const browserBuilderName = await context.getBuilderNameForTarget(browserTarget);
     const browserOptions = await context.validateOptions(rawBrowserOptions, browserBuilderName);
@@ -49,8 +49,8 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
         throw new Error('The builder requires a target.');
     }
     const projectMetadata = await context.getProjectMetadata(projectName);
-    const projectRoot = core_1.resolve(core_1.normalize(root), core_1.normalize(projectMetadata.root || ''));
-    const { styles } = utils_1.normalizeOptimization(browserOptions.optimization);
+    const projectRoot = (0, core_1.resolve)((0, core_1.normalize)(root), (0, core_1.normalize)(projectMetadata.root || ''));
+    const { styles } = (0, utils_1.normalizeOptimization)(browserOptions.optimization);
     const inlineCriticalCssProcessor = styles.inlineCritical
         ? new inline_critical_css_1.InlineCriticalCssProcessor({
             minify: styles.minify,
@@ -91,7 +91,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
         }
         await fs.promises.writeFile(outputIndexPath, html);
         if (browserOptions.serviceWorker) {
-            await service_worker_1.augmentAppWithServiceWorker(core_1.normalize(root), projectRoot, core_1.normalize(outputPath), browserOptions.baseHref || '/', browserOptions.ngswConfigPath);
+            await (0, service_worker_1.augmentAppWithServiceWorker)((0, core_1.normalize)(root), projectRoot, (0, core_1.normalize)(outputPath), browserOptions.baseHref || '/', browserOptions.ngswConfigPath);
         }
     }
     return browserResult;
@@ -113,12 +113,12 @@ async function _getServerModuleBundlePath(options, context, serverResult, browse
     return path.join(outputPath, maybeMain);
 }
 async function _appShellBuilder(options, context) {
-    const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
-    const serverTarget = architect_1.targetFromTargetString(options.serverTarget);
+    const browserTarget = (0, architect_1.targetFromTargetString)(options.browserTarget);
+    const serverTarget = (0, architect_1.targetFromTargetString)(options.serverTarget);
     // Never run the browser target in watch mode.
     // If service worker is needed, it will be added in _renderUniversal();
     const browserOptions = (await context.getTargetOptions(browserTarget));
-    const optimization = utils_1.normalizeOptimization(browserOptions.optimization);
+    const optimization = (0, utils_1.normalizeOptimization)(browserOptions.optimization);
     optimization.styles.inlineCritical = false;
     const browserTargetRun = await context.scheduleTarget(browserTarget, {
         watch: false,
@@ -154,4 +154,4 @@ async function _appShellBuilder(options, context) {
         await Promise.all([browserTargetRun.stop(), serverTargetRun.stop()]);
     }
 }
-exports.default = architect_1.createBuilder(_appShellBuilder);
+exports.default = (0, architect_1.createBuilder)(_appShellBuilder);

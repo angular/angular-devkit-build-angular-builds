@@ -32,7 +32,7 @@ class CommonJsUsageWarnPlugin {
                     const { dependencies, rawRequest } = module;
                     if (!rawRequest ||
                         rawRequest.startsWith('.') ||
-                        path_1.isAbsolute(rawRequest) ||
+                        (0, path_1.isAbsolute)(rawRequest) ||
                         this.allowedDependencies.has(rawRequest) ||
                         this.allowedDependencies.has(this.rawRequestToPackageName(rawRequest)) ||
                         rawRequest.startsWith('@angular/common/locales/')) {
@@ -70,7 +70,7 @@ class CommonJsUsageWarnPlugin {
                                 'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
                             // Avoid showing the same warning multiple times when in 'watch' mode.
                             if (!this.shownWarnings.has(warning)) {
-                                webpack_diagnostics_1.addWarning(compilation, warning);
+                                (0, webpack_diagnostics_1.addWarning)(compilation, warning);
                                 this.shownWarnings.add(warning);
                             }
                         }

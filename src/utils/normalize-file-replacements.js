@@ -22,11 +22,11 @@ function normalizeFileReplacements(fileReplacements, root) {
     }
     const normalizedReplacement = fileReplacements.map((replacement) => normalizeFileReplacement(replacement, root));
     for (const { replace, with: replacementWith } of normalizedReplacement) {
-        if (!fs_1.existsSync(core_1.getSystemPath(replacementWith))) {
-            throw new MissingFileReplacementException(core_1.getSystemPath(replacementWith));
+        if (!(0, fs_1.existsSync)((0, core_1.getSystemPath)(replacementWith))) {
+            throw new MissingFileReplacementException((0, core_1.getSystemPath)(replacementWith));
         }
-        if (!fs_1.existsSync(core_1.getSystemPath(replace))) {
-            throw new MissingFileReplacementException(core_1.getSystemPath(replace));
+        if (!(0, fs_1.existsSync)((0, core_1.getSystemPath)(replace))) {
+            throw new MissingFileReplacementException((0, core_1.getSystemPath)(replace));
         }
     }
     return normalizedReplacement;
@@ -36,22 +36,22 @@ function normalizeFileReplacement(fileReplacement, root) {
     let replacePath;
     let withPath;
     if (fileReplacement.src && fileReplacement.replaceWith) {
-        replacePath = core_1.normalize(fileReplacement.src);
-        withPath = core_1.normalize(fileReplacement.replaceWith);
+        replacePath = (0, core_1.normalize)(fileReplacement.src);
+        withPath = (0, core_1.normalize)(fileReplacement.replaceWith);
     }
     else if (fileReplacement.replace && fileReplacement.with) {
-        replacePath = core_1.normalize(fileReplacement.replace);
-        withPath = core_1.normalize(fileReplacement.with);
+        replacePath = (0, core_1.normalize)(fileReplacement.replace);
+        withPath = (0, core_1.normalize)(fileReplacement.with);
     }
     else {
         throw new Error(`Invalid file replacement: ${JSON.stringify(fileReplacement)}`);
     }
     // TODO: For 7.x should this only happen if not absolute?
     if (root) {
-        replacePath = core_1.join(root, replacePath);
+        replacePath = (0, core_1.join)(root, replacePath);
     }
     if (root) {
-        withPath = core_1.join(root, withPath);
+        withPath = (0, core_1.join)(root, withPath);
     }
     return { replace: replacePath, with: withPath };
 }

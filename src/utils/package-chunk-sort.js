@@ -12,7 +12,7 @@ const helpers_1 = require("../webpack/utils/helpers");
 function generateEntryPoints(options) {
     // Add all styles/scripts, except lazy-loaded ones.
     const extraEntryPoints = (extraEntryPoints, defaultBundleName) => {
-        const entryPoints = helpers_1.normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName)
+        const entryPoints = (0, helpers_1.normalizeExtraEntryPoints)(extraEntryPoints, defaultBundleName)
             .filter((entry) => entry.inject)
             .map((entry) => entry.bundleName);
         // remove duplicates

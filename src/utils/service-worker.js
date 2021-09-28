@@ -47,7 +47,7 @@ class CliFilesystem {
     hash(file) {
         return new Promise((resolve, reject) => {
             const hash = crypto.createHash('sha1').setEncoding('hex');
-            stream_1.pipeline(fs_1.createReadStream(this._resolve(file)), hash, (error) => error ? reject(error) : resolve(hash.read()));
+            (0, stream_1.pipeline)((0, fs_1.createReadStream)(this._resolve(file)), hash, (error) => error ? reject(error) : resolve(hash.read()));
         });
     }
     write(file, content) {
@@ -74,24 +74,24 @@ class CliFilesystem {
     }
 }
 async function augmentAppWithServiceWorker(projectRoot, appRoot, outputPath, baseHref, ngswConfigPath) {
-    const distPath = core_1.getSystemPath(core_1.normalize(outputPath));
-    const systemProjectRoot = core_1.getSystemPath(projectRoot);
+    const distPath = (0, core_1.getSystemPath)((0, core_1.normalize)(outputPath));
+    const systemProjectRoot = (0, core_1.getSystemPath)(projectRoot);
     // Find the service worker package
     const workerPath = require.resolve('@angular/service-worker/ngsw-worker.js', {
         paths: [systemProjectRoot],
     });
     // Absolute paths on Windows must be `file://` URLs when using ESM. Otherwise,
     // `c:` would be interpreted as a protocol instead of a drive letter.
-    const swConfigPath = url_1.pathToFileURL(require.resolve('@angular/service-worker/config', {
+    const swConfigPath = (0, url_1.pathToFileURL)(require.resolve('@angular/service-worker/config', {
         paths: [systemProjectRoot],
     }));
     // Determine the configuration file path
     let configPath;
     if (ngswConfigPath) {
-        configPath = core_1.getSystemPath(core_1.normalize(ngswConfigPath));
+        configPath = (0, core_1.getSystemPath)((0, core_1.normalize)(ngswConfigPath));
     }
     else {
-        configPath = path.join(core_1.getSystemPath(appRoot), 'ngsw-config.json');
+        configPath = path.join((0, core_1.getSystemPath)(appRoot), 'ngsw-config.json');
     }
     // Read the configuration file
     let config;
@@ -102,7 +102,7 @@ async function augmentAppWithServiceWorker(projectRoot, appRoot, outputPath, bas
     catch (error) {
         if (error.code === 'ENOENT') {
             throw new Error('Error: Expected to find an ngsw-config.json configuration file' +
-                ` in the ${core_1.getSystemPath(appRoot)} folder. Either provide one or` +
+                ` in the ${(0, core_1.getSystemPath)(appRoot)} folder. Either provide one or` +
                 ' disable Service Worker in the angular.json configuration file.');
         }
         else {
@@ -112,7 +112,7 @@ async function augmentAppWithServiceWorker(projectRoot, appRoot, outputPath, bas
     // Load ESM `@angular/service-worker/config` using the TypeScript dynamic import workaround.
     // Once TypeScript provides support for keeping the dynamic import this workaround can be
     // changed to a direct dynamic import.
-    const GeneratorConstructor = (await load_esm_1.loadEsmModule(swConfigPath)).Generator;
+    const GeneratorConstructor = (await (0, load_esm_1.loadEsmModule)(swConfigPath)).Generator;
     // Generate the manifest
     const generator = new GeneratorConstructor(new CliFilesystem(distPath), baseHref);
     const output = await generator.process(config);

@@ -93,7 +93,7 @@ function default_1(options) {
                     reject(err);
                     return;
                 }
-                let outputPath = loader_utils_1.interpolateName({ resourcePath: result }, filename(result), {
+                let outputPath = (0, loader_utils_1.interpolateName)({ resourcePath: result }, filename(result), {
                     content,
                     context: loader.context || loader.rootContext,
                 }).replace(/\\|\//g, '-');

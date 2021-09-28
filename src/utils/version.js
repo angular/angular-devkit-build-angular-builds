@@ -51,7 +51,7 @@ function assertCompatibleAngularVersion(projectRoot) {
     }
     const supportedAngularSemver = require('../../package.json')['peerDependencies']['@angular/compiler-cli'];
     const angularVersion = new semver_1.SemVer(angularPkgJson['version']);
-    if (!semver_1.satisfies(angularVersion, supportedAngularSemver, { includePrerelease: true })) {
+    if (!(0, semver_1.satisfies)(angularVersion, supportedAngularSemver, { includePrerelease: true })) {
         console.error(core_1.tags.stripIndents `
         This version of CLI is only compatible with Angular versions ${supportedAngularSemver},
         but Angular version ${angularVersion} was found instead.

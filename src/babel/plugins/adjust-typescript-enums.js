@@ -119,7 +119,7 @@ function default_1() {
                     core_1.types.returnStatement(core_1.types.cloneNode(declarationId)),
                 ]));
                 const replacementInitializer = core_1.types.callExpression(core_1.types.parenthesizedExpression(container), []);
-                helper_annotate_as_pure_1.default(replacementInitializer);
+                (0, helper_annotate_as_pure_1.default)(replacementInitializer);
                 // Add the wrapped enum initializer directly to the variable declaration
                 declaration.get('init').replaceWith(replacementInitializer);
             },

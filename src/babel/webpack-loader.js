@@ -32,12 +32,12 @@ async function requiresLinking(path, source) {
         // Load ESM `@angular/compiler-cli/linker` using the TypeScript dynamic import workaround.
         // Once TypeScript provides support for keeping the dynamic import this workaround can be
         // changed to a direct dynamic import.
-        const linkerModule = await load_esm_1.loadEsmModule('@angular/compiler-cli/linker');
+        const linkerModule = await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli/linker');
         needsLinking = linkerModule.needsLinking;
     }
     return needsLinking(path, source);
 }
-exports.default = babel_loader_1.custom(() => {
+exports.default = (0, babel_loader_1.custom)(() => {
     const baseOptions = Object.freeze({
         babelrc: false,
         configFile: false,
@@ -63,7 +63,7 @@ exports.default = babel_loader_1.custom(() => {
                     // Load ESM `@angular/compiler-cli/linker/babel` using the TypeScript dynamic import workaround.
                     // Once TypeScript provides support for keeping the dynamic import this workaround can be
                     // changed to a direct dynamic import.
-                    const linkerBabelModule = await load_esm_1.loadEsmModule('@angular/compiler-cli/linker/babel');
+                    const linkerBabelModule = await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli/linker/babel');
                     linkerPluginCreator = linkerBabelModule.createEs2015LinkerPlugin;
                 }
                 customOptions.angularLinker = {
@@ -104,7 +104,7 @@ exports.default = babel_loader_1.custom(() => {
                     // Once TypeScript provides support for keeping the dynamic import this workaround can be
                     // changed to a direct dynamic import.
                     try {
-                        i18nPluginCreators = await load_esm_1.loadEsmModule('@angular/localize/tools');
+                        i18nPluginCreators = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
                     }
                     catch { }
                 }

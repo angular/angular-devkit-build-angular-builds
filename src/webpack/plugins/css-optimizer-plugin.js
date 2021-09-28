@@ -102,7 +102,7 @@ class CssOptimizerPlugin {
     async addWarnings(compilation, warnings) {
         if (warnings.length > 0) {
             for (const warning of await this.esbuild.formatMessages(warnings, { kind: 'warning' })) {
-                webpack_diagnostics_1.addWarning(compilation, warning);
+                (0, webpack_diagnostics_1.addWarning)(compilation, warning);
             }
         }
     }

@@ -41,7 +41,7 @@ function resolveGlobalStyles(styleEntrypoints, root, preserveSymlinks) {
     if (styleEntrypoints.length === 0) {
         return { entryPoints, noInjectNames, paths };
     }
-    for (const style of helpers_1.normalizeExtraEntryPoints(styleEntrypoints, 'styles')) {
+    for (const style of (0, helpers_1.normalizeExtraEntryPoints)(styleEntrypoints, 'styles')) {
         let resolvedPath = path.resolve(root, style.input);
         if (!fs.existsSync(resolvedPath)) {
             try {
@@ -79,7 +79,7 @@ function getStylesConfig(wco) {
     extraPlugins.push(new plugins_1.AnyComponentStyleBudgetChecker(buildOptions.budgets));
     const cssSourceMap = buildOptions.sourceMap.styles;
     // Determine hashing format.
-    const hashFormat = helpers_1.getOutputHashFormat(buildOptions.outputHashing);
+    const hashFormat = (0, helpers_1.getOutputHashFormat)(buildOptions.outputHashing);
     // use includePaths from appConfig
     const includePaths = (_c = (_b = (_a = buildOptions.stylePreprocessorOptions) === null || _a === void 0 ? void 0 : _a.includePaths) === null || _b === void 0 ? void 0 : _b.map((p) => path.resolve(root, p))) !== null && _c !== void 0 ? _c : [];
     // Process global styles.
@@ -100,7 +100,7 @@ function getStylesConfig(wco) {
             });
         },
     });
-    const assetNameTemplate = helpers_1.assetNameTemplateFactory(hashFormat);
+    const assetNameTemplate = (0, helpers_1.assetNameTemplateFactory)(hashFormat);
     const extraPostcssPlugins = [];
     // Attempt to setup Tailwind CSS
     // A configuration file can exist in the project or workspace root
@@ -165,7 +165,7 @@ function getStylesConfig(wco) {
                         });
                     },
                 }),
-                plugins_1.PostcssCliResources({
+                (0, plugins_1.PostcssCliResources)({
                     baseHref: buildOptions.baseHref,
                     deployUrl: buildOptions.deployUrl,
                     resourcesOutputPath: buildOptions.resourcesOutputPath,

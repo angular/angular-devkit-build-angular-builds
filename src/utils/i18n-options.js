@@ -121,7 +121,7 @@ async function configureI18nBuild(context, options) {
         throw new Error('The builder requires a target.');
     }
     const buildOptions = { ...options };
-    const tsConfig = await read_tsconfig_1.readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
+    const tsConfig = await (0, read_tsconfig_1.readTsconfig)(buildOptions.tsConfig, context.workspaceRoot);
     const metadata = await context.getProjectMetadata(context.target);
     const i18n = createI18nOptions(metadata, buildOptions.localize);
     // No additional processing needed if no inlining requested and no source locale defined.
@@ -159,7 +159,7 @@ async function configureI18nBuild(context, options) {
             continue;
         }
         if (!loader) {
-            loader = await load_translations_1.createTranslationLoader();
+            loader = await (0, load_translations_1.createTranslationLoader)();
         }
         for (const file of desc.files) {
             const loadResult = loader(path_1.default.join(context.workspaceRoot, file.path));

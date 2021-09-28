@@ -33,9 +33,9 @@ const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 async function initialize(options, root) {
     const packager = (await Promise.resolve().then(() => __importStar(require('ng-packagr')))).ngPackagr();
-    packager.forProject(path_1.resolve(root, options.project));
+    packager.forProject((0, path_1.resolve)(root, options.project));
     if (options.tsConfig) {
-        packager.withTsConfig(path_1.resolve(root, options.tsConfig));
+        packager.withTsConfig((0, path_1.resolve)(root, options.tsConfig));
     }
     return packager;
 }
@@ -43,7 +43,7 @@ async function initialize(options, root) {
  * @experimental Direct usage of this function is considered experimental.
  */
 function execute(options, context) {
-    return rxjs_1.from(initialize(options, context.workspaceRoot)).pipe(operators_1.switchMap((packager) => (options.watch ? packager.watch() : packager.build())), operators_1.mapTo({ success: true }), operators_1.catchError((err) => rxjs_1.of({ success: false, error: err.message })));
+    return (0, rxjs_1.from)(initialize(options, context.workspaceRoot)).pipe((0, operators_1.switchMap)((packager) => (options.watch ? packager.watch() : packager.build())), (0, operators_1.mapTo)({ success: true }), (0, operators_1.catchError)((err) => (0, rxjs_1.of)({ success: false, error: err.message })));
 }
 exports.execute = execute;
-exports.default = architect_1.createBuilder(execute);
+exports.default = (0, architect_1.createBuilder)(execute);

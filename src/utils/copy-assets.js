@@ -34,7 +34,7 @@ const fs = __importStar(require("fs"));
 const glob_1 = __importDefault(require("glob"));
 const path = __importStar(require("path"));
 function globAsync(pattern, options) {
-    return new Promise((resolve, reject) => glob_1.default(pattern, options, (e, m) => (e ? reject(e) : resolve(m))));
+    return new Promise((resolve, reject) => (0, glob_1.default)(pattern, options, (e, m) => (e ? reject(e) : resolve(m))));
 }
 async function copyAssets(entries, basePaths, root, changed) {
     const defaultIgnore = ['.gitkeep', '**/.DS_Store', '**/Thumbs.db'];

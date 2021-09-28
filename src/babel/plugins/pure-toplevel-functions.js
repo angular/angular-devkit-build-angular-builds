@@ -72,12 +72,12 @@ function default_1() {
                 if (core_1.types.isIdentifier(callee) && isTslibHelperName(callee.name)) {
                     return;
                 }
-                helper_annotate_as_pure_1.default(path);
+                (0, helper_annotate_as_pure_1.default)(path);
             },
             NewExpression(path) {
                 // If the expression has a function parent, it is not top-level
                 if (!path.getFunctionParent()) {
-                    helper_annotate_as_pure_1.default(path);
+                    (0, helper_annotate_as_pure_1.default)(path);
                 }
             },
         },

@@ -49,7 +49,7 @@ async function checkPort(port, host) {
                 reject(createInUseError(port));
                 return;
             }
-            inquirer_1.prompt({
+            (0, inquirer_1.prompt)({
                 type: 'confirm',
                 name: 'useDifferent',
                 message: `Port ${port} is already in use.\nWould you like to use a different port?`,

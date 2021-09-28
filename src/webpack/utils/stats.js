@@ -103,9 +103,9 @@ function generateBuildStatsTable(data, colors, showTotalSize) {
     if (changedLazyChunksStats.length) {
         bundleInfo.push(['Lazy Chunk Files', 'Names', 'Size'].map(bold), ...changedLazyChunksStats);
     }
-    return text_table_1.default(bundleInfo, {
+    return (0, text_table_1.default)(bundleInfo, {
         hsep: dim(' | '),
-        stringLength: (s) => color_1.removeColor(s).length,
+        stringLength: (s) => (0, color_1.removeColor)(s).length,
         align: ['l', 'l', 'r'],
     });
 }
@@ -259,17 +259,17 @@ exports.statsHasWarnings = statsHasWarnings;
 function createWebpackLoggingCallback(options, logger) {
     const { verbose = false, scripts = [], styles = [] } = options;
     const extraEntryPoints = [
-        ...helpers_1.normalizeExtraEntryPoints(styles, 'styles'),
-        ...helpers_1.normalizeExtraEntryPoints(scripts, 'scripts'),
+        ...(0, helpers_1.normalizeExtraEntryPoints)(styles, 'styles'),
+        ...(0, helpers_1.normalizeExtraEntryPoints)(scripts, 'scripts'),
     ];
     return (stats, config) => {
         if (verbose) {
             logger.info(stats.toString(config.stats));
         }
-        const rawStats = stats.toJson(stats_1.getWebpackStatsConfig(false));
+        const rawStats = stats.toJson((0, stats_1.getWebpackStatsConfig)(false));
         const webpackStats = {
             ...rawStats,
-            chunks: async_chunks_1.markAsyncChunksNonInitial(rawStats, extraEntryPoints),
+            chunks: (0, async_chunks_1.markAsyncChunksNonInitial)(rawStats, extraEntryPoints),
         };
         webpackStatsLogger(logger, webpackStats, config);
     };

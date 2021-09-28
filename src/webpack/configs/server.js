@@ -20,7 +20,7 @@ function getServerConfig(wco) {
     const extraPlugins = [];
     const { scripts, styles, hidden } = sourceMap;
     if (scripts || styles) {
-        extraPlugins.push(helpers_1.getSourceMapDevTool(scripts, styles, hidden));
+        extraPlugins.push((0, helpers_1.getSourceMapDevTool)(scripts, styles, hidden));
     }
     const externals = [...externalDependencies];
     if (!bundleDependencies) {
@@ -58,7 +58,7 @@ function externalizePackages(context, request, callback) {
         return;
     }
     // Absolute & Relative paths are not externals
-    if (request.startsWith('.') || path_1.isAbsolute(request)) {
+    if (request.startsWith('.') || (0, path_1.isAbsolute)(request)) {
         callback();
         return;
     }

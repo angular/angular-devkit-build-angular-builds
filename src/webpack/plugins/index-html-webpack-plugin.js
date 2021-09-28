@@ -43,27 +43,27 @@ class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
                         files.push({
                             name: chunk.name,
                             file,
-                            extension: path_1.extname(file),
+                            extension: (0, path_1.extname)(file),
                         });
                     }
                 }
                 const { content, warnings, errors } = await this.process({
                     files,
-                    outputPath: path_1.dirname(this.options.outputPath),
+                    outputPath: (0, path_1.dirname)(this.options.outputPath),
                     baseHref: this.options.baseHref,
                     lang: this.options.lang,
                 });
                 assets[this.options.outputPath] = new webpack_1.sources.RawSource(content);
-                warnings.forEach((msg) => webpack_diagnostics_1.addWarning(this.compilation, msg));
-                errors.forEach((msg) => webpack_diagnostics_1.addError(this.compilation, msg));
+                warnings.forEach((msg) => (0, webpack_diagnostics_1.addWarning)(this.compilation, msg));
+                errors.forEach((msg) => (0, webpack_diagnostics_1.addError)(this.compilation, msg));
             }
             catch (error) {
-                webpack_diagnostics_1.addError(this.compilation, error.message);
+                (0, webpack_diagnostics_1.addError)(this.compilation, error.message);
             }
         };
     }
     async readAsset(path) {
-        const data = this.compilation.assets[path_1.basename(path)].source();
+        const data = this.compilation.assets[(0, path_1.basename)(path)].source();
         return typeof data === 'string' ? data : data.toString();
     }
     async readIndex(path) {

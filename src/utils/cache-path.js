@@ -17,8 +17,8 @@ const path_1 = require("path");
 const environment_options_1 = require("./environment-options");
 function findCachePath(name) {
     if (environment_options_1.cachingBasePath) {
-        return path_1.resolve(environment_options_1.cachingBasePath, name);
+        return (0, path_1.resolve)(environment_options_1.cachingBasePath, name);
     }
-    return find_cache_dir_1.default({ name }) || os_1.tmpdir();
+    return (0, find_cache_dir_1.default)({ name }) || (0, os_1.tmpdir)();
 }
 exports.findCachePath = findCachePath;
