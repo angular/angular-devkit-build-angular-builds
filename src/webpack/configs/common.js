@@ -283,6 +283,7 @@ async function getCommonConfig(wco) {
         context: root,
         entry: entryPoints,
         output: {
+            hashFunction: 'xxhash64',
             clean: (_a = buildOptions.deleteOutputPath) !== null && _a !== void 0 ? _a : true,
             path: path.resolve(root, buildOptions.outputPath),
             publicPath: (_b = buildOptions.deployUrl) !== null && _b !== void 0 ? _b : '',

@@ -105,7 +105,7 @@ async function _getServerModuleBundlePath(options, context, serverResult, browse
     if (!fs.existsSync(outputPath)) {
         throw new Error(`Could not find server output directory: ${outputPath}.`);
     }
-    const re = /^main\.(?:[a-zA-Z0-9]{20}\.)?js$/;
+    const re = /^main\.(?:[a-zA-Z0-9]{16}\.)?js$/;
     const maybeMain = fs.readdirSync(outputPath).find((x) => re.test(x));
     if (!maybeMain) {
         throw new Error('Could not find the main bundle.');
