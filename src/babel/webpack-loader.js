@@ -110,7 +110,7 @@ exports.default = (0, babel_loader_1.custom)(() => {
                 }
                 customOptions.i18n = {
                     ...i18n,
-                    i18nPluginCreators,
+                    pluginCreators: i18nPluginCreators,
                 };
                 shouldProcess = true;
             }
