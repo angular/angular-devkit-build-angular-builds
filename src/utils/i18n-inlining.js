@@ -86,7 +86,7 @@ async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPat
             }
         }
         // Copy any non-processed files into the output locations
-        await copy_assets_1.copyAssets([
+        await (0, copy_assets_1.copyAssets)([
             {
                 glob: '**/*',
                 input: emittedPath,

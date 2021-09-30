@@ -58,15 +58,15 @@ class AnyComponentStyleBudgetChecker {
                     size: compilation.assets[name].size(),
                     label: name,
                 }));
-                const thresholds = this.budgets.flatMap((budget) => [...bundle_calculator_1.calculateThresholds(budget)]);
+                const thresholds = this.budgets.flatMap((budget) => [...(0, bundle_calculator_1.calculateThresholds)(budget)]);
                 for (const { size, label } of componentStyles) {
-                    for (const { severity, message } of bundle_calculator_1.checkThresholds(thresholds[Symbol.iterator](), size, label)) {
+                    for (const { severity, message } of (0, bundle_calculator_1.checkThresholds)(thresholds[Symbol.iterator](), size, label)) {
                         switch (severity) {
                             case bundle_calculator_1.ThresholdSeverity.Warning:
-                                webpack_diagnostics_1.addWarning(compilation, message);
+                                (0, webpack_diagnostics_1.addWarning)(compilation, message);
                                 break;
                             case bundle_calculator_1.ThresholdSeverity.Error:
-                                webpack_diagnostics_1.addError(compilation, message);
+                                (0, webpack_diagnostics_1.addError)(compilation, message);
                                 break;
                             default:
                                 assertNever(severity);

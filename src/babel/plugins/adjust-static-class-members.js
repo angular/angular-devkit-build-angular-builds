@@ -208,7 +208,7 @@ function default_1() {
                     core_1.types.returnStatement(core_1.types.cloneNode(classNode.id)),
                 ]));
                 const replacementInitializer = core_1.types.callExpression(core_1.types.parenthesizedExpression(container), []);
-                helper_annotate_as_pure_1.default(replacementInitializer);
+                (0, helper_annotate_as_pure_1.default)(replacementInitializer);
                 // Replace class with IIFE wrapped class
                 const declaration = core_1.types.variableDeclaration('let', [
                     core_1.types.variableDeclarator(core_1.types.cloneNode(classNode.id), replacementInitializer),
@@ -264,7 +264,7 @@ function default_1() {
                     core_1.types.returnStatement(core_1.types.cloneNode(classNode.id)),
                 ]));
                 const replacementInitializer = core_1.types.callExpression(core_1.types.parenthesizedExpression(container), []);
-                helper_annotate_as_pure_1.default(replacementInitializer);
+                (0, helper_annotate_as_pure_1.default)(replacementInitializer);
                 // Add the wrapped class directly to the variable declaration
                 parentPath.get('init').replaceWith(replacementInitializer);
             },

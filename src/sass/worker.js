@@ -29,11 +29,11 @@ worker_threads_1.parentPort.on('message', ({ id, hasImporter, options }) => {
                 const { fromImport } = this;
                 workerImporterPort.postMessage({ id, url, prev, fromImport });
                 Atomics.wait(importerSignal, 0, 0);
-                return (_a = worker_threads_1.receiveMessageOnPort(workerImporterPort)) === null || _a === void 0 ? void 0 : _a.message;
+                return (_a = (0, worker_threads_1.receiveMessageOnPort)(workerImporterPort)) === null || _a === void 0 ? void 0 : _a.message;
             };
         }
         // The synchronous Sass render function can be up to two times faster than the async variant
-        const result = sass_1.renderSync(options);
+        const result = (0, sass_1.renderSync)(options);
         worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({ id, result });
     }
     catch (error) {

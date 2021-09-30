@@ -40,7 +40,7 @@ async function default_1({ asset, options }) {
         if (asset.map) {
             partialSourcemaps.push(asset.map);
         }
-        fullSourcemap = remapping_1.default(partialSourcemaps, () => null);
+        fullSourcemap = (0, remapping_1.default)(partialSourcemaps, () => null);
     }
     return { name: asset.name, code: terserResult.code, map: fullSourcemap };
 }
@@ -105,7 +105,7 @@ async function optimizeWithEsbuild(content, name, options) {
  * @returns A promise that resolves with the optimized code and source map.
  */
 async function optimizeWithTerser(name, code, sourcemaps, target, advanced) {
-    const result = await terser_1.minify({ [name]: code }, {
+    const result = await (0, terser_1.minify)({ [name]: code }, {
         compress: {
             passes: advanced ? 2 : 1,
             pure_getters: advanced,

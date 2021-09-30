@@ -39,7 +39,7 @@ const single_test_transform_1 = require("../../webpack/plugins/single-test-trans
 const schema_1 = require("../browser/schema");
 const find_tests_1 = require("./find-tests");
 async function initialize(options, context, webpackConfigurationTransformer) {
-    const { config } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(
+    const { config } = await (0, webpack_browser_config_1.generateBrowserWebpackConfigFromContext)(
     // only two properties are missing:
     // * `outputPath` which is fixed for tests
     // * `budgets` which might be incorrect due to extra dev libs
@@ -60,11 +60,11 @@ async function initialize(options, context, webpackConfigurationTransformer) {
         // https://github.com/webpack/webpack/blob/cde1b73e12eb8a77eb9ba42e7920c9ec5d29c2c9/lib/Compiler.js#L379-L388
         watch: true,
     }, context, (wco) => [
-        configs_1.getCommonConfig(wco),
-        configs_1.getStylesConfig(wco),
-        configs_1.getTypeScriptConfig(wco),
-        configs_1.getTestConfig(wco),
-        configs_1.getWorkerConfig(wco),
+        (0, configs_1.getCommonConfig)(wco),
+        (0, configs_1.getStylesConfig)(wco),
+        (0, configs_1.getTypeScriptConfig)(wco),
+        (0, configs_1.getTestConfig)(wco),
+        (0, configs_1.getWorkerConfig)(wco),
     ]);
     const karma = await Promise.resolve().then(() => __importStar(require('karma')));
     return [
@@ -77,12 +77,12 @@ async function initialize(options, context, webpackConfigurationTransformer) {
  */
 function execute(options, context, transforms = {}) {
     // Check Angular version.
-    version_1.assertCompatibleAngularVersion(context.workspaceRoot);
+    (0, version_1.assertCompatibleAngularVersion)(context.workspaceRoot);
     let singleRun;
     if (options.watch !== undefined) {
         singleRun = !options.watch;
     }
-    return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.switchMap(async ([karma, webpackConfig]) => {
+    return (0, rxjs_1.from)(initialize(options, context, transforms.webpackConfiguration)).pipe((0, operators_1.switchMap)(async ([karma, webpackConfig]) => {
         var _a;
         const karmaOptions = {
             singleRun,
@@ -102,8 +102,8 @@ function execute(options, context, transforms = {}) {
         }
         // prepend special webpack loader that will transform test.ts
         if (options.include && options.include.length > 0) {
-            const mainFilePath = core_1.getSystemPath(core_1.join(core_1.normalize(context.workspaceRoot), options.main));
-            const files = find_tests_1.findTests(options.include, path_1.dirname(mainFilePath), context.workspaceRoot);
+            const mainFilePath = (0, core_1.getSystemPath)((0, core_1.join)((0, core_1.normalize)(context.workspaceRoot), options.main));
+            const files = (0, find_tests_1.findTests)(options.include, (0, path_1.dirname)(mainFilePath), context.workspaceRoot);
             // early exit, no reason to start karma
             if (!files.length) {
                 throw new Error(`Specified patterns: "${options.include.join(', ')}" did not match any spec files.`);
@@ -133,9 +133,9 @@ function execute(options, context, transforms = {}) {
             webpackConfig,
             logger: context.logger,
         };
-        const config = await karma.config.parseConfig(path_1.resolve(context.workspaceRoot, options.karmaConfig), transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, { promiseConfig: true, throwErrors: true });
+        const config = await karma.config.parseConfig((0, path_1.resolve)(context.workspaceRoot, options.karmaConfig), transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, { promiseConfig: true, throwErrors: true });
         return [karma, config];
-    }), operators_1.switchMap(([karma, karmaConfig]) => new rxjs_1.Observable((subscriber) => {
+    }), (0, operators_1.switchMap)(([karma, karmaConfig]) => new rxjs_1.Observable((subscriber) => {
         var _a, _b, _c;
         var _d, _e;
         // Pass onto Karma to emit BuildEvents.
@@ -154,7 +154,7 @@ function execute(options, context, transforms = {}) {
         const karmaStart = karmaServer.start();
         // Cleanup, signal Karma to exit.
         return () => karmaStart.then(() => karmaServer.stop());
-    })), operators_1.defaultIfEmpty({ success: false }));
+    })), (0, operators_1.defaultIfEmpty)({ success: false }));
 }
 exports.execute = execute;
-exports.default = architect_1.createBuilder(execute);
+exports.default = (0, architect_1.createBuilder)(execute);

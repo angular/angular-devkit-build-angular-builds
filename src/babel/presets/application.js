@@ -26,67 +26,62 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const assert_1 = require("assert");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-function createI18nDiagnostics(reporter, 
-// TODO_ESM: Make `localizeToolExports` required once `@angular/localize` is published with the `tools` entry point
-localizeToolExports) {
-    // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-    const diagnosticsCtor = localizeToolExports
-        ? localizeToolExports.Diagnostics
-        : require('@angular/localize/src/tools/src/diagnostics').Diagnostics;
-    const diagnostics = new diagnosticsCtor();
-    if (!reporter) {
-        return diagnostics;
-    }
-    const baseAdd = diagnostics.add;
-    diagnostics.add = function (type, message, ...args) {
-        if (type !== 'ignore') {
-            baseAdd.call(diagnostics, type, message, ...args);
-            reporter(type, message);
+function createI18nDiagnostics(reporter) {
+    const diagnostics = new (class {
+        constructor() {
+            this.messages = [];
+            this.hasErrors = false;
         }
-    };
-    const baseError = diagnostics.error;
-    diagnostics.error = function (message, ...args) {
-        baseError.call(diagnostics, message, ...args);
-        reporter('error', message);
-    };
-    const baseWarn = diagnostics.warn;
-    diagnostics.warn = function (message, ...args) {
-        baseWarn.call(diagnostics, message, ...args);
-        reporter('warning', message);
-    };
-    const baseMerge = diagnostics.merge;
-    diagnostics.merge = function (other, ...args) {
-        baseMerge.call(diagnostics, other, ...args);
-        for (const diagnostic of other.messages) {
-            reporter(diagnostic.type, diagnostic.message);
+        add(type, message) {
+            if (type === 'ignore') {
+                return;
+            }
+            this.messages.push({ type, message });
+            this.hasErrors || (this.hasErrors = type === 'error');
+            reporter === null || reporter === void 0 ? void 0 : reporter(type, message);
         }
-    };
+        error(message) {
+            this.add('error', message);
+        }
+        warn(message) {
+            this.add('warning', message);
+        }
+        merge(other) {
+            for (const diagnostic of other.messages) {
+                this.add(diagnostic.type, diagnostic.message);
+            }
+        }
+        formatDiagnostics() {
+            assert_1.strict.fail('@angular/localize Diagnostics formatDiagnostics should not be called from within babel.');
+        }
+    })();
     return diagnostics;
 }
 function createI18nPlugins(locale, translation, missingTranslationBehavior, diagnosticReporter, 
-// TODO_ESM: Make `localizeToolExports` required once `@angular/localize` is published with the `tools` entry point
-localizeToolExports) {
-    const diagnostics = createI18nDiagnostics(diagnosticReporter, localizeToolExports);
+// TODO_ESM: Make `pluginCreators` required once `@angular/localize` is published with the `tools` entry point
+pluginCreators) {
+    const diagnostics = createI18nDiagnostics(diagnosticReporter);
     const plugins = [];
     if (translation) {
         const { makeEs2015TranslatePlugin,
         // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-         } = localizeToolExports !== null && localizeToolExports !== void 0 ? localizeToolExports : require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin');
+         } = pluginCreators !== null && pluginCreators !== void 0 ? pluginCreators : require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin');
         plugins.push(makeEs2015TranslatePlugin(diagnostics, translation, {
             missingTranslation: missingTranslationBehavior,
         }));
         const { makeEs5TranslatePlugin,
         // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-         } = localizeToolExports !== null && localizeToolExports !== void 0 ? localizeToolExports : require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin');
+         } = pluginCreators !== null && pluginCreators !== void 0 ? pluginCreators : require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin');
         plugins.push(makeEs5TranslatePlugin(diagnostics, translation, {
             missingTranslation: missingTranslationBehavior,
         }));
     }
     const { makeLocalePlugin,
     // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-     } = localizeToolExports !== null && localizeToolExports !== void 0 ? localizeToolExports : require('@angular/localize/src/tools/src/translate/source_files/locale_plugin');
+     } = pluginCreators !== null && pluginCreators !== void 0 ? pluginCreators : require('@angular/localize/src/tools/src/translate/source_files/locale_plugin');
     plugins.push(makeLocalePlugin(locale));
     return plugins;
 }
@@ -141,8 +136,8 @@ function default_1(api, options) {
         needRuntimeTransform = true;
     }
     if (options.i18n) {
-        const { locale, missingTranslationBehavior, localizeToolExports, translation } = options.i18n;
-        const i18nPlugins = createI18nPlugins(locale, translation, missingTranslationBehavior || 'ignore', options.diagnosticReporter, localizeToolExports);
+        const { locale, missingTranslationBehavior, pluginCreators, translation } = options.i18n;
+        const i18nPlugins = createI18nPlugins(locale, translation, missingTranslationBehavior || 'ignore', options.diagnosticReporter, pluginCreators);
         plugins.push(...i18nPlugins);
     }
     if (options.forceAsyncTransformation) {

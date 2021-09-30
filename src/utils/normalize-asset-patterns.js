@@ -18,16 +18,16 @@ class MissingAssetSourceRootException extends core_1.BaseException {
 exports.MissingAssetSourceRootException = MissingAssetSourceRootException;
 function normalizeAssetPatterns(assetPatterns, root, projectRoot, maybeSourceRoot) {
     // When sourceRoot is not available, we default to ${projectRoot}/src.
-    const sourceRoot = maybeSourceRoot || core_1.join(projectRoot, 'src');
-    const resolvedSourceRoot = core_1.resolve(root, sourceRoot);
+    const sourceRoot = maybeSourceRoot || (0, core_1.join)(projectRoot, 'src');
+    const resolvedSourceRoot = (0, core_1.resolve)(root, sourceRoot);
     if (assetPatterns.length === 0) {
         return [];
     }
     return assetPatterns.map((assetPattern) => {
         // Normalize string asset patterns to objects.
         if (typeof assetPattern === 'string') {
-            const assetPath = core_1.normalize(assetPattern);
-            const resolvedAssetPath = core_1.resolve(root, assetPath);
+            const assetPath = (0, core_1.normalize)(assetPattern);
+            const resolvedAssetPath = (0, core_1.resolve)(root, assetPath);
             // Check if the string asset is within sourceRoot.
             if (!resolvedAssetPath.startsWith(resolvedSourceRoot)) {
                 throw new MissingAssetSourceRootException(assetPattern);
@@ -35,7 +35,7 @@ function normalizeAssetPatterns(assetPatterns, root, projectRoot, maybeSourceRoo
             let glob, input;
             let isDirectory = false;
             try {
-                isDirectory = fs_1.statSync(core_1.getSystemPath(resolvedAssetPath)).isDirectory();
+                isDirectory = (0, fs_1.statSync)((0, core_1.getSystemPath)(resolvedAssetPath)).isDirectory();
             }
             catch {
                 isDirectory = true;
@@ -48,12 +48,12 @@ function normalizeAssetPatterns(assetPatterns, root, projectRoot, maybeSourceRoo
             }
             else {
                 // Files are their own glob.
-                glob = core_1.basename(assetPath);
+                glob = (0, core_1.basename)(assetPath);
                 // Input directory is their original dirname.
-                input = core_1.dirname(assetPath);
+                input = (0, core_1.dirname)(assetPath);
             }
             // Output directory for both is the relative path from source root to input.
-            const output = core_1.relative(resolvedSourceRoot, core_1.resolve(root, input));
+            const output = (0, core_1.relative)(resolvedSourceRoot, (0, core_1.resolve)(root, input));
             // Return the asset pattern in object format.
             return { glob, input, output };
         }

@@ -54,7 +54,7 @@ function getTestConfig(wco) {
         });
     }
     if (sourceMap.scripts || sourceMap.styles) {
-        extraPlugins.push(helpers_1.getSourceMapDevTool(sourceMap.scripts, sourceMap.styles, false, true));
+        extraPlugins.push((0, helpers_1.getSourceMapDevTool)(sourceMap.scripts, sourceMap.styles, false, true));
     }
     return {
         mode: 'development',
@@ -80,7 +80,7 @@ function getTestConfig(wco) {
         plugins: extraPlugins,
         optimization: {
             splitChunks: {
-                chunks: (chunk) => !helpers_1.isPolyfillsEntry(chunk.name),
+                chunks: (chunk) => !(0, helpers_1.isPolyfillsEntry)(chunk.name),
                 cacheGroups: {
                     vendors: false,
                     defaultVendors: {

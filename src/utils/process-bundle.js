@@ -69,7 +69,7 @@ async function loadLocalizeTools() {
         // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
         // Once TypeScript provides support for keeping the dynamic import this workaround can be
         // changed to a direct dynamic import.
-        localizeToolsModule = await load_esm_1.loadEsmModule('@angular/localize/tools');
+        localizeToolsModule = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
     }
     catch { }
 }
@@ -121,7 +121,7 @@ async function inlineLocales(options) {
     await loadLocalizeTools();
     let ast;
     try {
-        ast = core_1.parseSync(options.code, {
+        ast = (0, core_1.parseSync)(options.code, {
             babelrc: false,
             configFile: false,
             sourceType: 'script',
@@ -158,7 +158,7 @@ async function inlineLocales(options) {
             }
         }
         const { diagnostics: localeDiagnostics, plugins } = await createI18nPlugins(locale, translations, isSourceLocale ? 'ignore' : options.missingTranslation || 'warning', true, localeDataContent);
-        const transformResult = await core_1.transformFromAstSync(ast, options.code, {
+        const transformResult = await (0, core_1.transformFromAstSync)(ast, options.code, {
             filename: options.filename,
             // using false ensures that babel will NOT search and process sourcemap comments (large memory usage)
             // The types do not include the false option even though it is valid
@@ -177,7 +177,7 @@ async function inlineLocales(options) {
         const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
         fs.writeFileSync(outputPath, transformResult.code);
         if (options.map && transformResult.map) {
-            const outputMap = remapping_1.default([transformResult.map, options.map], () => null);
+            const outputMap = (0, remapping_1.default)([transformResult.map, options.map], () => null);
             fs.writeFileSync(outputPath + '.map', JSON.stringify(outputMap));
         }
     }
@@ -267,7 +267,7 @@ function findLocalizePositions(ast, options, utils) {
     const { File } = require('@babel/core');
     const file = new File({}, { code: options.code, ast });
     if (options.es5) {
-        core_1.traverse(file.ast, {
+        (0, core_1.traverse)(file.ast, {
             CallExpression(path) {
                 const callee = path.get('callee');
                 if (callee.isIdentifier() &&
@@ -287,7 +287,7 @@ function findLocalizePositions(ast, options, utils) {
         });
     }
     else {
-        core_1.traverse(file.ast, {
+        (0, core_1.traverse)(file.ast, {
             TaggedTemplateExpression(path) {
                 if (core_1.types.isIdentifier(path.node.tag) && path.node.tag.name === localizeName) {
                     const [messageParts, expressions] = unwrapTemplateLiteral(path, utils);
@@ -319,7 +319,7 @@ async function loadLocaleData(path, optimize, es5) {
     // The path is validated during option processing before the build starts
     const content = fs.readFileSync(path, 'utf8');
     // Downlevel and optimize the data
-    const transformResult = await core_1.transformAsync(content, {
+    const transformResult = await (0, core_1.transformAsync)(content, {
         filename: path,
         // The types do not include the false option even though it is valid
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

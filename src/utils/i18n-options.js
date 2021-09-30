@@ -6,33 +6,22 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.configureI18nBuild = exports.createI18nOptions = void 0;
 const core_1 = require("@angular-devkit/core");
-const fs = __importStar(require("fs"));
-const os = __importStar(require("os"));
-const path = __importStar(require("path"));
+const fs_1 = __importDefault(require("fs"));
+const module_1 = __importDefault(require("module"));
+const os_1 = __importDefault(require("os"));
+const path_1 = __importDefault(require("path"));
 const read_tsconfig_1 = require("../utils/read-tsconfig");
 const load_translations_1 = require("./load-translations");
+/**
+ * The base module location used to search for locale specific data.
+ */
+const LOCALE_DATA_BASE_MODULE = '@angular/common/locales/global';
 function normalizeTranslationFileOption(option, locale, expectObjectInError) {
     if (typeof option === 'string') {
         return [option];
@@ -132,18 +121,17 @@ async function configureI18nBuild(context, options) {
         throw new Error('The builder requires a target.');
     }
     const buildOptions = { ...options };
-    const tsConfig = await read_tsconfig_1.readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
+    const tsConfig = await (0, read_tsconfig_1.readTsconfig)(buildOptions.tsConfig, context.workspaceRoot);
     const metadata = await context.getProjectMetadata(context.target);
     const i18n = createI18nOptions(metadata, buildOptions.localize);
     // No additional processing needed if no inlining requested and no source locale defined.
     if (!i18n.shouldInline && !i18n.hasDefinedSourceLocale) {
         return { buildOptions, i18n };
     }
-    const projectRoot = path.join(context.workspaceRoot, metadata.root || '');
-    const localeDataBasePath = findLocaleDataBasePath(projectRoot);
-    if (!localeDataBasePath) {
-        throw new Error(`Unable to find locale data within '@angular/common'. Please ensure '@angular/common' is installed.`);
-    }
+    const projectRoot = path_1.default.join(context.workspaceRoot, metadata.root || '');
+    // The trailing slash is required to signal that the path is a directory and not a file.
+    const projectRequire = module_1.default.createRequire(projectRoot + '/');
+    const localeResolver = (locale) => projectRequire.resolve(path_1.default.join(LOCALE_DATA_BASE_MODULE, locale));
     // Load locale data and translations (if present)
     let loader;
     const usedFormats = new Set();
@@ -151,11 +139,11 @@ async function configureI18nBuild(context, options) {
         if (!i18n.inlineLocales.has(locale) && locale !== i18n.sourceLocale) {
             continue;
         }
-        let localeDataPath = findLocaleDataPath(locale, localeDataBasePath);
+        let localeDataPath = findLocaleDataPath(locale, localeResolver);
         if (!localeDataPath) {
             const [first] = locale.split('-');
             if (first) {
-                localeDataPath = findLocaleDataPath(first.toLowerCase(), localeDataBasePath);
+                localeDataPath = findLocaleDataPath(first.toLowerCase(), localeResolver);
                 if (localeDataPath) {
                     context.logger.warn(`Locale data for '${locale}' cannot be found.  Using locale data for '${first}'.`);
                 }
@@ -171,10 +159,10 @@ async function configureI18nBuild(context, options) {
             continue;
         }
         if (!loader) {
-            loader = await load_translations_1.createTranslationLoader();
+            loader = await (0, load_translations_1.createTranslationLoader)();
         }
         for (const file of desc.files) {
-            const loadResult = loader(path.join(context.workspaceRoot, file.path));
+            const loadResult = loader(path_1.default.join(context.workspaceRoot, file.path));
             for (const diagnostics of loadResult.diagnostics.messages) {
                 if (diagnostics.type === 'error') {
                     throw new Error(`Error parsing translation file '${file.path}': ${diagnostics.message}`);
@@ -210,12 +198,12 @@ async function configureI18nBuild(context, options) {
     }
     // If inlining store the output in a temporary location to facilitate post-processing
     if (i18n.shouldInline) {
-        const tempPath = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'angular-cli-i18n-'));
+        const tempPath = fs_1.default.mkdtempSync(path_1.default.join(fs_1.default.realpathSync(os_1.default.tmpdir()), 'angular-cli-i18n-'));
         buildOptions.outputPath = tempPath;
         // Remove temporary directory used for i18n processing
         process.on('exit', () => {
             try {
-                fs.rmdirSync(tempPath, { recursive: true, maxRetries: 3 });
+                fs_1.default.rmdirSync(tempPath, { recursive: true, maxRetries: 3 });
             }
             catch { }
         });
@@ -223,29 +211,17 @@ async function configureI18nBuild(context, options) {
     return { buildOptions, i18n };
 }
 exports.configureI18nBuild = configureI18nBuild;
-function findLocaleDataBasePath(projectRoot) {
-    try {
-        const commonPath = path.dirname(require.resolve('@angular/common/package.json', { paths: [projectRoot] }));
-        const localesPath = path.join(commonPath, 'locales/global');
-        if (!fs.existsSync(localesPath)) {
-            return null;
-        }
-        return localesPath;
-    }
-    catch {
-        return null;
-    }
-}
-function findLocaleDataPath(locale, basePath) {
+function findLocaleDataPath(locale, resolver) {
     // Remove private use subtags
     const scrubbedLocale = locale.replace(/-x(-[a-zA-Z0-9]{1,8})+$/, '');
-    const localeDataPath = path.join(basePath, scrubbedLocale + '.js');
-    if (!fs.existsSync(localeDataPath)) {
+    try {
+        return resolver(scrubbedLocale);
+    }
+    catch {
         if (scrubbedLocale === 'en-US') {
             // fallback to known existing en-US locale data as of 9.0
-            return findLocaleDataPath('en-US-POSIX', basePath);
+            return findLocaleDataPath('en-US-POSIX', resolver);
         }
         return null;
     }
-    return localeDataPath;
 }

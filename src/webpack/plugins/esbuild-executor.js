@@ -65,7 +65,7 @@ class EsbuildExecutor {
         // then the separate process spawn check can be removed in favor of a direct function
         // call check.
         try {
-            const { status, error } = child_process_1.spawnSync(process.execPath, [
+            const { status, error } = (0, child_process_1.spawnSync)(process.execPath, [
                 path.join(__dirname, '../../../esbuild-check.js'),
             ]);
             return status === 0 && error === undefined;

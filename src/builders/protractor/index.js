@@ -45,8 +45,8 @@ function runProtractor(root, options) {
     // TODO: Protractor manages process.exit itself, so this target will allways quit the
     // process. To work around this we run it in a subprocess.
     // https://github.com/angular/protractor/issues/4160
-    return utils_1.runModuleAsObservableFork(root, 'protractor/built/launcher', 'init', [
-        path_1.resolve(root, options.protractorConfig),
+    return (0, utils_1.runModuleAsObservableFork)(root, 'protractor/built/launcher', 'init', [
+        (0, path_1.resolve)(root, options.protractorConfig),
         additionalProtractorConfig,
     ]).toPromise();
 }
@@ -97,7 +97,7 @@ async function execute(options, context) {
     let baseUrl = options.baseUrl;
     let server;
     if (options.devServerTarget) {
-        const target = architect_1.targetFromTargetString(options.devServerTarget);
+        const target = (0, architect_1.targetFromTargetString)(options.devServerTarget);
         const serverOptions = await context.getTargetOptions(target);
         const overrides = {
             watch: false,
@@ -160,4 +160,4 @@ async function execute(options, context) {
     }
 }
 exports.execute = execute;
-exports.default = architect_1.createBuilder(execute);
+exports.default = (0, architect_1.createBuilder)(execute);

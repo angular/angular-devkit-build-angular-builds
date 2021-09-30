@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <reference types="packages/angular_devkit/build_angular/src/babel-bazel" />
 export declare function createI18nPlugins(locale: string, translation: unknown | undefined, missingTranslation: 'error' | 'warning' | 'ignore', shouldInline: boolean, localeDataContent?: string): Promise<{
     diagnostics: import("@angular/localize/src/tools/src/diagnostics").Diagnostics;
     plugins: import("@babel/core").PluginObj<import("@babel/core").PluginPass>[];

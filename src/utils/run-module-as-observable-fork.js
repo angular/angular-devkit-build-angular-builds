@@ -16,7 +16,7 @@ function runModuleAsObservableFork(cwd, modulePath, exportName,
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 args) {
     return new rxjs_1.Observable((obs) => {
-        const workerPath = path_1.resolve(__dirname, './run-module-worker.js');
+        const workerPath = (0, path_1.resolve)(__dirname, './run-module-worker.js');
         const debugArgRegex = /--inspect(?:-brk|-port)?|--debug(?:-brk|-port)/;
         const execArgv = process.execArgv.filter((arg) => {
             // Remove debug args.
@@ -35,7 +35,7 @@ args) {
         //     logger.error, // make it a stream
         //   ];
         // }
-        const forkedProcess = child_process_1.fork(workerPath, undefined, forkOptions);
+        const forkedProcess = (0, child_process_1.fork)(workerPath, undefined, forkOptions);
         // Cleanup.
         const killForkedProcess = () => {
             if (forkedProcess && forkedProcess.pid) {

@@ -72,7 +72,7 @@ async function augmentIndexHtml(params) {
         }
         linkTags.push(`<link ${attrs.join(' ')}>`);
     }
-    const { rewriter, transformedContent } = await html_rewriting_stream_1.htmlRewritingStream(html);
+    const { rewriter, transformedContent } = await (0, html_rewriting_stream_1.htmlRewritingStream)(html);
     const baseTagExists = html.includes('<base');
     rewriter
         .on('startTag', (tag) => {
@@ -128,7 +128,7 @@ async function augmentIndexHtml(params) {
 exports.augmentIndexHtml = augmentIndexHtml;
 function generateSriAttributes(content) {
     const algo = 'sha384';
-    const hash = crypto_1.createHash(algo).update(content, 'utf8').digest('base64');
+    const hash = (0, crypto_1.createHash)(algo).update(content, 'utf8').digest('base64');
     return `integrity="${algo}-${hash}"`;
 }
 function updateAttribute(tag, name, value) {

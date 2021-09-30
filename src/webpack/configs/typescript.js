@@ -41,7 +41,7 @@ function createIvyPlugin(wco, aot, tsconfig) {
     const fileReplacements = {};
     if (buildOptions.fileReplacements) {
         for (const replacement of buildOptions.fileReplacements) {
-            fileReplacements[core_1.getSystemPath(replacement.replace)] = core_1.getSystemPath(replacement.with);
+            fileReplacements[(0, core_1.getSystemPath)(replacement.replace)] = (0, core_1.getSystemPath)(replacement.with);
         }
     }
     let inlineStyleFileExtension;

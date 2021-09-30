@@ -47,7 +47,7 @@ const stats_1 = require("../../webpack/utils/stats");
 function execute(options, context, transforms = {}) {
     const root = context.workspaceRoot;
     // Check Angular version.
-    version_1.assertCompatibleAngularVersion(root);
+    (0, version_1.assertCompatibleAngularVersion)(root);
     const baseOutputPath = path.resolve(root, options.outputPath);
     let outputPaths;
     if (typeof options.bundleDependencies === 'string') {
@@ -67,28 +67,28 @@ function execute(options, context, transforms = {}) {
     `);
         }
     }
-    return rxjs_1.from(initialize(options, context, transforms.webpackConfiguration)).pipe(operators_1.concatMap(({ config, i18n, target }) => {
-        return build_webpack_1.runWebpack(config, context, {
+    return (0, rxjs_1.from)(initialize(options, context, transforms.webpackConfiguration)).pipe((0, operators_1.concatMap)(({ config, i18n, target }) => {
+        return (0, build_webpack_1.runWebpack)(config, context, {
             webpackFactory: require('webpack'),
             logging: (stats, config) => {
                 if (options.verbose) {
                     context.logger.info(stats.toString(config.stats));
                 }
             },
-        }).pipe(operators_1.concatMap(async (output) => {
+        }).pipe((0, operators_1.concatMap)(async (output) => {
             const { emittedFiles = [], outputPath, webpackStats } = output;
             if (!webpackStats) {
                 throw new Error('Webpack stats build result is required.');
             }
             let success = output.success;
             if (success && i18n.shouldInline) {
-                outputPaths = output_paths_1.ensureOutputPaths(baseOutputPath, i18n);
-                success = await i18n_inlining_1.i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), [], outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
+                outputPaths = (0, output_paths_1.ensureOutputPaths)(baseOutputPath, i18n);
+                success = await (0, i18n_inlining_1.i18nInlineEmittedFiles)(context, emittedFiles, i18n, baseOutputPath, Array.from(outputPaths.values()), [], outputPath, target <= typescript_1.ScriptTarget.ES5, options.i18nMissingTranslation);
             }
-            stats_1.webpackStatsLogger(context.logger, webpackStats, config);
+            (0, stats_1.webpackStatsLogger)(context.logger, webpackStats, config);
             return { ...output, success };
         }));
-    }), operators_1.map((output) => {
+    }), (0, operators_1.map)((output) => {
         if (!output.success) {
             return output;
         }
@@ -101,27 +101,27 @@ function execute(options, context, transforms = {}) {
     }));
 }
 exports.execute = execute;
-exports.default = architect_1.createBuilder(execute);
+exports.default = (0, architect_1.createBuilder)(execute);
 async function initialize(options, context, webpackConfigurationTransform) {
     const originalOutputPath = options.outputPath;
-    const { config, i18n, target } = await webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext({
+    const { config, i18n, target } = await (0, webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext)({
         ...options,
         buildOptimizer: false,
         aot: true,
         platform: 'server',
     }, context, (wco) => [
-        configs_1.getCommonConfig(wco),
-        configs_1.getServerConfig(wco),
-        configs_1.getStylesConfig(wco),
-        configs_1.getStatsConfig(wco),
-        configs_1.getTypeScriptConfig(wco),
+        (0, configs_1.getCommonConfig)(wco),
+        (0, configs_1.getServerConfig)(wco),
+        (0, configs_1.getStylesConfig)(wco),
+        (0, configs_1.getStatsConfig)(wco),
+        (0, configs_1.getTypeScriptConfig)(wco),
     ]);
     let transformedConfig;
     if (webpackConfigurationTransform) {
         transformedConfig = await webpackConfigurationTransform(config);
     }
     if (options.deleteOutputPath) {
-        utils_1.deleteOutputDir(context.workspaceRoot, originalOutputPath);
+        (0, utils_1.deleteOutputDir)(context.workspaceRoot, originalOutputPath);
     }
     return { config: transformedConfig || config, i18n, target };
 }

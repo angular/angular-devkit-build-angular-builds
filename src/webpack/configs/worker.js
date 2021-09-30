@@ -16,7 +16,7 @@ function getWorkerConfig(wco) {
         return {};
     }
     return {
-        plugins: [typescript_1.getTypescriptWorkerPlugin(wco, path_1.resolve(wco.root, webWorkerTsConfig))],
+        plugins: [(0, typescript_1.getTypescriptWorkerPlugin)(wco, (0, path_1.resolve)(wco.root, webWorkerTsConfig))],
     };
 }
 exports.getWorkerConfig = getWorkerConfig;

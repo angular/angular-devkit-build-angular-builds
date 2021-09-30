@@ -39,7 +39,7 @@ async function createTranslationLoader() {
             const analysis = analyze(parser, path, content);
             if (analysis.canParse) {
                 const { locale, translations } = parser.parse(path, content, analysis.hint);
-                const integrity = 'sha256-' + crypto_1.createHash('sha256').update(content).digest('base64');
+                const integrity = 'sha256-' + (0, crypto_1.createHash)('sha256').update(content).digest('base64');
                 return { format, locale, translations, diagnostics, integrity };
             }
             else {
@@ -76,7 +76,7 @@ async function importParsers() {
         // Once TypeScript provides support for keeping the dynamic import this workaround can be
         // changed to a direct dynamic import.
         // TODO_ESM: The type needs to be manually constructed until the tools entry point exists
-        localizeToolsModule = await load_esm_1.loadEsmModule('@angular/localize/tools');
+        localizeToolsModule = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
     }
     catch { }
     try {

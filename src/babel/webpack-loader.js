@@ -19,9 +19,9 @@ let needsLinking;
  */
 let linkerPluginCreator;
 /**
- * Cached instance of the `@angular/localize/tool` exports we rely on.
+ * Cached instance of the localize Babel plugins factory functions.
  */
-let localizeToolExports;
+let i18nPluginCreators;
 async function requiresLinking(path, source) {
     // @angular/core and @angular/compiler will cause false positives
     // Also, TypeScript files do not require linking
@@ -32,12 +32,12 @@ async function requiresLinking(path, source) {
         // Load ESM `@angular/compiler-cli/linker` using the TypeScript dynamic import workaround.
         // Once TypeScript provides support for keeping the dynamic import this workaround can be
         // changed to a direct dynamic import.
-        const linkerModule = await load_esm_1.loadEsmModule('@angular/compiler-cli/linker');
+        const linkerModule = await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli/linker');
         needsLinking = linkerModule.needsLinking;
     }
     return needsLinking(path, source);
 }
-exports.default = babel_loader_1.custom(() => {
+exports.default = (0, babel_loader_1.custom)(() => {
     const baseOptions = Object.freeze({
         babelrc: false,
         configFile: false,
@@ -63,7 +63,7 @@ exports.default = babel_loader_1.custom(() => {
                     // Load ESM `@angular/compiler-cli/linker/babel` using the TypeScript dynamic import workaround.
                     // Once TypeScript provides support for keeping the dynamic import this workaround can be
                     // changed to a direct dynamic import.
-                    const linkerBabelModule = await load_esm_1.loadEsmModule('@angular/compiler-cli/linker/babel');
+                    const linkerBabelModule = await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli/linker/babel');
                     linkerPluginCreator = linkerBabelModule.createEs2015LinkerPlugin;
                 }
                 customOptions.angularLinker = {
@@ -93,24 +93,24 @@ exports.default = babel_loader_1.custom(() => {
             if (i18n &&
                 !/[\\/]@angular[\\/](?:compiler|localize)/.test(this.resourcePath) &&
                 source.includes('$localize')) {
-                // Load the localize tool exports from the new `@angular/localize/tools` entry point.
+                // Load the i18n plugin creators from the new `@angular/localize/tools` entry point.
                 // This may fail during the transition to ESM due to the entry point not yet existing.
                 // During the transition, this will always attempt to load the entry point for each file.
                 // This will only occur during prerelease and will be automatically corrected once the new
                 // entry point exists.
                 // TODO_ESM: Make import failure an error once the `tools` entry point exists.
-                if (localizeToolExports === undefined) {
+                if (i18nPluginCreators === undefined) {
                     // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
                     // Once TypeScript provides support for keeping the dynamic import this workaround can be
                     // changed to a direct dynamic import.
                     try {
-                        localizeToolExports = await load_esm_1.loadEsmModule('@angular/localize/tools');
+                        i18nPluginCreators = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
                     }
                     catch { }
                 }
                 customOptions.i18n = {
                     ...i18n,
-                    localizeToolExports,
+                    pluginCreators: i18nPluginCreators,
                 };
                 shouldProcess = true;
             }

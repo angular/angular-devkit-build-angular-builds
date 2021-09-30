@@ -62,7 +62,7 @@ class DedupeModuleResolvePlugin {
                     return;
                 }
                 if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.verbose) {
-                    webpack_diagnostics_1.addWarning(compilation, `[DedupeModuleResolvePlugin]: ${resource} -> ${prevResource}`);
+                    (0, webpack_diagnostics_1.addWarning)(compilation, `[DedupeModuleResolvePlugin]: ${resource} -> ${prevResource}`);
                 }
                 // Alter current request with previously resolved module.
                 const createData = result.createData;

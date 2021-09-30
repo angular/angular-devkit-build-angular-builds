@@ -123,8 +123,8 @@ class NoEmitPlugin {
 async function execute(options, context, transforms) {
     var _a;
     // Check Angular version.
-    version_1.assertCompatibleAngularVersion(context.workspaceRoot);
-    const browserTarget = architect_1.targetFromTargetString(options.browserTarget);
+    (0, version_1.assertCompatibleAngularVersion)(context.workspaceRoot);
+    const browserTarget = (0, architect_1.targetFromTargetString)(options.browserTarget);
     const browserOptions = await context.validateOptions(await context.getTargetOptions(browserTarget), await context.getBuilderNameForTarget(browserTarget));
     const format = normalizeFormatOption(options);
     // We need to determine the outFile name so that AngularCompiler can retrieve it.
@@ -138,7 +138,7 @@ async function execute(options, context, transforms) {
         throw new Error('The builder requires a target.');
     }
     const metadata = await context.getProjectMetadata(context.target);
-    const i18n = i18n_options_1.createI18nOptions(metadata);
+    const i18n = (0, i18n_options_1.createI18nOptions)(metadata);
     let useLegacyIds = true;
     const ivyMessages = [];
     const builderOptions = {
@@ -162,17 +162,17 @@ async function execute(options, context, transforms) {
         outputHashing: schema_1.OutputHashing.None,
         namedChunks: true,
     };
-    const { config, projectRoot } = await webpack_browser_config_1.generateBrowserWebpackConfigFromContext(builderOptions, context, (wco) => {
+    const { config, projectRoot } = await (0, webpack_browser_config_1.generateBrowserWebpackConfigFromContext)(builderOptions, context, (wco) => {
         var _a;
         // Default value for legacy message ids is currently true
         useLegacyIds = (_a = wco.tsConfig.options.enableI18nLegacyMessageIdFormat) !== null && _a !== void 0 ? _a : true;
         const partials = [
             { plugins: [new NoEmitPlugin()] },
-            configs_1.getCommonConfig(wco),
-            configs_1.getBrowserConfig(wco),
-            configs_1.getTypeScriptConfig(wco),
-            configs_1.getWorkerConfig(wco),
-            configs_1.getStatsConfig(wco),
+            (0, configs_1.getCommonConfig)(wco),
+            (0, configs_1.getBrowserConfig)(wco),
+            (0, configs_1.getTypeScriptConfig)(wco),
+            (0, configs_1.getWorkerConfig)(wco),
+            (0, configs_1.getStatsConfig)(wco),
         ];
         // Add Ivy application file extractor support
         partials.unshift({
@@ -219,11 +219,11 @@ async function execute(options, context, transforms) {
         // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
         // Once TypeScript provides support for keeping the dynamic import this workaround can be
         // changed to a direct dynamic import.
-        localizeToolsModule = await load_esm_1.loadEsmModule('@angular/localize/tools');
+        localizeToolsModule = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
     }
     catch { }
-    const webpackResult = await build_webpack_1.runWebpack((await ((_a = transforms === null || transforms === void 0 ? void 0 : transforms.webpackConfiguration) === null || _a === void 0 ? void 0 : _a.call(transforms, config))) || config, context, {
-        logging: stats_1.createWebpackLoggingCallback(builderOptions, context.logger),
+    const webpackResult = await (0, build_webpack_1.runWebpack)((await ((_a = transforms === null || transforms === void 0 ? void 0 : transforms.webpackConfiguration) === null || _a === void 0 ? void 0 : _a.call(transforms, config))) || config, context, {
+        logging: (0, stats_1.createWebpackLoggingCallback)(builderOptions, context.logger),
         webpackFactory: webpack_1.default,
     }).toPromise();
     // Set the outputPath to the extraction output location for downstream consumers
@@ -262,4 +262,4 @@ async function execute(options, context, transforms) {
     return webpackResult;
 }
 exports.execute = execute;
-exports.default = architect_1.createBuilder(execute);
+exports.default = (0, architect_1.createBuilder)(execute);

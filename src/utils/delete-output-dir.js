@@ -33,7 +33,7 @@ const path_1 = require("path");
  * Delete an output directory, but error out if it's the root of the project.
  */
 function deleteOutputDir(root, outputPath) {
-    const resolvedOutputPath = path_1.resolve(root, outputPath);
+    const resolvedOutputPath = (0, path_1.resolve)(root, outputPath);
     if (resolvedOutputPath === root) {
         throw new Error('Output path MUST not be project root directory!');
     }
