@@ -26,9 +26,9 @@ function getServerConfig(wco) {
     if (!bundleDependencies) {
         externals.push(({ context, request }, callback) => externalizePackages(context !== null && context !== void 0 ? context : wco.projectRoot, request, callback));
     }
-    const config = {
+    return {
         resolve: {
-            mainFields: ['es2015', 'main', 'module'],
+            mainFields: ['es2020', 'es2015', 'main', 'module'],
         },
         output: {
             libraryTarget: 'commonjs',
@@ -50,7 +50,6 @@ function getServerConfig(wco) {
         node: false,
         externals,
     };
-    return config;
 }
 exports.getServerConfig = getServerConfig;
 function externalizePackages(context, request, callback) {
