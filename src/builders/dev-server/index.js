@@ -45,19 +45,6 @@ const configs_1 = require("../../webpack/configs");
 const index_html_webpack_plugin_1 = require("../../webpack/plugins/index-html-webpack-plugin");
 const stats_1 = require("../../webpack/utils/stats");
 const schema_1 = require("../browser/schema");
-const devServerBuildOverriddenKeys = [
-    'watch',
-    'optimization',
-    'aot',
-    'sourceMap',
-    'vendorChunk',
-    'commonChunk',
-    'baseHref',
-    'progress',
-    'poll',
-    'verbose',
-    'deployUrl',
-];
 /**
  * Reusable implementation of the Angular Webpack development server builder.
  * @param options Dev Server options.
@@ -74,31 +61,8 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     (0, version_1.assertCompatibleAngularVersion)(workspaceRoot);
     const browserTarget = (0, architect_1.targetFromTargetString)(options.browserTarget);
     async function setup() {
-        var _a, _b;
-        // Get the browser configuration from the target name.
-        const rawBrowserOptions = (await context.getTargetOptions(browserTarget));
+        var _a;
         options.port = await (0, check_port_1.checkPort)((_a = options.port) !== null && _a !== void 0 ? _a : 4200, options.host || 'localhost');
-        // Override options we need to override, if defined.
-        const overrides = Object.keys(options)
-            .filter((key) => options[key] !== undefined && devServerBuildOverriddenKeys.includes(key))
-            .reduce((previous, key) => ({
-            ...previous,
-            [key]: options[key],
-        }), {});
-        const devServerOptions = Object.keys(options)
-            .filter((key) => !devServerBuildOverriddenKeys.includes(key) && key !== 'browserTarget')
-            .reduce((previous, key) => ({
-            ...previous,
-            [key]: options[key],
-        }), {});
-        // In dev server we should not have budgets because of extra libs such as socks-js
-        overrides.budgets = undefined;
-        if (rawBrowserOptions.outputHashing && rawBrowserOptions.outputHashing !== schema_1.OutputHashing.None) {
-            // Disable output hashing for dev build as this can cause memory leaks
-            // See: https://github.com/webpack/webpack-dev-server/issues/377#issuecomment-241258405
-            overrides.outputHashing = schema_1.OutputHashing.None;
-            logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
-        }
         if (options.hmr) {
             logger.warn(core_1.tags.stripIndents `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
       See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
@@ -124,11 +88,22 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         for more information.
       `);
         }
-        // Webpack's live reload functionality adds the `strip-ansi` package which is commonJS
-        (_b = rawBrowserOptions.allowedCommonJsDependencies) !== null && _b !== void 0 ? _b : (rawBrowserOptions.allowedCommonJsDependencies = []);
-        rawBrowserOptions.allowedCommonJsDependencies.push('strip-ansi');
+        // Get the browser configuration from the target name.
+        const rawBrowserOptions = (await context.getTargetOptions(browserTarget));
+        if (rawBrowserOptions.outputHashing && rawBrowserOptions.outputHashing !== schema_1.OutputHashing.None) {
+            // Disable output hashing for dev build as this can cause memory leaks
+            // See: https://github.com/webpack/webpack-dev-server/issues/377#issuecomment-241258405
+            rawBrowserOptions.outputHashing = schema_1.OutputHashing.None;
+            logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
+        }
         const browserName = await context.getBuilderNameForTarget(browserTarget);
-        const browserOptions = (await context.validateOptions({ ...rawBrowserOptions, ...overrides }, browserName));
+        const browserOptions = (await context.validateOptions({
+            ...rawBrowserOptions,
+            watch: options.watch,
+            verbose: options.verbose,
+            // In dev server we should not have budgets because of extra libs such as socks-js
+            budgets: undefined,
+        }, browserName));
         const { styles, scripts } = (0, utils_1.normalizeOptimization)(browserOptions.optimization);
         if (scripts || styles.minify) {
             logger.error(core_1.tags.stripIndents `
@@ -149,7 +124,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             (0, configs_1.getAnalyticsConfig)(wco, context),
             (0, configs_1.getTypeScriptConfig)(wco),
             browserOptions.webWorkerTsConfig ? (0, configs_1.getWorkerConfig)(wco) : {},
-        ], devServerOptions);
+        ], options);
         if (!config.devServer) {
             throw new Error('Webpack Dev Server configuration was not set.');
         }
