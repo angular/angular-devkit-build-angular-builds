@@ -236,7 +236,7 @@ async function getCommonConfig(wco) {
     }
     if (scriptsSourceMap || stylesSourceMap) {
         extraRules.push({
-            test: /\.m?js$/,
+            test: /\.[cm]?jsx?$/,
             enforce: 'pre',
             loader: require.resolve('source-map-loader'),
             options: {
@@ -322,7 +322,7 @@ async function getCommonConfig(wco) {
                     sideEffects: true,
                 },
                 {
-                    test: /\.[cm]?js$|\.tsx?$/,
+                    test: /\.[cm]?[tj]sx?$/,
                     // The below is needed due to a bug in `@babel/runtime`. See: https://github.com/babel/babel/issues/12824
                     resolve: { fullySpecified: false },
                     exclude: [/[/\\](?:core-js|@babel|tslib|web-animations-js|web-streams-polyfill)[/\\]/],

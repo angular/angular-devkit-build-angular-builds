@@ -179,7 +179,7 @@ async function execute(options, context, transforms) {
             module: {
                 rules: [
                     {
-                        test: /\.[t|j]s$/,
+                        test: /\.[cm]?[tj]sx?$/,
                         loader: require.resolve('./ivy-extract-loader'),
                         options: {
                             messageHandler: (messages) => ivyMessages.push(...messages),

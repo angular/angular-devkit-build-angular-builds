@@ -246,7 +246,7 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
         translation: i18n.shouldInline ? translation : undefined,
     };
     const i18nRule = {
-        test: /\.(?:[cm]?js|ts)$/,
+        test: /\.[cm]?[tj]sx?$/,
         enforce: 'post',
         use: [
             {
