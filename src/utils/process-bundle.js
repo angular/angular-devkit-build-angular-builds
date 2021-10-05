@@ -60,39 +60,30 @@ let localizeToolsModule;
  */
 async function loadLocalizeTools() {
     if (localizeToolsModule !== undefined) {
-        return;
+        return localizeToolsModule;
     }
-    // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
-    // This provides interim compatibility while the framework is transitioned to bundled ESM packages.
-    // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-    try {
-        // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
-        // Once TypeScript provides support for keeping the dynamic import this workaround can be
-        // changed to a direct dynamic import.
-        localizeToolsModule = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
-    }
-    catch { }
+    // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
+    // Once TypeScript provides support for keeping the dynamic import this workaround can be
+    // changed to a direct dynamic import.
+    return (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
 }
 async function createI18nPlugins(locale, translation, missingTranslation, shouldInline, localeDataContent) {
+    const { Diagnostics, makeEs2015TranslatePlugin, makeEs5TranslatePlugin, makeLocalePlugin } = await loadLocalizeTools();
     const plugins = [];
-    const localizeDiag = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/diagnostics'))));
-    const diagnostics = new localizeDiag.Diagnostics();
+    const diagnostics = new Diagnostics();
     if (shouldInline) {
-        const es2015 = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/es2015_translate_plugin'))));
         plugins.push(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        es2015.makeEs2015TranslatePlugin(diagnostics, (translation || {}), {
+        makeEs2015TranslatePlugin(diagnostics, (translation || {}), {
             missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
         }));
-        const es5 = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/es5_translate_plugin'))));
         plugins.push(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        es5.makeEs5TranslatePlugin(diagnostics, (translation || {}), {
+        makeEs5TranslatePlugin(diagnostics, (translation || {}), {
             missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
         }));
     }
-    const inlineLocale = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/source_files/locale_plugin'))));
-    plugins.push(inlineLocale.makeLocalePlugin(locale));
+    plugins.push(makeLocalePlugin(locale));
     if (localeDataContent) {
         plugins.push({
             visitor: {
@@ -189,10 +180,9 @@ async function inlineLocalesDirect(ast, options) {
         return { file: options.filename, diagnostics: [], count: 0 };
     }
     const { default: generate } = await Promise.resolve().then(() => __importStar(require('@babel/generator')));
-    const utils = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/source_file_utils'))));
-    const localizeDiag = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/diagnostics'))));
+    const localizeDiag = await loadLocalizeTools();
     const diagnostics = new localizeDiag.Diagnostics();
-    const positions = findLocalizePositions(ast, options, utils);
+    const positions = findLocalizePositions(ast, options, localizeDiag);
     if (positions.length === 0 && !options.setLocale) {
         return inlineCopyOnly(options);
     }
@@ -215,8 +205,8 @@ async function inlineLocalesDirect(ast, options) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const translations = isSourceLocale ? {} : i18n.locales[locale].translation || {};
         for (const position of positions) {
-            const translated = utils.translate(diagnostics, translations, position.messageParts, position.expressions, isSourceLocale ? 'ignore' : options.missingTranslation || 'warning');
-            const expression = utils.buildLocalizeReplacement(translated[0], translated[1]);
+            const translated = localizeDiag.translate(diagnostics, translations, position.messageParts, position.expressions, isSourceLocale ? 'ignore' : options.missingTranslation || 'warning');
+            const expression = localizeDiag.buildLocalizeReplacement(translated[0], translated[1]);
             const { code } = generate(expression);
             content.replace(position.start, position.end - 1, code);
         }

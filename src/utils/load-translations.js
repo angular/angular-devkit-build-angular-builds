@@ -67,28 +67,19 @@ async function createTranslationLoader() {
 }
 exports.createTranslationLoader = createTranslationLoader;
 async function importParsers() {
-    // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
-    // This provides interim compatibility while the framework is transitioned to bundled ESM packages.
-    // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
-    let localizeToolsModule;
     try {
         // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
         // Once TypeScript provides support for keeping the dynamic import this workaround can be
         // changed to a direct dynamic import.
-        // TODO_ESM: The type needs to be manually constructed until the tools entry point exists
-        localizeToolsModule = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
-    }
-    catch { }
-    try {
-        const { Diagnostics } = localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/diagnostics'))));
+        const { Diagnostics, ArbTranslationParser, SimpleJsonTranslationParser, Xliff1TranslationParser, Xliff2TranslationParser, XtbTranslationParser, } = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
         const diagnostics = new Diagnostics();
         const parsers = {
-            arb: new (localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/translation_files/translation_parsers/arb_translation_parser'))))).ArbTranslationParser(),
-            json: new (localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/translation_files/translation_parsers/simple_json_translation_parser'))))).SimpleJsonTranslationParser(),
-            xlf: new (localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff1_translation_parser'))))).Xliff1TranslationParser(),
-            xlf2: new (localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xliff2_translation_parser'))))).Xliff2TranslationParser(),
+            arb: new ArbTranslationParser(),
+            json: new SimpleJsonTranslationParser(),
+            xlf: new Xliff1TranslationParser(),
+            xlf2: new Xliff2TranslationParser(),
             // The name ('xmb') needs to match the AOT compiler option
-            xmb: new (localizeToolsModule !== null && localizeToolsModule !== void 0 ? localizeToolsModule : (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/translate/translation_files/translation_parsers/xtb_translation_parser'))))).XtbTranslationParser(),
+            xmb: new XtbTranslationParser(),
         };
         return { parsers, diagnostics };
     }

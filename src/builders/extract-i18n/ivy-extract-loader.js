@@ -46,17 +46,11 @@ async function extract(loaderContext, content, map, options) {
     // TODO_ESM: Remove all deep imports once `@angular/localize` is published with the `tools` entry point
     let MessageExtractor;
     try {
-        try {
-            // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
-            // Once TypeScript provides support for keeping the dynamic import this workaround can be
-            // changed to a direct dynamic import.
-            const localizeToolsModule = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
-            MessageExtractor = localizeToolsModule.MessageExtractor;
-        }
-        catch {
-            MessageExtractor = (await Promise.resolve().then(() => __importStar(require('@angular/localize/src/tools/src/extract/extraction'))))
-                .MessageExtractor;
-        }
+        // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
+        // Once TypeScript provides support for keeping the dynamic import this workaround can be
+        // changed to a direct dynamic import.
+        const localizeToolsModule = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
+        MessageExtractor = localizeToolsModule.MessageExtractor;
     }
     catch {
         throw new Error(`Unable to load message extractor. Please ensure '@angular/localize' is installed.`);

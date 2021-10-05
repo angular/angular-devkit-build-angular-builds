@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export declare function createI18nPlugins(locale: string, translation: unknown | undefined, missingTranslation: 'error' | 'warning' | 'ignore', shouldInline: boolean, localeDataContent?: string): Promise<{
-    diagnostics: import("@angular/localize/src/tools/src/diagnostics").Diagnostics;
-    plugins: import("@babel/core").PluginObj<import("@babel/core").PluginPass>[];
+    diagnostics: import("@angular/localize/tools").Diagnostics;
+    plugins: import("@angular/localize/tools/src/babel_core").PluginObj[];
 }>;
 export interface InlineOptions {
     filename: string;
