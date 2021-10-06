@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { NormalizedCachedOptions } from '../normalize-cache';
 import { NormalizedOptimizationOptions } from '../normalize-optimization';
 import { CrossOriginValue, Entrypoint, FileInfo } from './augment-index-html';
 export interface IndexHtmlGeneratorProcessOptions {
@@ -21,6 +22,7 @@ export interface IndexHtmlGeneratorOptions {
     postTransform?: IndexHtmlTransform;
     crossOrigin?: CrossOriginValue;
     optimization?: NormalizedOptimizationOptions;
+    cache?: NormalizedCachedOptions;
 }
 export declare type IndexHtmlTransform = (content: string) => Promise<string>;
 export interface IndexHtmlTransformResult {

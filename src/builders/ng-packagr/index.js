@@ -31,19 +31,31 @@ const architect_1 = require("@angular-devkit/architect");
 const path_1 = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
-async function initialize(options, root) {
-    const packager = (await Promise.resolve().then(() => __importStar(require('ng-packagr')))).ngPackagr();
-    packager.forProject((0, path_1.resolve)(root, options.project));
-    if (options.tsConfig) {
-        packager.withTsConfig((0, path_1.resolve)(root, options.tsConfig));
-    }
-    return packager;
-}
+const normalize_cache_1 = require("../../utils/normalize-cache");
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
 function execute(options, context) {
-    return (0, rxjs_1.from)(initialize(options, context.workspaceRoot)).pipe((0, operators_1.switchMap)((packager) => (options.watch ? packager.watch() : packager.build())), (0, operators_1.mapTo)({ success: true }), (0, operators_1.catchError)((err) => (0, rxjs_1.of)({ success: false, error: err.message })));
+    return (0, rxjs_1.from)((async () => {
+        var _a;
+        const root = context.workspaceRoot;
+        const packager = (await Promise.resolve().then(() => __importStar(require('ng-packagr')))).ngPackagr();
+        packager.forProject((0, path_1.resolve)(root, options.project));
+        if (options.tsConfig) {
+            packager.withTsConfig((0, path_1.resolve)(root, options.tsConfig));
+        }
+        const projectName = (_a = context.target) === null || _a === void 0 ? void 0 : _a.project;
+        if (!projectName) {
+            throw new Error('The builder requires a target.');
+        }
+        const metadata = await context.getProjectMetadata(projectName);
+        const { enabled: cacheEnabled, path: cacheDirectory } = (0, normalize_cache_1.normalizeCacheOptions)(metadata, context.workspaceRoot);
+        const ngPackagrOptions = {
+            cacheEnabled,
+            cacheDirectory: (0, path_1.join)(cacheDirectory, 'ng-packagr'),
+        };
+        return { packager, ngPackagrOptions };
+    })()).pipe((0, operators_1.switchMap)(({ packager, ngPackagrOptions }) => options.watch ? packager.watch(ngPackagrOptions) : packager.build(ngPackagrOptions)), (0, operators_1.mapTo)({ success: true }), (0, operators_1.catchError)((err) => (0, rxjs_1.of)({ success: false, error: err.message })));
 }
 exports.execute = execute;
 exports.default = (0, architect_1.createBuilder)(execute);

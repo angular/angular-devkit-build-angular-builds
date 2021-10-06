@@ -35,9 +35,9 @@ const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const url = __importStar(require("url"));
 const utils_1 = require("../../utils");
-const cache_path_1 = require("../../utils/cache-path");
 const check_port_1 = require("../../utils/check-port");
 const color_1 = require("../../utils/color");
+const normalize_cache_1 = require("../../utils/normalize-cache");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
 const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
@@ -61,8 +61,12 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     (0, version_1.assertCompatibleAngularVersion)(workspaceRoot);
     const browserTarget = (0, architect_1.targetFromTargetString)(options.browserTarget);
     async function setup() {
-        var _a;
-        options.port = await (0, check_port_1.checkPort)((_a = options.port) !== null && _a !== void 0 ? _a : 4200, options.host || 'localhost');
+        var _a, _b, _c, _d;
+        const projectName = (_a = context.target) === null || _a === void 0 ? void 0 : _a.project;
+        if (!projectName) {
+            throw new Error('The builder requires a target.');
+        }
+        options.port = await (0, check_port_1.checkPort)((_b = options.port) !== null && _b !== void 0 ? _b : 4200, options.host || 'localhost');
         if (options.hmr) {
             logger.warn(core_1.tags.stripIndents `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
       See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
@@ -96,6 +100,8 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             rawBrowserOptions.outputHashing = schema_1.OutputHashing.None;
             logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
         }
+        const metadata = await context.getProjectMetadata(projectName);
+        const cacheOptions = (0, normalize_cache_1.normalizeCacheOptions)(metadata, context.workspaceRoot);
         const browserName = await context.getBuilderNameForTarget(browserTarget);
         const browserOptions = (await context.validateOptions({
             ...rawBrowserOptions,
@@ -143,20 +149,11 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             if (i18n.inlineLocales.size > 1) {
                 throw new Error('The development server only supports localizing a single locale per build.');
             }
-            await setupLocalize(locale, i18n, browserOptions, webpackConfig);
+            await setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheOptions);
         }
         if (transforms.webpackConfiguration) {
             webpackConfig = await transforms.webpackConfiguration(webpackConfig);
         }
-        return {
-            browserOptions,
-            webpackConfig,
-            projectRoot,
-            locale,
-        };
-    }
-    return (0, rxjs_1.from)(setup()).pipe((0, operators_1.switchMap)(({ browserOptions, webpackConfig, locale }) => {
-        var _a, _b;
         if (browserOptions.index) {
             const { scripts = [], styles = [], baseHref } = browserOptions;
             const entrypoints = (0, package_chunk_sort_1.generateEntryPoints)({
@@ -165,9 +162,9 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 // The below is needed as otherwise HMR for CSS will break.
                 // styles.js and runtime.js needs to be loaded as a non-module scripts as otherwise `document.currentScript` will be null.
                 // https://github.com/webpack-contrib/mini-css-extract-plugin/blob/90445dd1d81da0c10b9b0e8a17b417d0651816b8/src/hmr/hotModuleReplacement.js#L39
-                isHMREnabled: !!((_a = webpackConfig.devServer) === null || _a === void 0 ? void 0 : _a.hot),
+                isHMREnabled: !!((_c = webpackConfig.devServer) === null || _c === void 0 ? void 0 : _c.hot),
             });
-            (_b = webpackConfig.plugins) !== null && _b !== void 0 ? _b : (webpackConfig.plugins = []);
+            (_d = webpackConfig.plugins) !== null && _d !== void 0 ? _d : (webpackConfig.plugins = []);
             webpackConfig.plugins.push(new index_html_webpack_plugin_1.IndexHtmlWebpackPlugin({
                 indexPath: path.resolve(workspaceRoot, (0, webpack_browser_config_1.getIndexInputFile)(browserOptions.index)),
                 outputPath: (0, webpack_browser_config_1.getIndexOutputFile)(browserOptions.index),
@@ -175,12 +172,20 @@ function serveWebpackBrowser(options, context, transforms = {}) {
                 entrypoints,
                 deployUrl: browserOptions.deployUrl,
                 sri: browserOptions.subresourceIntegrity,
+                cache: cacheOptions,
                 postTransform: transforms.indexHtml,
                 optimization: (0, utils_1.normalizeOptimization)(browserOptions.optimization),
                 crossOrigin: browserOptions.crossOrigin,
                 lang: locale,
             }));
         }
+        return {
+            browserOptions,
+            webpackConfig,
+            projectRoot,
+        };
+    }
+    return (0, rxjs_1.from)(setup()).pipe((0, operators_1.switchMap)(({ browserOptions, webpackConfig }) => {
         return (0, build_webpack_1.runWebpackDevServer)(webpackConfig, context, {
             logging: transforms.logging || (0, stats_1.createWebpackLoggingCallback)(browserOptions, logger),
             webpackFactory: require('webpack'),
@@ -216,7 +221,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     }));
 }
 exports.serveWebpackBrowser = serveWebpackBrowser;
-async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
+async function setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheOptions) {
     var _a;
     const localeDescription = i18n.locales[locale];
     // Modify main entrypoint to include locale data
@@ -252,7 +257,8 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig) {
             {
                 loader: require.resolve('../../babel/webpack-loader'),
                 options: {
-                    cacheDirectory: (0, cache_path_1.findCachePath)('babel-dev-server-i18n'),
+                    cacheDirectory: (cacheOptions.enabled && path.join(cacheOptions.path, 'babel-dev-server-i18n')) ||
+                        false,
                     cacheIdentifier: JSON.stringify({
                         locale,
                         translationIntegrity: localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.files.map((file) => file.integrity),

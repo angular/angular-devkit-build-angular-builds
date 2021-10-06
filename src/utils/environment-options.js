@@ -6,28 +6,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.maxWorkers = exports.profilingEnabled = exports.persistentBuildCacheEnabled = exports.cachingBasePath = exports.cachingDisabled = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
-const path = __importStar(require("path"));
+exports.cachingDisabled = exports.maxWorkers = exports.profilingEnabled = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
+const color_1 = require("./color");
 function isDisabled(variable) {
     return variable === '0' || variable.toLowerCase() === 'false';
 }
@@ -76,23 +57,6 @@ exports.allowMangle = isPresent(mangleVariable)
     : debugOptimize.mangle;
 exports.shouldBeautify = debugOptimize.beautify;
 exports.allowMinify = debugOptimize.minify;
-// Build cache
-const cacheVariable = process.env['NG_BUILD_CACHE'];
-exports.cachingDisabled = isPresent(cacheVariable) && isDisabled(cacheVariable);
-exports.cachingBasePath = (() => {
-    if (exports.cachingDisabled || !isPresent(cacheVariable) || isEnabled(cacheVariable)) {
-        return null;
-    }
-    if (!path.isAbsolute(cacheVariable)) {
-        throw new Error('NG_BUILD_CACHE path value must be absolute.');
-    }
-    return cacheVariable;
-})();
-// Persistent build cache
-const persistentBuildCacheVariable = process.env['NG_PERSISTENT_BUILD_CACHE'];
-exports.persistentBuildCacheEnabled = !exports.cachingDisabled &&
-    isPresent(persistentBuildCacheVariable) &&
-    isEnabled(persistentBuildCacheVariable);
 // Build profiling
 const profilingVariable = process.env['NG_BUILD_PROFILING'];
 exports.profilingEnabled = isPresent(profilingVariable) && isEnabled(profilingVariable);
@@ -107,3 +71,14 @@ exports.profilingEnabled = isPresent(profilingVariable) && isEnabled(profilingVa
  */
 const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
 exports.maxWorkers = isPresent(maxWorkersVariable) ? +maxWorkersVariable : 4;
+// Build cache
+const cacheVariable = process.env['NG_BUILD_CACHE'];
+exports.cachingDisabled = (() => {
+    if (!isPresent(cacheVariable)) {
+        return null;
+    }
+    // eslint-disable-next-line no-console
+    console.warn(color_1.colors.yellow(`Warning: 'NG_BUILD_CACHE' environment variable support will be removed in version 14.\n` +
+        `Configure 'cli.cache' in the workspace configuration instead.`));
+    return isDisabled(cacheVariable);
+})();

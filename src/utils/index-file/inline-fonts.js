@@ -34,13 +34,9 @@ const cacache = __importStar(require("cacache"));
 const fs = __importStar(require("fs"));
 const https = __importStar(require("https"));
 const https_proxy_agent_1 = __importDefault(require("https-proxy-agent"));
+const path_1 = require("path");
 const url_1 = require("url");
-const cache_path_1 = require("../cache-path");
-const environment_options_1 = require("../environment-options");
 const html_rewriting_stream_1 = require("./html-rewriting-stream");
-const cacheFontsPath = environment_options_1.cachingDisabled
-    ? undefined
-    : (0, cache_path_1.findCachePath)('angular-build-fonts');
 const packageVersion = require('../../../package.json').version;
 const SUPPORTED_PROVIDERS = {
     'fonts.googleapis.com': {
@@ -53,6 +49,10 @@ const SUPPORTED_PROVIDERS = {
 class InlineFontsProcessor {
     constructor(options) {
         this.options = options;
+        const { path: cacheDirectory, enabled } = this.options.cache || {};
+        if (cacheDirectory && enabled) {
+            this.cachePath = (0, path_1.join)(cacheDirectory, 'angular-build-fonts');
+        }
     }
     async process(content) {
         var _a;
@@ -147,8 +147,8 @@ class InlineFontsProcessor {
     async getResponse(url) {
         var _a;
         const key = `${packageVersion}|${url}`;
-        if (cacheFontsPath) {
-            const entry = await cacache.get.info(cacheFontsPath, key);
+        if (this.cachePath) {
+            const entry = await cacache.get.info(this.cachePath, key);
             if (entry) {
                 return fs.promises.readFile(entry.path, 'utf8');
             }
@@ -177,8 +177,8 @@ class InlineFontsProcessor {
                 .on('error', (e) => reject(new Error(`Inlining of fonts failed. An error has occurred while retrieving ${url} over the internet.\n` +
                 e.message)));
         });
-        if (cacheFontsPath) {
-            await cacache.put(cacheFontsPath, key, data);
+        if (this.cachePath) {
+            await cacache.put(this.cachePath, key, data);
         }
         return data;
     }

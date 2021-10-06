@@ -118,7 +118,7 @@ async function generateBrowserWebpackConfigFromContext(options, context, webpack
     const sourceRoot = projectSourceRoot
         ? (0, core_1.resolve)(workspaceRoot, (0, core_1.normalize)(projectSourceRoot))
         : undefined;
-    const normalizedOptions = (0, utils_1.normalizeBrowserSchema)(workspaceRoot, projectRoot, sourceRoot, options);
+    const normalizedOptions = (0, utils_1.normalizeBrowserSchema)(workspaceRoot, projectRoot, sourceRoot, options, projectMetadata);
     const config = await generateWebpackConfig((0, core_1.getSystemPath)(workspaceRoot), (0, core_1.getSystemPath)(projectRoot), sourceRoot && (0, core_1.getSystemPath)(sourceRoot), normalizedOptions, webpackPartialGenerator, context.logger, extraBuildOptions);
     // If builder watch support is present in the context, add watch plugin
     // This is internal only and currently only used for testing

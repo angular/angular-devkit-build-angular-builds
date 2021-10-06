@@ -41,6 +41,7 @@ const color_1 = require("../../utils/color");
 const copy_assets_1 = require("../../utils/copy-assets");
 const i18n_inlining_1 = require("../../utils/i18n-inlining");
 const index_html_generator_1 = require("../../utils/index-file/index-html-generator");
+const normalize_cache_1 = require("../../utils/normalize-cache");
 const output_paths_1 = require("../../utils/output-paths");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
 const service_worker_1 = require("../../utils/service-worker");
@@ -102,10 +103,13 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         const sysProjectRoot = (0, core_1.getSystemPath)((0, core_1.resolve)((0, core_1.normalize)(context.workspaceRoot), (0, core_1.normalize)((_a = projectMetadata.root) !== null && _a !== void 0 ? _a : '')));
         const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(sysProjectRoot);
         checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
-        return initialize(options, context, transforms.webpackConfiguration);
+        return {
+            ...(await initialize(options, context, transforms.webpackConfiguration)),
+            cacheOptions: (0, normalize_cache_1.normalizeCacheOptions)(projectMetadata, context.workspaceRoot),
+        };
     }), (0, operators_1.switchMap)(
     // eslint-disable-next-line max-lines-per-function
-    ({ config, projectRoot, projectSourceRoot, i18n, target }) => {
+    ({ config, projectRoot, projectSourceRoot, i18n, target, cacheOptions }) => {
         const normalizedOptimization = (0, utils_1.normalizeOptimization)(options.optimization);
         return (0, build_webpack_1.runWebpack)(config, context, {
             webpackFactory: require('webpack'),
@@ -191,6 +195,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             styles: (_e = options.styles) !== null && _e !== void 0 ? _e : [],
                         });
                         const indexHtmlGenerator = new index_html_generator_1.IndexHtmlGenerator({
+                            cache: cacheOptions,
                             indexPath: path.join(context.workspaceRoot, (0, webpack_browser_config_1.getIndexInputFile)(options.index)),
                             entrypoints,
                             deployUrl: options.deployUrl,

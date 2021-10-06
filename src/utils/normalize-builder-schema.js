@@ -8,14 +8,17 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeBrowserSchema = void 0;
+const core_1 = require("@angular-devkit/core");
 const normalize_asset_patterns_1 = require("./normalize-asset-patterns");
+const normalize_cache_1 = require("./normalize-cache");
 const normalize_file_replacements_1 = require("./normalize-file-replacements");
 const normalize_optimization_1 = require("./normalize-optimization");
 const normalize_source_maps_1 = require("./normalize-source-maps");
-function normalizeBrowserSchema(root, projectRoot, sourceRoot, options) {
+function normalizeBrowserSchema(root, projectRoot, sourceRoot, options, metadata) {
     const normalizedSourceMapOptions = (0, normalize_source_maps_1.normalizeSourceMaps)(options.sourceMap || false);
     return {
         ...options,
+        cache: (0, normalize_cache_1.normalizeCacheOptions)(metadata, (0, core_1.getSystemPath)(root)),
         assets: (0, normalize_asset_patterns_1.normalizeAssetPatterns)(options.assets || [], root, projectRoot, sourceRoot),
         fileReplacements: (0, normalize_file_replacements_1.normalizeFileReplacements)(options.fileReplacements || [], root),
         optimization: (0, normalize_optimization_1.normalizeOptimization)(options.optimization),

@@ -37,7 +37,6 @@ const path = __importStar(require("path"));
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
 const utils_1 = require("../../utils");
-const cache_path_1 = require("../../utils/cache-path");
 const environment_options_1 = require("../../utils/environment-options");
 const load_esm_1 = require("../../utils/load-esm");
 const spinner_1 = require("../../utils/spinner");
@@ -49,7 +48,7 @@ const helpers_1 = require("../utils/helpers");
 async function getCommonConfig(wco) {
     var _a, _b;
     const { root, projectRoot, buildOptions, tsConfig } = wco;
-    const { platform = 'browser', sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, } = buildOptions;
+    const { cache, platform = 'browser', sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, } = buildOptions;
     const extraPlugins = [];
     const extraRules = [];
     const entryPoints = {};
@@ -321,7 +320,7 @@ async function getCommonConfig(wco) {
                         {
                             loader: require.resolve('../../babel/webpack-loader'),
                             options: {
-                                cacheDirectory: (0, cache_path_1.findCachePath)('babel-webpack'),
+                                cacheDirectory: (cache.enabled && path.join(cache.path, 'babel-webpack')) || false,
                                 scriptTarget: wco.scriptTarget,
                                 aot: buildOptions.aot,
                                 optimize: buildOptions.buildOptimizer,
@@ -351,11 +350,12 @@ async function getCommonConfig(wco) {
 }
 exports.getCommonConfig = getCommonConfig;
 function getCacheSettings(wco, supportedBrowsers, angularVersion) {
-    if (environment_options_1.persistentBuildCacheEnabled) {
+    const { enabled, path: cacheDirectory } = wco.buildOptions.cache;
+    if (enabled) {
         const packageVersion = require('../../../package.json').version;
         return {
             type: 'filesystem',
-            cacheDirectory: (0, cache_path_1.findCachePath)('angular-webpack'),
+            cacheDirectory: path.join(cacheDirectory, 'angular-webpack'),
             maxMemoryGenerations: 1,
             // We use the versions and build options as the cache name. The Webpack configurations are too
             // dynamic and shared among different build types: test, build and serve.
@@ -375,7 +375,7 @@ function getCacheSettings(wco, supportedBrowsers, angularVersion) {
                 .digest('hex'),
         };
     }
-    if (wco.buildOptions.watch && !environment_options_1.cachingDisabled) {
+    if (wco.buildOptions.watch) {
         return {
             type: 'memory',
             maxGenerations: 1,
