@@ -61,6 +61,7 @@ function getTestConfig(wco) {
         target: wco.tsConfig.options.target === typescript_1.ScriptTarget.ES5 ? ['web', 'es5'] : 'web',
         resolve: {
             mainFields: ['es2020', 'es2015', 'browser', 'module', 'main'],
+            conditionNames: ['es2020', 'es2015', '...'],
         },
         devtool: false,
         entry: {
