@@ -91,7 +91,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
         }
         await fs.promises.writeFile(outputIndexPath, html);
         if (browserOptions.serviceWorker) {
-            await (0, service_worker_1.augmentAppWithServiceWorker)((0, core_1.normalize)(root), projectRoot, (0, core_1.normalize)(outputPath), browserOptions.baseHref || '/', browserOptions.ngswConfigPath);
+            await (0, service_worker_1.augmentAppWithServiceWorker)(projectRoot, (0, core_1.normalize)(outputPath), browserOptions.baseHref || '/', browserOptions.ngswConfigPath);
         }
     }
     return browserResult;
