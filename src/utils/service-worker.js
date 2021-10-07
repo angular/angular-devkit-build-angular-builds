@@ -32,7 +32,6 @@ const crypto = __importStar(require("crypto"));
 const fs_1 = require("fs");
 const path = __importStar(require("path"));
 const stream_1 = require("stream");
-const url_1 = require("url");
 const load_esm_1 = require("./load-esm");
 class CliFilesystem {
     constructor(base) {
@@ -73,26 +72,12 @@ class CliFilesystem {
         return items;
     }
 }
-async function augmentAppWithServiceWorker(projectRoot, appRoot, outputPath, baseHref, ngswConfigPath) {
+async function augmentAppWithServiceWorker(appRoot, outputPath, baseHref, ngswConfigPath) {
     const distPath = (0, core_1.getSystemPath)((0, core_1.normalize)(outputPath));
-    const systemProjectRoot = (0, core_1.getSystemPath)(projectRoot);
-    // Find the service worker package
-    const workerPath = require.resolve('@angular/service-worker/ngsw-worker.js', {
-        paths: [systemProjectRoot],
-    });
-    // Absolute paths on Windows must be `file://` URLs when using ESM. Otherwise,
-    // `c:` would be interpreted as a protocol instead of a drive letter.
-    const swConfigPath = (0, url_1.pathToFileURL)(require.resolve('@angular/service-worker/config', {
-        paths: [systemProjectRoot],
-    }));
     // Determine the configuration file path
-    let configPath;
-    if (ngswConfigPath) {
-        configPath = (0, core_1.getSystemPath)((0, core_1.normalize)(ngswConfigPath));
-    }
-    else {
-        configPath = path.join((0, core_1.getSystemPath)(appRoot), 'ngsw-config.json');
-    }
+    const configPath = ngswConfigPath
+        ? (0, core_1.getSystemPath)((0, core_1.normalize)(ngswConfigPath))
+        : path.join((0, core_1.getSystemPath)(appRoot), 'ngsw-config.json');
     // Read the configuration file
     let config;
     try {
@@ -112,13 +97,15 @@ async function augmentAppWithServiceWorker(projectRoot, appRoot, outputPath, bas
     // Load ESM `@angular/service-worker/config` using the TypeScript dynamic import workaround.
     // Once TypeScript provides support for keeping the dynamic import this workaround can be
     // changed to a direct dynamic import.
-    const GeneratorConstructor = (await (0, load_esm_1.loadEsmModule)(swConfigPath)).Generator;
+    const GeneratorConstructor = (await (0, load_esm_1.loadEsmModule)('@angular/service-worker/config')).Generator;
     // Generate the manifest
     const generator = new GeneratorConstructor(new CliFilesystem(distPath), baseHref);
     const output = await generator.process(config);
     // Write the manifest
     const manifest = JSON.stringify(output, null, 2);
     await fs_1.promises.writeFile(path.join(distPath, 'ngsw.json'), manifest);
+    // Find the service worker package
+    const workerPath = require.resolve('@angular/service-worker/ngsw-worker.js');
     // Write the worker code
     await fs_1.promises.copyFile(workerPath, path.join(distPath, 'ngsw-worker.js'), fs_1.constants.COPYFILE_FICLONE);
     // If present, write the safety worker code

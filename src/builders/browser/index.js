@@ -244,7 +244,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         spinner.start('Generating service worker...');
                         for (const [locale, outputPath] of outputPaths.entries()) {
                             try {
-                                await (0, service_worker_1.augmentAppWithServiceWorker)(root, (0, core_1.normalize)(projectRoot), (0, core_1.normalize)(outputPath), getLocaleBaseHref(i18n, locale) || options.baseHref || '/', options.ngswConfigPath);
+                                await (0, service_worker_1.augmentAppWithServiceWorker)((0, core_1.normalize)(projectRoot), (0, core_1.normalize)(outputPath), getLocaleBaseHref(i18n, locale) || options.baseHref || '/', options.ngswConfigPath);
                             }
                             catch (error) {
                                 spinner.fail('Service worker generation failed.');
