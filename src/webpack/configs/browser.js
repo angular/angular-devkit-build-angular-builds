@@ -37,6 +37,7 @@ function getBrowserConfig(wco) {
         devtool: false,
         resolve: {
             mainFields: ['es2015', 'browser', 'module', 'main'],
+            conditionNames: ['es2015', '...'],
         },
         output: {
             crossOriginLoading,
