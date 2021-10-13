@@ -73,11 +73,11 @@ class AnalyticsBuildStats {
  * Analytics plugin that reports the analytics we want from the CLI.
  */
 class NgBuildAnalyticsPlugin {
-    constructor(_projectRoot, _analytics, _category, _isIvy) {
+    constructor(_projectRoot, _analytics, _category, aotEnabled) {
         this._projectRoot = _projectRoot;
         this._analytics = _analytics;
         this._category = _category;
-        this._isIvy = _isIvy;
+        this.aotEnabled = aotEnabled;
         this._built = false;
         this._stats = new AnalyticsBuildStats();
     }
@@ -108,7 +108,7 @@ class NgBuildAnalyticsPlugin {
             // Adding commas before and after so the regex are easier to define filters.
             dimensions[core_1.analytics.NgCliAnalyticsDimensions.BuildErrors] = `,${this._stats.errors.join()},`;
         }
-        dimensions[core_1.analytics.NgCliAnalyticsDimensions.NgIvyEnabled] = this._isIvy;
+        dimensions[core_1.analytics.NgCliAnalyticsDimensions.AotEnabled] = this.aotEnabled;
         return dimensions;
     }
     _reportBuildMetrics(stats) {

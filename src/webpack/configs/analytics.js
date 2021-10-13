@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAnalyticsConfig = void 0;
 const analytics_1 = require("../plugins/analytics");
 function getAnalyticsConfig(wco, context) {
+    var _a;
     if (!context.analytics) {
         return {};
     }
@@ -21,7 +22,9 @@ function getAnalyticsConfig(wco, context) {
     }
     // The category is the builder name if it's an angular builder.
     return {
-        plugins: [new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category, true)],
+        plugins: [
+            new analytics_1.NgBuildAnalyticsPlugin(wco.projectRoot, context.analytics, category, (_a = wco.buildOptions.aot) !== null && _a !== void 0 ? _a : false),
+        ],
     };
 }
 exports.getAnalyticsConfig = getAnalyticsConfig;
