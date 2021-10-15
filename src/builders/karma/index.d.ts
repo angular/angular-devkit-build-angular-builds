@@ -8,7 +8,7 @@
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { ConfigOptions } from 'karma';
 import { Observable } from 'rxjs';
-import * as webpack from 'webpack';
+import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { Schema as KarmaBuilderOptions } from './schema';
 export declare type KarmaConfigOptions = ConfigOptions & {
@@ -19,7 +19,7 @@ export declare type KarmaConfigOptions = ConfigOptions & {
  * @experimental Direct usage of this function is considered experimental.
  */
 export declare function execute(options: KarmaBuilderOptions, context: BuilderContext, transforms?: {
-    webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
+    webpackConfiguration?: ExecutionTransformer<Configuration>;
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
 }): Observable<BuilderOutput>;
 export { KarmaBuilderOptions };
