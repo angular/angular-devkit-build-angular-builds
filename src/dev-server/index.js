@@ -274,6 +274,9 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             if (buildEvent.success) {
                 logger.info(`\n${color_1.colors.greenBright(color_1.colors.symbols.check)} Compiled successfully.`);
             }
+            else {
+                logger.info(`\n${color_1.colors.redBright(color_1.colors.symbols.cross)} Failed to compile.`);
+            }
             return { ...buildEvent, baseUrl: serverAddress };
         }));
     }));
