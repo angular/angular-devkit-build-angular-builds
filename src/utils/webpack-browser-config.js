@@ -36,7 +36,7 @@ const utils_1 = require("../utils");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
 const builder_watch_plugin_1 = require("../webpack/plugins/builder-watch-plugin");
 const i18n_options_1 = require("./i18n-options");
-async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, options, webpackPartialGenerator, logger, extraBuildOptions) {
+async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, projectName, options, webpackPartialGenerator, logger, extraBuildOptions) {
     // Ensure Build Optimizer is only used with AOT.
     if (options.buildOptimizer && !options.aot) {
         throw new Error(`The 'buildOptimizer' option cannot be used without 'aot'.`);
@@ -54,6 +54,7 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, opt
         buildOptions,
         tsConfig,
         tsConfigPath,
+        projectName,
         scriptTarget,
     };
     wco.buildOptions.progress = (0, utils_1.defaultProgress)(wco.buildOptions.progress);
@@ -119,7 +120,7 @@ async function generateBrowserWebpackConfigFromContext(options, context, webpack
         ? (0, core_1.resolve)(workspaceRoot, (0, core_1.normalize)(projectSourceRoot))
         : undefined;
     const normalizedOptions = (0, utils_1.normalizeBrowserSchema)(workspaceRoot, projectRoot, sourceRoot, options, projectMetadata);
-    const config = await generateWebpackConfig((0, core_1.getSystemPath)(workspaceRoot), (0, core_1.getSystemPath)(projectRoot), sourceRoot && (0, core_1.getSystemPath)(sourceRoot), normalizedOptions, webpackPartialGenerator, context.logger, extraBuildOptions);
+    const config = await generateWebpackConfig((0, core_1.getSystemPath)(workspaceRoot), (0, core_1.getSystemPath)(projectRoot), sourceRoot && (0, core_1.getSystemPath)(sourceRoot), projectName, normalizedOptions, webpackPartialGenerator, context.logger, extraBuildOptions);
     // If builder watch support is present in the context, add watch plugin
     // This is internal only and currently only used for testing
     const watcherFactory = context.watcherFactory;

@@ -47,7 +47,7 @@ const helpers_1 = require("../utils/helpers");
 // eslint-disable-next-line max-lines-per-function
 async function getCommonConfig(wco) {
     var _a, _b;
-    const { root, projectRoot, buildOptions, tsConfig } = wco;
+    const { root, projectRoot, buildOptions, tsConfig, projectName } = wco;
     const { cache, platform = 'browser', sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, } = buildOptions;
     const extraPlugins = [];
     const extraRules = [];
@@ -282,6 +282,7 @@ async function getCommonConfig(wco) {
         context: root,
         entry: entryPoints,
         output: {
+            uniqueName: projectName,
             hashFunction: 'xxhash64',
             clean: (_a = buildOptions.deleteOutputPath) !== null && _a !== void 0 ? _a : true,
             path: path.resolve(root, buildOptions.outputPath),
