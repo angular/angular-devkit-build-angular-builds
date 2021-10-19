@@ -32,7 +32,7 @@ const path = __importStar(require("path"));
 const action_executor_1 = require("./action-executor");
 const copy_assets_1 = require("./copy-assets");
 const spinner_1 = require("./spinner");
-function emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emittedPath, outputPath, es5, missingTranslation) {
+function emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emittedPath, outputPath, es5, missingTranslation, context) {
     const options = [];
     const originalFiles = [];
     for (const emittedFile of emittedFiles) {
@@ -51,16 +51,31 @@ function emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emitte
             setLocale: emittedFile.name === 'main' || emittedFile.name === 'vendor',
         };
         originalFiles.push(originalPath);
+        // Remove temporary original file as the content has now been read
+        try {
+            fs.unlinkSync(originalPath);
+        }
+        catch (e) {
+            context.logger.debug(`Unable to delete i18n temporary file [${originalPath}]: ${e.toString()}`);
+        }
         try {
             const originalMapPath = originalPath + '.map';
             action.map = fs.readFileSync(originalMapPath, 'utf8');
             originalFiles.push(originalMapPath);
+            // Remove temporary original map file as the content has now been read
+            try {
+                fs.unlinkSync(originalMapPath);
+            }
+            catch (e) {
+                context.logger.debug(`Unable to delete i18n temporary file [${originalMapPath}]: ${e.toString()}`);
+            }
         }
         catch (err) {
             if (err.code !== 'ENOENT') {
                 throw err;
             }
         }
+        context.logger.debug(`i18n file queued for processing: ${action.filename}`);
         options.push(action);
     }
     return { options, originalFiles };
@@ -71,8 +86,9 @@ async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPat
     const spinner = new spinner_1.Spinner();
     spinner.start('Generating localized bundles...');
     try {
-        const { options, originalFiles: processedFiles } = emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emittedPath, baseOutputPath, es5, missingTranslation);
+        const { options, originalFiles: processedFiles } = emittedFilesToInlineOptions(emittedFiles, scriptsEntryPointName, emittedPath, baseOutputPath, es5, missingTranslation, context);
         for await (const result of executor.inlineAll(options)) {
+            context.logger.debug(`i18n file processed: ${result.file}`);
             for (const diagnostic of result.diagnostics) {
                 spinner.stop();
                 if (diagnostic.type === 'error') {
