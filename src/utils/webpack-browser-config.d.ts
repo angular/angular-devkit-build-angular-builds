@@ -15,7 +15,7 @@ import { WebpackConfigOptions } from '../utils/build-options';
 import { I18nOptions } from './i18n-options';
 export declare type BrowserWebpackConfigOptions = WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
 export declare type WebpackPartialGenerator = (configurationOptions: BrowserWebpackConfigOptions) => (Promise<Configuration> | Configuration)[];
-export declare function generateWebpackConfig(workspaceRoot: string, projectRoot: string, sourceRoot: string | undefined, options: NormalizedBrowserBuilderSchema, webpackPartialGenerator: WebpackPartialGenerator, logger: logging.LoggerApi, extraBuildOptions: Partial<NormalizedBrowserBuilderSchema>): Promise<Configuration>;
+export declare function generateWebpackConfig(workspaceRoot: string, projectRoot: string, sourceRoot: string | undefined, projectName: string, options: NormalizedBrowserBuilderSchema, webpackPartialGenerator: WebpackPartialGenerator, logger: logging.LoggerApi, extraBuildOptions: Partial<NormalizedBrowserBuilderSchema>): Promise<Configuration>;
 export declare function generateI18nBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, webpackPartialGenerator: WebpackPartialGenerator, extraBuildOptions?: Partial<NormalizedBrowserBuilderSchema>): Promise<{
     config: Configuration;
     projectRoot: string;
