@@ -16,8 +16,7 @@ function normalizeOptimization(optimization = true) {
                 ? optimization.styles
                 : {
                     minify: !!optimization.styles,
-                    // inlineCritical is always false unless explictly set.
-                    inlineCritical: false,
+                    inlineCritical: !!optimization.styles,
                 },
             fonts: typeof optimization.fonts === 'object'
                 ? optimization.fonts
@@ -30,8 +29,7 @@ function normalizeOptimization(optimization = true) {
         scripts: optimization,
         styles: {
             minify: optimization,
-            // inlineCritical is always false unless explictly set.
-            inlineCritical: false,
+            inlineCritical: optimization,
         },
         fonts: {
             inline: optimization,
