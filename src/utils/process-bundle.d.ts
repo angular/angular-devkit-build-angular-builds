@@ -24,6 +24,7 @@ export interface ProcessBundleOptions {
     runtimeData?: ProcessBundleResult[];
     replacements?: [string, string][];
     supportedBrowsers?: string[] | Record<string, string>;
+    memoryMode?: boolean;
 }
 export interface ProcessBundleResult {
     name: string;
@@ -35,9 +36,11 @@ export interface ProcessBundleFile {
     filename: string;
     size: number;
     integrity?: string;
+    content?: string;
     map?: {
         filename: string;
         size: number;
+        content?: string;
     };
 }
 export declare const enum CacheKey {

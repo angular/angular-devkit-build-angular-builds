@@ -134,7 +134,7 @@ async function process(options) {
 }
 exports.process = process;
 async function processBundle(options) {
-    const { optimize, isOriginal, code, map, downlevelMap, filename: filepath, hiddenSourceMaps, cacheKeys = [], integrityAlgorithm, } = options;
+    const { optimize, isOriginal, code, map, downlevelMap, filename: filepath, hiddenSourceMaps, cacheKeys = [], integrityAlgorithm, memoryMode, } = options;
     const filename = path.basename(filepath);
     let resultCode = code;
     let optimizeResult;
@@ -168,11 +168,15 @@ async function processBundle(options) {
             mapContent = map;
         }
         await cachePut(mapContent, cacheKeys[isOriginal ? 1 /* OriginalMap */ : 3 /* DownlevelMap */]);
-        fs.writeFileSync(filepath + '.map', mapContent);
+        if (!memoryMode) {
+            fs.writeFileSync(filepath + '.map', mapContent);
+        }
     }
-    const fileResult = createFileEntry(filepath, resultCode, mapContent, integrityAlgorithm);
+    const fileResult = createFileEntry(filepath, resultCode, mapContent, memoryMode, integrityAlgorithm);
     await cachePut(resultCode, cacheKeys[isOriginal ? 0 /* OriginalCode */ : 2 /* DownlevelCode */], fileResult.integrity);
-    fs.writeFileSync(filepath, resultCode);
+    if (!memoryMode) {
+        fs.writeFileSync(filepath, resultCode);
+    }
     return fileResult;
 }
 async function terserMangle(code, options = {}) {
@@ -200,16 +204,18 @@ async function terserMangle(code, options = {}) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return { code: minifyOutput.code, map: minifyOutput.map };
 }
-function createFileEntry(filename, code, map, integrityAlgorithm) {
+function createFileEntry(filename, code, map, memoryMode, integrityAlgorithm) {
     return {
         filename: filename,
         size: Buffer.byteLength(code),
         integrity: integrityAlgorithm && generateIntegrityValue(integrityAlgorithm, code),
+        content: memoryMode ? code : undefined,
         map: !map
             ? undefined
             : {
                 filename: filename + '.map',
                 size: Buffer.byteLength(map),
+                content: memoryMode ? map : undefined,
             },
     };
 }

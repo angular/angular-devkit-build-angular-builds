@@ -131,7 +131,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         }).pipe(
         // eslint-disable-next-line max-lines-per-function
         operators_1.concatMap(async (buildEvent) => {
-            var _a, _b, _c, _d, _e, _f, _g, _h;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
             const spinner = new spinner_1.Spinner();
             spinner.enabled = options.progress !== false;
             const { success, emittedFiles = [], outputPath: webpackOutputPath } = buildEvent;
@@ -241,7 +241,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         if (actionOptions.sourceMaps) {
                             try {
                                 map = fs.readFileSync(filename + '.map', 'utf8');
-                                if (es5Polyfills) {
+                                if (es5Polyfills || i18n.shouldInline) {
                                     fs.unlinkSync(filename + '.map');
                                 }
                             }
@@ -250,6 +250,11 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         if (es5Polyfills) {
                             fs.unlinkSync(filename);
                             filename = filename.replace(/\-es20\d{2}/, '');
+                        }
+                        else if (i18n.shouldInline) {
+                            // Original files must be deleted with i18n to avoid the original files from
+                            // being copied over the translated files when copying the project assets.
+                            fs.unlinkSync(filename);
                         }
                         const es2015Polyfills = file.file.startsWith('polyfills-es20');
                         // Record the bundle processing action
@@ -265,6 +270,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             runtime: file.file.startsWith('runtime'),
                             ignoreOriginal: es5Polyfills,
                             optimizeOnly: es2015Polyfills,
+                            // When using i18n, file results are kept in memory for further processing
+                            memoryMode: i18n.shouldInline,
                         });
                         // ES2015 polyfills are only optimized; optimization check was performed above
                         if (es2015Polyfills) {
@@ -312,39 +319,32 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     if (i18n.shouldInline) {
                         spinner.start('Generating localized bundles...');
                         const inlineActions = [];
-                        const processedFiles = new Set();
                         for (const result of processResults) {
                             if (result.original) {
                                 inlineActions.push({
                                     filename: path.basename(result.original.filename),
-                                    code: fs.readFileSync(result.original.filename, 'utf8'),
-                                    map: result.original.map &&
-                                        fs.readFileSync(result.original.map.filename, 'utf8'),
+                                    // Memory mode is always enabled for i18n
+                                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                                    code: result.original.content,
+                                    map: (_a = result.original.map) === null || _a === void 0 ? void 0 : _a.content,
                                     outputPath: baseOutputPath,
                                     es5: false,
                                     missingTranslation: options.i18nMissingTranslation,
                                     setLocale: result.name === mainChunkId,
                                 });
-                                processedFiles.add(result.original.filename);
-                                if (result.original.map) {
-                                    processedFiles.add(result.original.map.filename);
-                                }
                             }
                             if (result.downlevel) {
                                 inlineActions.push({
                                     filename: path.basename(result.downlevel.filename),
-                                    code: fs.readFileSync(result.downlevel.filename, 'utf8'),
-                                    map: result.downlevel.map &&
-                                        fs.readFileSync(result.downlevel.map.filename, 'utf8'),
+                                    // Memory mode is always enabled for i18n
+                                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                                    code: result.downlevel.content,
+                                    map: (_b = result.downlevel.map) === null || _b === void 0 ? void 0 : _b.content,
                                     outputPath: baseOutputPath,
                                     es5: true,
                                     missingTranslation: options.i18nMissingTranslation,
                                     setLocale: result.name === mainChunkId,
                                 });
-                                processedFiles.add(result.downlevel.filename);
-                                if (result.downlevel.map) {
-                                    processedFiles.add(result.downlevel.map.filename);
-                                }
                             }
                         }
                         let hasErrors = false;
@@ -372,7 +372,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                     glob: '**/*',
                                     input: webpackOutputPath,
                                     output: '',
-                                    ignore: [...processedFiles].map((f) => path.relative(webpackOutputPath, f)),
                                 },
                             ], Array.from(outputPaths.values()), '');
                         }
@@ -394,7 +393,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         }
                     }
                     for (const result of processResults) {
-                        const chunk = (_a = webpackStats.chunks) === null || _a === void 0 ? void 0 : _a.find((chunk) => { var _a; return ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()) === result.name; });
+                        const chunk = (_c = webpackStats.chunks) === null || _c === void 0 ? void 0 : _c.find((chunk) => { var _a; return ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()) === result.name; });
                         if (result.original) {
                             bundleInfoStats.push(generateBundleInfoStats(result.original, chunk, 'modern'));
                         }
@@ -402,9 +401,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             bundleInfoStats.push(generateBundleInfoStats(result.downlevel, chunk, 'legacy'));
                         }
                     }
-                    const unprocessedChunks = ((_b = webpackStats.chunks) === null || _b === void 0 ? void 0 : _b.filter((chunk) => !processResults.find((result) => { var _a; return ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()) === result.name; }))) || [];
+                    const unprocessedChunks = ((_d = webpackStats.chunks) === null || _d === void 0 ? void 0 : _d.filter((chunk) => !processResults.find((result) => { var _a; return ((_a = chunk.id) === null || _a === void 0 ? void 0 : _a.toString()) === result.name; }))) || [];
                     for (const chunk of unprocessedChunks) {
-                        const asset = (_c = webpackStats.assets) === null || _c === void 0 ? void 0 : _c.find((a) => { var _a; return a.name === ((_a = chunk.files) === null || _a === void 0 ? void 0 : _a[0]); });
+                        const asset = (_e = webpackStats.assets) === null || _e === void 0 ? void 0 : _e.find((a) => { var _a; return a.name === ((_a = chunk.files) === null || _a === void 0 ? void 0 : _a[0]); });
                         bundleInfoStats.push(stats_1.generateBundleStats({ ...chunk, size: asset === null || asset === void 0 ? void 0 : asset.size }));
                     }
                 }
@@ -425,10 +424,10 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     for (const { severity, message } of budgetFailures) {
                         switch (severity) {
                             case bundle_calculator_1.ThresholdSeverity.Warning:
-                                (_d = webpackStats.warnings) === null || _d === void 0 ? void 0 : _d.push({ message });
+                                (_f = webpackStats.warnings) === null || _f === void 0 ? void 0 : _f.push({ message });
                                 break;
                             case bundle_calculator_1.ThresholdSeverity.Error:
-                                (_e = webpackStats.errors) === null || _e === void 0 ? void 0 : _e.push({ message });
+                                (_g = webpackStats.errors) === null || _g === void 0 ? void 0 : _g.push({ message });
                                 break;
                             default:
                                 assertNever(severity);
@@ -438,7 +437,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 const buildSuccess = success && !stats_1.statsHasErrors(webpackStats);
                 if (buildSuccess) {
                     // Copy assets
-                    if (!options.watch && ((_f = options.assets) === null || _f === void 0 ? void 0 : _f.length)) {
+                    if (!options.watch && ((_h = options.assets) === null || _h === void 0 ? void 0 : _h.length)) {
                         spinner.start('Copying assets...');
                         try {
                             await copy_assets_1.copyAssets(utils_1.normalizeAssetPatterns(options.assets, root, core_1.normalize(projectRoot), projectSourceRoot === undefined ? undefined : core_1.normalize(projectSourceRoot)), Array.from(outputPaths.values()), context.workspaceRoot);
@@ -453,8 +452,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         spinner.start('Generating index html...');
                         const WOFFSupportNeeded = !buildBrowserFeatures.isFeatureSupported('woff2');
                         const entrypoints = package_chunk_sort_1.generateEntryPoints({
-                            scripts: (_g = options.scripts) !== null && _g !== void 0 ? _g : [],
-                            styles: (_h = options.styles) !== null && _h !== void 0 ? _h : [],
+                            scripts: (_j = options.scripts) !== null && _j !== void 0 ? _j : [],
+                            styles: (_k = options.styles) !== null && _k !== void 0 ? _k : [],
                         });
                         const indexHtmlGenerator = new index_html_generator_1.IndexHtmlGenerator({
                             indexPath: path.join(context.workspaceRoot, webpack_browser_config_1.getIndexInputFile(options.index)),

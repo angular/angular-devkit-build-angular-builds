@@ -62,13 +62,12 @@ class BundleActionExecutor {
         const executions = new Map();
         for (const action of actions) {
             const execution = executor(action);
-            executions.set(execution, execution.then((result) => {
-                executions.delete(execution);
-                return result;
-            }));
+            executions.set(execution, execution.then((result) => [execution, result]));
         }
         while (executions.size > 0) {
-            yield Promise.race(executions.values());
+            const [execution, result] = await Promise.race(executions.values());
+            executions.delete(execution);
+            yield result;
         }
     }
     stop() {
