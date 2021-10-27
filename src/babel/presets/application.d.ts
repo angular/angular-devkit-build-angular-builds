@@ -32,6 +32,14 @@ export interface ApplicationPresetOptions {
     };
     forceES5?: boolean;
     forceAsyncTransformation?: boolean;
+    instrumentCode?: {
+        includedBasePath: string;
+    };
+    optimize?: {
+        looseEnums: boolean;
+        pureTopLevel: boolean;
+        wrapDecorators: boolean;
+    };
     diagnosticReporter?: DiagnosticReporter;
 }
 export default function (api: unknown, options: ApplicationPresetOptions): {

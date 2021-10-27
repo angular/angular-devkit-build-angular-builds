@@ -51,8 +51,9 @@ exports.default = (0, babel_loader_1.custom)(() => {
         inputSourceMap: false,
     });
     return {
-        async customOptions({ i18n, scriptTarget, aot, optimize, ...rawOptions }, { source }) {
+        async customOptions(options, { source }) {
             var _a, _b;
+            const { i18n, scriptTarget, aot, optimize, instrumentCode, ...rawOptions } = options;
             // Must process file if plugins are added
             let shouldProcess = Array.isArray(rawOptions.plugins) && rawOptions.plugins.length > 0;
             const customOptions = {
@@ -60,6 +61,7 @@ exports.default = (0, babel_loader_1.custom)(() => {
                 forceES5: false,
                 angularLinker: undefined,
                 i18n: undefined,
+                instrumentCode: undefined,
             };
             // Analyze file for linking
             if (await requiresLinking(this.resourcePath, source)) {
@@ -91,7 +93,7 @@ exports.default = (0, babel_loader_1.custom)(() => {
                     customOptions.forceAsyncTransformation =
                         !/[\\/][_f]?esm2015[\\/]/.test(this.resourcePath) && source.includes('async');
                 }
-                shouldProcess || (shouldProcess = customOptions.forceAsyncTransformation || customOptions.forceES5);
+                shouldProcess || (shouldProcess = customOptions.forceAsyncTransformation || customOptions.forceES5 || false);
             }
             // Analyze for i18n inlining
             if (i18n &&
@@ -131,6 +133,16 @@ exports.default = (0, babel_loader_1.custom)(() => {
                 };
                 shouldProcess = true;
             }
+            if (instrumentCode &&
+                !instrumentCode.excludedPaths.has(this.resourcePath) &&
+                !/\.(e2e|spec)\.tsx?$|[\\/]node_modules[\\/]/.test(this.resourcePath) &&
+                this.resourcePath.startsWith(instrumentCode.includedBasePath)) {
+                // `babel-plugin-istanbul` has it's own includes but we do the below so that we avoid running the the loader.
+                customOptions.instrumentCode = {
+                    includedBasePath: instrumentCode.includedBasePath,
+                };
+                shouldProcess = true;
+            }
             // Add provided loader options to default base options
             const loaderOptions = {
                 ...baseOptions,
@@ -150,27 +162,12 @@ exports.default = (0, babel_loader_1.custom)(() => {
             return { custom: customOptions, loader: loaderOptions };
         },
         config(configuration, { customOptions }) {
-            var _a;
-            const plugins = (_a = configuration.options.plugins) !== null && _a !== void 0 ? _a : [];
-            if (customOptions.optimize) {
-                if (customOptions.optimize.pureTopLevel) {
-                    plugins.push(require('./plugins/pure-toplevel-functions').default);
-                }
-                plugins.push(require('./plugins/elide-angular-metadata').default, [
-                    require('./plugins/adjust-typescript-enums').default,
-                    { loose: customOptions.optimize.looseEnums },
-                ], [
-                    require('./plugins/adjust-static-class-members').default,
-                    { wrapDecorators: customOptions.optimize.wrapDecorators },
-                ]);
-            }
             return {
                 ...configuration.options,
                 // Using `false` disables babel from attempting to locate sourcemaps or process any inline maps.
                 // The babel types do not include the false option even though it is valid
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 inputSourceMap: false,
-                plugins,
                 presets: [
                     ...(configuration.options.presets || []),
                     [
@@ -201,13 +198,7 @@ exports.default = (0, babel_loader_1.custom)(() => {
                 // `@ampproject/remapping` source map objects but both are compatible with Webpack.
                 // This method for merging is used because it provides more accurate output
                 // and is faster while using less memory.
-                result.map = {
-                    // Convert the SourceMap back to simple plain object.
-                    // This is needed because otherwise code-coverage will fail with `don't know how to turn this value into a node`
-                    // Which is throw by Babel when it is invoked again from `istanbul-lib-instrument`.
-                    // https://github.com/babel/babel/blob/780aa48d2a34dc55f556843074b6aed45e7eabeb/packages/babel-types/src/converters/valueToNode.ts#L115-L130
-                    ...(0, remapping_1.default)([result.map, inputSourceMap], () => null),
-                };
+                result.map = (0, remapping_1.default)([result.map, inputSourceMap], () => null);
             }
             return result;
         },

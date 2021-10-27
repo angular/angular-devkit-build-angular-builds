@@ -20,3 +20,4 @@ export declare function getSourceMapDevTool(scriptsSourceMap: boolean | undefine
 export declare function isPolyfillsEntry(name: string): boolean;
 export declare function getWatchOptions(poll: number | undefined): NonNullable<Configuration['watchOptions']>;
 export declare function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath: string) => string;
+export declare function getInstrumentationExcludedPaths(sourceRoot: string, excludedPaths: string[]): Set<string>;
