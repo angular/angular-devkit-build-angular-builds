@@ -47,8 +47,8 @@ const helpers_1 = require("../utils/helpers");
 // eslint-disable-next-line max-lines-per-function
 async function getCommonConfig(wco) {
     var _a, _b;
-    const { root, projectRoot, buildOptions, tsConfig, projectName } = wco;
-    const { cache, platform = 'browser', sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, } = buildOptions;
+    const { root, projectRoot, buildOptions, tsConfig, projectName, sourceRoot } = wco;
+    const { cache, codeCoverage, codeCoverageExclude = [], platform = 'browser', sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, } = buildOptions;
     const extraPlugins = [];
     const extraRules = [];
     const entryPoints = {};
@@ -325,6 +325,12 @@ async function getCommonConfig(wco) {
                                 scriptTarget: wco.scriptTarget,
                                 aot: buildOptions.aot,
                                 optimize: buildOptions.buildOptimizer,
+                                instrumentCode: codeCoverage
+                                    ? {
+                                        includedBasePath: sourceRoot,
+                                        excludedPaths: (0, helpers_1.getInstrumentationExcludedPaths)(root, codeCoverageExclude),
+                                    }
+                                    : undefined,
                             },
                         },
                     ],

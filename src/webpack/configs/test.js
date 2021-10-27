@@ -27,32 +27,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTestConfig = void 0;
-const glob = __importStar(require("glob"));
 const path = __importStar(require("path"));
 const typescript_1 = require("typescript");
 const helpers_1 = require("../utils/helpers");
 function getTestConfig(wco) {
-    const { buildOptions: { codeCoverage, codeCoverageExclude, main, sourceMap, webWorkerTsConfig }, root, sourceRoot, } = wco;
-    const extraRules = [];
+    const { buildOptions: { main, sourceMap, webWorkerTsConfig }, root, } = wco;
     const extraPlugins = [];
-    if (codeCoverage) {
-        const exclude = [/\.(e2e|spec)\.tsx?$/, /node_modules/];
-        if (codeCoverageExclude) {
-            for (const excludeGlob of codeCoverageExclude) {
-                glob
-                    .sync(path.join(root, excludeGlob), { nodir: true })
-                    .forEach((file) => exclude.push(path.normalize(file)));
-            }
-        }
-        extraRules.push({
-            test: /\.[cm]?[tj]sx?$/,
-            loader: require.resolve('@jsdevtools/coverage-istanbul-loader'),
-            options: { esModules: true },
-            enforce: 'post',
-            exclude,
-            include: sourceRoot,
-        });
-    }
     if (sourceMap.scripts || sourceMap.styles) {
         extraPlugins.push((0, helpers_1.getSourceMapDevTool)(sourceMap.scripts, sourceMap.styles, false, true));
     }
@@ -68,7 +48,6 @@ function getTestConfig(wco) {
             main: path.resolve(root, main),
         },
         module: {
-            rules: extraRules,
             parser: webWorkerTsConfig === undefined
                 ? {
                     javascript: {

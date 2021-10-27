@@ -145,6 +145,24 @@ function default_1(api, options) {
         plugins.push(require('@babel/plugin-transform-async-to-generator').default, require('@babel/plugin-proposal-async-generator-functions').default);
         needRuntimeTransform = true;
     }
+    if (options.optimize) {
+        if (options.optimize.pureTopLevel) {
+            plugins.push(require('../plugins/pure-toplevel-functions').default);
+        }
+        plugins.push(require('../plugins/elide-angular-metadata').default, [
+            require('../plugins/adjust-typescript-enums').default,
+            { loose: options.optimize.looseEnums },
+        ], [
+            require('../plugins/adjust-static-class-members').default,
+            { wrapDecorators: options.optimize.wrapDecorators },
+        ]);
+    }
+    if (options.instrumentCode) {
+        plugins.push([
+            require('babel-plugin-istanbul').default,
+            { inputSourceMap: false, cwd: options.instrumentCode.includedBasePath },
+        ]);
+    }
     if (needRuntimeTransform) {
         // Babel equivalent to TypeScript's `importHelpers` option
         plugins.push([

@@ -25,8 +25,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.assetNameTemplateFactory = exports.getWatchOptions = exports.isPolyfillsEntry = exports.getSourceMapDevTool = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
+exports.getInstrumentationExcludedPaths = exports.assetNameTemplateFactory = exports.getWatchOptions = exports.isPolyfillsEntry = exports.getSourceMapDevTool = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
+const glob_1 = __importDefault(require("glob"));
 const path = __importStar(require("path"));
 const webpack_1 = require("webpack");
 function getOutputHashFormat(option, length = 20) {
@@ -126,3 +130,13 @@ function assetNameTemplateFactory(hashFormat) {
     };
 }
 exports.assetNameTemplateFactory = assetNameTemplateFactory;
+function getInstrumentationExcludedPaths(sourceRoot, excludedPaths) {
+    const excluded = new Set();
+    for (const excludeGlob of excludedPaths) {
+        glob_1.default
+            .sync(path.join(sourceRoot, excludeGlob), { nodir: true })
+            .forEach((p) => excluded.add(path.normalize(p)));
+    }
+    return excluded;
+}
+exports.getInstrumentationExcludedPaths = getInstrumentationExcludedPaths;
