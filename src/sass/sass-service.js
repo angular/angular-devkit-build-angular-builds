@@ -48,9 +48,9 @@ class SassWorkerImplementation {
      * @param callback The function to execute when the rendering is complete.
      */
     render(options, callback) {
-        // The `functions` and `importer` options are JavaScript functions that cannot be transferred.
+        // The `functions`, `logger` and `importer` options are JavaScript functions that cannot be transferred.
         // If any additional function options are added in the future, they must be excluded as well.
-        const { functions, importer, ...serializableOptions } = options;
+        const { functions, importer, logger, ...serializableOptions } = options;
         // The CLI's configuration does not use or expose the ability to defined custom Sass functions
         if (functions && Object.keys(functions).length > 0) {
             throw new Error('Sass custom functions are not supported.');
