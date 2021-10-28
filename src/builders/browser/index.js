@@ -59,9 +59,7 @@ async function initialize(options, context, webpackConfigurationTransform) {
     const adjustedOptions = options.watch ? options : { ...options, assets: [] };
     const { config, projectRoot, projectSourceRoot, i18n, target } = await (0, webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext)(adjustedOptions, context, (wco) => [
         (0, configs_1.getCommonConfig)(wco),
-        (0, configs_1.getBrowserConfig)(wco),
         (0, configs_1.getStylesConfig)(wco),
-        (0, configs_1.getStatsConfig)(wco),
         (0, configs_1.getAnalyticsConfig)(wco, context),
         (0, configs_1.getTypeScriptConfig)(wco),
         wco.buildOptions.webWorkerTsConfig ? (0, configs_1.getWorkerConfig)(wco) : {},

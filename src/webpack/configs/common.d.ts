@@ -6,5 +6,5 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Configuration } from 'webpack';
-import { WebpackConfigOptions, WebpackTestOptions } from '../../utils/build-options';
-export declare function getCommonConfig(wco: WebpackConfigOptions<WebpackTestOptions>): Promise<Configuration>;
+import { WebpackConfigOptions } from '../../utils/build-options';
+export declare function getCommonConfig(wco: WebpackConfigOptions): Promise<Configuration>;

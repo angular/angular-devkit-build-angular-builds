@@ -34,7 +34,6 @@ const core_1 = require("@angular-devkit/core");
 const path = __importStar(require("path"));
 const text_table_1 = __importDefault(require("text-table"));
 const color_1 = require("../../utils/color");
-const stats_1 = require("../configs/stats");
 const async_chunks_1 = require("./async-chunks");
 const helpers_1 = require("./helpers");
 function formatSize(size) {
@@ -266,7 +265,7 @@ function createWebpackLoggingCallback(options, logger) {
         if (verbose) {
             logger.info(stats.toString(config.stats));
         }
-        const rawStats = stats.toJson((0, stats_1.getWebpackStatsConfig)(false));
+        const rawStats = stats.toJson((0, helpers_1.getStatsOptions)(false));
         const webpackStats = {
             ...rawStats,
             chunks: (0, async_chunks_1.markAsyncChunksNonInitial)(rawStats, extraEntryPoints),

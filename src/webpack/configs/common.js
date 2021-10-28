@@ -31,24 +31,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCommonConfig = void 0;
 const copy_webpack_plugin_1 = __importDefault(require("copy-webpack-plugin"));
-const crypto_1 = require("crypto");
-const fs_1 = require("fs");
 const path = __importStar(require("path"));
 const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
+const webpack_subresource_integrity_1 = require("webpack-subresource-integrity");
 const utils_1 = require("../../utils");
 const environment_options_1 = require("../../utils/environment-options");
 const load_esm_1 = require("../../utils/load-esm");
-const spinner_1 = require("../../utils/spinner");
-const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const plugins_1 = require("../plugins");
-const javascript_optimizer_plugin_1 = require("../plugins/javascript-optimizer-plugin");
+const progress_plugin_1 = require("../plugins/progress-plugin");
 const helpers_1 = require("../utils/helpers");
 // eslint-disable-next-line max-lines-per-function
 async function getCommonConfig(wco) {
     var _a, _b;
     const { root, projectRoot, buildOptions, tsConfig, projectName, sourceRoot } = wco;
-    const { cache, codeCoverage, codeCoverageExclude = [], platform = 'browser', sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, } = buildOptions;
+    const { cache, codeCoverage, crossOrigin = 'none', platform = 'browser', codeCoverageExclude = [], sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap, hidden: hiddenSourceMap, }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, commonChunk, vendorChunk, subresourceIntegrity, verbose, poll, webWorkerTsConfig, externalDependencies = [], allowedCommonJsDependencies, bundleDependencies, } = buildOptions;
+    const isPlatformServer = buildOptions.platform === 'server';
     const extraPlugins = [];
     const extraRules = [];
     const entryPoints = {};
@@ -63,32 +61,17 @@ async function getCommonConfig(wco) {
     const hashFormat = (0, helpers_1.getOutputHashFormat)(buildOptions.outputHashing || 'none');
     const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);
     if (buildOptions.progress) {
-        const spinner = new spinner_1.Spinner();
-        spinner.start(`Generating ${platform} application bundles (phase: setup)...`);
-        extraPlugins.push(new webpack_1.ProgressPlugin({
-            handler: (percentage, message) => {
-                const phase = message ? ` (phase: ${message})` : '';
-                spinner.text = `Generating ${platform} application bundles${phase}...`;
-                switch (percentage) {
-                    case 1:
-                        if (spinner.isSpinning) {
-                            spinner.succeed(`${platform.replace(/^\w/, (s) => s.toUpperCase())} application bundle generation complete.`);
-                        }
-                        break;
-                    case 0:
-                        if (!spinner.isSpinning) {
-                            spinner.start();
-                        }
-                        break;
-                }
-            },
-        }));
+        extraPlugins.push(new progress_plugin_1.ProgressPlugin(platform));
     }
     if (buildOptions.main) {
         const mainPath = path.resolve(root, buildOptions.main);
         entryPoints['main'] = [mainPath];
     }
-    if (platform !== 'server') {
+    if (isPlatformServer) {
+        // Fixes Critical dependency: the request of a dependency is an expression
+        extraPlugins.push(new webpack_1.ContextReplacementPlugin(/@?hapi|express[\\/]/));
+    }
+    if (!isPlatformServer) {
         if (buildOptions.polyfills) {
             const projectPolyfills = path.resolve(root, buildOptions.polyfills);
             if (entryPoints['polyfills']) {
@@ -113,85 +96,30 @@ async function getCommonConfig(wco) {
             outputPath: path.resolve(root, 'chrome-profiler-events.json'),
         }));
     }
+    if (allowedCommonJsDependencies) {
+        // When this is not defined it means the builder doesn't support showing common js usages.
+        // When it does it will be an array.
+        extraPlugins.push(new plugins_1.CommonJsUsageWarnPlugin({
+            allowedDependencies: allowedCommonJsDependencies,
+        }));
+    }
     // process global scripts
-    const globalScriptsByBundleName = (0, helpers_1.normalizeExtraEntryPoints)(buildOptions.scripts, 'scripts').reduce((prev, curr) => {
-        const { bundleName, inject, input } = curr;
-        let resolvedPath = path.resolve(root, input);
-        if (!(0, fs_1.existsSync)(resolvedPath)) {
-            try {
-                resolvedPath = require.resolve(input, { paths: [root] });
-            }
-            catch {
-                throw new Error(`Script file ${input} does not exist.`);
-            }
-        }
-        const existingEntry = prev.find((el) => el.bundleName === bundleName);
-        if (existingEntry) {
-            if (existingEntry.inject && !inject) {
-                // All entries have to be lazy for the bundle to be lazy.
-                throw new Error(`The ${bundleName} bundle is mixing injected and non-injected scripts.`);
-            }
-            existingEntry.paths.push(resolvedPath);
-        }
-        else {
-            prev.push({
-                bundleName,
-                inject,
-                paths: [resolvedPath],
-            });
-        }
-        return prev;
-    }, []);
     // Add a new asset for each entry.
-    for (const script of globalScriptsByBundleName) {
+    for (const { bundleName, inject, paths } of (0, helpers_1.globalScriptsByBundleName)(root, buildOptions.scripts)) {
         // Lazy scripts don't get a hash, otherwise they can't be loaded by name.
-        const hash = script.inject ? hashFormat.script : '';
-        const bundleName = script.bundleName;
+        const hash = inject ? hashFormat.script : '';
         extraPlugins.push(new plugins_1.ScriptsWebpackPlugin({
             name: bundleName,
             sourceMap: scriptsSourceMap,
+            scripts: paths,
             filename: `${path.basename(bundleName)}${hash}.js`,
-            scripts: script.paths,
             basePath: projectRoot,
         }));
     }
     // process asset entries
     if (buildOptions.assets.length) {
-        const copyWebpackPluginPatterns = buildOptions.assets.map((asset, index) => {
-            // Resolve input paths relative to workspace root and add slash at the end.
-            // eslint-disable-next-line prefer-const
-            let { input, output, ignore = [], glob } = asset;
-            input = path.resolve(root, input).replace(/\\/g, '/');
-            input = input.endsWith('/') ? input : input + '/';
-            output = output.endsWith('/') ? output : output + '/';
-            if (output.startsWith('..')) {
-                throw new Error('An asset cannot be written to a location outside of the output path.');
-            }
-            return {
-                context: input,
-                // Now we remove starting slash to make Webpack place it from the output root.
-                to: output.replace(/^\//, ''),
-                from: glob,
-                noErrorOnMissing: true,
-                force: true,
-                globOptions: {
-                    dot: true,
-                    followSymbolicLinks: !!asset.followSymlinks,
-                    ignore: [
-                        '.gitkeep',
-                        '**/.DS_Store',
-                        '**/Thumbs.db',
-                        // Negate patterns needs to be absolute because copy-webpack-plugin uses absolute globs which
-                        // causes negate patterns not to match.
-                        // See: https://github.com/webpack-contrib/copy-webpack-plugin/issues/498#issuecomment-639327909
-                        ...ignore,
-                    ].map((i) => path.posix.join(input, i)),
-                },
-                priority: index,
-            };
-        });
         extraPlugins.push(new copy_webpack_plugin_1.default({
-            patterns: copyWebpackPluginPatterns,
+            patterns: (0, helpers_1.assetPatterns)(root, buildOptions.assets),
         }));
     }
     if (buildOptions.showCircularDependencies) {
@@ -212,26 +140,33 @@ async function getCommonConfig(wco) {
             skipChildCompilers: true,
         }));
     }
+    if (scriptsSourceMap || stylesSourceMap) {
+        const include = [];
+        if (scriptsSourceMap) {
+            include.push(/js$/);
+        }
+        if (stylesSourceMap) {
+            include.push(/css$/);
+        }
+        extraPlugins.push(new webpack_1.SourceMapDevToolPlugin({
+            filename: '[file].map',
+            include,
+            // We want to set sourceRoot to  `webpack:///` for non
+            // inline sourcemaps as otherwise paths to sourcemaps will be broken in browser
+            // `webpack:///` is needed for Visual Studio breakpoints to work properly as currently
+            // there is no way to set the 'webRoot'
+            sourceRoot: 'webpack:///',
+            moduleFilenameTemplate: '[resource-path]',
+            append: hiddenSourceMap ? false : undefined,
+        }));
+    }
     if (buildOptions.statsJson) {
-        extraPlugins.push(new (class {
-            apply(compiler) {
-                compiler.hooks.done.tapPromise('angular-cli-stats', async (stats) => {
-                    const { stringifyStream } = await Promise.resolve().then(() => __importStar(require('@discoveryjs/json-ext')));
-                    const data = stats.toJson('verbose');
-                    const statsOutputPath = path.resolve(root, buildOptions.outputPath, 'stats.json');
-                    try {
-                        await fs_1.promises.mkdir(path.dirname(statsOutputPath), { recursive: true });
-                        await new Promise((resolve, reject) => stringifyStream(data)
-                            .pipe((0, fs_1.createWriteStream)(statsOutputPath))
-                            .on('close', resolve)
-                            .on('error', reject));
-                    }
-                    catch (error) {
-                        (0, webpack_diagnostics_1.addError)(stats.compilation, `Unable to write stats file: ${error.message || 'unknown error'}`);
-                    }
-                });
-            }
-        })());
+        extraPlugins.push(new plugins_1.JsonStatsPlugin(path.resolve(root, buildOptions.outputPath, 'stats.json')));
+    }
+    if (subresourceIntegrity) {
+        extraPlugins.push(new webpack_subresource_integrity_1.SubresourceIntegrityPlugin({
+            hashFuncNames: ['sha384'],
+        }));
     }
     if (scriptsSourceMap || stylesSourceMap) {
         extraRules.push({
@@ -253,20 +188,31 @@ async function getCommonConfig(wco) {
     }
     const extraMinimizers = [];
     if (scriptsOptimization) {
-        extraMinimizers.push(new javascript_optimizer_plugin_1.JavaScriptOptimizerPlugin({
+        extraMinimizers.push(new plugins_1.JavaScriptOptimizerPlugin({
             define: buildOptions.aot ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT : GLOBAL_DEFS_FOR_TERSER,
             sourcemap: scriptsSourceMap,
             target: wco.scriptTarget,
-            keepNames: !environment_options_1.allowMangle || platform === 'server',
+            keepNames: !environment_options_1.allowMangle || isPlatformServer,
             removeLicenses: buildOptions.extractLicenses,
             advanced: buildOptions.buildOptimizer,
         }));
+    }
+    const externals = [...externalDependencies];
+    if (isPlatformServer && !bundleDependencies) {
+        externals.push(({ context, request }, callback) => (0, helpers_1.externalizePackages)(context !== null && context !== void 0 ? context : wco.projectRoot, request, callback));
+    }
+    let crossOriginLoading = false;
+    if (subresourceIntegrity && crossOrigin === 'none') {
+        crossOriginLoading = 'anonymous';
+    }
+    else if (crossOrigin !== 'none') {
+        crossOriginLoading = crossOrigin;
     }
     return {
         mode: scriptsOptimization || stylesOptimization.minify ? 'production' : 'development',
         devtool: false,
         target: [
-            platform === 'server' ? 'node' : 'web',
+            isPlatformServer ? 'node' : 'web',
             tsConfig.options.target === typescript_1.ScriptTarget.ES5 ? 'es5' : 'es2015',
         ],
         profile: buildOptions.statsJson,
@@ -275,12 +221,17 @@ async function getCommonConfig(wco) {
             extensions: ['.ts', '.tsx', '.mjs', '.js'],
             symlinks: !buildOptions.preserveSymlinks,
             modules: [tsConfig.options.baseUrl || projectRoot, 'node_modules'],
+            mainFields: isPlatformServer
+                ? ['es2020', 'es2015', 'module', 'main']
+                : ['es2020', 'es2015', 'browser', 'module', 'main'],
+            conditionNames: ['es2020', 'es2015', '...'],
         },
         resolveLoader: {
             symlinks: !buildOptions.preserveSymlinks,
         },
         context: root,
         entry: entryPoints,
+        externals,
         output: {
             uniqueName: projectName,
             hashFunction: 'xxhash64',
@@ -289,9 +240,16 @@ async function getCommonConfig(wco) {
             publicPath: (_b = buildOptions.deployUrl) !== null && _b !== void 0 ? _b : '',
             filename: `[name]${hashFormat.chunk}.js`,
             chunkFilename: `[name]${hashFormat.chunk}.js`,
+            libraryTarget: isPlatformServer ? 'commonjs' : undefined,
+            crossOriginLoading,
+            trustedTypes: 'angular#bundler',
+            scriptType: 'module',
         },
         watch: buildOptions.watch,
-        watchOptions: (0, helpers_1.getWatchOptions)(buildOptions.poll),
+        watchOptions: {
+            poll,
+            ignored: poll === undefined ? undefined : 'node_modules/**',
+        },
         performance: {
             hints: false,
         },
@@ -304,6 +262,14 @@ async function getCommonConfig(wco) {
         module: {
             // Show an error for missing exports instead of a warning.
             strictExportPresence: true,
+            parser: webWorkerTsConfig === undefined
+                ? {
+                    javascript: {
+                        worker: false,
+                        url: false,
+                    },
+                }
+                : undefined,
             rules: [
                 {
                     // Mark files inside `rxjs/add` as containing side effects.
@@ -343,50 +309,43 @@ async function getCommonConfig(wco) {
             asyncWebAssembly: true,
         },
         infrastructureLogging: {
-            level: buildOptions.verbose ? 'verbose' : 'error',
+            level: verbose ? 'verbose' : 'error',
         },
-        cache: getCacheSettings(wco, buildBrowserFeatures.supportedBrowsers, NG_VERSION.full),
+        stats: (0, helpers_1.getStatsOptions)(verbose),
+        cache: (0, helpers_1.getCacheSettings)(wco, buildBrowserFeatures.supportedBrowsers, NG_VERSION.full),
         optimization: {
             minimizer: extraMinimizers,
             moduleIds: 'deterministic',
             chunkIds: buildOptions.namedChunks ? 'named' : 'deterministic',
             emitOnErrors: false,
+            runtimeChunk: isPlatformServer ? false : 'single',
+            splitChunks: {
+                maxAsyncRequests: Infinity,
+                cacheGroups: {
+                    default: !!commonChunk && {
+                        chunks: 'async',
+                        minChunks: 2,
+                        priority: 10,
+                    },
+                    common: !!commonChunk && {
+                        name: 'common',
+                        chunks: 'async',
+                        minChunks: 2,
+                        enforce: true,
+                        priority: 5,
+                    },
+                    vendors: false,
+                    defaultVendors: !!vendorChunk && {
+                        name: 'vendor',
+                        chunks: (chunk) => chunk.name === 'main',
+                        enforce: true,
+                        test: /[\\/]node_modules[\\/]/,
+                    },
+                },
+            },
         },
-        plugins: [new plugins_1.DedupeModuleResolvePlugin({ verbose: buildOptions.verbose }), ...extraPlugins],
+        plugins: [new plugins_1.DedupeModuleResolvePlugin({ verbose }), ...extraPlugins],
+        node: false,
     };
 }
 exports.getCommonConfig = getCommonConfig;
-function getCacheSettings(wco, supportedBrowsers, angularVersion) {
-    const { enabled, path: cacheDirectory } = wco.buildOptions.cache;
-    if (enabled) {
-        const packageVersion = require('../../../package.json').version;
-        return {
-            type: 'filesystem',
-            cacheDirectory: path.join(cacheDirectory, 'angular-webpack'),
-            maxMemoryGenerations: 1,
-            // We use the versions and build options as the cache name. The Webpack configurations are too
-            // dynamic and shared among different build types: test, build and serve.
-            // None of which are "named".
-            name: (0, crypto_1.createHash)('sha1')
-                .update(angularVersion)
-                .update(packageVersion)
-                .update(wco.projectRoot)
-                .update(JSON.stringify(wco.tsConfig))
-                .update(JSON.stringify({
-                ...wco.buildOptions,
-                // Needed because outputPath changes on every build when using i18n extraction
-                // https://github.com/angular/angular-cli/blob/736a5f89deaca85f487b78aec9ff66d4118ceb6a/packages/angular_devkit/build_angular/src/utils/i18n-options.ts#L264-L265
-                outputPath: undefined,
-            }))
-                .update(supportedBrowsers.join(''))
-                .digest('hex'),
-        };
-    }
-    if (wco.buildOptions.watch) {
-        return {
-            type: 'memory',
-            maxGenerations: 1,
-        };
-    }
-    return false;
-}

@@ -11,4 +11,6 @@ export { SuppressExtractedTextChunksWebpackPlugin } from './suppress-entry-chunk
 export { RemoveHashPlugin, RemoveHashPluginOptions } from './remove-hash-plugin';
 export { DedupeModuleResolvePlugin } from './dedupe-module-resolve-plugin';
 export { CommonJsUsageWarnPlugin } from './common-js-usage-warn-plugin';
+export { JsonStatsPlugin } from './json-stats-plugin';
+export { JavaScriptOptimizerPlugin } from './javascript-optimizer-plugin';
 export { default as PostcssCliResources, PostcssCliResourcesOptions, } from './postcss-cli-resources';

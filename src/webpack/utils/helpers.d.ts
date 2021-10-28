@@ -5,8 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Configuration, SourceMapDevToolPlugin } from 'webpack';
-import { ExtraEntryPoint, ExtraEntryPointClass } from '../../builders/browser/schema';
+import type { ObjectPattern } from 'copy-webpack-plugin';
+import type { Configuration, WebpackOptionsNormalized } from 'webpack';
+import { AssetPatternClass, ExtraEntryPoint, ExtraEntryPointClass } from '../../builders/browser/schema';
+import { WebpackConfigOptions } from '../../utils/build-options';
 export interface HashFormat {
     chunk: string;
     extract: string;
@@ -16,8 +18,16 @@ export interface HashFormat {
 export declare function getOutputHashFormat(option: string, length?: number): HashFormat;
 export declare type NormalizedEntryPoint = Required<ExtraEntryPointClass>;
 export declare function normalizeExtraEntryPoints(extraEntryPoints: ExtraEntryPoint[], defaultBundleName: string): NormalizedEntryPoint[];
-export declare function getSourceMapDevTool(scriptsSourceMap: boolean | undefined, stylesSourceMap: boolean | undefined, hiddenSourceMap?: boolean, inlineSourceMap?: boolean): SourceMapDevToolPlugin;
-export declare function isPolyfillsEntry(name: string): boolean;
-export declare function getWatchOptions(poll: number | undefined): NonNullable<Configuration['watchOptions']>;
 export declare function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath: string) => string;
 export declare function getInstrumentationExcludedPaths(sourceRoot: string, excludedPaths: string[]): Set<string>;
+export declare function getCacheSettings(wco: WebpackConfigOptions, supportedBrowsers: string[], angularVersion: string): WebpackOptionsNormalized['cache'];
+export declare function globalScriptsByBundleName(root: string, scripts: ExtraEntryPoint[]): {
+    bundleName: string;
+    inject: boolean;
+    paths: string[];
+}[];
+export declare function assetPatterns(root: string, assets: AssetPatternClass[]): ObjectPattern[];
+export declare function externalizePackages(context: string, request: string | undefined, callback: (error?: Error, result?: string) => void): void;
+declare type WebpackStatsOptions = Exclude<Configuration['stats'], string | boolean>;
+export declare function getStatsOptions(verbose?: boolean): WebpackStatsOptions;
+export {};

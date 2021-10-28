@@ -166,6 +166,7 @@ async function execute(options, context, transforms) {
         subresourceIntegrity: false,
         outputHashing: schema_1.OutputHashing.None,
         namedChunks: true,
+        allowedCommonJsDependencies: undefined,
     };
     const { config, projectRoot } = await (0, webpack_browser_config_1.generateBrowserWebpackConfigFromContext)(builderOptions, context, (wco) => {
         var _a;
@@ -174,10 +175,8 @@ async function execute(options, context, transforms) {
         const partials = [
             { plugins: [new NoEmitPlugin()] },
             (0, configs_1.getCommonConfig)(wco),
-            (0, configs_1.getBrowserConfig)(wco),
             (0, configs_1.getTypeScriptConfig)(wco),
             (0, configs_1.getWorkerConfig)(wco),
-            (0, configs_1.getStatsConfig)(wco),
         ];
         // Add Ivy application file extractor support
         partials.unshift({

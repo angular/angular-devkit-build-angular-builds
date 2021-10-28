@@ -63,7 +63,6 @@ async function initialize(options, context, webpackConfigurationTransformer) {
         (0, configs_1.getCommonConfig)(wco),
         (0, configs_1.getStylesConfig)(wco),
         (0, configs_1.getTypeScriptConfig)(wco),
-        (0, configs_1.getTestConfig)(wco),
         (0, configs_1.getWorkerConfig)(wco),
     ]);
     const karma = await Promise.resolve().then(() => __importStar(require('karma')));
