@@ -286,6 +286,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     const processActions = [];
                     let processRuntimeAction;
                     for (const action of actions) {
+                        if (options.verbose) {
+                            context.logger.info(`[${new Date().toISOString()}] Differential loading file queued: ${action.filename}`);
+                        }
                         // If SRI is enabled always process the runtime bundle
                         // Lazy route integrity values are stored in the runtime bundle
                         if (action.integrityAlgorithm && action.runtime) {
@@ -300,6 +303,14 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                     try {
                         spinner.start('Generating ES5 bundles for differential loading...');
                         for await (const result of differentialLoadingExecutor.processAll(processActions)) {
+                            if (options.verbose) {
+                                if (result.original) {
+                                    context.logger.info(`[${new Date().toISOString()}] Differential loading file processed: ${result.original.filename}`);
+                                }
+                                if (result.downlevel) {
+                                    context.logger.info(`[${new Date().toISOString()}] Differential loading file processed: ${result.downlevel.filename}`);
+                                }
+                            }
                             processResults.push(result);
                         }
                     }
@@ -315,12 +326,18 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         };
                         processResults.push(await Promise.resolve().then(() => __importStar(require('../utils/process-bundle'))).then((m) => m.process(runtimeOptions)));
                     }
+                    if (options.verbose) {
+                        context.logger.info(`[${new Date().toISOString()}] Differential loading processing complete.`);
+                    }
                     spinner.succeed('ES5 bundle generation complete.');
                     if (i18n.shouldInline) {
                         spinner.start('Generating localized bundles...');
                         const inlineActions = [];
                         for (const result of processResults) {
                             if (result.original) {
+                                if (options.verbose) {
+                                    context.logger.info(`[${new Date().toISOString()}] i18n localize file queued: ${result.original.filename}`);
+                                }
                                 inlineActions.push({
                                     filename: path.basename(result.original.filename),
                                     // Memory mode is always enabled for i18n
@@ -334,6 +351,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                                 });
                             }
                             if (result.downlevel) {
+                                if (options.verbose) {
+                                    context.logger.info(`[${new Date().toISOString()}] i18n localize file queued: ${result.downlevel.filename}`);
+                                }
                                 inlineActions.push({
                                     filename: path.basename(result.downlevel.filename),
                                     // Memory mode is always enabled for i18n
@@ -350,9 +370,11 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         let hasErrors = false;
                         const i18nExecutor = new action_executor_1.BundleActionExecutor({ i18n }, options.subresourceIntegrity ? 'sha384' : undefined);
                         try {
+                            let localizedCount = 0;
                             for await (const result of i18nExecutor.inlineAll(inlineActions)) {
+                                localizedCount++;
                                 if (options.verbose) {
-                                    context.logger.info(`Localized "${result.file}" [${result.count} translation(s)].`);
+                                    context.logger.info(`[${new Date().toISOString()}] (${localizedCount}/${inlineActions.length}) Localized "${result.file}" [${result.count} translation(s)].`);
                                 }
                                 for (const diagnostic of result.diagnostics) {
                                     spinner.stop();
