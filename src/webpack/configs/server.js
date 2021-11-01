@@ -28,7 +28,8 @@ function getServerConfig(wco) {
     }
     return {
         resolve: {
-            mainFields: ['es2020', 'es2015', 'main', 'module'],
+            mainFields: ['es2015', 'main', 'module'],
+            conditionNames: ['es2015', '...'],
         },
         output: {
             libraryTarget: 'commonjs',
