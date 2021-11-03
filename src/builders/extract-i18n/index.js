@@ -175,8 +175,6 @@ async function execute(options, context, transforms) {
         const partials = [
             { plugins: [new NoEmitPlugin()] },
             (0, configs_1.getCommonConfig)(wco),
-            (0, configs_1.getTypeScriptConfig)(wco),
-            (0, configs_1.getWorkerConfig)(wco),
         ];
         // Add Ivy application file extractor support
         partials.unshift({

@@ -30,22 +30,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCommonConfig = void 0;
+const webpack_1 = require("@ngtools/webpack");
 const copy_webpack_plugin_1 = __importDefault(require("copy-webpack-plugin"));
 const path = __importStar(require("path"));
 const typescript_1 = require("typescript");
-const webpack_1 = require("webpack");
+const webpack_2 = require("webpack");
 const webpack_subresource_integrity_1 = require("webpack-subresource-integrity");
 const utils_1 = require("../../utils");
 const environment_options_1 = require("../../utils/environment-options");
 const load_esm_1 = require("../../utils/load-esm");
 const plugins_1 = require("../plugins");
 const progress_plugin_1 = require("../plugins/progress-plugin");
+const typescript_2 = require("../plugins/typescript");
 const helpers_1 = require("../utils/helpers");
 // eslint-disable-next-line max-lines-per-function
 async function getCommonConfig(wco) {
     var _a, _b;
-    const { root, projectRoot, buildOptions, tsConfig, projectName, sourceRoot } = wco;
-    const { cache, codeCoverage, crossOrigin = 'none', platform = 'browser', codeCoverageExclude = [], sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap, hidden: hiddenSourceMap, }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, commonChunk, vendorChunk, subresourceIntegrity, verbose, poll, webWorkerTsConfig, externalDependencies = [], allowedCommonJsDependencies, bundleDependencies, } = buildOptions;
+    const { root, projectRoot, buildOptions, tsConfig, projectName, sourceRoot, tsConfigPath } = wco;
+    const { cache, codeCoverage, crossOrigin = 'none', platform = 'browser', aot = true, codeCoverageExclude = [], main, polyfills, sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap, hidden: hiddenSourceMap, }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, commonChunk, vendorChunk, subresourceIntegrity, verbose, poll, webWorkerTsConfig, externalDependencies = [], allowedCommonJsDependencies, bundleDependencies, } = buildOptions;
     const isPlatformServer = buildOptions.platform === 'server';
     const extraPlugins = [];
     const extraRules = [];
@@ -69,7 +71,7 @@ async function getCommonConfig(wco) {
     }
     if (isPlatformServer) {
         // Fixes Critical dependency: the request of a dependency is an expression
-        extraPlugins.push(new webpack_1.ContextReplacementPlugin(/@?hapi|express[\\/]/));
+        extraPlugins.push(new webpack_2.ContextReplacementPlugin(/@?hapi|express[\\/]/));
     }
     if (!isPlatformServer) {
         if (buildOptions.polyfills) {
@@ -92,7 +94,7 @@ async function getCommonConfig(wco) {
         }
     }
     if (environment_options_1.profilingEnabled) {
-        extraPlugins.push(new webpack_1.debug.ProfilingPlugin({
+        extraPlugins.push(new webpack_2.debug.ProfilingPlugin({
             outputPath: path.resolve(root, 'chrome-profiler-events.json'),
         }));
     }
@@ -148,7 +150,7 @@ async function getCommonConfig(wco) {
         if (stylesSourceMap) {
             include.push(/css$/);
         }
-        extraPlugins.push(new webpack_1.SourceMapDevToolPlugin({
+        extraPlugins.push(new webpack_2.SourceMapDevToolPlugin({
             filename: '[file].map',
             include,
             // We want to set sourceRoot to  `webpack:///` for non
@@ -185,6 +187,16 @@ async function getCommonConfig(wco) {
                 },
             },
         });
+    }
+    if (main || polyfills) {
+        extraRules.push({
+            test: /\.[cm]?[tj]sx?$/,
+            loader: webpack_1.AngularWebpackLoaderPath,
+        });
+        extraPlugins.push((0, typescript_2.createIvyPlugin)(wco, aot, tsConfigPath));
+    }
+    if (webWorkerTsConfig) {
+        extraPlugins.push((0, typescript_2.createIvyPlugin)(wco, false, path.resolve(wco.root, webWorkerTsConfig)));
     }
     const extraMinimizers = [];
     if (scriptsOptimization) {

@@ -61,8 +61,6 @@ async function initialize(options, context, webpackConfigurationTransform) {
         (0, configs_1.getCommonConfig)(wco),
         (0, configs_1.getStylesConfig)(wco),
         (0, configs_1.getAnalyticsConfig)(wco, context),
-        (0, configs_1.getTypeScriptConfig)(wco),
-        wco.buildOptions.webWorkerTsConfig ? (0, configs_1.getWorkerConfig)(wco) : {},
     ]);
     // Validate asset option values if processed directly
     if (((_a = options.assets) === null || _a === void 0 ? void 0 : _a.length) && !((_b = adjustedOptions.assets) === null || _b === void 0 ? void 0 : _b.length)) {

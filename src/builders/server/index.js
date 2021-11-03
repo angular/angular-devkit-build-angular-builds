@@ -109,7 +109,7 @@ async function initialize(options, context, webpackConfigurationTransform) {
         buildOptimizer: false,
         aot: true,
         platform: 'server',
-    }, context, (wco) => [(0, configs_1.getCommonConfig)(wco), (0, configs_1.getStylesConfig)(wco), (0, configs_1.getTypeScriptConfig)(wco)]);
+    }, context, (wco) => [(0, configs_1.getCommonConfig)(wco), (0, configs_1.getStylesConfig)(wco)]);
     let transformedConfig;
     if (webpackConfigurationTransform) {
         transformedConfig = await webpackConfigurationTransform(config);

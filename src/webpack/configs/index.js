@@ -21,5 +21,3 @@ __exportStar(require("./analytics"), exports);
 __exportStar(require("./common"), exports);
 __exportStar(require("./dev-server"), exports);
 __exportStar(require("./styles"), exports);
-__exportStar(require("./typescript"), exports);
-__exportStar(require("./worker"), exports);

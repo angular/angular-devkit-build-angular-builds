@@ -126,8 +126,6 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             (0, configs_1.getCommonConfig)(wco),
             (0, configs_1.getStylesConfig)(wco),
             (0, configs_1.getAnalyticsConfig)(wco, context),
-            (0, configs_1.getTypeScriptConfig)(wco),
-            browserOptions.webWorkerTsConfig ? (0, configs_1.getWorkerConfig)(wco) : {},
         ], options);
         if (!config.devServer) {
             throw new Error('Webpack Dev Server configuration was not set.');

@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTypescriptWorkerPlugin = exports.getTypeScriptConfig = void 0;
+exports.createIvyPlugin = void 0;
 const core_1 = require("@angular-devkit/core");
 const webpack_1 = require("@ngtools/webpack");
 const typescript_1 = require("typescript");
@@ -22,6 +22,9 @@ function ensureIvy(wco) {
     wco.tsConfig.options.enableIvy = true;
 }
 function createIvyPlugin(wco, aot, tsconfig) {
+    if (aot) {
+        ensureIvy(wco);
+    }
     const { buildOptions } = wco;
     const optimize = buildOptions.optimization.scripts;
     const compilerOptions = {
@@ -69,26 +72,4 @@ function createIvyPlugin(wco, aot, tsconfig) {
         inlineStyleFileExtension,
     });
 }
-function getTypeScriptConfig(wco) {
-    const { buildOptions: { aot = false, main, polyfills }, tsConfigPath, } = wco;
-    if (main || polyfills) {
-        ensureIvy(wco);
-        return {
-            module: {
-                rules: [
-                    {
-                        test: /\.[jt]sx?$/,
-                        loader: webpack_1.AngularWebpackLoaderPath,
-                    },
-                ],
-            },
-            plugins: [createIvyPlugin(wco, aot, tsConfigPath)],
-        };
-    }
-    return {};
-}
-exports.getTypeScriptConfig = getTypeScriptConfig;
-function getTypescriptWorkerPlugin(wco, workerTsConfigPath) {
-    return createIvyPlugin(wco, false, workerTsConfigPath);
-}
-exports.getTypescriptWorkerPlugin = getTypescriptWorkerPlugin;
+exports.createIvyPlugin = createIvyPlugin;
