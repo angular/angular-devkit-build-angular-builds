@@ -140,7 +140,6 @@ function restoreFormValues(oldInputs, oldOptions) {
                 case 'date':
                 case 'datetime-local':
                 case 'email':
-                case 'file':
                 case 'hidden':
                 case 'month':
                 case 'number':
