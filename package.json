@@ -7,9 +7,9 @@
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "1.0.1",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#a0ff636a2",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#a0ff636a2",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#a0ff636a2",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#1cdc24da0",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#1cdc24da0",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#1cdc24da0",
     "@babel/core": "7.15.8",
     "@babel/generator": "7.15.8",
     "@babel/helper-annotate-as-pure": "7.15.4",
@@ -20,7 +20,7 @@
     "@babel/runtime": "7.15.4",
     "@babel/template": "7.15.4",
     "@discoveryjs/json-ext": "0.5.5",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#a0ff636a2",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#1cdc24da0",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.3",
     "babel-plugin-istanbul": "6.1.1",
@@ -75,11 +75,11 @@
     "esbuild": "0.13.12"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": "^13.0.0 || ^13.0.0-next",
-    "@angular/localize": "^13.0.0 || ^13.0.0-next",
-    "@angular/service-worker": "^13.0.0 || ^13.0.0-next",
+    "@angular/compiler-cli": "^13.0.0",
+    "@angular/localize": "^13.0.0",
+    "@angular/service-worker": "^13.0.0",
     "karma": "^6.3.0",
-    "ng-packagr": "^13.0.0 || ^13.0.0-next",
+    "ng-packagr": "^13.0.0",
     "protractor": "^7.0.0",
     "tailwindcss": "^2.0.0",
     "typescript": "~4.4.3"
