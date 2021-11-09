@@ -20,7 +20,7 @@ export declare type NormalizedEntryPoint = Required<ExtraEntryPointClass>;
 export declare function normalizeExtraEntryPoints(extraEntryPoints: ExtraEntryPoint[], defaultBundleName: string): NormalizedEntryPoint[];
 export declare function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath: string) => string;
 export declare function getInstrumentationExcludedPaths(sourceRoot: string, excludedPaths: string[]): Set<string>;
-export declare function getCacheSettings(wco: WebpackConfigOptions, supportedBrowsers: string[], angularVersion: string): WebpackOptionsNormalized['cache'];
+export declare function getCacheSettings(wco: WebpackConfigOptions, angularVersion: string): WebpackOptionsNormalized['cache'];
 export declare function globalScriptsByBundleName(root: string, scripts: ExtraEntryPoint[]): {
     bundleName: string;
     inject: boolean;

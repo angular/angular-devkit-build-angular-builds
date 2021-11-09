@@ -109,7 +109,7 @@ function getInstrumentationExcludedPaths(sourceRoot, excludedPaths) {
     return excluded;
 }
 exports.getInstrumentationExcludedPaths = getInstrumentationExcludedPaths;
-function getCacheSettings(wco, supportedBrowsers, angularVersion) {
+function getCacheSettings(wco, angularVersion) {
     const { enabled, path: cacheDirectory } = wco.buildOptions.cache;
     if (enabled) {
         const packageVersion = require('../../../package.json').version;
@@ -131,7 +131,6 @@ function getCacheSettings(wco, supportedBrowsers, angularVersion) {
                 // https://github.com/angular/angular-cli/blob/736a5f89deaca85f487b78aec9ff66d4118ceb6a/packages/angular_devkit/build_angular/src/utils/i18n-options.ts#L264-L265
                 outputPath: undefined,
             }))
-                .update(supportedBrowsers.join(''))
                 .digest('hex'),
         };
     }

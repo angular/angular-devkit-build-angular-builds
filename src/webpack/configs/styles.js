@@ -30,7 +30,6 @@ exports.getStylesConfig = void 0;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const sass_service_1 = require("../../sass/sass-service");
-const build_browser_features_1 = require("../../utils/build-browser-features");
 const plugins_1 = require("../plugins");
 const css_optimizer_plugin_1 = require("../plugins/css-optimizer-plugin");
 const helpers_1 = require("../utils/helpers");
@@ -134,9 +133,8 @@ function getStylesConfig(wco) {
             extraPostcssPlugins.push(require(tailwindPackagePath)({ config: tailwindConfigPath }));
         }
     }
-    const { supportedBrowsers } = new build_browser_features_1.BuildBrowserFeatures(wco.projectRoot);
     const postcssPresetEnvPlugin = postcssPresetEnv({
-        browsers: supportedBrowsers,
+        browsers: buildOptions.supportedBrowsers,
         autoprefixer: true,
         stage: 3,
     });
@@ -361,7 +359,7 @@ function getStylesConfig(wco) {
             minimizer: buildOptions.optimization.styles.minify
                 ? [
                     new css_optimizer_plugin_1.CssOptimizerPlugin({
-                        supportedBrowsers,
+                        supportedBrowsers: buildOptions.supportedBrowsers,
                     }),
                 ]
                 : undefined,

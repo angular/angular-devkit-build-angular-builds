@@ -14,6 +14,7 @@ const normalize_cache_1 = require("./normalize-cache");
 const normalize_file_replacements_1 = require("./normalize-file-replacements");
 const normalize_optimization_1 = require("./normalize-optimization");
 const normalize_source_maps_1 = require("./normalize-source-maps");
+const supported_browsers_1 = require("./supported-browsers");
 function normalizeBrowserSchema(root, projectRoot, sourceRoot, options, metadata) {
     const normalizedSourceMapOptions = (0, normalize_source_maps_1.normalizeSourceMaps)(options.sourceMap || false);
     return {
@@ -37,6 +38,7 @@ function normalizeBrowserSchema(root, projectRoot, sourceRoot, options, metadata
         // A value of 0 is falsy and will disable polling rather then enable
         // 500 ms is a sensible default in this case
         poll: options.poll === 0 ? 500 : options.poll,
+        supportedBrowsers: (0, supported_browsers_1.getSupportedBrowsers)((0, core_1.getSystemPath)(projectRoot)),
     };
 }
 exports.normalizeBrowserSchema = normalizeBrowserSchema;

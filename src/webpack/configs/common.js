@@ -36,7 +36,6 @@ const path = __importStar(require("path"));
 const typescript_1 = require("typescript");
 const webpack_2 = require("webpack");
 const webpack_subresource_integrity_1 = require("webpack-subresource-integrity");
-const utils_1 = require("../../utils");
 const environment_options_1 = require("../../utils/environment-options");
 const load_esm_1 = require("../../utils/load-esm");
 const plugins_1 = require("../plugins");
@@ -61,7 +60,6 @@ async function getCommonConfig(wco) {
     const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT, VERSION: NG_VERSION, } = (compilerCliModule.GLOBAL_DEFS_FOR_TERSER ? compilerCliModule : compilerCliModule.default);
     // determine hashing format
     const hashFormat = (0, helpers_1.getOutputHashFormat)(buildOptions.outputHashing || 'none');
-    const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(projectRoot);
     if (buildOptions.progress) {
         extraPlugins.push(new progress_plugin_1.ProgressPlugin(platform));
     }
@@ -327,7 +325,7 @@ async function getCommonConfig(wco) {
             level: verbose ? 'verbose' : 'error',
         },
         stats: (0, helpers_1.getStatsOptions)(verbose),
-        cache: (0, helpers_1.getCacheSettings)(wco, buildBrowserFeatures.supportedBrowsers, NG_VERSION.full),
+        cache: (0, helpers_1.getCacheSettings)(wco, NG_VERSION.full),
         optimization: {
             minimizer: extraMinimizers,
             moduleIds: 'deterministic',

@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-export * from './build-browser-features';
 export * from './default-progress';
 export * from './delete-output-dir';
 export * from './run-module-as-observable-fork';

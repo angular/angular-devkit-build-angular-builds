@@ -46,6 +46,7 @@ const output_paths_1 = require("../../utils/output-paths");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
 const service_worker_1 = require("../../utils/service-worker");
 const spinner_1 = require("../../utils/spinner");
+const supported_browsers_1 = require("../../utils/supported-browsers");
 const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const configs_1 = require("../../webpack/configs");
@@ -97,8 +98,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     return (0, rxjs_1.from)(context.getProjectMetadata(projectName)).pipe((0, operators_1.switchMap)(async (projectMetadata) => {
         var _a;
         const sysProjectRoot = (0, core_1.getSystemPath)((0, core_1.resolve)((0, core_1.normalize)(context.workspaceRoot), (0, core_1.normalize)((_a = projectMetadata.root) !== null && _a !== void 0 ? _a : '')));
-        const buildBrowserFeatures = new utils_1.BuildBrowserFeatures(sysProjectRoot);
-        checkInternetExplorerSupport(buildBrowserFeatures.supportedBrowsers, context.logger);
+        checkInternetExplorerSupport(sysProjectRoot, context.logger);
         return {
             ...(await initialize(options, context, transforms.webpackConfiguration)),
             cacheOptions: (0, normalize_cache_1.normalizeCacheOptions)(projectMetadata, context.workspaceRoot),
@@ -290,7 +290,8 @@ function mapEmittedFilesToFileInfo(files = []) {
     }
     return filteredFiles;
 }
-function checkInternetExplorerSupport(supportedBrowsers, logger) {
+function checkInternetExplorerSupport(projectRoot, logger) {
+    const supportedBrowsers = (0, supported_browsers_1.getSupportedBrowsers)(projectRoot);
     if (supportedBrowsers.some((b) => b === 'ie 9' || b === 'ie 10' || b === 'ie 11')) {
         logger.warn(`Warning: Support was requested for Internet Explorer in the project's browserslist configuration. ` +
             'Internet Explorer is no longer officially supported.' +
