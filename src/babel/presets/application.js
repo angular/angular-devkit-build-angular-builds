@@ -101,7 +101,7 @@ function createNgtscLogger(reporter) {
     };
 }
 function default_1(api, options) {
-    var _a;
+    var _a, _b;
     const presets = [];
     const plugins = [];
     let needRuntimeTransform = false;
@@ -160,7 +160,10 @@ function default_1(api, options) {
     if (options.instrumentCode) {
         plugins.push([
             require('babel-plugin-istanbul').default,
-            { inputSourceMap: false, cwd: options.instrumentCode.includedBasePath },
+            {
+                inputSourceMap: (_b = options.instrumentCode.inputSourceMap) !== null && _b !== void 0 ? _b : false,
+                cwd: options.instrumentCode.includedBasePath,
+            },
         ]);
     }
     if (needRuntimeTransform) {
