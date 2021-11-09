@@ -34,6 +34,7 @@ export interface ApplicationPresetOptions {
     forceAsyncTransformation?: boolean;
     instrumentCode?: {
         includedBasePath: string;
+        inputSourceMap: unknown;
     };
     optimize?: {
         looseEnums: boolean;
