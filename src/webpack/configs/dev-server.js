@@ -158,21 +158,71 @@ async function addProxyConfig(root, proxyConfig) {
         return undefined;
     }
     const proxyPath = (0, path_1.resolve)(root, proxyConfig);
-    if ((0, fs_1.existsSync)(proxyPath)) {
-        try {
-            return require(proxyPath);
-        }
-        catch (e) {
-            if (e.code === 'ERR_REQUIRE_ESM') {
-                // Load the ESM configuration file using the TypeScript dynamic import workaround.
-                // Once TypeScript provides support for keeping the dynamic import this workaround can be
-                // changed to a direct dynamic import.
-                return (await (0, load_esm_1.loadEsmModule)(url.pathToFileURL(proxyPath))).default;
-            }
-            throw e;
-        }
+    if (!(0, fs_1.existsSync)(proxyPath)) {
+        throw new Error(`Proxy configuration file ${proxyPath} does not exist.`);
     }
-    throw new Error('Proxy config file ' + proxyPath + ' does not exist.');
+    switch ((0, path_1.extname)(proxyPath)) {
+        case '.json': {
+            const content = await fs_1.promises.readFile(proxyPath, 'utf-8');
+            const { parse, printParseErrorCode } = await Promise.resolve().then(() => __importStar(require('jsonc-parser')));
+            const parseErrors = [];
+            const proxyConfiguration = parse(content, parseErrors, { allowTrailingComma: true });
+            if (parseErrors.length > 0) {
+                let errorMessage = `Proxy configuration file ${proxyPath} contains parse errors:`;
+                for (const parseError of parseErrors) {
+                    const { line, column } = getJsonErrorLineColumn(parseError.offset, content);
+                    errorMessage += `\n[${line}, ${column}] ${printParseErrorCode(parseError.error)}`;
+                }
+                throw new Error(errorMessage);
+            }
+            return proxyConfiguration;
+        }
+        case '.mjs':
+            // Load the ESM configuration file using the TypeScript dynamic import workaround.
+            // Once TypeScript provides support for keeping the dynamic import this workaround can be
+            // changed to a direct dynamic import.
+            return (await (0, load_esm_1.loadEsmModule)(url.pathToFileURL(proxyPath))).default;
+        case '.cjs':
+            return require(proxyPath);
+        default:
+            // The file could be either CommonJS or ESM.
+            // CommonJS is tried first then ESM if loading fails.
+            try {
+                return require(proxyPath);
+            }
+            catch (e) {
+                if (e.code === 'ERR_REQUIRE_ESM') {
+                    // Load the ESM configuration file using the TypeScript dynamic import workaround.
+                    // Once TypeScript provides support for keeping the dynamic import this workaround can be
+                    // changed to a direct dynamic import.
+                    return (await (0, load_esm_1.loadEsmModule)(url.pathToFileURL(proxyPath))).default;
+                }
+                throw e;
+            }
+    }
+}
+/**
+ * Calculates the line and column for an error offset in the content of a JSON file.
+ * @param location The offset error location from the beginning of the content.
+ * @param content The full content of the file containing the error.
+ * @returns An object containing the line and column
+ */
+function getJsonErrorLineColumn(offset, content) {
+    if (offset === 0) {
+        return { line: 1, column: 1 };
+    }
+    let line = 0;
+    let position = 0;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+        ++line;
+        const nextNewline = content.indexOf('\n', position);
+        if (nextNewline === -1 || nextNewline > offset) {
+            break;
+        }
+        position = nextNewline + 1;
+    }
+    return { line, column: offset - position + 1 };
 }
 /**
  * Find the default server path. We don't want to expose baseHref and deployUrl as arguments, only
