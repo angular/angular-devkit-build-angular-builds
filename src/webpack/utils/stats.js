@@ -50,35 +50,52 @@ function formatSize(size) {
 exports.formatSize = formatSize;
 function generateBundleStats(info) {
     var _a, _b, _c;
-    const size = typeof info.size === 'number' ? info.size : '-';
+    const rawSize = typeof info.rawSize === 'number' ? info.rawSize : '-';
+    const estimatedTransferSize = typeof info.estimatedTransferSize === 'number' ? info.estimatedTransferSize : '-';
     const files = (_b = (_a = info.files) === null || _a === void 0 ? void 0 : _a.filter((f) => !f.endsWith('.map')).map((f) => path.basename(f)).join(', ')) !== null && _b !== void 0 ? _b : '';
     const names = ((_c = info.names) === null || _c === void 0 ? void 0 : _c.length) ? info.names.join(', ') : '-';
     const initial = !!info.initial;
     return {
         initial,
-        stats: [files, names, size],
+        stats: [files, names, rawSize, estimatedTransferSize],
     };
 }
 exports.generateBundleStats = generateBundleStats;
-function generateBuildStatsTable(data, colors, showTotalSize) {
+function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTransferSize) {
     const g = (x) => (colors ? color_1.colors.greenBright(x) : x);
     const c = (x) => (colors ? color_1.colors.cyanBright(x) : x);
     const bold = (x) => (colors ? color_1.colors.bold(x) : x);
     const dim = (x) => (colors ? color_1.colors.dim(x) : x);
     const changedEntryChunksStats = [];
     const changedLazyChunksStats = [];
-    let initialTotalSize = 0;
+    let initialTotalRawSize = 0;
+    let initialTotalEstimatedTransferSize;
     for (const { initial, stats } of data) {
-        const [files, names, size] = stats;
-        const data = [
-            g(files),
-            names,
-            c(typeof size === 'number' ? formatSize(size) : size),
-        ];
+        const [files, names, rawSize, estimatedTransferSize] = stats;
+        let data;
+        if (showEstimatedTransferSize) {
+            data = [
+                g(files),
+                names,
+                c(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
+                c(typeof estimatedTransferSize === 'number'
+                    ? formatSize(estimatedTransferSize)
+                    : estimatedTransferSize),
+            ];
+        }
+        else {
+            data = [g(files), names, c(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize), ''];
+        }
         if (initial) {
             changedEntryChunksStats.push(data);
-            if (typeof size === 'number') {
-                initialTotalSize += size;
+            if (typeof rawSize === 'number') {
+                initialTotalRawSize += rawSize;
+            }
+            if (showEstimatedTransferSize && typeof estimatedTransferSize === 'number') {
+                if (initialTotalEstimatedTransferSize === undefined) {
+                    initialTotalEstimatedTransferSize = 0;
+                }
+                initialTotalEstimatedTransferSize += estimatedTransferSize;
             }
         }
         else {
@@ -86,12 +103,24 @@ function generateBuildStatsTable(data, colors, showTotalSize) {
         }
     }
     const bundleInfo = [];
+    const baseTitles = ['Names', 'Raw Size'];
+    const tableAlign = ['l', 'l', 'r'];
+    if (showEstimatedTransferSize) {
+        baseTitles.push('Estimated Transfer Size');
+        tableAlign.push('r');
+    }
     // Entry chunks
     if (changedEntryChunksStats.length) {
-        bundleInfo.push(['Initial Chunk Files', 'Names', 'Size'].map(bold), ...changedEntryChunksStats);
+        bundleInfo.push(['Initial Chunk Files', ...baseTitles].map(bold), ...changedEntryChunksStats);
         if (showTotalSize) {
             bundleInfo.push([]);
-            bundleInfo.push([' ', 'Initial Total', formatSize(initialTotalSize)].map(bold));
+            const totalSizeElements = [' ', 'Initial Total', formatSize(initialTotalRawSize)];
+            if (showEstimatedTransferSize) {
+                totalSizeElements.push(typeof initialTotalEstimatedTransferSize === 'number'
+                    ? formatSize(initialTotalEstimatedTransferSize)
+                    : '-');
+            }
+            bundleInfo.push(totalSizeElements.map(bold));
         }
     }
     // Seperator
@@ -100,12 +129,12 @@ function generateBuildStatsTable(data, colors, showTotalSize) {
     }
     // Lazy chunks
     if (changedLazyChunksStats.length) {
-        bundleInfo.push(['Lazy Chunk Files', 'Names', 'Size'].map(bold), ...changedLazyChunksStats);
+        bundleInfo.push(['Lazy Chunk Files', ...baseTitles].map(bold), ...changedLazyChunksStats);
     }
     return (0, text_table_1.default)(bundleInfo, {
         hsep: dim(' | '),
         stringLength: (s) => (0, color_1.removeColor)(s).length,
-        align: ['l', 'l', 'r'],
+        align: tableAlign,
     });
 }
 function generateBuildStats(hash, time, colors) {
@@ -127,6 +156,7 @@ statsConfig, bundleState) {
     const rs = (x) => (colors ? color_1.colors.reset(x) : x);
     const changedChunksStats = bundleState !== null && bundleState !== void 0 ? bundleState : [];
     let unchangedChunkNumber = 0;
+    let hasEstimatedTransferSizes = false;
     if (!(bundleState === null || bundleState === void 0 ? void 0 : bundleState.length)) {
         const isFirstRun = !runsCache.has(json.outputPath || '');
         for (const chunk of json.chunks) {
@@ -136,8 +166,24 @@ statsConfig, bundleState) {
                 continue;
             }
             const assets = (_b = json.assets) === null || _b === void 0 ? void 0 : _b.filter((asset) => { var _a; return (_a = chunk.files) === null || _a === void 0 ? void 0 : _a.includes(asset.name); });
-            const summedSize = assets === null || assets === void 0 ? void 0 : assets.filter((asset) => !asset.name.endsWith('.map')).reduce((total, asset) => total + asset.size, 0);
-            changedChunksStats.push(generateBundleStats({ ...chunk, size: summedSize }));
+            let rawSize = 0;
+            let estimatedTransferSize;
+            if (assets) {
+                for (const asset of assets) {
+                    if (asset.name.endsWith('.map')) {
+                        continue;
+                    }
+                    rawSize += asset.size;
+                    if (typeof asset.info.estimatedTransferSize === 'number') {
+                        if (estimatedTransferSize === undefined) {
+                            estimatedTransferSize = 0;
+                            hasEstimatedTransferSizes = true;
+                        }
+                        estimatedTransferSize += asset.info.estimatedTransferSize;
+                    }
+                }
+            }
+            changedChunksStats.push(generateBundleStats({ ...chunk, rawSize, estimatedTransferSize }));
         }
         unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
         runsCache.add(json.outputPath || '');
@@ -152,7 +198,7 @@ statsConfig, bundleState) {
         }
         return 0;
     });
-    const statsTable = generateBuildStatsTable(changedChunksStats, colors, unchangedChunkNumber === 0);
+    const statsTable = generateBuildStatsTable(changedChunksStats, colors, unchangedChunkNumber === 0, hasEstimatedTransferSizes);
     // In some cases we do things outside of webpack context
     // Such us index generation, service worker augmentation etc...
     // This will correct the time and include these.

@@ -40,6 +40,7 @@ const environment_options_1 = require("../../utils/environment-options");
 const load_esm_1 = require("../../utils/load-esm");
 const plugins_1 = require("../plugins");
 const progress_plugin_1 = require("../plugins/progress-plugin");
+const transfer_size_plugin_1 = require("../plugins/transfer-size-plugin");
 const typescript_2 = require("../plugins/typescript");
 const helpers_1 = require("../utils/helpers");
 // eslint-disable-next-line max-lines-per-function
@@ -206,6 +207,9 @@ async function getCommonConfig(wco) {
             removeLicenses: buildOptions.extractLicenses,
             advanced: buildOptions.buildOptimizer,
         }));
+    }
+    if (platform === 'browser' && (scriptsOptimization || stylesOptimization.minify)) {
+        extraMinimizers.push(new transfer_size_plugin_1.TransferSizePlugin());
     }
     const externals = [...externalDependencies];
     if (isPlatformServer && !bundleDependencies) {

@@ -10,13 +10,19 @@ import { logging } from '@angular-devkit/core';
 import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../builders/browser/schema';
 export declare function formatSize(size: number): string;
-export declare type BundleStatsData = [files: string, names: string, size: number | string];
+export declare type BundleStatsData = [
+    files: string,
+    names: string,
+    rawSize: number | string,
+    estimatedTransferSize: number | string
+];
 export interface BundleStats {
     initial: boolean;
     stats: BundleStatsData;
 }
 export declare function generateBundleStats(info: {
-    size?: number;
+    rawSize?: number;
+    estimatedTransferSize?: number;
     files?: string[];
     names?: string[];
     initial?: boolean;
