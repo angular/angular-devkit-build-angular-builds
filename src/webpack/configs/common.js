@@ -322,6 +322,7 @@ async function getCommonConfig(wco) {
             ],
         },
         experiments: {
+            backCompat: false,
             syncWebAssembly: true,
             asyncWebAssembly: true,
         },
