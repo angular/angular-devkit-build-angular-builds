@@ -155,8 +155,9 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 }
                 // Check for budget errors and display them to the user.
                 const budgets = options.budgets;
+                let budgetFailures;
                 if (budgets === null || budgets === void 0 ? void 0 : budgets.length) {
-                    const budgetFailures = (0, bundle_calculator_1.checkBudgets)(budgets, webpackStats);
+                    budgetFailures = [...(0, bundle_calculator_1.checkBudgets)(budgets, webpackStats)];
                     for (const { severity, message } of budgetFailures) {
                         switch (severity) {
                             case bundle_calculator_1.ThresholdSeverity.Warning:
@@ -250,7 +251,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         spinner.succeed('Service worker generation complete.');
                     }
                 }
-                (0, stats_1.webpackStatsLogger)(context.logger, webpackStats, config);
+                (0, stats_1.webpackStatsLogger)(context.logger, webpackStats, config, budgetFailures);
                 return { success: buildSuccess };
             }
         }), (0, operators_1.map)((event) => ({

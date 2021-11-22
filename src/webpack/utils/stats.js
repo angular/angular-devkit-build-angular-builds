@@ -61,30 +61,59 @@ function generateBundleStats(info) {
     };
 }
 exports.generateBundleStats = generateBundleStats;
-function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTransferSize) {
+function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTransferSize, budgetFailures) {
     const g = (x) => (colors ? color_1.colors.greenBright(x) : x);
     const c = (x) => (colors ? color_1.colors.cyanBright(x) : x);
+    const r = (x) => (colors ? color_1.colors.redBright(x) : x);
+    const y = (x) => (colors ? color_1.colors.yellowBright(x) : x);
     const bold = (x) => (colors ? color_1.colors.bold(x) : x);
     const dim = (x) => (colors ? color_1.colors.dim(x) : x);
+    const getSizeColor = (name, file, defaultColor = c) => {
+        const severity = budgets.get(name) || (file && budgets.get(file));
+        switch (severity) {
+            case 'warning':
+                return y;
+            case 'error':
+                return r;
+            default:
+                return defaultColor;
+        }
+    };
     const changedEntryChunksStats = [];
     const changedLazyChunksStats = [];
     let initialTotalRawSize = 0;
     let initialTotalEstimatedTransferSize;
+    const budgets = new Map();
+    if (budgetFailures) {
+        for (const { label, severity } of budgetFailures) {
+            // In some cases a file can have multiple budget failures.
+            // Favor error.
+            if (label && (!budgets.has(label) || budgets.get(label) === 'warning')) {
+                budgets.set(label, severity);
+            }
+        }
+    }
     for (const { initial, stats } of data) {
         const [files, names, rawSize, estimatedTransferSize] = stats;
+        const getRawSizeColor = getSizeColor(names, files);
         let data;
         if (showEstimatedTransferSize) {
             data = [
                 g(files),
                 names,
-                c(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
+                getRawSizeColor(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
                 c(typeof estimatedTransferSize === 'number'
                     ? formatSize(estimatedTransferSize)
                     : estimatedTransferSize),
             ];
         }
         else {
-            data = [g(files), names, c(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize), ''];
+            data = [
+                g(files),
+                names,
+                getRawSizeColor(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
+                '',
+            ];
         }
         if (initial) {
             changedEntryChunksStats.push(data);
@@ -114,7 +143,12 @@ function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTrans
         bundleInfo.push(['Initial Chunk Files', ...baseTitles].map(bold), ...changedEntryChunksStats);
         if (showTotalSize) {
             bundleInfo.push([]);
-            const totalSizeElements = [' ', 'Initial Total', formatSize(initialTotalRawSize)];
+            const initialSizeTotalColor = getSizeColor('bundle initial', undefined, (x) => x);
+            const totalSizeElements = [
+                ' ',
+                'Initial Total',
+                initialSizeTotalColor(formatSize(initialTotalRawSize)),
+            ];
             if (showEstimatedTransferSize) {
                 totalSizeElements.push(typeof initialTotalEstimatedTransferSize === 'number'
                     ? formatSize(initialTotalEstimatedTransferSize)
@@ -147,47 +181,45 @@ function generateBuildStats(hash, time, colors) {
 const runsCache = new Set();
 function statsToString(json, 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-statsConfig, bundleState) {
+statsConfig, budgetFailures) {
     var _a, _b;
     if (!((_a = json.chunks) === null || _a === void 0 ? void 0 : _a.length)) {
         return '';
     }
     const colors = statsConfig.colors;
     const rs = (x) => (colors ? color_1.colors.reset(x) : x);
-    const changedChunksStats = bundleState !== null && bundleState !== void 0 ? bundleState : [];
+    const changedChunksStats = [];
     let unchangedChunkNumber = 0;
     let hasEstimatedTransferSizes = false;
-    if (!(bundleState === null || bundleState === void 0 ? void 0 : bundleState.length)) {
-        const isFirstRun = !runsCache.has(json.outputPath || '');
-        for (const chunk of json.chunks) {
-            // During first build we want to display unchanged chunks
-            // but unchanged cached chunks are always marked as not rendered.
-            if (!isFirstRun && !chunk.rendered) {
-                continue;
-            }
-            const assets = (_b = json.assets) === null || _b === void 0 ? void 0 : _b.filter((asset) => { var _a; return (_a = chunk.files) === null || _a === void 0 ? void 0 : _a.includes(asset.name); });
-            let rawSize = 0;
-            let estimatedTransferSize;
-            if (assets) {
-                for (const asset of assets) {
-                    if (asset.name.endsWith('.map')) {
-                        continue;
+    const isFirstRun = !runsCache.has(json.outputPath || '');
+    for (const chunk of json.chunks) {
+        // During first build we want to display unchanged chunks
+        // but unchanged cached chunks are always marked as not rendered.
+        if (!isFirstRun && !chunk.rendered) {
+            continue;
+        }
+        const assets = (_b = json.assets) === null || _b === void 0 ? void 0 : _b.filter((asset) => { var _a; return (_a = chunk.files) === null || _a === void 0 ? void 0 : _a.includes(asset.name); });
+        let rawSize = 0;
+        let estimatedTransferSize;
+        if (assets) {
+            for (const asset of assets) {
+                if (asset.name.endsWith('.map')) {
+                    continue;
+                }
+                rawSize += asset.size;
+                if (typeof asset.info.estimatedTransferSize === 'number') {
+                    if (estimatedTransferSize === undefined) {
+                        estimatedTransferSize = 0;
+                        hasEstimatedTransferSizes = true;
                     }
-                    rawSize += asset.size;
-                    if (typeof asset.info.estimatedTransferSize === 'number') {
-                        if (estimatedTransferSize === undefined) {
-                            estimatedTransferSize = 0;
-                            hasEstimatedTransferSizes = true;
-                        }
-                        estimatedTransferSize += asset.info.estimatedTransferSize;
-                    }
+                    estimatedTransferSize += asset.info.estimatedTransferSize;
                 }
             }
-            changedChunksStats.push(generateBundleStats({ ...chunk, rawSize, estimatedTransferSize }));
         }
-        unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
-        runsCache.add(json.outputPath || '');
+        changedChunksStats.push(generateBundleStats({ ...chunk, rawSize, estimatedTransferSize }));
     }
+    unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
+    runsCache.add(json.outputPath || '');
     // Sort chunks by size in descending order
     changedChunksStats.sort((a, b) => {
         if (a.stats[2] > b.stats[2]) {
@@ -198,7 +230,7 @@ statsConfig, bundleState) {
         }
         return 0;
     });
-    const statsTable = generateBuildStatsTable(changedChunksStats, colors, unchangedChunkNumber === 0, hasEstimatedTransferSizes);
+    const statsTable = generateBuildStatsTable(changedChunksStats, colors, unchangedChunkNumber === 0, hasEstimatedTransferSizes, budgetFailures);
     // In some cases we do things outside of webpack context
     // Such us index generation, service worker augmentation etc...
     // This will correct the time and include these.
@@ -320,8 +352,8 @@ function createWebpackLoggingCallback(options, logger) {
     };
 }
 exports.createWebpackLoggingCallback = createWebpackLoggingCallback;
-function webpackStatsLogger(logger, json, config, bundleStats) {
-    logger.info(statsToString(json, config.stats, bundleStats));
+function webpackStatsLogger(logger, json, config, budgetFailures) {
+    logger.info(statsToString(json, config.stats, budgetFailures));
     if (statsHasWarnings(json)) {
         logger.warn(statsWarningsToString(json, config.stats));
     }

@@ -143,7 +143,7 @@ class BundleCalculator extends Calculator {
             .filter((chunk) => { var _a; return (_a = chunk === null || chunk === void 0 ? void 0 : chunk.names) === null || _a === void 0 ? void 0 : _a.includes(budgetName); })
             .map((chunk) => this.calculateChunkSize(chunk))
             .reduce((l, r) => l + r, 0);
-        return [{ size, label: `bundle ${this.budget.name}` }];
+        return [{ size, label: this.budget.name }];
     }
 }
 /**
@@ -262,6 +262,7 @@ function* checkThresholds(thresholds, size, label) {
                 const sizeDifference = (0, stats_1.formatSize)(size - threshold.limit);
                 yield {
                     severity: threshold.severity,
+                    label,
                     message: `${label} exceeded maximum budget. Budget ${(0, stats_1.formatSize)(threshold.limit)} was not met by ${sizeDifference} with a total of ${(0, stats_1.formatSize)(size)}.`,
                 };
                 break;
@@ -273,6 +274,7 @@ function* checkThresholds(thresholds, size, label) {
                 const sizeDifference = (0, stats_1.formatSize)(threshold.limit - size);
                 yield {
                     severity: threshold.severity,
+                    label,
                     message: `${label} failed to meet minimum budget. Budget ${(0, stats_1.formatSize)(threshold.limit)} was not met by ${sizeDifference} with a total of ${(0, stats_1.formatSize)(size)}.`,
                 };
                 break;

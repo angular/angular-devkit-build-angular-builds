@@ -9,6 +9,7 @@ import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { logging } from '@angular-devkit/core';
 import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../builders/browser/schema';
+import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 export declare function formatSize(size: number): string;
 export declare type BundleStatsData = [
     files: string,
@@ -33,4 +34,4 @@ export declare function statsErrorsToString(json: StatsCompilation, statsConfig:
 export declare function statsHasErrors(json: StatsCompilation): boolean;
 export declare function statsHasWarnings(json: StatsCompilation): boolean;
 export declare function createWebpackLoggingCallback(options: BrowserBuilderOptions, logger: logging.LoggerApi): WebpackLoggingCallback;
-export declare function webpackStatsLogger(logger: logging.LoggerApi, json: StatsCompilation, config: Configuration, bundleStats?: BundleStats[]): void;
+export declare function webpackStatsLogger(logger: logging.LoggerApi, json: StatsCompilation, config: Configuration, budgetFailures?: BudgetCalculatorResult[]): void;

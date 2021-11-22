@@ -20,13 +20,12 @@ export declare enum ThresholdSeverity {
     Warning = "warning",
     Error = "error"
 }
+export interface BudgetCalculatorResult {
+    severity: ThresholdSeverity;
+    message: string;
+    label?: string;
+}
 export declare function calculateThresholds(budget: Budget): IterableIterator<Threshold>;
-export declare function checkBudgets(budgets: Budget[], webpackStats: StatsCompilation): IterableIterator<{
-    severity: ThresholdSeverity;
-    message: string;
-}>;
-export declare function checkThresholds(thresholds: IterableIterator<Threshold>, size: number, label?: string): IterableIterator<{
-    severity: ThresholdSeverity;
-    message: string;
-}>;
+export declare function checkBudgets(budgets: Budget[], webpackStats: StatsCompilation): IterableIterator<BudgetCalculatorResult>;
+export declare function checkThresholds(thresholds: IterableIterator<Threshold>, size: number, label?: string): IterableIterator<BudgetCalculatorResult>;
 export {};
