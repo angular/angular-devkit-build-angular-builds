@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.augmentIndexHtml = void 0;
 const crypto_1 = require("crypto");
+const load_esm_1 = require("../load-esm");
 const html_rewriting_stream_1 = require("./html-rewriting-stream");
 /*
  * Helper function used by the IndexHtmlWebpackPlugin.
@@ -18,6 +19,8 @@ const html_rewriting_stream_1 = require("./html-rewriting-stream");
  */
 async function augmentIndexHtml(params) {
     const { loadOutputFile, files, entrypoints, sri, deployUrl = '', lang, baseHref, html } = params;
+    const warnings = [];
+    const errors = [];
     let { crossOrigin = 'none' } = params;
     if (sri && crossOrigin === 'none') {
         crossOrigin = 'anonymous';
@@ -72,6 +75,7 @@ async function augmentIndexHtml(params) {
         }
         linkTags.push(`<link ${attrs.join(' ')}>`);
     }
+    const dir = lang ? await getLanguageDirection(lang, warnings) : undefined;
     const { rewriter, transformedContent } = await (0, html_rewriting_stream_1.htmlRewritingStream)(html);
     const baseTagExists = html.includes('<base');
     rewriter
@@ -81,6 +85,9 @@ async function augmentIndexHtml(params) {
                 // Adjust document locale if specified
                 if (isString(lang)) {
                     updateAttribute(tag, 'lang', lang);
+                }
+                if (dir) {
+                    updateAttribute(tag, 'dir', dir);
                 }
                 break;
             case 'head':
@@ -119,11 +126,14 @@ async function augmentIndexHtml(params) {
         rewriter.emitEndTag(tag);
     });
     const content = await transformedContent;
-    if (linkTags.length || scriptTags.length) {
-        // In case no body/head tags are not present (dotnet partial templates)
-        return linkTags.join('') + scriptTags.join('') + content;
-    }
-    return content;
+    return {
+        content: linkTags.length || scriptTags.length
+            ? // In case no body/head tags are not present (dotnet partial templates)
+                linkTags.join('') + scriptTags.join('') + content
+            : content,
+        warnings,
+        errors,
+    };
 }
 exports.augmentIndexHtml = augmentIndexHtml;
 function generateSriAttributes(content) {
@@ -143,4 +153,14 @@ function updateAttribute(tag, name, value) {
 }
 function isString(value) {
     return typeof value === 'string';
+}
+async function getLanguageDirection(lang, warnings) {
+    try {
+        const localeData = (await (0, load_esm_1.loadEsmModule)(`@angular/common/locales/${lang}`)).default;
+        const dir = localeData[localeData.length - 2];
+        return isString(dir) ? dir : undefined;
+    }
+    catch {
+        warnings.push(`Locale data for '${lang}' cannot be found. 'dir' attribute will not be set for this locale.`);
+    }
 }
