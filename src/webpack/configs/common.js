@@ -39,6 +39,7 @@ const webpack_subresource_integrity_1 = require("webpack-subresource-integrity")
 const environment_options_1 = require("../../utils/environment-options");
 const load_esm_1 = require("../../utils/load-esm");
 const plugins_1 = require("../plugins");
+const named_chunks_plugin_1 = require("../plugins/named-chunks-plugin");
 const progress_plugin_1 = require("../plugins/progress-plugin");
 const transfer_size_plugin_1 = require("../plugins/transfer-size-plugin");
 const typescript_2 = require("../plugins/typescript");
@@ -362,7 +363,7 @@ async function getCommonConfig(wco) {
                 },
             },
         },
-        plugins: [new plugins_1.DedupeModuleResolvePlugin({ verbose }), ...extraPlugins],
+        plugins: [new named_chunks_plugin_1.NamedChunksPlugin(), new plugins_1.DedupeModuleResolvePlugin({ verbose }), ...extraPlugins],
         node: false,
     };
 }
