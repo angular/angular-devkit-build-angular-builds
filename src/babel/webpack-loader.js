@@ -41,6 +41,7 @@ async function requiresLinking(path, source) {
     }
     return needsLinking(path, source);
 }
+// eslint-disable-next-line max-lines-per-function
 exports.default = (0, babel_loader_1.custom)(() => {
     const baseOptions = Object.freeze({
         babelrc: false,
@@ -118,6 +119,14 @@ exports.default = (0, babel_loader_1.custom)(() => {
                     ...i18n,
                     pluginCreators: i18nPluginCreators,
                 };
+                // Add translation files as dependencies of the file to support rebuilds
+                // Except for `@angular/core` which needs locale injection but has no translations
+                if (customOptions.i18n.translationFiles &&
+                    !/[\\/]@angular[\\/]core/.test(this.resourcePath)) {
+                    for (const file of customOptions.i18n.translationFiles) {
+                        this.addDependency(file);
+                    }
+                }
                 shouldProcess = true;
             }
             if (optimize) {

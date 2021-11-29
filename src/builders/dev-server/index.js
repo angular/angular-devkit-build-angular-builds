@@ -37,10 +37,13 @@ const url = __importStar(require("url"));
 const utils_1 = require("../../utils");
 const check_port_1 = require("../../utils/check-port");
 const color_1 = require("../../utils/color");
+const i18n_options_1 = require("../../utils/i18n-options");
+const load_translations_1 = require("../../utils/load-translations");
 const normalize_cache_1 = require("../../utils/normalize-cache");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
 const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
+const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const configs_1 = require("../../webpack/configs");
 const index_html_webpack_plugin_1 = require("../../webpack/plugins/index-html-webpack-plugin");
 const stats_1 = require("../../webpack/utils/stats");
@@ -145,7 +148,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
             if (i18n.inlineLocales.size > 1) {
                 throw new Error('The development server only supports localizing a single locale per build.');
             }
-            await setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheOptions);
+            await setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheOptions, context);
         }
         if (transforms.webpackConfiguration) {
             webpackConfig = await transforms.webpackConfiguration(webpackConfig);
@@ -220,7 +223,7 @@ function serveWebpackBrowser(options, context, transforms = {}) {
     }));
 }
 exports.serveWebpackBrowser = serveWebpackBrowser;
-async function setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheOptions) {
+async function setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheOptions, context) {
     var _a;
     const localeDescription = i18n.locales[locale];
     // Modify main entrypoint to include locale data
@@ -248,6 +251,7 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheO
         locale,
         missingTranslationBehavior,
         translation: i18n.shouldInline ? translation : undefined,
+        translationFiles: localeDescription === null || localeDescription === void 0 ? void 0 : localeDescription.files.map((file) => path.resolve(context.workspaceRoot, file.path)),
     };
     const i18nRule = {
         test: /\.[cm]?[tj]sx?$/,
@@ -276,5 +280,30 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheO
         webpackConfig.module.rules = rules;
     }
     rules.push(i18nRule);
+    // Add a plugin to reload translation files on rebuilds
+    const loader = await (0, load_translations_1.createTranslationLoader)();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    webpackConfig.plugins.push({
+        apply: (compiler) => {
+            compiler.hooks.thisCompilation.tap('build-angular', (compilation) => {
+                if (i18n.shouldInline && i18nLoaderOptions.translation === undefined) {
+                    // Reload translations
+                    (0, i18n_options_1.loadTranslations)(locale, localeDescription, context.workspaceRoot, loader, {
+                        warn(message) {
+                            (0, webpack_diagnostics_1.addWarning)(compilation, message);
+                        },
+                        error(message) {
+                            (0, webpack_diagnostics_1.addError)(compilation, message);
+                        },
+                    });
+                    i18nLoaderOptions.translation = localeDescription.translation;
+                }
+                compilation.hooks.finishModules.tap('build-angular', () => {
+                    // After loaders are finished, clear out the now unneeded translations
+                    i18nLoaderOptions.translation = undefined;
+                });
+            });
+        },
+    });
 }
 exports.default = (0, architect_1.createBuilder)(serveWebpackBrowser);

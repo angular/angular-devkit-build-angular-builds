@@ -9,19 +9,21 @@ import { BuilderContext } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
 import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
 import { Schema as ServerBuilderSchema } from '../builders/server/schema';
+import { TranslationLoader } from './load-translations';
+export interface LocaleDescription {
+    files: {
+        path: string;
+        integrity?: string;
+        format?: string;
+    }[];
+    translation?: Record<string, unknown>;
+    dataPath?: string;
+    baseHref?: string;
+}
 export interface I18nOptions {
     inlineLocales: Set<string>;
     sourceLocale: string;
-    locales: Record<string, {
-        files: {
-            path: string;
-            integrity?: string;
-            format?: string;
-        }[];
-        translation?: Record<string, unknown>;
-        dataPath?: string;
-        baseHref?: string;
-    }>;
+    locales: Record<string, LocaleDescription>;
     flatOutput?: boolean;
     readonly shouldInline: boolean;
     hasDefinedSourceLocale?: boolean;
@@ -31,3 +33,7 @@ export declare function configureI18nBuild<T extends BrowserBuilderSchema | Serv
     buildOptions: T;
     i18n: I18nOptions;
 }>;
+export declare function loadTranslations(locale: string, desc: LocaleDescription, workspaceRoot: string, loader: TranslationLoader, logger: {
+    warn: (message: string) => void;
+    error: (message: string) => void;
+}, usedFormats?: Set<string>): void;

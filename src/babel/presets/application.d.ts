@@ -23,6 +23,7 @@ export interface ApplicationPresetOptions {
         locale: string;
         missingTranslationBehavior?: 'error' | 'warning' | 'ignore';
         translation?: unknown;
+        translationFiles?: string[];
         pluginCreators?: I18nPluginCreators;
     };
     angularLinker?: {
