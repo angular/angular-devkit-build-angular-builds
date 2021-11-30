@@ -102,7 +102,7 @@ exports.isPolyfillsEntry = isPolyfillsEntry;
 function getWatchOptions(poll) {
     return {
         poll,
-        ignored: poll === undefined ? '**/$_lazy_route_resources' : 'node_modules/**',
+        ignored: poll === undefined ? '**/$_lazy_route_resources' : '**/node_modules/**',
     };
 }
 exports.getWatchOptions = getWatchOptions;
