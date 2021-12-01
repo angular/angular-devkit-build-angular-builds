@@ -29,6 +29,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const nodePath = __importStar(require("path"));
 const load_esm_1 = require("../../utils/load-esm");
 function localizeExtractLoader(content, map) {
+    // This loader is not cacheable due to how message extraction works.
+    // Extracted messages are not part of webpack pipeline and hence they cannot be retrieved from cache.
+    // TODO: We should investigate in the future on making this deterministic and more cacheable.
+    this.cacheable(false);
     const options = this.getOptions();
     const callback = this.async();
     extract(this, content, map, options).then(() => {
