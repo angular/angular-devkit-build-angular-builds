@@ -190,8 +190,10 @@ async function getCommonConfig(wco) {
     }
     if (main || polyfills) {
         extraRules.push({
-            test: /\.[cm]?[tj]sx?$/,
+            test: tsConfig.options.allowJs ? /\.[cm]?[tj]sx?$/ : /\.[cm]?tsx?$/,
             loader: webpack_1.AngularWebpackLoaderPath,
+            // The below are known paths that are not part of the TypeScript compilation even when allowJs is enabled.
+            exclude: [/[/\\](?:css-loader|mini-css-extract-plugin|webpack-dev-server|webpack)[/\\]/],
         });
         extraPlugins.push((0, typescript_2.createIvyPlugin)(wco, aot, tsConfigPath));
     }
