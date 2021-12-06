@@ -92,14 +92,16 @@ function getStylesConfig(wco) {
         wco.logger.warn('Stylus usage is deprecated and will be removed in a future major version. ' +
             'To opt-out of the deprecated behaviour, please migrate to another stylesheet language.');
     }
-    const sassImplementation = new sass_service_1.SassWorkerImplementation();
-    extraPlugins.push({
-        apply(compiler) {
-            compiler.hooks.shutdown.tap('sass-worker', () => {
-                sassImplementation === null || sassImplementation === void 0 ? void 0 : sassImplementation.close();
-            });
-        },
-    });
+    const sassImplementation = getSassImplementation();
+    if (sassImplementation instanceof sass_service_1.SassWorkerImplementation) {
+        extraPlugins.push({
+            apply(compiler) {
+                compiler.hooks.shutdown.tap('sass-worker', () => {
+                    sassImplementation === null || sassImplementation === void 0 ? void 0 : sassImplementation.close();
+                });
+            },
+        });
+    }
     const assetNameTemplate = (0, helpers_1.assetNameTemplateFactory)(hashFormat);
     const extraPostcssPlugins = [];
     // Attempt to setup Tailwind CSS
@@ -370,3 +372,12 @@ function getStylesConfig(wco) {
     };
 }
 exports.getStylesConfig = getStylesConfig;
+function getSassImplementation() {
+    const { webcontainer } = process.versions;
+    // When `webcontainer` is a truthy it means that we are running in a StackBlitz webcontainer.
+    // `SassWorkerImplementation` uses `receiveMessageOnPort` Node.js `worker_thread` API to ensure sync behavior which is ~2x faster.
+    // However, it is non trivial to support this in a webcontainer and while slower we choose to use `dart-sass`
+    // which in Webpack uses the slower async path.
+    // We should periodically check with StackBlitz folks (Mark Whitfeld / Dominic Elm) to determine if this workaround is still needed.
+    return webcontainer ? require('sass') : new sass_service_1.SassWorkerImplementation();
+}
