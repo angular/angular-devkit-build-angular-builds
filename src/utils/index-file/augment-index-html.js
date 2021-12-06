@@ -154,13 +154,26 @@ function updateAttribute(tag, name, value) {
 function isString(value) {
     return typeof value === 'string';
 }
-async function getLanguageDirection(lang, warnings) {
+async function getLanguageDirection(locale, warnings) {
+    const dir = await getLanguageDirectionFromLocales(locale);
+    if (!dir) {
+        warnings.push(`Locale data for '${locale}' cannot be found. 'dir' attribute will not be set for this locale.`);
+    }
+    return dir;
+}
+async function getLanguageDirectionFromLocales(locale) {
     try {
-        const localeData = (await (0, load_esm_1.loadEsmModule)(`@angular/common/locales/${lang}`)).default;
+        const localeData = (await (0, load_esm_1.loadEsmModule)(`@angular/common/locales/${locale}`)).default;
         const dir = localeData[localeData.length - 2];
         return isString(dir) ? dir : undefined;
     }
     catch {
-        warnings.push(`Locale data for '${lang}' cannot be found. 'dir' attribute will not be set for this locale.`);
+        // In some cases certain locales might map to files which are named only with language id.
+        // Example: `en-US` -> `en`.
+        const [languageId] = locale.split('-', 1);
+        if (languageId !== locale) {
+            return getLanguageDirectionFromLocales(languageId);
+        }
     }
+    return undefined;
 }

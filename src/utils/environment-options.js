@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cachingDisabled = exports.maxWorkers = exports.profilingEnabled = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
+exports.cachingDisabled = exports.maxWorkers = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
 const color_1 = require("./color");
 function isDisabled(variable) {
     return variable === '0' || variable.toLowerCase() === 'false';
@@ -57,9 +57,6 @@ exports.allowMangle = isPresent(mangleVariable)
     : debugOptimize.mangle;
 exports.shouldBeautify = debugOptimize.beautify;
 exports.allowMinify = debugOptimize.minify;
-// Build profiling
-const profilingVariable = process.env['NG_BUILD_PROFILING'];
-exports.profilingEnabled = isPresent(profilingVariable) && isEnabled(profilingVariable);
 /**
  * Some environments, like CircleCI which use Docker report a number of CPUs by the host and not the count of available.
  * This cause `Error: Call retries were exceeded` errors when trying to use them.
