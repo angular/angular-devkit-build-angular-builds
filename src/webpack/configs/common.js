@@ -93,6 +93,11 @@ async function getCommonConfig(wco) {
             }
         }
     }
+    if (environment_options_1.profilingEnabled) {
+        extraPlugins.push(new webpack_2.debug.ProfilingPlugin({
+            outputPath: path.resolve(root, 'chrome-profiler-events.json'),
+        }));
+    }
     if (allowedCommonJsDependencies) {
         // When this is not defined it means the builder doesn't support showing common js usages.
         // When it does it will be an array.
