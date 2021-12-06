@@ -66,13 +66,10 @@ exports.default = (0, babel_loader_1.custom)(() => {
             };
             // Analyze file for linking
             if (await requiresLinking(this.resourcePath, source)) {
-                if (!linkerPluginCreator) {
-                    // Load ESM `@angular/compiler-cli/linker/babel` using the TypeScript dynamic import workaround.
-                    // Once TypeScript provides support for keeping the dynamic import this workaround can be
-                    // changed to a direct dynamic import.
-                    const linkerBabelModule = await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli/linker/babel');
-                    linkerPluginCreator = linkerBabelModule.createEs2015LinkerPlugin;
-                }
+                // Load ESM `@angular/compiler-cli/linker/babel` using the TypeScript dynamic import workaround.
+                // Once TypeScript provides support for keeping the dynamic import this workaround can be
+                // changed to a direct dynamic import.
+                linkerPluginCreator !== null && linkerPluginCreator !== void 0 ? linkerPluginCreator : (linkerPluginCreator = (await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli/linker/babel')).createEs2015LinkerPlugin);
                 customOptions.angularLinker = {
                     shouldLink: true,
                     jitMode: aot !== true,
@@ -105,15 +102,11 @@ exports.default = (0, babel_loader_1.custom)(() => {
                 // During the transition, this will always attempt to load the entry point for each file.
                 // This will only occur during prerelease and will be automatically corrected once the new
                 // entry point exists.
-                // TODO_ESM: Make import failure an error once the `tools` entry point exists.
                 if (i18nPluginCreators === undefined) {
                     // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
                     // Once TypeScript provides support for keeping the dynamic import this workaround can be
                     // changed to a direct dynamic import.
-                    try {
-                        i18nPluginCreators = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
-                    }
-                    catch { }
+                    i18nPluginCreators = await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
                 }
                 customOptions.i18n = {
                     ...i18n,

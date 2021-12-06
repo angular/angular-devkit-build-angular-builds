@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import type { ɵParsedTranslation } from '@angular/localize/private';
 import type { makeEs2015TranslatePlugin, makeEs5TranslatePlugin, makeLocalePlugin } from '@angular/localize/tools';
 export declare type DiagnosticReporter = (type: 'error' | 'warning' | 'info', message: string) => void;
 /**
@@ -22,9 +23,9 @@ export interface ApplicationPresetOptions {
     i18n?: {
         locale: string;
         missingTranslationBehavior?: 'error' | 'warning' | 'ignore';
-        translation?: unknown;
+        translation?: Record<string, ɵParsedTranslation>;
         translationFiles?: string[];
-        pluginCreators?: I18nPluginCreators;
+        pluginCreators: I18nPluginCreators;
     };
     angularLinker?: {
         shouldLink: boolean;

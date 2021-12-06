@@ -158,9 +158,7 @@ async function configureI18nBuild(context, options) {
         if (!desc.files.length) {
             continue;
         }
-        if (!loader) {
-            loader = await (0, load_translations_1.createTranslationLoader)();
-        }
+        loader !== null && loader !== void 0 ? loader : (loader = await (0, load_translations_1.createTranslationLoader)());
         loadTranslations(locale, desc, context.workspaceRoot, loader, {
             warn(message) {
                 context.logger.warn(message);
