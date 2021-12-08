@@ -29,9 +29,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getInstrumentationExcludedPaths = exports.assetNameTemplateFactory = exports.getWatchOptions = exports.isPolyfillsEntry = exports.getSourceMapDevTool = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
+exports.getMainFieldsAndConditionNames = exports.getInstrumentationExcludedPaths = exports.assetNameTemplateFactory = exports.getWatchOptions = exports.isPolyfillsEntry = exports.getSourceMapDevTool = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
 const glob_1 = __importDefault(require("glob"));
 const path = __importStar(require("path"));
+const typescript_1 = require("typescript");
 const webpack_1 = require("webpack");
 function getOutputHashFormat(option, length = 20) {
     const hashFormats = {
@@ -140,3 +141,18 @@ function getInstrumentationExcludedPaths(sourceRoot, excludedPaths) {
     return excluded;
 }
 exports.getInstrumentationExcludedPaths = getInstrumentationExcludedPaths;
+function getMainFieldsAndConditionNames(target, platformServer) {
+    const mainFields = platformServer
+        ? ['es2015', 'module', 'main']
+        : ['es2015', 'browser', 'module', 'main'];
+    const conditionNames = ['es2015', '...'];
+    if (target >= typescript_1.ScriptTarget.ES2020) {
+        mainFields.unshift('es2020');
+        conditionNames.unshift('es2020');
+    }
+    return {
+        mainFields,
+        conditionNames,
+    };
+}
+exports.getMainFieldsAndConditionNames = getMainFieldsAndConditionNames;

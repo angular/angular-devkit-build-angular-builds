@@ -27,10 +27,6 @@ function getServerConfig(wco) {
         externals.push(({ context, request }, callback) => externalizePackages(context !== null && context !== void 0 ? context : wco.projectRoot, request, callback));
     }
     return {
-        resolve: {
-            mainFields: ['es2015', 'main', 'module'],
-            conditionNames: ['es2015', '...'],
-        },
         output: {
             libraryTarget: 'commonjs',
         },

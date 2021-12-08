@@ -262,11 +262,12 @@ async function getCommonConfig(wco) {
             advanced: buildOptions.buildOptimizer,
         }));
     }
+    const isPlatformServer = platform === 'server';
     return {
         mode: scriptsOptimization || stylesOptimization.minify ? 'production' : 'development',
         devtool: false,
         target: [
-            platform === 'server' ? 'node' : 'web',
+            isPlatformServer ? 'node' : 'web',
             tsConfig.options.target === typescript_1.ScriptTarget.ES5 ? 'es5' : 'es2015',
         ],
         profile: buildOptions.statsJson,
@@ -275,6 +276,7 @@ async function getCommonConfig(wco) {
             extensions: ['.ts', '.tsx', '.mjs', '.js'],
             symlinks: !buildOptions.preserveSymlinks,
             modules: [tsConfig.options.baseUrl || projectRoot, 'node_modules'],
+            ...(0, helpers_1.getMainFieldsAndConditionNames)(wco.scriptTarget, isPlatformServer),
         },
         resolveLoader: {
             symlinks: !buildOptions.preserveSymlinks,
