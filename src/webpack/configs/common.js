@@ -47,7 +47,7 @@ const helpers_1 = require("../utils/helpers");
 // eslint-disable-next-line max-lines-per-function
 async function getCommonConfig(wco) {
     var _a, _b;
-    const { root, projectRoot, buildOptions, tsConfig, projectName, sourceRoot, tsConfigPath } = wco;
+    const { root, projectRoot, buildOptions, tsConfig, projectName, sourceRoot, tsConfigPath, scriptTarget, } = wco;
     const { cache, codeCoverage, crossOrigin = 'none', platform = 'browser', aot = true, codeCoverageExclude = [], main, polyfills, sourceMap: { styles: stylesSourceMap, scripts: scriptsSourceMap, vendor: vendorSourceMap, hidden: hiddenSourceMap, }, optimization: { styles: stylesOptimization, scripts: scriptsOptimization }, commonChunk, vendorChunk, subresourceIntegrity, verbose, poll, webWorkerTsConfig, externalDependencies = [], allowedCommonJsDependencies, bundleDependencies, } = buildOptions;
     const isPlatformServer = buildOptions.platform === 'server';
     const extraPlugins = [];
@@ -197,7 +197,7 @@ async function getCommonConfig(wco) {
         extraMinimizers.push(new plugins_1.JavaScriptOptimizerPlugin({
             define: buildOptions.aot ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT : GLOBAL_DEFS_FOR_TERSER,
             sourcemap: scriptsSourceMap,
-            target: wco.scriptTarget,
+            target: scriptTarget,
             keepNames: !environment_options_1.allowMangle || isPlatformServer,
             removeLicenses: buildOptions.extractLicenses,
             advanced: buildOptions.buildOptimizer,
@@ -222,7 +222,7 @@ async function getCommonConfig(wco) {
         devtool: false,
         target: [
             isPlatformServer ? 'node' : 'web',
-            tsConfig.options.target === typescript_1.ScriptTarget.ES5 ? 'es5' : 'es2015',
+            scriptTarget === typescript_1.ScriptTarget.ES5 ? 'es5' : 'es2015',
         ],
         profile: buildOptions.statsJson,
         resolve: {
@@ -230,10 +230,7 @@ async function getCommonConfig(wco) {
             extensions: ['.ts', '.tsx', '.mjs', '.js'],
             symlinks: !buildOptions.preserveSymlinks,
             modules: [tsConfig.options.baseUrl || projectRoot, 'node_modules'],
-            mainFields: isPlatformServer
-                ? ['es2015', 'module', 'main']
-                : ['es2020', 'es2015', 'browser', 'module', 'main'],
-            conditionNames: isPlatformServer ? ['es2015', '...'] : ['es2020', 'es2015', '...'],
+            ...(0, helpers_1.getMainFieldsAndConditionNames)(scriptTarget, isPlatformServer),
         },
         resolveLoader: {
             symlinks: !buildOptions.preserveSymlinks,
@@ -284,6 +281,12 @@ async function getCommonConfig(wco) {
                 : undefined,
             rules: [
                 {
+                    test: /\.?(svg|html)$/,
+                    // Only process HTML and SVG which are known Angular component resources.
+                    resourceQuery: /\?ngResource/,
+                    type: 'asset/source',
+                },
+                {
                     // Mark files inside `rxjs/add` as containing side effects.
                     // If this is fixed upstream and the fixed version becomes the minimum
                     // supported version, this can be removed.
@@ -300,7 +303,7 @@ async function getCommonConfig(wco) {
                             loader: require.resolve('../../babel/webpack-loader'),
                             options: {
                                 cacheDirectory: (cache.enabled && path.join(cache.path, 'babel-webpack')) || false,
-                                scriptTarget: wco.scriptTarget,
+                                scriptTarget,
                                 aot: buildOptions.aot,
                                 optimize: buildOptions.buildOptimizer,
                                 instrumentCode: codeCoverage

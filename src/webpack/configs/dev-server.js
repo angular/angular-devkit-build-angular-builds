@@ -30,7 +30,7 @@ exports.buildServePath = exports.getDevServerConfig = void 0;
 const core_1 = require("@angular-devkit/core");
 const fs_1 = require("fs");
 const path_1 = require("path");
-const url = __importStar(require("url"));
+const url_1 = require("url");
 const load_esm_1 = require("../../utils/load-esm");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const hmr_loader_1 = require("../plugins/hmr/hmr-loader");
@@ -78,7 +78,7 @@ async function getDevServerConfig(wco) {
                 rewrites: [
                     {
                         from: new RegExp(`^(?!${servePath})/.*`),
-                        to: (context) => url.format(context.parsedUrl),
+                        to: (context) => context.parsedUrl.href,
                     },
                 ],
             },
@@ -186,7 +186,7 @@ async function addProxyConfig(root, proxyConfig) {
             // Load the ESM configuration file using the TypeScript dynamic import workaround.
             // Once TypeScript provides support for keeping the dynamic import this workaround can be
             // changed to a direct dynamic import.
-            return (await (0, load_esm_1.loadEsmModule)(url.pathToFileURL(proxyPath))).default;
+            return (await (0, load_esm_1.loadEsmModule)((0, url_1.pathToFileURL)(proxyPath))).default;
         case '.cjs':
             return require(proxyPath);
         default:
@@ -200,7 +200,7 @@ async function addProxyConfig(root, proxyConfig) {
                     // Load the ESM configuration file using the TypeScript dynamic import workaround.
                     // Once TypeScript provides support for keeping the dynamic import this workaround can be
                     // changed to a direct dynamic import.
-                    return (await (0, load_esm_1.loadEsmModule)(url.pathToFileURL(proxyPath))).default;
+                    return (await (0, load_esm_1.loadEsmModule)((0, url_1.pathToFileURL)(proxyPath))).default;
                 }
                 throw e;
             }
@@ -274,10 +274,8 @@ function getAllowedHostsConfig(options) {
 function getPublicHostOptions(options, webSocketPath) {
     let publicHost = options.publicHost;
     if (publicHost) {
-        if (!/^\w+:\/\//.test(publicHost)) {
-            publicHost = `https://${publicHost}`;
-        }
-        publicHost = url.parse(publicHost).host;
+        const hostWithProtocol = !/^\w+:\/\//.test(publicHost) ? `https://${publicHost}` : publicHost;
+        publicHost = new url_1.URL(hostWithProtocol).host;
     }
     return `auto://${publicHost || '0.0.0.0:0'}${webSocketPath}`;
 }
