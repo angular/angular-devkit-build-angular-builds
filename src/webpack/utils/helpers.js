@@ -29,12 +29,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMainFieldsAndConditionNames = exports.getStatsOptions = exports.externalizePackages = exports.assetPatterns = exports.globalScriptsByBundleName = exports.getCacheSettings = exports.getInstrumentationExcludedPaths = exports.assetNameTemplateFactory = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
+exports.getStatsOptions = exports.externalizePackages = exports.assetPatterns = exports.globalScriptsByBundleName = exports.getCacheSettings = exports.getInstrumentationExcludedPaths = exports.assetNameTemplateFactory = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
 const crypto_1 = require("crypto");
 const fs_1 = require("fs");
 const glob_1 = __importDefault(require("glob"));
 const path = __importStar(require("path"));
-const typescript_1 = require("typescript");
 function getOutputHashFormat(option, length = 20) {
     const hashFormats = {
         none: { chunk: '', extract: '', file: '', script: '' },
@@ -266,18 +265,3 @@ function getStatsOptions(verbose = false) {
         : webpackOutputOptions;
 }
 exports.getStatsOptions = getStatsOptions;
-function getMainFieldsAndConditionNames(target, platformServer) {
-    const mainFields = platformServer
-        ? ['es2015', 'module', 'main']
-        : ['es2015', 'browser', 'module', 'main'];
-    const conditionNames = ['es2015', '...'];
-    if (target >= typescript_1.ScriptTarget.ES2020) {
-        mainFields.unshift('es2020');
-        conditionNames.unshift('es2020');
-    }
-    return {
-        mainFields,
-        conditionNames,
-    };
-}
-exports.getMainFieldsAndConditionNames = getMainFieldsAndConditionNames;
