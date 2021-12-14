@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Options, Result, SassException } from 'sass';
+import { LegacyResult as CompileResult, LegacyException as Exception, LegacyOptions as Options } from 'sass';
 /**
  * The callback type for the `dart-sass` asynchronous render function.
  */
-declare type RenderCallback = (error?: SassException, result?: Result) => void;
+declare type RenderCallback = (error?: Exception, result?: CompileResult) => void;
 /**
  * A Sass renderer implementation that provides an interface that can be used by Webpack's
  * `sass-loader`. The implementation uses a Worker thread to perform the Sass rendering
@@ -37,7 +37,7 @@ export declare class SassWorkerImplementation {
      * @param options The `dart-sass` options to use when rendering the stylesheet.
      * @param callback The function to execute when the rendering is complete.
      */
-    render(options: Options, callback: RenderCallback): void;
+    render(options: Options<'async'>, callback: RenderCallback): void;
     /**
      * Shutdown the Sass render worker.
      * Executing this method will stop any pending render requests.
