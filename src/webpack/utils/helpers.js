@@ -116,6 +116,7 @@ function getCacheSettings(wco, angularVersion) {
         const packageVersion = require('../../../package.json').version;
         return {
             type: 'filesystem',
+            profile: wco.buildOptions.verbose,
             cacheDirectory: path.join(cacheDirectory, 'angular-webpack'),
             maxMemoryGenerations: 1,
             // We use the versions and build options as the cache name. The Webpack configurations are too
