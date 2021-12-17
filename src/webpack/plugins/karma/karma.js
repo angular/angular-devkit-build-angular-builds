@@ -32,7 +32,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const path = __importStar(require("path"));
 const glob = __importStar(require("glob"));
 const webpack_1 = __importDefault(require("webpack"));
-const webpackDevMiddleware = require('webpack-dev-middleware');
+const webpack_dev_middleware_1 = __importDefault(require("webpack-dev-middleware"));
 const stats_1 = require("../../utils/stats");
 const node_1 = require("@angular-devkit/core/node");
 const index_1 = require("../../../utils/index");
@@ -172,7 +172,7 @@ const init = (config, emitter) => {
         }
         unblock();
     });
-    webpackMiddleware = webpackDevMiddleware(compiler, webpackMiddlewareConfig);
+    webpackMiddleware = (0, webpack_dev_middleware_1.default)(compiler, webpackMiddlewareConfig);
     emitter.on('exit', (done) => {
         webpackMiddleware.close();
         done();
