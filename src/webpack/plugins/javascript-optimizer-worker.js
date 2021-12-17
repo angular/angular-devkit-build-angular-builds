@@ -61,7 +61,7 @@ async function optimizeWithEsbuild(content, name, options) {
     let result;
     try {
         result = await esbuild.transform(content, {
-            minifyIdentifiers: !options.keepNames,
+            minifyIdentifiers: !options.keepIdentifierNames,
             minifySyntax: true,
             // NOTE: Disabling whitespace ensures unused pure annotations are kept
             minifyWhitespace: false,
@@ -70,6 +70,10 @@ async function optimizeWithEsbuild(content, name, options) {
             sourcefile: name,
             sourcemap: options.sourcemap && 'external',
             define: options.define,
+            // This option should always be disabled for browser builds as we don't rely on `.name`
+            // and causes deadcode to be retained which makes `NG_BUILD_MANGLE` unusable to investigate tree-shaking issues.
+            // We enable `keepNames` only for server builds as Domino relies on `.name`.
+            // Once we no longer rely on Domino for SSR we should be able to remove this.
             keepNames: options.keepNames,
             target: `es${options.target}`,
         });
@@ -113,6 +117,8 @@ async function optimizeWithTerser(name, code, sourcemaps, target, advanced) {
         ecma: target,
         // esbuild in the first pass is used to minify identifiers instead of mangle here
         mangle: false,
+        // esbuild in the first pass is used to minify function names
+        keep_fnames: true,
         format: {
             // ASCII output is enabled here as well to prevent terser from converting back to UTF-8
             ascii_only: true,

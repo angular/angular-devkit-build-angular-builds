@@ -32,7 +32,7 @@ const PLUGIN_NAME = 'angular-javascript-optimizer';
  * optimizations not yet implemented by `esbuild`.
  */
 class JavaScriptOptimizerPlugin {
-    constructor(options = {}) {
+    constructor(options) {
         this.options = options;
     }
     apply(compiler) {
@@ -103,6 +103,7 @@ class JavaScriptOptimizerPlugin {
                     sourcemap: this.options.sourcemap,
                     define,
                     keepNames: this.options.keepNames,
+                    keepIdentifierNames: this.options.keepIdentifierNames,
                     target,
                     removeLicenses: this.options.removeLicenses,
                     advanced: this.options.advanced,

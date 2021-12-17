@@ -13,10 +13,10 @@ import type { Compiler } from 'webpack';
 export interface JavaScriptOptimizerOptions {
     /**
      * Enables advanced optimizations in the underlying JavaScript optimizers.
-     * This currently increases the `terser` passes to 3 and enables the `pure_getters`
+     * This currently increases the `terser` passes to 2 and enables the `pure_getters`
      * option for `terser`.
      */
-    advanced: boolean;
+    advanced?: boolean;
     /**
      * An object record of string keys that will be replaced with their respective values when found
      * within the code during optimization.
@@ -27,7 +27,7 @@ export interface JavaScriptOptimizerOptions {
      * The output sourcemap will be a full sourcemap containing the merge of the input sourcemap and
      * all intermediate sourcemaps.
      */
-    sourcemap: boolean;
+    sourcemap?: boolean;
     /**
      * The ECMAScript version that should be used when generating output code.
      * The optimizer will not adjust the output code with features present in newer
@@ -37,12 +37,20 @@ export interface JavaScriptOptimizerOptions {
     /**
      * Enables the retention of identifier names and ensures that function and class names are
      * present in the output code.
+     *
+     * **Note**: in some cases symbols are still renamed to avoid collisions.
+     */
+    keepIdentifierNames: boolean;
+    /**
+     * Enables the retention of original name of classes and functions.
+     *
+     * **Note**: this causes increase of bundle size as it causes dead-code elimination to not work fully.
      */
     keepNames: boolean;
     /**
      * Enables the removal of all license comments from the output code.
      */
-    removeLicenses: boolean;
+    removeLicenses?: boolean;
 }
 /**
  * A Webpack plugin that provides JavaScript optimization capabilities.
@@ -53,7 +61,7 @@ export interface JavaScriptOptimizerOptions {
  * optimizations not yet implemented by `esbuild`.
  */
 export declare class JavaScriptOptimizerPlugin {
-    options: Partial<JavaScriptOptimizerOptions>;
-    constructor(options?: Partial<JavaScriptOptimizerOptions>);
+    options: JavaScriptOptimizerOptions;
+    constructor(options: JavaScriptOptimizerOptions);
     apply(compiler: Compiler): void;
 }
