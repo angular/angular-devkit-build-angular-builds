@@ -192,11 +192,12 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         }).pipe((0, operators_1.concatMap)(async (buildEvent, index) => {
             var _a, _b;
             // Resolve serve address.
+            const publicPath = (_b = (_a = webpackConfig.devServer) === null || _a === void 0 ? void 0 : _a.devMiddleware) === null || _b === void 0 ? void 0 : _b.publicPath;
             const serverAddress = url.format({
                 protocol: options.ssl ? 'https' : 'http',
                 hostname: options.host === '0.0.0.0' ? 'localhost' : options.host,
                 port: buildEvent.port,
-                pathname: (_b = (_a = webpackConfig.devServer) === null || _a === void 0 ? void 0 : _a.devMiddleware) === null || _b === void 0 ? void 0 : _b.publicPath,
+                pathname: typeof publicPath === 'string' ? publicPath : undefined,
             });
             if (index === 0) {
                 logger.info('\n' +
