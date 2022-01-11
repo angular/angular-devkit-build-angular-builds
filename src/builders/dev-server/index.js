@@ -296,7 +296,7 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheO
                         error(message) {
                             (0, webpack_diagnostics_1.addError)(compilation, message);
                         },
-                    });
+                    }, undefined, browserOptions.i18nDuplicateTranslation);
                     i18nLoaderOptions.translation = localeDescription.translation;
                 }
                 compilation.hooks.finishModules.tap('build-angular', () => {

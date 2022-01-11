@@ -7,7 +7,7 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
-import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
+import { Schema as BrowserBuilderSchema, I18NTranslation } from '../builders/browser/schema';
 import { Schema as ServerBuilderSchema } from '../builders/server/schema';
 import { TranslationLoader } from './load-translations';
 export interface LocaleDescription {
@@ -36,4 +36,4 @@ export declare function configureI18nBuild<T extends BrowserBuilderSchema | Serv
 export declare function loadTranslations(locale: string, desc: LocaleDescription, workspaceRoot: string, loader: TranslationLoader, logger: {
     warn: (message: string) => void;
     error: (message: string) => void;
-}, usedFormats?: Set<string>): void;
+}, usedFormats?: Set<string>, duplicateTranslation?: I18NTranslation): void;

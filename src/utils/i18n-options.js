@@ -16,6 +16,7 @@ const fs_1 = __importDefault(require("fs"));
 const module_1 = __importDefault(require("module"));
 const os_1 = __importDefault(require("os"));
 const path_1 = __importDefault(require("path"));
+const schema_1 = require("../builders/browser/schema");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
 const load_translations_1 = require("./load-translations");
 /**
@@ -166,7 +167,7 @@ async function configureI18nBuild(context, options) {
             error(message) {
                 throw new Error(message);
             },
-        }, usedFormats);
+        }, usedFormats, buildOptions.i18nDuplicateTranslation);
         if (usedFormats.size > 1 && tsConfig.options.enableI18nLegacyMessageIdFormat !== false) {
             // This limitation is only for legacy message id support (defaults to true as of 9.0)
             throw new Error('Localization currently only supports using one type of translation file format for the entire application.');
@@ -201,7 +202,7 @@ function findLocaleDataPath(locale, resolver) {
         return null;
     }
 }
-function loadTranslations(locale, desc, workspaceRoot, loader, logger, usedFormats) {
+function loadTranslations(locale, desc, workspaceRoot, loader, logger, usedFormats, duplicateTranslation) {
     for (const file of desc.files) {
         const loadResult = loader(path_1.default.join(workspaceRoot, file.path));
         for (const diagnostics of loadResult.diagnostics.messages) {
@@ -222,7 +223,18 @@ function loadTranslations(locale, desc, workspaceRoot, loader, logger, usedForma
             // Merge translations
             for (const [id, message] of Object.entries(loadResult.translations)) {
                 if (desc.translation[id] !== undefined) {
-                    logger.warn(`WARNING [${file.path}]: Duplicate translations for message '${id}' when merging`);
+                    const duplicateTranslationMessage = `[${file.path}]: Duplicate translations for message '${id}' when merging.`;
+                    switch (duplicateTranslation) {
+                        case schema_1.I18NTranslation.Ignore:
+                            break;
+                        case schema_1.I18NTranslation.Error:
+                            logger.error(`ERROR ${duplicateTranslationMessage}`);
+                            break;
+                        case schema_1.I18NTranslation.Warning:
+                        default:
+                            logger.warn(`WARNING ${duplicateTranslationMessage}`);
+                            break;
+                    }
                 }
                 desc.translation[id] = message;
             }

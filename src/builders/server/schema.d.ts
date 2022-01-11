@@ -29,9 +29,13 @@ export interface Schema {
      */
     fileReplacements?: FileReplacement[];
     /**
+     * How to handle duplicate translations for i18n.
+     */
+    i18nDuplicateTranslation?: I18NTranslation;
+    /**
      * How to handle missing translations for i18n.
      */
-    i18nMissingTranslation?: I18NMissingTranslation;
+    i18nMissingTranslation?: I18NTranslation;
     /**
      * The stylesheet language to use for the application's inline component styles.
      */
@@ -128,9 +132,11 @@ export interface FileReplacement {
     with?: string;
 }
 /**
+ * How to handle duplicate translations for i18n.
+ *
  * How to handle missing translations for i18n.
  */
-export declare enum I18NMissingTranslation {
+export declare enum I18NTranslation {
     Error = "error",
     Ignore = "ignore",
     Warning = "warning"
