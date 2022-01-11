@@ -81,7 +81,7 @@ async function getCommonConfig(wco) {
             }
         }
         if (!buildOptions.aot) {
-            const jitPolyfills = 'core-js/proposals/reflect-metadata';
+            const jitPolyfills = require.resolve('core-js/proposals/reflect-metadata');
             if (entryPoints['polyfills']) {
                 entryPoints['polyfills'].push(jitPolyfills);
             }
