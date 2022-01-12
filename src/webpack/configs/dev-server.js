@@ -58,7 +58,6 @@ async function getDevServerConfig(wco) {
             },
         });
     }
-    const webSocketPath = path_1.posix.join(servePath, 'ws');
     return {
         plugins: extraPlugins,
         module: {
@@ -82,11 +81,6 @@ async function getDevServerConfig(wco) {
                     },
                 ],
             },
-            webSocketServer: {
-                options: {
-                    path: webSocketPath,
-                },
-            },
             compress: false,
             static: false,
             server: getServerConfig(root, wco.buildOptions),
@@ -98,14 +92,7 @@ async function getDevServerConfig(wco) {
             liveReload,
             hot: hmr && !liveReload ? 'only' : hmr,
             proxy: await addProxyConfig(root, proxyConfig),
-            client: {
-                logging: 'info',
-                webSocketURL: getPublicHostOptions(wco.buildOptions, webSocketPath),
-                overlay: {
-                    errors: true,
-                    warnings: false,
-                },
-            },
+            ...getWebSocketSettings(wco.buildOptions, servePath),
         },
     };
 }
@@ -270,6 +257,31 @@ function getAllowedHostsConfig(options) {
         return options.allowedHosts;
     }
     return undefined;
+}
+function getWebSocketSettings(options, servePath) {
+    const { hmr, liveReload } = options;
+    if (!hmr && !liveReload) {
+        return {
+            webSocketServer: false,
+            client: undefined,
+        };
+    }
+    const webSocketPath = path_1.posix.join(servePath, 'ws');
+    return {
+        webSocketServer: {
+            options: {
+                path: webSocketPath,
+            },
+        },
+        client: {
+            logging: 'info',
+            webSocketURL: getPublicHostOptions(options, webSocketPath),
+            overlay: {
+                errors: true,
+                warnings: false,
+            },
+        },
+    };
 }
 function getPublicHostOptions(options, webSocketPath) {
     let publicHost = options.publicHost;

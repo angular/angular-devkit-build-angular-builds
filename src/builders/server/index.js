@@ -37,6 +37,7 @@ const typescript_1 = require("typescript");
 const utils_1 = require("../../utils");
 const i18n_inlining_1 = require("../../utils/i18n-inlining");
 const output_paths_1 = require("../../utils/output-paths");
+const purge_cache_1 = require("../../utils/purge-cache");
 const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const configs_1 = require("../../webpack/configs");
@@ -103,6 +104,8 @@ function execute(options, context, transforms = {}) {
 exports.execute = execute;
 exports.default = (0, architect_1.createBuilder)(execute);
 async function initialize(options, context, webpackConfigurationTransform) {
+    // Purge old build disk cache.
+    await (0, purge_cache_1.purgeStaleBuildCache)(context);
     const originalOutputPath = options.outputPath;
     const { config, i18n, target } = await (0, webpack_browser_config_1.generateI18nBrowserWebpackConfigFromContext)({
         ...options,

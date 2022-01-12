@@ -32,12 +32,15 @@ const path_1 = require("path");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const normalize_cache_1 = require("../../utils/normalize-cache");
+const purge_cache_1 = require("../../utils/purge-cache");
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
 function execute(options, context) {
     return (0, rxjs_1.from)((async () => {
         var _a;
+        // Purge old build disk cache.
+        await (0, purge_cache_1.purgeStaleBuildCache)(context);
         const root = context.workspaceRoot;
         const packager = (await Promise.resolve().then(() => __importStar(require('ng-packagr')))).ngPackagr();
         packager.forProject((0, path_1.resolve)(root, options.project));

@@ -176,12 +176,11 @@ async function configureI18nBuild(context, options) {
     if (i18n.shouldInline) {
         const tempPath = fs_1.default.mkdtempSync(path_1.default.join(fs_1.default.realpathSync(os_1.default.tmpdir()), 'angular-cli-i18n-'));
         buildOptions.outputPath = tempPath;
-        // Remove temporary directory used for i18n processing
-        process.on('exit', () => {
-            try {
-                fs_1.default.rmdirSync(tempPath, { recursive: true, maxRetries: 3 });
-            }
-            catch { }
+        process.on('exit', () => deleteTempDirectory(tempPath));
+        process.once('SIGINT', () => {
+            deleteTempDirectory(tempPath);
+            // Needed due to `ora` as otherwise process will not terminate.
+            process.kill(process.pid, 'SIGINT');
         });
     }
     return { buildOptions, i18n };
@@ -201,7 +200,22 @@ function findLocaleDataPath(locale, resolver) {
         return null;
     }
 }
+/** Remove temporary directory used for i18n processing. */
+function deleteTempDirectory(tempPath) {
+    // The below should be removed and replaced with just `rmSync` when support for Node.Js 12 is removed.
+    const { rmSync, rmdirSync } = fs_1.default;
+    try {
+        if (rmSync) {
+            rmSync(tempPath, { force: true, recursive: true, maxRetries: 3 });
+        }
+        else {
+            rmdirSync(tempPath, { recursive: true, maxRetries: 3 });
+        }
+    }
+    catch { }
+}
 function loadTranslations(locale, desc, workspaceRoot, loader, logger, usedFormats) {
+    let translations = undefined;
     for (const file of desc.files) {
         const loadResult = loader(path_1.default.join(workspaceRoot, file.path));
         for (const diagnostics of loadResult.diagnostics.messages) {
@@ -218,19 +232,20 @@ function loadTranslations(locale, desc, workspaceRoot, loader, logger, usedForma
         usedFormats === null || usedFormats === void 0 ? void 0 : usedFormats.add(loadResult.format);
         file.format = loadResult.format;
         file.integrity = loadResult.integrity;
-        if (desc.translation) {
+        if (translations) {
             // Merge translations
             for (const [id, message] of Object.entries(loadResult.translations)) {
-                if (desc.translation[id] !== undefined) {
+                if (translations[id] !== undefined) {
                     logger.warn(`WARNING [${file.path}]: Duplicate translations for message '${id}' when merging`);
                 }
-                desc.translation[id] = message;
+                translations[id] = message;
             }
         }
         else {
             // First or only translation file
-            desc.translation = loadResult.translations;
+            translations = loadResult.translations;
         }
     }
+    desc.translation = translations;
 }
 exports.loadTranslations = loadTranslations;

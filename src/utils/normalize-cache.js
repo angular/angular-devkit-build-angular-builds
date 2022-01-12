@@ -11,6 +11,7 @@ exports.normalizeCacheOptions = void 0;
 const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
 const environment_options_1 = require("./environment-options");
+const package_version_1 = require("./package-version");
 function normalizeCacheOptions(metadata, worspaceRoot) {
     var _a;
     const cacheMetadata = core_1.json.isJsonObject(metadata.cli) && core_1.json.isJsonObject(metadata.cli.cache)
@@ -32,9 +33,11 @@ function normalizeCacheOptions(metadata, worspaceRoot) {
                 break;
         }
     }
+    const cacheBasePath = (0, path_1.resolve)(worspaceRoot, path);
     return {
         enabled: cacheEnabled,
-        path: (0, path_1.resolve)(worspaceRoot, path),
+        basePath: cacheBasePath,
+        path: (0, path_1.join)(cacheBasePath, package_version_1.VERSION),
     };
 }
 exports.normalizeCacheOptions = normalizeCacheOptions;

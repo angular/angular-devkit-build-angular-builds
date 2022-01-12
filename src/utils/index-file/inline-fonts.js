@@ -36,8 +36,8 @@ const https = __importStar(require("https"));
 const https_proxy_agent_1 = __importDefault(require("https-proxy-agent"));
 const path_1 = require("path");
 const url_1 = require("url");
+const package_version_1 = require("../package-version");
 const html_rewriting_stream_1 = require("./html-rewriting-stream");
-const packageVersion = require('../../../package.json').version;
 const SUPPORTED_PROVIDERS = {
     'fonts.googleapis.com': {
         preconnectUrl: 'https://fonts.gstatic.com',
@@ -146,7 +146,7 @@ class InlineFontsProcessor {
     }
     async getResponse(url) {
         var _a;
-        const key = `${packageVersion}|${url}`;
+        const key = `${package_version_1.VERSION}|${url}`;
         if (this.cachePath) {
             const entry = await cacache.get.info(this.cachePath, key);
             if (entry) {

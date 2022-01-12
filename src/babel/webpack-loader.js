@@ -14,6 +14,7 @@ const remapping_1 = __importDefault(require("@ampproject/remapping"));
 const babel_loader_1 = require("babel-loader");
 const typescript_1 = require("typescript");
 const load_esm_1 = require("../utils/load-esm");
+const package_version_1 = require("../utils/package-version");
 /**
  * Cached instance of the compiler-cli linker's needsLinking function.
  */
@@ -151,7 +152,7 @@ exports.default = (0, babel_loader_1.custom)(() => {
                 ...baseOptions,
                 ...rawOptions,
                 cacheIdentifier: JSON.stringify({
-                    buildAngular: require('../../package.json').version,
+                    buildAngular: package_version_1.VERSION,
                     customOptions,
                     baseOptions,
                     rawOptions,

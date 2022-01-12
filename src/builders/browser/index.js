@@ -26,7 +26,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildWebpackBrowser = void 0;
+exports.buildWebpackBrowser = exports.BUILD_TIMEOUT = void 0;
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
@@ -44,6 +44,7 @@ const index_html_generator_1 = require("../../utils/index-file/index-html-genera
 const normalize_cache_1 = require("../../utils/normalize-cache");
 const output_paths_1 = require("../../utils/output-paths");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
+const purge_cache_1 = require("../../utils/purge-cache");
 const service_worker_1 = require("../../utils/service-worker");
 const spinner_1 = require("../../utils/spinner");
 const supported_browsers_1 = require("../../utils/supported-browsers");
@@ -53,6 +54,11 @@ const configs_1 = require("../../webpack/configs");
 const async_chunks_1 = require("../../webpack/utils/async-chunks");
 const helpers_1 = require("../../webpack/utils/helpers");
 const stats_1 = require("../../webpack/utils/stats");
+/**
+ * Maximum time in milliseconds for single build/rebuild
+ * This accounts for CI variability.
+ */
+exports.BUILD_TIMEOUT = 30000;
 async function initialize(options, context, webpackConfigurationTransform) {
     var _a, _b;
     const originalOutputPath = options.outputPath;
@@ -98,6 +104,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     return (0, rxjs_1.from)(context.getProjectMetadata(projectName)).pipe((0, operators_1.switchMap)(async (projectMetadata) => {
         var _a;
         const sysProjectRoot = (0, core_1.getSystemPath)((0, core_1.resolve)((0, core_1.normalize)(context.workspaceRoot), (0, core_1.normalize)((_a = projectMetadata.root) !== null && _a !== void 0 ? _a : '')));
+        // Purge old build disk cache.
+        await (0, purge_cache_1.purgeStaleBuildCache)(context);
         checkInternetExplorerSupport(sysProjectRoot, context.logger);
         return {
             ...(await initialize(options, context, transforms.webpackConfiguration)),
