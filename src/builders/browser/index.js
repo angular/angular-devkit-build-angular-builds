@@ -26,7 +26,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildWebpackBrowser = void 0;
+exports.buildWebpackBrowser = exports.BUILD_TIMEOUT = void 0;
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
@@ -54,6 +54,11 @@ const configs_1 = require("../../webpack/configs");
 const async_chunks_1 = require("../../webpack/utils/async-chunks");
 const helpers_1 = require("../../webpack/utils/helpers");
 const stats_1 = require("../../webpack/utils/stats");
+/**
+ * Maximum time in milliseconds for single build/rebuild
+ * This accounts for CI variability.
+ */
+exports.BUILD_TIMEOUT = 30000;
 async function initialize(options, context, webpackConfigurationTransform) {
     var _a, _b;
     const originalOutputPath = options.outputPath;

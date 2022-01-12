@@ -25,6 +25,11 @@ export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
     outputPath: string;
 };
 /**
+ * Maximum time in milliseconds for single build/rebuild
+ * This accounts for CI variability.
+ */
+export declare const BUILD_TIMEOUT = 30000;
+/**
  * @experimental Direct usage of this function is considered experimental.
  */
 export declare function buildWebpackBrowser(options: BrowserBuilderSchema, context: BuilderContext, transforms?: {
