@@ -289,6 +289,7 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheO
     webpackConfig.plugins.push({
         apply: (compiler) => {
             compiler.hooks.thisCompilation.tap('build-angular', (compilation) => {
+                var _a;
                 if (i18n.shouldInline && i18nLoaderOptions.translation === undefined) {
                     // Reload translations
                     (0, i18n_options_1.loadTranslations)(locale, localeDescription, context.workspaceRoot, loader, {
@@ -299,7 +300,7 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheO
                             (0, webpack_diagnostics_1.addError)(compilation, message);
                         },
                     });
-                    i18nLoaderOptions.translation = localeDescription.translation;
+                    i18nLoaderOptions.translation = (_a = localeDescription.translation) !== null && _a !== void 0 ? _a : {};
                 }
                 compilation.hooks.finishModules.tap('build-angular', () => {
                     // After loaders are finished, clear out the now unneeded translations
