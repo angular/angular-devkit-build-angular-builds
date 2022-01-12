@@ -35,6 +35,7 @@ const fs_1 = require("fs");
 const glob_1 = __importDefault(require("glob"));
 const path = __importStar(require("path"));
 const typescript_1 = require("typescript");
+const package_version_1 = require("../../utils/package-version");
 function getOutputHashFormat(option, length = 20) {
     const hashFormats = {
         none: { chunk: '', extract: '', file: '', script: '' },
@@ -113,7 +114,6 @@ exports.getInstrumentationExcludedPaths = getInstrumentationExcludedPaths;
 function getCacheSettings(wco, angularVersion) {
     const { enabled, path: cacheDirectory } = wco.buildOptions.cache;
     if (enabled) {
-        const packageVersion = require('../../../package.json').version;
         return {
             type: 'filesystem',
             profile: wco.buildOptions.verbose,
@@ -124,7 +124,7 @@ function getCacheSettings(wco, angularVersion) {
             // None of which are "named".
             name: (0, crypto_1.createHash)('sha1')
                 .update(angularVersion)
-                .update(packageVersion)
+                .update(package_version_1.VERSION)
                 .update(wco.projectRoot)
                 .update(JSON.stringify(wco.tsConfig))
                 .update(JSON.stringify({

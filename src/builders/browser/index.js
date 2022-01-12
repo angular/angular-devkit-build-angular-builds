@@ -44,6 +44,7 @@ const index_html_generator_1 = require("../../utils/index-file/index-html-genera
 const normalize_cache_1 = require("../../utils/normalize-cache");
 const output_paths_1 = require("../../utils/output-paths");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
+const purge_cache_1 = require("../../utils/purge-cache");
 const service_worker_1 = require("../../utils/service-worker");
 const spinner_1 = require("../../utils/spinner");
 const supported_browsers_1 = require("../../utils/supported-browsers");
@@ -98,6 +99,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     return (0, rxjs_1.from)(context.getProjectMetadata(projectName)).pipe((0, operators_1.switchMap)(async (projectMetadata) => {
         var _a;
         const sysProjectRoot = (0, core_1.getSystemPath)((0, core_1.resolve)((0, core_1.normalize)(context.workspaceRoot), (0, core_1.normalize)((_a = projectMetadata.root) !== null && _a !== void 0 ? _a : '')));
+        // Purge old build disk cache.
+        await (0, purge_cache_1.purgeStaleBuildCache)(context);
         checkInternetExplorerSupport(sysProjectRoot, context.logger);
         return {
             ...(await initialize(options, context, transforms.webpackConfiguration)),

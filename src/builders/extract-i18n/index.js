@@ -37,6 +37,7 @@ const path = __importStar(require("path"));
 const webpack_1 = __importDefault(require("webpack"));
 const i18n_options_1 = require("../../utils/i18n-options");
 const load_esm_1 = require("../../utils/load-esm");
+const purge_cache_1 = require("../../utils/purge-cache");
 const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const configs_1 = require("../../webpack/configs");
@@ -119,6 +120,8 @@ async function execute(options, context, transforms) {
     var _a;
     // Check Angular version.
     (0, version_1.assertCompatibleAngularVersion)(context.workspaceRoot);
+    // Purge old build disk cache.
+    await (0, purge_cache_1.purgeStaleBuildCache)(context);
     const browserTarget = (0, architect_1.targetFromTargetString)(options.browserTarget);
     const browserOptions = await context.validateOptions(await context.getTargetOptions(browserTarget), await context.getBuilderNameForTarget(browserTarget));
     const format = normalizeFormatOption(options);

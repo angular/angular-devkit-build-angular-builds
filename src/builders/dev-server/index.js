@@ -41,6 +41,7 @@ const i18n_options_1 = require("../../utils/i18n-options");
 const load_translations_1 = require("../../utils/load-translations");
 const normalize_cache_1 = require("../../utils/normalize-cache");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
+const purge_cache_1 = require("../../utils/purge-cache");
 const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
@@ -69,6 +70,8 @@ function serveWebpackBrowser(options, context, transforms = {}) {
         if (!projectName) {
             throw new Error('The builder requires a target.');
         }
+        // Purge old build disk cache.
+        await (0, purge_cache_1.purgeStaleBuildCache)(context);
         options.port = await (0, check_port_1.checkPort)((_b = options.port) !== null && _b !== void 0 ? _b : 4200, options.host || 'localhost');
         if (options.hmr) {
             logger.warn(core_1.tags.stripIndents `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
