@@ -26,7 +26,9 @@ async function default_1({ asset, options }) {
     // esbuild is used as a first pass
     const esbuildResult = await optimizeWithEsbuild(asset.code, asset.name, options);
     // terser is used as a second pass
-    const terserResult = await optimizeWithTerser(asset.name, esbuildResult.code, options.sourcemap, options.target, options.advanced);
+    const terserResult = await optimizeWithTerser(asset.name, esbuildResult.code, options.sourcemap, 
+    // Terser only supports up to ES2020.
+    options.target === 'next' ? 2020 : options.target, options.advanced);
     // Merge intermediate sourcemaps with input sourcemap if enabled
     let fullSourcemap;
     if (options.sourcemap) {
