@@ -91,11 +91,11 @@ class JavaScriptOptimizerPlugin {
                     if (this.options.target <= typescript_1.ScriptTarget.ES5) {
                         target = 5;
                     }
-                    else if (this.options.target < typescript_1.ScriptTarget.ESNext) {
-                        target = Number(typescript_1.ScriptTarget[this.options.target].slice(2));
+                    else if (this.options.target === typescript_1.ScriptTarget.ESNext) {
+                        target = 'next';
                     }
                     else {
-                        target = 2020;
+                        target = Number(typescript_1.ScriptTarget[this.options.target].slice(2));
                     }
                 }
                 // Setup the options used by all worker tasks
