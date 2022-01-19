@@ -25,9 +25,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStylesConfig = void 0;
 const fs = __importStar(require("fs"));
+const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
 const path = __importStar(require("path"));
 const sass_service_1 = require("../../sass/sass-service");
 const plugins_1 = require("../plugins");
@@ -70,7 +74,6 @@ function resolveGlobalStyles(styleEntrypoints, root, preserveSymlinks) {
 // eslint-disable-next-line max-lines-per-function
 function getStylesConfig(wco) {
     var _a, _b, _c;
-    const MiniCssExtractPlugin = require('mini-css-extract-plugin');
     const postcssImports = require('postcss-import');
     const postcssPresetEnv = require('postcss-preset-env');
     const { root, buildOptions } = wco;
@@ -188,7 +191,7 @@ function getStylesConfig(wco) {
         // for component css.
         !buildOptions.sourceMap.hidden);
     // extract global css from js files into own css file.
-    extraPlugins.push(new MiniCssExtractPlugin({ filename: `[name]${hashFormat.extract}.css` }));
+    extraPlugins.push(new mini_css_extract_plugin_1.default({ filename: `[name]${hashFormat.extract}.css` }));
     if (!buildOptions.hmr) {
         // don't remove `.js` files for `.css` when we are using HMR these contain HMR accept codes.
         // suppress empty .js files in css only entry points.
@@ -207,7 +210,7 @@ function getStylesConfig(wco) {
     ];
     const globalStyleLoaders = [
         {
-            loader: MiniCssExtractPlugin.loader,
+            loader: mini_css_extract_plugin_1.default.loader,
         },
         {
             loader: require.resolve('css-loader'),
