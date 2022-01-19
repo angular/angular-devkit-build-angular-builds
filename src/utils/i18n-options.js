@@ -216,6 +216,7 @@ function deleteTempDirectory(tempPath) {
     catch { }
 }
 function loadTranslations(locale, desc, workspaceRoot, loader, logger, usedFormats, duplicateTranslation) {
+    let translations = undefined;
     for (const file of desc.files) {
         const loadResult = loader(path_1.default.join(workspaceRoot, file.path));
         for (const diagnostics of loadResult.diagnostics.messages) {
@@ -232,10 +233,10 @@ function loadTranslations(locale, desc, workspaceRoot, loader, logger, usedForma
         usedFormats === null || usedFormats === void 0 ? void 0 : usedFormats.add(loadResult.format);
         file.format = loadResult.format;
         file.integrity = loadResult.integrity;
-        if (desc.translation) {
+        if (translations) {
             // Merge translations
             for (const [id, message] of Object.entries(loadResult.translations)) {
-                if (desc.translation[id] !== undefined) {
+                if (translations[id] !== undefined) {
                     const duplicateTranslationMessage = `[${file.path}]: Duplicate translations for message '${id}' when merging.`;
                     switch (duplicateTranslation) {
                         case schema_1.I18NTranslation.Ignore:
@@ -249,13 +250,14 @@ function loadTranslations(locale, desc, workspaceRoot, loader, logger, usedForma
                             break;
                     }
                 }
-                desc.translation[id] = message;
+                translations[id] = message;
             }
         }
         else {
             // First or only translation file
-            desc.translation = loadResult.translations;
+            translations = loadResult.translations;
         }
     }
+    desc.translation = translations;
 }
 exports.loadTranslations = loadTranslations;
