@@ -350,6 +350,7 @@ function getStylesConfig(wco) {
                             {
                                 use: componentStyleLoaders,
                                 type: 'asset/source',
+                                resourceQuery: /\?ngResource/,
                             },
                         ],
                     },
