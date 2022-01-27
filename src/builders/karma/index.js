@@ -80,7 +80,7 @@ function execute(options, context, transforms = {}) {
         singleRun = !options.watch;
     }
     return (0, rxjs_1.from)(initialize(options, context, transforms.webpackConfiguration)).pipe((0, operators_1.switchMap)(async ([karma, webpackConfig]) => {
-        var _a;
+        var _a, _b, _c, _d, _e;
         const karmaOptions = {
             singleRun,
         };
@@ -98,15 +98,20 @@ function execute(options, context, transforms = {}) {
             }
         }
         // prepend special webpack loader that will transform test.ts
-        if (options.include && options.include.length > 0) {
-            const mainFilePath = (0, core_1.getSystemPath)((0, core_1.join)((0, core_1.normalize)(context.workspaceRoot), options.main));
-            const files = (0, find_tests_1.findTests)(options.include, (0, path_1.dirname)(mainFilePath), context.workspaceRoot);
+        if ((_a = options.include) === null || _a === void 0 ? void 0 : _a.length) {
+            const projectName = (_b = context.target) === null || _b === void 0 ? void 0 : _b.project;
+            if (!projectName) {
+                throw new Error('The builder requires a target.');
+            }
+            const projectMetadata = await context.getProjectMetadata(projectName);
+            const projectSourceRoot = (0, core_1.getSystemPath)((0, core_1.join)((0, core_1.normalize)(context.workspaceRoot), (_c = projectMetadata.root) !== null && _c !== void 0 ? _c : '', (_d = projectMetadata.sourceRoot) !== null && _d !== void 0 ? _d : ''));
+            const files = await (0, find_tests_1.findTests)(options.include, context.workspaceRoot, projectSourceRoot);
             // early exit, no reason to start karma
             if (!files.length) {
                 throw new Error(`Specified patterns: "${options.include.join(', ')}" did not match any spec files.`);
             }
             // Get the rules and ensure the Webpack configuration is setup properly
-            const rules = ((_a = webpackConfig.module) === null || _a === void 0 ? void 0 : _a.rules) || [];
+            const rules = ((_e = webpackConfig.module) === null || _e === void 0 ? void 0 : _e.rules) || [];
             if (!webpackConfig.module) {
                 webpackConfig.module = { rules };
             }
@@ -114,7 +119,7 @@ function execute(options, context, transforms = {}) {
                 webpackConfig.module.rules = rules;
             }
             rules.unshift({
-                test: mainFilePath,
+                test: (0, path_1.resolve)(context.workspaceRoot, options.main),
                 use: {
                     // cannot be a simple path as it differs between environments
                     loader: single_test_transform_1.SingleTestTransformLoader,
