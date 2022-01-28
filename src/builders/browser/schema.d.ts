@@ -24,7 +24,7 @@ export interface Schema {
      */
     budgets?: Budget[];
     /**
-     * Enables '@angular-devkit/build-optimizer' optimizations when using the 'aot' option.
+     * Enables advanced build optimizations when using the 'aot' option.
      */
     buildOptimizer?: boolean;
     /**
