@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "14.0.0-next.0",
+  "version": "13.2.0-next.2+34.sha-4cd912d",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@ampproject/remapping": "1.1.1",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#d18469eb3",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#d18469eb3",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#d18469eb3",
-    "@babel/core": "7.16.12",
+    "@ampproject/remapping": "1.0.2",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds:4cd912dab1c0d25b691887265d80b798693a3dc9",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds:4cd912dab1c0d25b691887265d80b798693a3dc9",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds:4cd912dab1c0d25b691887265d80b798693a3dc9",
+    "@babel/core": "7.16.10",
     "@babel/generator": "7.16.8",
     "@babel/helper-annotate-as-pure": "7.16.7",
     "@babel/plugin-proposal-async-generator-functions": "7.16.8",
@@ -20,7 +20,7 @@
     "@babel/runtime": "7.16.7",
     "@babel/template": "7.16.7",
     "@discoveryjs/json-ext": "0.5.6",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#d18469eb3",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds:4cd912dab1c0d25b691887265d80b798693a3dc9",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.3",
     "babel-plugin-istanbul": "6.1.1",
@@ -31,7 +31,7 @@
     "core-js": "3.20.3",
     "critters": "0.0.16",
     "css-loader": "6.5.1",
-    "esbuild-wasm": "0.14.14",
+    "esbuild-wasm": "0.14.12",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.0",
@@ -41,7 +41,7 @@
     "less-loader": "10.2.0",
     "license-webpack-plugin": "4.0.0",
     "loader-utils": "3.2.0",
-    "mini-css-extract-plugin": "2.5.3",
+    "mini-css-extract-plugin": "2.5.2",
     "minimatch": "3.0.4",
     "open": "8.4.0",
     "ora": "5.4.1",
@@ -65,14 +65,14 @@
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.3.1",
-    "webpack": "5.67.0",
+    "webpack": "5.66.0",
     "webpack-dev-middleware": "5.3.0",
     "webpack-dev-server": "4.7.3",
     "webpack-merge": "5.8.0",
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.14.14"
+    "esbuild": "0.14.12"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^13.0.0 || ^13.2.0-next",
@@ -105,11 +105,11 @@
     }
   },
   "keywords": [
-    "angular",
     "Angular CLI",
+    "Angular DevKit",
+    "angular",
     "devkit",
-    "sdk",
-    "Angular DevKit"
+    "sdk"
   ],
   "repository": {
     "type": "git",

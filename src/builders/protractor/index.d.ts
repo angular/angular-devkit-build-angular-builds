@@ -12,5 +12,5 @@ export { ProtractorBuilderOptions };
  * @experimental Direct usage of this function is considered experimental.
  */
 export declare function execute(options: ProtractorBuilderOptions, context: BuilderContext): Promise<BuilderOutput>;
-declare const _default: import("@angular-devkit/architect/src/internal").Builder<ProtractorBuilderOptions & import("@angular-devkit/core").JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<ProtractorBuilderOptions & import("@angular-devkit/core").JsonObject>;
 export default _default;
