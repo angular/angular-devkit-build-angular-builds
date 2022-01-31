@@ -116,12 +116,6 @@ async function getCommonConfig(wco) {
             patterns: (0, helpers_1.assetPatterns)(root, buildOptions.assets),
         }));
     }
-    if (buildOptions.showCircularDependencies) {
-        const CircularDependencyPlugin = require('circular-dependency-plugin');
-        extraPlugins.push(new CircularDependencyPlugin({
-            exclude: /[\\/]node_modules[\\/]/,
-        }));
-    }
     if (buildOptions.extractLicenses) {
         const LicenseWebpackPlugin = require('license-webpack-plugin').LicenseWebpackPlugin;
         extraPlugins.push(new LicenseWebpackPlugin({
