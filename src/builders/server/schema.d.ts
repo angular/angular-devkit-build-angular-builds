@@ -84,12 +84,6 @@ export interface Schema {
      */
     resourcesOutputPath?: string;
     /**
-     * Show circular dependency warnings on builds.
-     * @deprecated The recommended method to detect circular dependencies in project code is to
-     * use either a lint rule or other external tooling.
-     */
-    showCircularDependencies?: boolean;
-    /**
      * Output source maps for scripts and styles. For more information, see
      * https://angular.io/guide/workspace-config#source-map-configuration.
      */

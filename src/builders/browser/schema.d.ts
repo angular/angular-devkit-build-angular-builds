@@ -126,17 +126,11 @@ export interface Schema {
     /**
      * Global scripts to be included in the build.
      */
-    scripts?: ExtraEntryPoint[];
+    scripts?: ScriptElement[];
     /**
      * Generates a service worker config for production builds.
      */
     serviceWorker?: boolean;
-    /**
-     * Show circular dependency warnings on builds.
-     * @deprecated The recommended method to detect circular dependencies in project code is to
-     * use either a lint rule or other external tooling.
-     */
-    showCircularDependencies?: boolean;
     /**
      * Output source maps for scripts and styles. For more information, see
      * https://angular.io/guide/workspace-config#source-map-configuration.
@@ -154,7 +148,7 @@ export interface Schema {
     /**
      * Global styles to be included in the build.
      */
-    styles?: ExtraEntryPoint[];
+    styles?: StyleElement[];
     /**
      * Enables the use of subresource integrity validation.
      */
@@ -366,8 +360,8 @@ export declare enum OutputHashing {
     Media = "media",
     None = "none"
 }
-export declare type ExtraEntryPoint = ExtraEntryPointClass | string;
-export interface ExtraEntryPointClass {
+export declare type ScriptElement = ScriptClass | string;
+export interface ScriptClass {
     /**
      * The bundle name for this extra entry point.
      */
@@ -412,4 +406,19 @@ export interface StylePreprocessorOptions {
      * Paths to include. Paths will be resolved to workspace root.
      */
     includePaths?: string[];
+}
+export declare type StyleElement = StyleClass | string;
+export interface StyleClass {
+    /**
+     * The bundle name for this extra entry point.
+     */
+    bundleName?: string;
+    /**
+     * If the bundle will be referenced in the HTML file.
+     */
+    inject?: boolean;
+    /**
+     * The file to include.
+     */
+    input: string;
 }
