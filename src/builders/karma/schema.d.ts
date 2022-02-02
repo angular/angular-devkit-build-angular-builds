@@ -28,7 +28,7 @@ export interface Schema {
      * - when a path to directory is provided, all spec files ending ".spec.@(ts|tsx)" will be
      * included
      * - when a path to a file is provided, and a matching spec file exists it will be included
-     * instead
+     * instead.
      */
     include?: string[];
     /**
