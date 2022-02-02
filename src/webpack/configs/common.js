@@ -58,7 +58,7 @@ async function getCommonConfig(wco) {
     // changed to a direct dynamic import.
     const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT, VERSION: NG_VERSION, } = await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli');
     // determine hashing format
-    const hashFormat = (0, helpers_1.getOutputHashFormat)(buildOptions.outputHashing || 'none');
+    const hashFormat = (0, helpers_1.getOutputHashFormat)(buildOptions.outputHashing);
     if (buildOptions.progress) {
         extraPlugins.push(new progress_plugin_1.ProgressPlugin(platform));
     }
@@ -298,7 +298,9 @@ async function getCommonConfig(wco) {
                     test: /\.[cm]?[tj]sx?$/,
                     // The below is needed due to a bug in `@babel/runtime`. See: https://github.com/babel/babel/issues/12824
                     resolve: { fullySpecified: false },
-                    exclude: [/[/\\](?:core-js|@babel|tslib|web-animations-js|web-streams-polyfill)[/\\]/],
+                    exclude: [
+                        /[/\\](?:core-js|@babel|tslib|web-animations-js|web-streams-polyfill|whatwg-url)[/\\]/,
+                    ],
                     use: [
                         {
                             loader: require.resolve('../../babel/webpack-loader'),

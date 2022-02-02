@@ -35,25 +35,41 @@ const fs_1 = require("fs");
 const glob_1 = __importDefault(require("glob"));
 const path = __importStar(require("path"));
 const typescript_1 = require("typescript");
+const schema_1 = require("../../builders/browser/schema");
 const package_version_1 = require("../../utils/package-version");
-function getOutputHashFormat(option, length = 20) {
-    const hashFormats = {
-        none: { chunk: '', extract: '', file: '', script: '' },
-        media: { chunk: '', extract: '', file: `.[hash:${length}]`, script: '' },
-        bundles: {
-            chunk: `.[contenthash:${length}]`,
-            extract: `.[contenthash:${length}]`,
-            file: '',
-            script: `.[hash:${length}]`,
-        },
-        all: {
-            chunk: `.[contenthash:${length}]`,
-            extract: `.[contenthash:${length}]`,
-            file: `.[hash:${length}]`,
-            script: `.[hash:${length}]`,
-        },
-    };
-    return hashFormats[option] || hashFormats['none'];
+function getOutputHashFormat(outputHashing = schema_1.OutputHashing.None, length = 20) {
+    const hashTemplate = `.[contenthash:${length}]`;
+    switch (outputHashing) {
+        case 'media':
+            return {
+                chunk: '',
+                extract: '',
+                file: hashTemplate,
+                script: '',
+            };
+        case 'bundles':
+            return {
+                chunk: hashTemplate,
+                extract: hashTemplate,
+                file: '',
+                script: hashTemplate,
+            };
+        case 'all':
+            return {
+                chunk: hashTemplate,
+                extract: hashTemplate,
+                file: hashTemplate,
+                script: hashTemplate,
+            };
+        case 'none':
+        default:
+            return {
+                chunk: '',
+                extract: '',
+                file: '',
+                script: '',
+            };
+    }
 }
 exports.getOutputHashFormat = getOutputHashFormat;
 function normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName) {
