@@ -18,5 +18,5 @@ export declare type ExtractI18nBuilderOptions = Schema & JsonObject;
 export declare function execute(options: ExtractI18nBuilderOptions, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
 }): Promise<BuildResult>;
-declare const _default: import("@angular-devkit/architect/src/internal").Builder<Schema & JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<Schema & JsonObject>;
 export default _default;

@@ -13,5 +13,5 @@ import { Schema as NgPackagrBuilderOptions } from './schema';
  */
 export declare function execute(options: NgPackagrBuilderOptions, context: BuilderContext): Observable<BuilderOutput>;
 export { NgPackagrBuilderOptions };
-declare const _default: import("@angular-devkit/architect/src/internal").Builder<Record<string, string> & NgPackagrBuilderOptions & import("../../../../core/src").JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<Record<string, string> & NgPackagrBuilderOptions & import("../../../../core/src").JsonObject>;
 export default _default;
