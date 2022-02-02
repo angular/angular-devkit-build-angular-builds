@@ -7,7 +7,7 @@
  */
 import { logging } from '@angular-devkit/core';
 import type { ParsedConfiguration } from '@angular/compiler-cli';
-import { AssetPatternClass, Budget, CrossOrigin, I18NTranslation, IndexUnion, InlineStyleLanguage, Localize, ScriptElement, SourceMapClass, StyleElement } from '../builders/browser/schema';
+import { AssetPatternClass, Budget, CrossOrigin, I18NTranslation, IndexUnion, InlineStyleLanguage, Localize, OutputHashing, ScriptElement, SourceMapClass, StyleElement } from '../builders/browser/schema';
 import { Schema as DevServerSchema } from '../builders/dev-server/schema';
 import { NormalizedCachedOptions } from './normalize-cache';
 import { NormalizedFileReplacement } from './normalize-file-replacements';
@@ -30,7 +30,7 @@ export interface BuildOptions {
     bundleDependencies?: boolean;
     externalDependencies?: string[];
     watch?: boolean;
-    outputHashing?: string;
+    outputHashing?: OutputHashing;
     poll?: number;
     index?: IndexUnion;
     deleteOutputPath?: boolean;

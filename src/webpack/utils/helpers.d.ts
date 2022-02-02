@@ -8,7 +8,7 @@
 import type { ObjectPattern } from 'copy-webpack-plugin';
 import { ScriptTarget } from 'typescript';
 import type { Configuration, WebpackOptionsNormalized } from 'webpack';
-import { AssetPatternClass, ScriptElement, StyleElement } from '../../builders/browser/schema';
+import { AssetPatternClass, OutputHashing, ScriptElement, StyleElement } from '../../builders/browser/schema';
 import { WebpackConfigOptions } from '../../utils/build-options';
 export interface HashFormat {
     chunk: string;
@@ -16,7 +16,7 @@ export interface HashFormat {
     file: string;
     script: string;
 }
-export declare function getOutputHashFormat(option: string, length?: number): HashFormat;
+export declare function getOutputHashFormat(outputHashing?: OutputHashing, length?: number): HashFormat;
 export declare type NormalizedEntryPoint = Required<Exclude<ScriptElement | StyleElement, string>>;
 export declare function normalizeExtraEntryPoints(extraEntryPoints: (ScriptElement | StyleElement)[], defaultBundleName: string): NormalizedEntryPoint[];
 export declare function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath: string) => string;
