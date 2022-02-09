@@ -1,15 +1,15 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "14.0.0-next.0+12.sha-7ce5000",
+  "version": "14.0.0-next.0+14.sha-08b106e",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
-    "@ampproject/remapping": "2.0.2",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#7ce50002a",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#7ce50002a",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#7ce50002a",
+    "@ampproject/remapping": "2.1.0",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#08b106e9f",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#08b106e9f",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#08b106e9f",
     "@babel/core": "7.17.0",
     "@babel/generator": "7.17.0",
     "@babel/helper-annotate-as-pure": "7.16.7",
@@ -20,7 +20,7 @@
     "@babel/runtime": "7.17.0",
     "@babel/template": "7.16.7",
     "@discoveryjs/json-ext": "0.5.6",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#7ce50002a",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#08b106e9f",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.3",
     "babel-plugin-istanbul": "6.1.1",
@@ -30,7 +30,7 @@
     "core-js": "3.21.0",
     "critters": "0.0.16",
     "css-loader": "6.6.0",
-    "esbuild-wasm": "0.14.18",
+    "esbuild-wasm": "0.14.20",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.0",
@@ -41,7 +41,7 @@
     "license-webpack-plugin": "4.0.1",
     "loader-utils": "3.2.0",
     "mini-css-extract-plugin": "2.5.3",
-    "minimatch": "3.0.4",
+    "minimatch": "3.0.5",
     "open": "8.4.0",
     "ora": "5.4.1",
     "parse5-html-rewriting-stream": "6.0.1",
@@ -71,7 +71,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.14.18"
+    "esbuild": "0.14.20"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next",
