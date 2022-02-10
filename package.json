@@ -1,26 +1,26 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "14.0.0-next.0+17.sha-a83e90a",
+  "version": "14.0.0-next.1+3.sha-063acc3",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.1.0",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#a83e90aa4",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#a83e90aa4",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#a83e90aa4",
-    "@babel/core": "7.17.0",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#063acc335",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#063acc335",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#063acc335",
+    "@babel/core": "7.17.2",
     "@babel/generator": "7.17.0",
     "@babel/helper-annotate-as-pure": "7.16.7",
     "@babel/plugin-proposal-async-generator-functions": "7.16.8",
     "@babel/plugin-transform-async-to-generator": "7.16.8",
     "@babel/plugin-transform-runtime": "7.17.0",
     "@babel/preset-env": "7.16.11",
-    "@babel/runtime": "7.17.0",
+    "@babel/runtime": "7.17.2",
     "@babel/template": "7.16.7",
     "@discoveryjs/json-ext": "0.5.6",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#a83e90aa4",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#063acc335",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.3",
     "babel-plugin-istanbul": "6.1.1",
@@ -30,7 +30,7 @@
     "core-js": "3.21.0",
     "critters": "0.0.16",
     "css-loader": "6.6.0",
-    "esbuild-wasm": "0.14.20",
+    "esbuild-wasm": "0.14.21",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.0",
@@ -71,7 +71,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.14.20"
+    "esbuild": "0.14.21"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next",
