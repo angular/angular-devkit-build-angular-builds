@@ -1,15 +1,15 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "14.0.0-next.2+7.sha-34bf5a7",
+  "version": "14.0.0-next.2+8.sha-748d3ab",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.1.2",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#34bf5a76e",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#34bf5a76e",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#34bf5a76e",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#748d3ab2e",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#748d3ab2e",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#748d3ab2e",
     "@babel/core": "7.17.5",
     "@babel/generator": "7.17.3",
     "@babel/helper-annotate-as-pure": "7.16.7",
@@ -20,7 +20,7 @@
     "@babel/runtime": "7.17.2",
     "@babel/template": "7.16.7",
     "@discoveryjs/json-ext": "0.5.6",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#34bf5a76e",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#748d3ab2e",
     "ansi-colors": "4.1.1",
     "babel-loader": "8.2.3",
     "babel-plugin-istanbul": "6.1.1",
@@ -30,7 +30,7 @@
     "core-js": "3.21.1",
     "critters": "0.0.16",
     "css-loader": "6.6.0",
-    "esbuild-wasm": "0.14.22",
+    "esbuild-wasm": "0.14.23",
     "glob": "7.2.0",
     "https-proxy-agent": "5.0.0",
     "inquirer": "8.2.0",
@@ -60,7 +60,7 @@
     "source-map-support": "0.5.21",
     "stylus": "0.56.0",
     "stylus-loader": "6.2.0",
-    "terser": "5.10.0",
+    "terser": "5.11.0",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.3.1",
@@ -71,7 +71,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.14.22"
+    "esbuild": "0.14.23"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^14.0.0 || ^14.0.0-next",
