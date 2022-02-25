@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path, json } from '@angular-devkit/core';
+import { json } from '@angular-devkit/core';
 import { AssetPatternClass, Schema as BrowserBuilderSchema, SourceMapClass } from '../builders/browser/schema';
 import { BuildOptions } from './build-options';
 import { NormalizedFileReplacement } from './normalize-file-replacements';
@@ -19,4 +19,4 @@ export declare type NormalizedBrowserBuilderSchema = BrowserBuilderSchema & Buil
     fileReplacements: NormalizedFileReplacement[];
     optimization: NormalizedOptimizationOptions;
 };
-export declare function normalizeBrowserSchema(root: Path, projectRoot: Path, sourceRoot: Path | undefined, options: BrowserBuilderSchema, metadata: json.JsonObject): NormalizedBrowserBuilderSchema;
+export declare function normalizeBrowserSchema(workspaceRoot: string, projectRoot: string, projectSourceRoot: string | undefined, options: BrowserBuilderSchema, metadata: json.JsonObject): NormalizedBrowserBuilderSchema;
