@@ -7,7 +7,6 @@
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
-import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import webpack from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
@@ -16,7 +15,7 @@ import { Schema as BrowserBuilderSchema } from './schema';
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
-export declare type BrowserBuilderOutput = json.JsonObject & BuilderOutput & {
+export declare type BrowserBuilderOutput = BuilderOutput & {
     baseOutputPath: string;
     outputPaths: string[];
     /**
@@ -37,5 +36,5 @@ export declare function buildWebpackBrowser(options: BrowserBuilderSchema, conte
     logging?: WebpackLoggingCallback;
     indexHtml?: IndexHtmlTransform;
 }): Observable<BrowserBuilderOutput>;
-declare const _default: import("../../../../architect/src/internal").Builder<json.JsonObject & BrowserBuilderSchema>;
+declare const _default: import("../../../../architect/src/internal").Builder<BrowserBuilderSchema & import("@angular-devkit/core").JsonObject>;
 export default _default;

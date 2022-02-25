@@ -6,11 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import { json } from '@angular-devkit/core';
 import { Schema as ProtractorBuilderOptions } from './schema';
 export { ProtractorBuilderOptions };
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
 export declare function execute(options: ProtractorBuilderOptions, context: BuilderContext): Promise<BuilderOutput>;
-declare const _default: import("../../../../architect/src/internal").Builder<ProtractorBuilderOptions & import("@angular-devkit/core").JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<ProtractorBuilderOptions & json.JsonObject>;
 export default _default;

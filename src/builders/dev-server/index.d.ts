@@ -13,7 +13,7 @@ import webpack from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { Schema } from './schema';
-export declare type DevServerBuilderOptions = Schema & json.JsonObject;
+export declare type DevServerBuilderOptions = Schema;
 /**
  * @experimental Direct usage of this type is considered experimental.
  */

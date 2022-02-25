@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import webpack from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
@@ -14,7 +13,7 @@ import { Schema as ServerBuilderOptions } from './schema';
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
-export declare type ServerBuilderOutput = json.JsonObject & BuilderOutput & {
+export declare type ServerBuilderOutput = BuilderOutput & {
     baseOutputPath: string;
     outputPaths: string[];
     /**
@@ -29,5 +28,5 @@ export { ServerBuilderOptions };
 export declare function execute(options: ServerBuilderOptions, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
 }): Observable<ServerBuilderOutput>;
-declare const _default: import("../../../../architect/src/internal").Builder<ServerBuilderOptions & json.JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<ServerBuilderOptions & import("@angular-devkit/core").JsonObject>;
 export default _default;

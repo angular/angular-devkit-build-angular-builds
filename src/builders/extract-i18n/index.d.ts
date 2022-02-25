@@ -11,7 +11,7 @@ import { JsonObject } from '@angular-devkit/core';
 import webpack from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { Schema } from './schema';
-export declare type ExtractI18nBuilderOptions = Schema & JsonObject;
+export declare type ExtractI18nBuilderOptions = Schema;
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
