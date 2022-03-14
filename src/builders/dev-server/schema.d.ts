@@ -58,7 +58,7 @@ export interface Schema {
      */
     publicHost?: string;
     /**
-     * The pathname where the app will be served.
+     * The pathname where the application will be served.
      */
     servePath?: string;
     /**
