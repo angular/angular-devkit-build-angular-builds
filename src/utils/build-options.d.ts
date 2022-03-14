@@ -7,7 +7,7 @@
  */
 import { logging } from '@angular-devkit/core';
 import type { ParsedConfiguration } from '@angular/compiler-cli';
-import { AssetPatternClass, Budget, CrossOrigin, I18NTranslation, IndexUnion, InlineStyleLanguage, Localize, OutputHashing, ScriptElement, SourceMapClass, StyleElement } from '../builders/browser/schema';
+import { AssetPatternClass, Budget, CrossOrigin, ExtraEntryPoint, I18NTranslation, IndexUnion, InlineStyleLanguage, Localize, OutputHashing, SourceMapClass } from '../builders/browser/schema';
 import { Schema as DevServerSchema } from '../builders/dev-server/schema';
 import { NormalizedCachedOptions } from './normalize-cache';
 import { NormalizedFileReplacement } from './normalize-file-replacements';
@@ -36,6 +36,7 @@ export interface BuildOptions {
     deleteOutputPath?: boolean;
     preserveSymlinks?: boolean;
     extractLicenses?: boolean;
+    showCircularDependencies?: boolean;
     buildOptimizer?: boolean;
     namedChunks?: boolean;
     crossOrigin?: CrossOrigin;
@@ -48,8 +49,8 @@ export interface BuildOptions {
     polyfills?: string;
     budgets: Budget[];
     assets: AssetPatternClass[];
-    scripts: ScriptElement[];
-    styles: StyleElement[];
+    scripts: ExtraEntryPoint[];
+    styles: ExtraEntryPoint[];
     stylePreprocessorOptions?: {
         includePaths: string[];
     };

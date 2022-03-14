@@ -8,7 +8,7 @@
 import type { ObjectPattern } from 'copy-webpack-plugin';
 import { ScriptTarget } from 'typescript';
 import type { Configuration, WebpackOptionsNormalized } from 'webpack';
-import { AssetPatternClass, OutputHashing, ScriptElement, StyleElement } from '../../builders/browser/schema';
+import { AssetPatternClass, ExtraEntryPoint, ExtraEntryPointClass, OutputHashing } from '../../builders/browser/schema';
 import { WebpackConfigOptions } from '../../utils/build-options';
 export interface HashFormat {
     chunk: string;
@@ -17,12 +17,12 @@ export interface HashFormat {
     script: string;
 }
 export declare function getOutputHashFormat(outputHashing?: OutputHashing, length?: number): HashFormat;
-export declare type NormalizedEntryPoint = Required<Exclude<ScriptElement | StyleElement, string>>;
-export declare function normalizeExtraEntryPoints(extraEntryPoints: (ScriptElement | StyleElement)[], defaultBundleName: string): NormalizedEntryPoint[];
+export declare type NormalizedEntryPoint = Required<ExtraEntryPointClass>;
+export declare function normalizeExtraEntryPoints(extraEntryPoints: ExtraEntryPoint[], defaultBundleName: string): NormalizedEntryPoint[];
 export declare function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath: string) => string;
 export declare function getInstrumentationExcludedPaths(sourceRoot: string, excludedPaths: string[]): Set<string>;
 export declare function getCacheSettings(wco: WebpackConfigOptions, angularVersion: string): WebpackOptionsNormalized['cache'];
-export declare function globalScriptsByBundleName(root: string, scripts: ScriptElement[]): {
+export declare function globalScriptsByBundleName(root: string, scripts: ExtraEntryPoint[]): {
     bundleName: string;
     inject: boolean;
     paths: string[];

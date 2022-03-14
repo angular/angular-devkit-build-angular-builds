@@ -24,7 +24,7 @@ export interface Schema {
      */
     budgets?: Budget[];
     /**
-     * Enables advanced build optimizations when using the 'aot' option.
+     * Enables '@angular-devkit/build-optimizer' optimizations when using the 'aot' option.
      */
     buildOptimizer?: boolean;
     /**
@@ -98,6 +98,7 @@ export interface Schema {
     outputHashing?: OutputHashing;
     /**
      * The full path for the new output directory, relative to the current workspace.
+     *
      * By default, writes output to a folder named dist/ in the current project.
      */
     outputPath: string;
@@ -125,11 +126,17 @@ export interface Schema {
     /**
      * Global scripts to be included in the build.
      */
-    scripts?: ScriptElement[];
+    scripts?: ExtraEntryPoint[];
     /**
      * Generates a service worker config for production builds.
      */
     serviceWorker?: boolean;
+    /**
+     * Show circular dependency warnings on builds.
+     * @deprecated The recommended method to detect circular dependencies in project code is to
+     * use either a lint rule or other external tooling.
+     */
+    showCircularDependencies?: boolean;
     /**
      * Output source maps for scripts and styles. For more information, see
      * https://angular.io/guide/workspace-config#source-map-configuration.
@@ -147,7 +154,7 @@ export interface Schema {
     /**
      * Global styles to be included in the build.
      */
-    styles?: StyleElement[];
+    styles?: ExtraEntryPoint[];
     /**
      * Enables the use of subresource integrity validation.
      */
@@ -359,8 +366,8 @@ export declare enum OutputHashing {
     Media = "media",
     None = "none"
 }
-export declare type ScriptElement = ScriptClass | string;
-export interface ScriptClass {
+export declare type ExtraEntryPoint = ExtraEntryPointClass | string;
+export interface ExtraEntryPointClass {
     /**
      * The bundle name for this extra entry point.
      */
@@ -405,19 +412,4 @@ export interface StylePreprocessorOptions {
      * Paths to include. Paths will be resolved to workspace root.
      */
     includePaths?: string[];
-}
-export declare type StyleElement = StyleClass | string;
-export interface StyleClass {
-    /**
-     * The bundle name for this extra entry point.
-     */
-    bundleName?: string;
-    /**
-     * If the bundle will be referenced in the HTML file.
-     */
-    inject?: boolean;
-    /**
-     * The file to include.
-     */
-    input: string;
 }
