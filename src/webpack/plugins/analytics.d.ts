@@ -40,10 +40,9 @@ export declare class NgBuildAnalyticsPlugin {
     protected _projectRoot: string;
     protected _analytics: analytics.Analytics;
     protected _category: string;
-    private aotEnabled;
     protected _built: boolean;
     protected _stats: AnalyticsBuildStats;
-    constructor(_projectRoot: string, _analytics: analytics.Analytics, _category: string, aotEnabled: boolean);
+    constructor(_projectRoot: string, _analytics: analytics.Analytics, _category: string);
     protected _reset(): void;
     protected _getMetrics(stats: Stats): (string | number)[];
     protected _getDimensions(): (string | number | boolean)[];
