@@ -28,9 +28,9 @@ export declare class EsbuildExecutor implements Pick<typeof import('esbuild'), '
     /**
      * Determines whether the native variant of esbuild can be used on the current platform.
      *
-     * @returns True, if the native variant of esbuild is support; False, if the WASM variant is required.
+     * @returns A promise which resolves to `true`, if the native variant of esbuild is support or `false`, if the WASM variant is required.
      */
-    static hasNativeSupport(): boolean;
+    static hasNativeSupport(): Promise<boolean>;
     /**
      * Initializes the esbuild transform and format messages functions.
      *
