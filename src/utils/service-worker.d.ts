@@ -5,5 +5,4 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Path } from '@angular-devkit/core';
-export declare function augmentAppWithServiceWorker(appRoot: Path, outputPath: Path, baseHref: string, ngswConfigPath?: string): Promise<void>;
+export declare function augmentAppWithServiceWorker(appRoot: string, outputPath: string, baseHref: string, ngswConfigPath?: string): Promise<void>;
