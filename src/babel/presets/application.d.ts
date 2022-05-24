@@ -32,7 +32,7 @@ export interface ApplicationPresetOptions {
         jitMode: boolean;
         linkerPluginCreator: typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin;
     };
-    forceES5?: boolean;
+    forcePresetEnv?: boolean;
     forceAsyncTransformation?: boolean;
     instrumentCode?: {
         includedBasePath: string;
@@ -43,6 +43,7 @@ export interface ApplicationPresetOptions {
         pureTopLevel: boolean;
         wrapDecorators: boolean;
     };
+    supportedBrowsers?: string[];
     diagnosticReporter?: DiagnosticReporter;
 }
 export default function (api: unknown, options: ApplicationPresetOptions): {
