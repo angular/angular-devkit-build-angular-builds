@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
-import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { Schema as BrowserBuilderOptions } from './schema';
 /**
  * Main execution function for the esbuild-based application builder.
  * The options are compatible with the Webpack-based builder.
@@ -14,6 +14,6 @@ import { Schema as BrowserBuilderOptions } from '../browser/schema';
  * @param context The Architect builder context object
  * @returns A promise with the builder result output
  */
-export declare function execute(options: BrowserBuilderOptions, context: BuilderContext): Promise<BuilderOutput>;
+export declare function buildEsbuildBrowser(options: BrowserBuilderOptions, context: BuilderContext): Promise<BuilderOutput>;
 declare const _default: import("../../../../architect/src/internal").Builder<BrowserBuilderOptions & import("../../../../core/src").JsonObject>;
 export default _default;
