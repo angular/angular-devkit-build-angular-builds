@@ -16,6 +16,7 @@ export interface HashFormat {
     file: string;
     script: string;
 }
+export declare type WebpackStatsOptions = Exclude<Configuration['stats'], string | boolean | undefined>;
 export declare function getOutputHashFormat(outputHashing?: OutputHashing, length?: number): HashFormat;
 export declare type NormalizedEntryPoint = Required<Exclude<ScriptElement | StyleElement, string>>;
 export declare function normalizeExtraEntryPoints(extraEntryPoints: (ScriptElement | StyleElement)[], defaultBundleName: string): NormalizedEntryPoint[];
@@ -29,7 +30,5 @@ export declare function globalScriptsByBundleName(root: string, scripts: ScriptE
 }[];
 export declare function assetPatterns(root: string, assets: AssetPatternClass[]): ObjectPattern[];
 export declare function externalizePackages(context: string, request: string | undefined, callback: (error?: Error, result?: string) => void): void;
-declare type WebpackStatsOptions = Exclude<Configuration['stats'], string | boolean>;
 export declare function getStatsOptions(verbose?: boolean): WebpackStatsOptions;
 export declare function getMainFieldsAndConditionNames(target: ScriptTarget, platformServer: boolean): Pick<WebpackOptionsNormalized['resolve'], 'mainFields' | 'conditionNames'>;
-export {};

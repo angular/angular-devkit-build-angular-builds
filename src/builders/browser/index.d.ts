@@ -17,11 +17,19 @@ import { Schema as BrowserBuilderSchema } from './schema';
  */
 export declare type BrowserBuilderOutput = BuilderOutput & {
     baseOutputPath: string;
+    /**
+     * @deprecated in version 14. Use 'outputs' instead.
+     */
     outputPaths: string[];
     /**
-     * @deprecated in version 9. Use 'outputPaths' instead.
+     * @deprecated in version 9. Use 'outputs' instead.
      */
     outputPath: string;
+    outputs: {
+        locale?: string;
+        path: string;
+        baseHref: string;
+    }[];
 };
 /**
  * Maximum time in milliseconds for single build/rebuild
