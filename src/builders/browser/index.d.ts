@@ -28,7 +28,7 @@ export declare type BrowserBuilderOutput = BuilderOutput & {
     outputs: {
         locale?: string;
         path: string;
-        baseHref: string;
+        baseHref?: string;
     }[];
 };
 /**
