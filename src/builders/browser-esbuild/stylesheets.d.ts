@@ -10,7 +10,7 @@ export interface BundleStylesheetOptions {
     workspaceRoot?: string;
     optimization: boolean;
     preserveSymlinks?: boolean;
-    sourcemap: boolean | 'external';
+    sourcemap: boolean | 'external' | 'inline';
     outputNames?: {
         bundles?: string;
         media?: string;
