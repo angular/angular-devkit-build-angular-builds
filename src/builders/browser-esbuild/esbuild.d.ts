@@ -7,8 +7,6 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuildFailure, BuildOptions, BuildResult, Message, OutputFile } from 'esbuild';
-/** Default outdir setting for esbuild. */
-export declare const DEFAULT_OUTDIR: string;
 /**
  * Determines if an unknown value is an esbuild BuildFailure error object thrown by esbuild.
  * @param value A potential esbuild BuildFailure error object.

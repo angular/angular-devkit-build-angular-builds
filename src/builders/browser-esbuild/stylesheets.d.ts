@@ -7,7 +7,7 @@
  */
 import type { OutputFile } from 'esbuild';
 export interface BundleStylesheetOptions {
-    workspaceRoot?: string;
+    workspaceRoot: string;
     optimization: boolean;
     preserveSymlinks?: boolean;
     sourcemap: boolean | 'external' | 'inline';
