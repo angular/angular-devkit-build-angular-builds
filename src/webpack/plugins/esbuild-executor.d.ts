@@ -41,6 +41,6 @@ export declare class EsbuildExecutor implements Pick<typeof import('esbuild'), '
      * Transitions an executor instance to use the WASM-variant of esbuild.
      */
     private useWasm;
-    transform(input: string, options?: TransformOptions): Promise<TransformResult>;
+    transform(input: string | Uint8Array, options?: TransformOptions): Promise<TransformResult>;
     formatMessages(messages: PartialMessage[], options: FormatMessagesOptions): Promise<string[]>;
 }
