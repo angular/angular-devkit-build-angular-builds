@@ -8,5 +8,5 @@
 import type { Plugin } from 'esbuild';
 export declare function createSassPlugin(options: {
     sourcemap: boolean;
-    includePaths?: string[];
+    loadPaths?: string[];
 }): Plugin;
