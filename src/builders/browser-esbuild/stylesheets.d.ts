@@ -16,6 +16,7 @@ export interface BundleStylesheetOptions {
         media?: string;
     };
     includePaths?: string[];
+    externalDependencies?: string[];
 }
 /**
  * Bundle a stylesheet that exists as a file on the filesystem.
