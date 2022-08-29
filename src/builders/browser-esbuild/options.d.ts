@@ -19,8 +19,8 @@ import { Schema as BrowserBuilderOptions } from '../browser/schema';
  */
 export declare function normalizeOptions(context: BuilderContext, projectName: string, options: BrowserBuilderOptions): Promise<{
     workspaceRoot: string;
-    mainEntryPoint: string;
-    polyfillsEntryPoint: string | undefined;
+    entryPoints: Record<string, string>;
+    entryPointNameLookup: ReadonlyMap<string, string>;
     optimizationOptions: import("../../utils").NormalizedOptimizationOptions;
     outputPath: string;
     sourcemapOptions: import("../browser/schema").SourceMapClass;
