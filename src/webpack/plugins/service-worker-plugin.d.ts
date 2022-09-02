@@ -9,7 +9,6 @@ import type { Compiler } from 'webpack';
 export interface ServiceWorkerPluginOptions {
     projectRoot: string;
     root: string;
-    outputPath: string;
     baseHref?: string;
     ngswConfigPath?: string;
 }
