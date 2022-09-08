@@ -3,7 +3,7 @@ export interface Schema {
      * Which external dependencies to bundle into the bundle. By default, all of node_modules
      * will be bundled.
      */
-    bundleDependencies?: BundleDependenciesUnion;
+    bundleDependencies?: boolean;
     /**
      * Delete the output path before building.
      */
@@ -109,15 +109,6 @@ export interface Schema {
      * Run build when files change.
      */
     watch?: boolean;
-}
-/**
- * Which external dependencies to bundle into the bundle. By default, all of node_modules
- * will be bundled.
- */
-export declare type BundleDependenciesUnion = boolean | BundleDependenciesEnum;
-export declare enum BundleDependenciesEnum {
-    All = "all",
-    None = "none"
 }
 export interface FileReplacement {
     replace?: string;
