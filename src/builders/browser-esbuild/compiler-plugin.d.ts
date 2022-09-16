@@ -12,4 +12,5 @@ export declare function createCompilerPlugin(pluginOptions: {
     tsconfig: string;
     advancedOptimizations?: boolean;
     thirdPartySourcemaps?: boolean;
+    fileReplacements?: Record<string, string>;
 }, styleOptions: BundleStylesheetOptions): Plugin;

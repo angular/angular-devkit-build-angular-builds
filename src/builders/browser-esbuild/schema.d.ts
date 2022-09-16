@@ -262,10 +262,8 @@ export declare enum CrossOrigin {
     UseCredentials = "use-credentials"
 }
 export interface FileReplacement {
-    replace?: string;
-    replaceWith?: string;
-    src?: string;
-    with?: string;
+    replace: string;
+    with: string;
 }
 /**
  * How to handle duplicate translations for i18n.
