@@ -32,5 +32,4 @@ export declare class CssOptimizerPlugin {
      */
     private optimize;
     private addWarnings;
-    private transformSupportedBrowsersToTargets;
 }

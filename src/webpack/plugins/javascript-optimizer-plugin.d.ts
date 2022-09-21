@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ScriptTarget } from 'typescript';
 import type { Compiler } from 'webpack';
 /**
  * The options used to configure the {@link JavaScriptOptimizerPlugin}.
@@ -29,11 +28,9 @@ export interface JavaScriptOptimizerOptions {
      */
     sourcemap?: boolean;
     /**
-     * The ECMAScript version that should be used when generating output code.
-     * The optimizer will not adjust the output code with features present in newer
-     * ECMAScript versions.
+     * A list of supported browsers that is used for output code.
      */
-    target: ScriptTarget;
+    supportedBrowsers?: string[];
     /**
      * Enables the retention of identifier names and ensures that function and class names are
      * present in the output code.
@@ -61,7 +58,8 @@ export interface JavaScriptOptimizerOptions {
  * optimizations not yet implemented by `esbuild`.
  */
 export declare class JavaScriptOptimizerPlugin {
-    options: JavaScriptOptimizerOptions;
+    private options;
+    private targets;
     constructor(options: JavaScriptOptimizerOptions);
     apply(compiler: Compiler): void;
 }

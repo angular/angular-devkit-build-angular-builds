@@ -7,7 +7,6 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { logging } from '@angular-devkit/core';
-import { ScriptTarget } from 'typescript';
 import { Configuration } from 'webpack';
 import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
 import { NormalizedBrowserBuilderSchema } from '../utils';
@@ -21,7 +20,6 @@ export declare function generateI18nBrowserWebpackConfigFromContext(options: Bro
     projectRoot: string;
     projectSourceRoot?: string;
     i18n: I18nOptions;
-    target: ScriptTarget;
 }>;
 export declare function generateBrowserWebpackConfigFromContext(options: BrowserBuilderSchema, context: BuilderContext, webpackPartialGenerator: WebpackPartialGenerator, extraBuildOptions?: Partial<NormalizedBrowserBuilderSchema>): Promise<{
     config: Configuration;

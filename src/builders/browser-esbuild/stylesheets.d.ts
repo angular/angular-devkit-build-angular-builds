@@ -17,6 +17,7 @@ export interface BundleStylesheetOptions {
     };
     includePaths?: string[];
     externalDependencies?: string[];
+    target: string[];
 }
 /**
  * Bundle a stylesheet that exists as a file on the filesystem.

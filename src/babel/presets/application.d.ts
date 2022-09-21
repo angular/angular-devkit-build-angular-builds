@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { ɵParsedTranslation } from '@angular/localize';
-import type { makeEs2015TranslatePlugin, makeEs5TranslatePlugin, makeLocalePlugin } from '@angular/localize/tools';
+import type { makeEs2015TranslatePlugin, makeLocalePlugin } from '@angular/localize/tools';
 export declare type DiagnosticReporter = (type: 'error' | 'warning' | 'info', message: string) => void;
 /**
  * An interface representing the factory functions for the `@angular/localize` translation Babel plugins.
@@ -16,7 +16,6 @@ export declare type DiagnosticReporter = (type: 'error' | 'warning' | 'info', me
  */
 export interface I18nPluginCreators {
     makeEs2015TranslatePlugin: typeof makeEs2015TranslatePlugin;
-    makeEs5TranslatePlugin: typeof makeEs5TranslatePlugin;
     makeLocalePlugin: typeof makeLocalePlugin;
 }
 export interface ApplicationPresetOptions {

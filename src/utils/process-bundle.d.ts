@@ -13,7 +13,6 @@ export interface InlineOptions {
     filename: string;
     code: string;
     map?: string;
-    es5: boolean;
     outputPath: string;
     missingTranslation?: 'warning' | 'error' | 'ignore';
     setLocale?: boolean;

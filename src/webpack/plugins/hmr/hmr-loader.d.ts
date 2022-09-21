@@ -6,4 +6,4 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export declare const HmrLoader: string;
-export default function (this: any, content: string, map: any): void;
+export default function localizeExtractLoader(this: import('webpack').LoaderContext<{}>, content: string, map: Parameters<import('webpack').LoaderDefinitionFunction>[1]): void;

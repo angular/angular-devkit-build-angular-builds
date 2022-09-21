@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { ObjectPattern } from 'copy-webpack-plugin';
-import { ScriptTarget } from 'typescript';
 import type { Configuration, WebpackOptionsNormalized } from 'webpack';
 import { AssetPatternClass, OutputHashing, ScriptElement, StyleElement } from '../../builders/browser/schema';
 import { WebpackConfigOptions } from '../../utils/build-options';
@@ -31,4 +30,3 @@ export declare function globalScriptsByBundleName(root: string, scripts: ScriptE
 export declare function assetPatterns(root: string, assets: AssetPatternClass[]): ObjectPattern[];
 export declare function externalizePackages(context: string, request: string | undefined, callback: (error?: Error, result?: string) => void): void;
 export declare function getStatsOptions(verbose?: boolean): WebpackStatsOptions;
-export declare function getMainFieldsAndConditionNames(target: ScriptTarget, platformServer: boolean): Pick<WebpackOptionsNormalized['resolve'], 'mainFields' | 'conditionNames'>;

@@ -60,7 +60,7 @@ export interface BuildOptions {
     cache: NormalizedCachedOptions;
     codeCoverage?: boolean;
     codeCoverageExclude?: string[];
-    supportedBrowsers: string[];
+    supportedBrowsers?: string[];
 }
 export interface WebpackDevServerOptions extends BuildOptions, Omit<DevServerSchema, 'optimization' | 'sourceMap' | 'browserTarget'> {
 }
@@ -72,6 +72,5 @@ export interface WebpackConfigOptions<T = BuildOptions> {
     buildOptions: T;
     tsConfig: ParsedConfiguration;
     tsConfigPath: string;
-    scriptTarget: import('typescript').ScriptTarget;
     projectName: string;
 }

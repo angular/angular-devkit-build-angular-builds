@@ -39,9 +39,10 @@ export interface OptimizeRequestOptions {
      */
     sourcemap?: boolean;
     /**
-     * Specifies the target ECMAScript version for the output code.
+     * Specifies the list of supported esbuild targets.
+     * @see: https://esbuild.github.io/api/#target
      */
-    target: 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 'next';
+    target?: string[];
     /**
      * Controls whether esbuild should only use the WASM-variant instead of trying to
      * use the native variant. Some platforms may not support the native-variant and
