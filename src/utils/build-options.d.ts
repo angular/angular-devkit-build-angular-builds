@@ -27,7 +27,6 @@ export interface BuildOptions {
     progress?: boolean;
     localize?: Localize;
     i18nMissingTranslation?: I18NTranslation;
-    bundleDependencies?: boolean;
     externalDependencies?: string[];
     watch?: boolean;
     outputHashing?: OutputHashing;

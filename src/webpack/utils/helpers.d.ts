@@ -28,5 +28,4 @@ export declare function globalScriptsByBundleName(root: string, scripts: ScriptE
     paths: string[];
 }[];
 export declare function assetPatterns(root: string, assets: AssetPatternClass[]): ObjectPattern[];
-export declare function externalizePackages(context: string, request: string | undefined, callback: (error?: Error, result?: string) => void): void;
 export declare function getStatsOptions(verbose?: boolean): WebpackStatsOptions;

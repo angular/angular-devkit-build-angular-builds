@@ -1,10 +1,5 @@
 export interface Schema {
     /**
-     * Which external dependencies to bundle into the bundle. By default, all of node_modules
-     * will be bundled.
-     */
-    bundleDependencies?: boolean;
-    /**
      * Delete the output path before building.
      */
     deleteOutputPath?: boolean;
