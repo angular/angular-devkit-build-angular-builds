@@ -111,9 +111,9 @@ export interface Schema {
      */
     poll?: number;
     /**
-     * The full path for the polyfills file, relative to the current workspace.
+     * Polyfills to be included in the build.
      */
-    polyfills?: string;
+    polyfills?: Polyfills;
     /**
      * Do not use the real path when resolving modules. If unset then will default to `true` if
      * NodeJS option --preserve-symlinks is set.
@@ -362,6 +362,10 @@ export declare enum OutputHashing {
     Media = "media",
     None = "none"
 }
+/**
+ * Polyfills to be included in the build.
+ */
+export declare type Polyfills = string[] | string;
 export declare type ScriptElement = ScriptClass | string;
 export interface ScriptClass {
     /**

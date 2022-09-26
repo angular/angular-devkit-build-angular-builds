@@ -44,7 +44,7 @@ export interface BuildOptions {
     statsJson: boolean;
     hmr?: boolean;
     main: string;
-    polyfills?: string;
+    polyfills: string[];
     budgets: Budget[];
     assets: AssetPatternClass[];
     scripts: ScriptElement[];

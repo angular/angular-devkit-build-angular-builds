@@ -48,9 +48,9 @@ export interface Schema {
      */
     poll?: number;
     /**
-     * The name of the polyfills file.
+     * Polyfills to be included in the build.
      */
-    polyfills?: string;
+    polyfills?: Polyfills;
     /**
      * Do not use the real path when resolving modules. If unset then will default to `true` if
      * NodeJS option --preserve-symlinks is set.
@@ -128,6 +128,10 @@ export declare enum InlineStyleLanguage {
     Sass = "sass",
     Scss = "scss"
 }
+/**
+ * Polyfills to be included in the build.
+ */
+export declare type Polyfills = string[] | string;
 export declare type ScriptElement = ScriptClass | string;
 export interface ScriptClass {
     /**

@@ -18,5 +18,6 @@ export declare type NormalizedBrowserBuilderSchema = BrowserBuilderSchema & Buil
     assets: AssetPatternClass[];
     fileReplacements: NormalizedFileReplacement[];
     optimization: NormalizedOptimizationOptions;
+    polyfills: string[];
 };
 export declare function normalizeBrowserSchema(workspaceRoot: string, projectRoot: string, projectSourceRoot: string | undefined, options: BrowserBuilderSchema, metadata: json.JsonObject, logger: logging.LoggerApi): NormalizedBrowserBuilderSchema;
