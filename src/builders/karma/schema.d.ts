@@ -42,7 +42,7 @@ export interface Schema {
     /**
      * The name of the main entry-point file.
      */
-    main: string;
+    main?: string;
     /**
      * Enable and define the file watching poll time period in milliseconds.
      */
