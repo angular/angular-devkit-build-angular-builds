@@ -5,14 +5,18 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { CompileResult, StringOptionsWithImporter, StringOptionsWithoutImporter } from 'sass';
+import { LegacyResult as CompileResult, LegacyException as Exception, LegacyOptions as Options } from 'sass';
+/**
+ * The callback type for the `dart-sass` asynchronous render function.
+ */
+declare type RenderCallback = (error?: Exception, result?: CompileResult) => void;
 /**
  * A Sass renderer implementation that provides an interface that can be used by Webpack's
  * `sass-loader`. The implementation uses a Worker thread to perform the Sass rendering
  * with the `dart-sass` package.  The `dart-sass` synchronous render function is used within
  * the worker which can be up to two times faster than the asynchronous variant.
  */
-export declare class SassWorkerImplementation {
+export declare class SassLegacyWorkerImplementation {
     private readonly workers;
     private readonly availableWorkers;
     private readonly requests;
@@ -27,14 +31,14 @@ export declare class SassWorkerImplementation {
     /**
      * The synchronous render function is not used by the `sass-loader`.
      */
-    compileString(): never;
+    renderSync(): never;
     /**
      * Asynchronously request a Sass stylesheet to be renderered.
      *
-     * @param source The contents to compile.
      * @param options The `dart-sass` options to use when rendering the stylesheet.
+     * @param callback The function to execute when the rendering is complete.
      */
-    compileStringAsync(source: string, options: StringOptionsWithImporter<'async'> | StringOptionsWithoutImporter<'async'>): Promise<CompileResult>;
+    render(options: Options<'async'>, callback: RenderCallback): void;
     /**
      * Shutdown the Sass render worker.
      * Executing this method will stop any pending render requests.
@@ -43,5 +47,5 @@ export declare class SassWorkerImplementation {
     private createWorker;
     private processImporters;
     private createRequest;
-    private isImporter;
 }
+export {};
