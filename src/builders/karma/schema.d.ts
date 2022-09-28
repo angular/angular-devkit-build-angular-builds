@@ -38,7 +38,7 @@ export interface Schema {
     /**
      * The name of the Karma configuration file.
      */
-    karmaConfig?: string;
+    karmaConfig: string;
     /**
      * The name of the main entry-point file.
      */
