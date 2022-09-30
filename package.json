@@ -1,15 +1,15 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "15.0.0-next.3+sha-f9a2c3a",
+  "version": "15.0.0-next.3+sha-e781a26",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.2.0",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#f9a2c3a12",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#f9a2c3a12",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#f9a2c3a12",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#e781a260f",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#e781a260f",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#e781a260f",
     "@babel/core": "7.19.3",
     "@babel/generator": "7.19.3",
     "@babel/helper-annotate-as-pure": "7.18.6",
@@ -20,7 +20,7 @@
     "@babel/runtime": "7.19.0",
     "@babel/template": "7.18.10",
     "@discoveryjs/json-ext": "0.5.7",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#f9a2c3a12",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#e781a260f",
     "ansi-colors": "4.1.3",
     "autoprefixer": "10.4.12",
     "babel-loader": "8.2.5",
@@ -30,7 +30,7 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.16",
     "css-loader": "6.7.1",
-    "esbuild-wasm": "0.15.9",
+    "esbuild-wasm": "0.15.10",
     "glob": "8.0.3",
     "https-proxy-agent": "5.0.1",
     "inquirer": "8.2.4",
@@ -46,7 +46,7 @@
     "ora": "5.4.1",
     "parse5-html-rewriting-stream": "6.0.1",
     "piscina": "3.2.0",
-    "postcss": "8.4.16",
+    "postcss": "8.4.17",
     "postcss-import": "15.0.0",
     "postcss-loader": "7.0.1",
     "regenerator-runtime": "0.13.9",
@@ -68,7 +68,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.15.9"
+    "esbuild": "0.15.10"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^15.0.0-next",
