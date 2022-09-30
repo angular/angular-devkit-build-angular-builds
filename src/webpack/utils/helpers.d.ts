@@ -21,8 +21,12 @@ export declare type NormalizedEntryPoint = Required<Exclude<ScriptElement | Styl
 export declare function normalizeExtraEntryPoints(extraEntryPoints: (ScriptElement | StyleElement)[], defaultBundleName: string): NormalizedEntryPoint[];
 export declare function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath: string) => string;
 export declare function getInstrumentationExcludedPaths(root: string, excludedPaths: string[]): Set<string>;
+export declare function normalizeGlobalStyles(styleEntrypoints: StyleElement[]): {
+    entryPoints: Record<string, string[]>;
+    noInjectNames: string[];
+};
 export declare function getCacheSettings(wco: WebpackConfigOptions, angularVersion: string): WebpackOptionsNormalized['cache'];
-export declare function globalScriptsByBundleName(root: string, scripts: ScriptElement[]): {
+export declare function globalScriptsByBundleName(scripts: ScriptElement[]): {
     bundleName: string;
     inject: boolean;
     paths: string[];
