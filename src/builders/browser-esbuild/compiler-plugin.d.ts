@@ -7,10 +7,11 @@
  */
 import type { Plugin } from 'esbuild';
 import { BundleStylesheetOptions } from './stylesheets';
-export declare function createCompilerPlugin(pluginOptions: {
+export interface CompilerPluginOptions {
     sourcemap: boolean;
     tsconfig: string;
     advancedOptimizations?: boolean;
     thirdPartySourcemaps?: boolean;
     fileReplacements?: Record<string, string>;
-}, styleOptions: BundleStylesheetOptions): Plugin;
+}
+export declare function createCompilerPlugin(pluginOptions: CompilerPluginOptions, styleOptions: BundleStylesheetOptions): Plugin;

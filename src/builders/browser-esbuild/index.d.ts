@@ -10,10 +10,10 @@ import { Schema as BrowserBuilderOptions } from './schema';
 /**
  * Main execution function for the esbuild-based application builder.
  * The options are compatible with the Webpack-based builder.
- * @param options The browser builder options to use when setting up the application build
+ * @param initialOptions The browser builder options to use when setting up the application build
  * @param context The Architect builder context object
- * @returns A promise with the builder result output
+ * @returns An async iterable with the builder result output
  */
-export declare function buildEsbuildBrowser(options: BrowserBuilderOptions, context: BuilderContext): Promise<BuilderOutput>;
+export declare function buildEsbuildBrowser(initialOptions: BrowserBuilderOptions, context: BuilderContext): AsyncIterable<BuilderOutput>;
 declare const _default: import("../../../../architect/src/internal").Builder<BrowserBuilderOptions & import("../../../../core/src").JsonObject>;
 export default _default;
