@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
-import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { Schema as BrowserBuilderOptions } from './schema';
+export declare type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 /**
  * Normalize the user provided options by creating full paths for all path based options
  * and converting multi-form options into a single form that can be directly used
@@ -18,17 +19,36 @@ import { Schema as BrowserBuilderOptions } from '../browser/schema';
  * @returns An object containing normalized options required to perform the build.
  */
 export declare function normalizeOptions(context: BuilderContext, projectName: string, options: BrowserBuilderOptions): Promise<{
+    advancedOptimizations: boolean | undefined;
+    baseHref: string | undefined;
+    crossOrigin: import("./schema").CrossOrigin | undefined;
+    externalDependencies: string[] | undefined;
+    preserveSymlinks: boolean | undefined;
+    stylePreprocessorOptions: import("./schema").StylePreprocessorOptions | undefined;
+    subresourceIntegrity: boolean | undefined;
+    verbose: boolean | undefined;
     workspaceRoot: string;
     entryPoints: Record<string, string>;
-    entryPointNameLookup: ReadonlyMap<string, string>;
     optimizationOptions: import("../../utils").NormalizedOptimizationOptions;
     outputPath: string;
-    sourcemapOptions: import("../browser/schema").SourceMapClass;
+    sourcemapOptions: import("../..").SourceMapObject;
     tsconfig: string;
     projectRoot: string;
-    assets: import("../browser/schema").AssetPatternClass[] | undefined;
+    assets: import("../..").AssetPatternObject[] | undefined;
     outputNames: {
         bundles: string;
         media: string;
     };
+    fileReplacements: Record<string, string> | undefined;
+    globalStyles: {
+        name: string;
+        files: string[];
+        initial: boolean;
+    }[];
+    serviceWorkerOptions: string | undefined;
+    indexHtmlOptions: {
+        input: string;
+        output: string;
+        insertionOrder: import("../../utils/package-chunk-sort").EntryPointsType[];
+    } | undefined;
 }>;
