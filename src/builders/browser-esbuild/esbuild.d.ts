@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
-import { BuildFailure, BuildOptions, BuildResult, Message, OutputFile } from 'esbuild';
+import { BuildFailure, BuildInvalidate, BuildOptions, BuildResult, Message, OutputFile } from 'esbuild';
 /**
  * Determines if an unknown value is an esbuild BuildFailure error object thrown by esbuild.
  * @param value A potential esbuild BuildFailure error object.
@@ -19,11 +19,12 @@ export declare function isEsBuildFailure(value: unknown): value is BuildFailure;
  * All builds use the `write` option with a value of `false` to allow for the output files
  * build result array to be populated.
  *
- * @param options The esbuild options object to use when building.
+ * @param optionsOrInvalidate The esbuild options object to use when building or the invalidate object
+ * returned from an incremental build to perform an additional incremental build.
  * @returns If output files are generated, the full esbuild BuildResult; if not, the
  * warnings and errors for the attempted build.
  */
-export declare function bundle(options: BuildOptions): Promise<(BuildResult & {
+export declare function bundle(optionsOrInvalidate: BuildOptions | BuildInvalidate): Promise<(BuildResult & {
     outputFiles: OutputFile[];
 }) | (BuildFailure & {
     outputFiles?: never;
