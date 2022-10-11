@@ -22,17 +22,22 @@ export interface BundleStats {
     initial: boolean;
     stats: BundleStatsData;
 }
-export declare function generateBundleStats(info: {
-    rawSize?: number;
-    estimatedTransferSize?: number;
-    files?: string[];
-    names?: string[];
-    initial?: boolean;
-    rendered?: boolean;
-}): BundleStats;
 export declare function statsWarningsToString(json: StatsCompilation, statsConfig: WebpackStatsOptions): string;
 export declare function statsErrorsToString(json: StatsCompilation, statsConfig: WebpackStatsOptions): string;
 export declare function statsHasErrors(json: StatsCompilation): boolean;
 export declare function statsHasWarnings(json: StatsCompilation): boolean;
 export declare function createWebpackLoggingCallback(options: BrowserBuilderOptions, logger: logging.LoggerApi): WebpackLoggingCallback;
+export interface BuildEventStats {
+    aot: boolean;
+    optimization: boolean;
+    allChunksCount: number;
+    lazyChunksCount: number;
+    initialChunksCount: number;
+    changedChunksCount?: number;
+    durationInMs: number;
+    cssSizeInBytes: number;
+    jsSizeInBytes: number;
+    ngComponentCount: number;
+}
+export declare function generateBuildEventStats(webpackStats: StatsCompilation, browserBuilderOptions: BrowserBuilderOptions): BuildEventStats;
 export declare function webpackStatsLogger(logger: logging.LoggerApi, json: StatsCompilation, config: Configuration, budgetFailures?: BudgetCalculatorResult[]): void;

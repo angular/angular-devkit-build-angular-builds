@@ -11,11 +11,13 @@ import { Observable } from 'rxjs';
 import webpack from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
+import { BuildEventStats } from '../../webpack/utils/stats';
 import { Schema as BrowserBuilderSchema } from './schema';
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
 export declare type BrowserBuilderOutput = BuilderOutput & {
+    stats: BuildEventStats;
     baseOutputPath: string;
     /**
      * @deprecated in version 14. Use 'outputs' instead.
