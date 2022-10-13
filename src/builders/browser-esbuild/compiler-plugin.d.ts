@@ -10,7 +10,7 @@ import ts from 'typescript';
 import { BundleStylesheetOptions } from './stylesheets';
 export declare class SourceFileCache extends Map<string, ts.SourceFile> {
     readonly modifiedFiles: Set<string>;
-    readonly babelFileCache: Map<string, string>;
+    readonly babelFileCache: Map<string, Uint8Array>;
     invalidate(files: Iterable<string>): void;
 }
 export interface CompilerPluginOptions {
