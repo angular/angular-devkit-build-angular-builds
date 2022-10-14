@@ -5,7 +5,17 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { CompileResult, StringOptionsWithImporter, StringOptionsWithoutImporter } from 'sass';
+import { CompileResult, FileImporter, StringOptionsWithImporter, StringOptionsWithoutImporter } from 'sass';
+declare type FileImporterOptions = Parameters<FileImporter['findFileUrl']>[1];
+export interface FileImporterWithRequestContextOptions extends FileImporterOptions {
+    /**
+     * This is a custom option and is required as SASS does not provide context from which the file is being resolved.
+     * This breaks Yarn PNP as transitive deps cannot be resolved from the workspace root.
+     *
+     * Workaround until https://github.com/sass/sass/issues/3247 is addressed.
+     */
+    previousResolvedModules?: Set<string>;
+}
 /**
  * A Sass renderer implementation that provides an interface that can be used by Webpack's
  * `sass-loader`. The implementation uses a Worker thread to perform the Sass rendering
@@ -45,3 +55,4 @@ export declare class SassWorkerImplementation {
     private createRequest;
     private isImporter;
 }
+export {};
