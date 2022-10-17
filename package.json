@@ -1,15 +1,15 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "15.1.0-next.0+sha-e9cd7f3",
+  "version": "15.1.0-next.0+sha-30ce743",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.2.0",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#e9cd7f35c",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#e9cd7f35c",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#e9cd7f35c",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#30ce7435d",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#30ce7435d",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#30ce7435d",
     "@babel/core": "7.19.3",
     "@babel/generator": "7.19.5",
     "@babel/helper-annotate-as-pure": "7.18.6",
@@ -20,7 +20,7 @@
     "@babel/runtime": "7.19.4",
     "@babel/template": "7.18.10",
     "@discoveryjs/json-ext": "0.5.7",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#e9cd7f35c",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#30ce7435d",
     "ansi-colors": "4.1.3",
     "autoprefixer": "10.4.12",
     "babel-loader": "8.2.5",
@@ -31,7 +31,7 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.16",
     "css-loader": "6.7.1",
-    "esbuild-wasm": "0.15.10",
+    "esbuild-wasm": "0.15.11",
     "glob": "8.0.3",
     "https-proxy-agent": "5.0.1",
     "inquirer": "8.2.4",
@@ -68,7 +68,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.15.10"
+    "esbuild": "0.15.11"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^15.0.0-next",
