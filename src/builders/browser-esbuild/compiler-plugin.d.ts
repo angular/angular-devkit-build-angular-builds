@@ -11,6 +11,7 @@ import { BundleStylesheetOptions } from './stylesheets';
 export declare class SourceFileCache extends Map<string, ts.SourceFile> {
     readonly modifiedFiles: Set<string>;
     readonly babelFileCache: Map<string, Uint8Array>;
+    readonly typeScriptFileCache: Map<string, Uint8Array>;
     invalidate(files: Iterable<string>): void;
 }
 export interface CompilerPluginOptions {
