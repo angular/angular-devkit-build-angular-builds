@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { Plugin } from 'esbuild';
+export declare function shutdownSassWorkerPool(): void;
 export declare function createSassPlugin(options: {
     sourcemap: boolean;
     loadPaths?: string[];
