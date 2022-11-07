@@ -33,3 +33,8 @@ export declare function globalScriptsByBundleName(scripts: ScriptElement[]): {
 }[];
 export declare function assetPatterns(root: string, assets: AssetPatternClass[]): ObjectPattern[];
 export declare function getStatsOptions(verbose?: boolean): WebpackStatsOptions;
+/**
+ * @param root the workspace root
+ * @returns `true` when `@angular/platform-server` is installed.
+ */
+export declare function isPlatformServerInstalled(root: string): boolean;
