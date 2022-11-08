@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <reference types="node" />
+import { RawSourceMap } from '@ampproject/remapping';
 import { Dirent } from 'node:fs';
 import type { FileImporter, Importer, ImporterResult } from 'sass';
 /**
@@ -21,10 +22,13 @@ import type { FileImporter, Importer, ImporterResult } from 'sass';
  */
 declare abstract class UrlRebasingImporter implements Importer<'sync'> {
     private entryDirectory;
+    private rebaseSourceMaps?;
     /**
      * @param entryDirectory The directory of the entry stylesheet that was passed to the Sass compiler.
+     * @param rebaseSourceMaps When provided, rebased files will have an intermediate sourcemap added to the Map
+     * which can be used to generate a final sourcemap that contains original sources.
      */
-    constructor(entryDirectory: string);
+    constructor(entryDirectory: string, rebaseSourceMaps?: Map<string, RawSourceMap> | undefined);
     abstract canonicalize(url: string, options: {
         fromImport: boolean;
     }): URL | null;
@@ -37,7 +41,7 @@ declare abstract class UrlRebasingImporter implements Importer<'sync'> {
  */
 export declare class RelativeUrlRebasingImporter extends UrlRebasingImporter {
     private directoryCache;
-    constructor(entryDirectory: string, directoryCache?: Map<string, Dirent[]>);
+    constructor(entryDirectory: string, directoryCache?: Map<string, Dirent[]>, rebaseSourceMaps?: Map<string, RawSourceMap>);
     canonicalize(url: string, options: {
         fromImport: boolean;
     }): URL | null;
@@ -66,7 +70,7 @@ export declare class RelativeUrlRebasingImporter extends UrlRebasingImporter {
  */
 export declare class ModuleUrlRebasingImporter extends RelativeUrlRebasingImporter {
     private finder;
-    constructor(entryDirectory: string, directoryCache: Map<string, Dirent[]>, finder: FileImporter<'sync'>['findFileUrl']);
+    constructor(entryDirectory: string, directoryCache: Map<string, Dirent[]>, rebaseSourceMaps: Map<string, RawSourceMap> | undefined, finder: FileImporter<'sync'>['findFileUrl']);
     canonicalize(url: string, options: {
         fromImport: boolean;
     }): URL | null;
@@ -78,7 +82,7 @@ export declare class ModuleUrlRebasingImporter extends RelativeUrlRebasingImport
  */
 export declare class LoadPathsUrlRebasingImporter extends RelativeUrlRebasingImporter {
     private loadPaths;
-    constructor(entryDirectory: string, directoryCache: Map<string, Dirent[]>, loadPaths: Iterable<string>);
+    constructor(entryDirectory: string, directoryCache: Map<string, Dirent[]>, rebaseSourceMaps: Map<string, RawSourceMap> | undefined, loadPaths: Iterable<string>);
     canonicalize(url: string, options: {
         fromImport: boolean;
     }): URL | null;
