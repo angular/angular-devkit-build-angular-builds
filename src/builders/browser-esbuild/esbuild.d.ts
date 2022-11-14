@@ -7,6 +7,7 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuildFailure, BuildInvalidate, BuildOptions, BuildResult, Message, OutputFile } from 'esbuild';
+import { FileInfo } from '../../utils/index-file/augment-index-html';
 /**
  * Determines if an unknown value is an esbuild BuildFailure error object thrown by esbuild.
  * @param value A potential esbuild BuildFailure error object.
@@ -24,8 +25,9 @@ export declare function isEsBuildFailure(value: unknown): value is BuildFailure;
  * @returns If output files are generated, the full esbuild BuildResult; if not, the
  * warnings and errors for the attempted build.
  */
-export declare function bundle(optionsOrInvalidate: BuildOptions | BuildInvalidate): Promise<(BuildResult & {
+export declare function bundle(workspaceRoot: string, optionsOrInvalidate: BuildOptions | BuildInvalidate): Promise<(BuildResult & {
     outputFiles: OutputFile[];
+    initialFiles: FileInfo[];
 }) | (BuildFailure & {
     outputFiles?: never;
 })>;
