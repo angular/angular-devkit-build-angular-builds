@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import type { OutputFile } from 'esbuild';
+import type { BuildOptions, OutputFile } from 'esbuild';
 export interface BundleStylesheetOptions {
     workspaceRoot: string;
     optimization: boolean;
@@ -19,6 +19,9 @@ export interface BundleStylesheetOptions {
     externalDependencies?: string[];
     target: string[];
 }
+export declare function createStylesheetBundleOptions(options: BundleStylesheetOptions): BuildOptions & {
+    plugins: NonNullable<BuildOptions['plugins']>;
+};
 /**
  * Bundle a stylesheet that exists as a file on the filesystem.
  *
