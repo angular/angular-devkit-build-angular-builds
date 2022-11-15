@@ -157,8 +157,8 @@ export interface Schema {
      */
     tsConfig: string;
     /**
-     * Generate a seperate bundle containing only vendor libraries. This option should only used
-     * for development.
+     * Generate a seperate bundle containing only vendor libraries. This option should only be
+     * used for development to reduce the incremental compilation time.
      */
     vendorChunk?: boolean;
     /**
