@@ -5,10 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <reference types="node" />
 import { RawSourceMap } from '@ampproject/remapping';
-import { Dirent } from 'node:fs';
 import type { FileImporter, Importer, ImporterResult } from 'sass';
+/**
+ * A preprocessed cache entry for the files and directories within a previously searched
+ * directory when performing Sass import resolution.
+ */
+export interface DirectoryEntry {
+    files: Set<string>;
+    directories: Set<string>;
+}
 /**
  * A Sass Importer base class that provides the load logic to rebase all `url()` functions
  * within a stylesheet. The rebasing will ensure that the URLs in the output of the Sass compiler
@@ -41,7 +47,7 @@ declare abstract class UrlRebasingImporter implements Importer<'sync'> {
  */
 export declare class RelativeUrlRebasingImporter extends UrlRebasingImporter {
     private directoryCache;
-    constructor(entryDirectory: string, directoryCache?: Map<string, Dirent[]>, rebaseSourceMaps?: Map<string, RawSourceMap>);
+    constructor(entryDirectory: string, directoryCache?: Map<string, DirectoryEntry>, rebaseSourceMaps?: Map<string, RawSourceMap>);
     canonicalize(url: string, options: {
         fromImport: boolean;
     }): URL | null;
@@ -58,7 +64,7 @@ export declare class RelativeUrlRebasingImporter extends UrlRebasingImporter {
      * Checks an array of potential stylesheet files to determine if there is a valid
      * stylesheet file. More than one discovered file may indicate an error.
      * @param found An array of discovered stylesheet files.
-     * @returns A fully resolved URL for a stylesheet file or `null` if not found.
+     * @returns A fully resolved path for a stylesheet file or `null` if not found.
      * @throws If there are ambiguous files discovered.
      */
     private checkFound;
@@ -70,7 +76,7 @@ export declare class RelativeUrlRebasingImporter extends UrlRebasingImporter {
  */
 export declare class ModuleUrlRebasingImporter extends RelativeUrlRebasingImporter {
     private finder;
-    constructor(entryDirectory: string, directoryCache: Map<string, Dirent[]>, rebaseSourceMaps: Map<string, RawSourceMap> | undefined, finder: FileImporter<'sync'>['findFileUrl']);
+    constructor(entryDirectory: string, directoryCache: Map<string, DirectoryEntry>, rebaseSourceMaps: Map<string, RawSourceMap> | undefined, finder: FileImporter<'sync'>['findFileUrl']);
     canonicalize(url: string, options: {
         fromImport: boolean;
     }): URL | null;
@@ -82,7 +88,7 @@ export declare class ModuleUrlRebasingImporter extends RelativeUrlRebasingImport
  */
 export declare class LoadPathsUrlRebasingImporter extends RelativeUrlRebasingImporter {
     private loadPaths;
-    constructor(entryDirectory: string, directoryCache: Map<string, Dirent[]>, rebaseSourceMaps: Map<string, RawSourceMap> | undefined, loadPaths: Iterable<string>);
+    constructor(entryDirectory: string, directoryCache: Map<string, DirectoryEntry>, rebaseSourceMaps: Map<string, RawSourceMap> | undefined, loadPaths: Iterable<string>);
     canonicalize(url: string, options: {
         fromImport: boolean;
     }): URL | null;
