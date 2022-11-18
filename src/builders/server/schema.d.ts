@@ -1,9 +1,5 @@
 export interface Schema {
     /**
-     * List of static application assets.
-     */
-    assets?: AssetPattern[];
-    /**
      * Delete the output path before building.
      */
     deleteOutputPath?: boolean;
@@ -113,30 +109,6 @@ export interface Schema {
      * Run build when files change.
      */
     watch?: boolean;
-}
-export declare type AssetPattern = AssetPatternClass | string;
-export interface AssetPatternClass {
-    /**
-     * Allow glob patterns to follow symlink directories. This allows subdirectories of the
-     * symlink to be searched.
-     */
-    followSymlinks?: boolean;
-    /**
-     * The pattern to match.
-     */
-    glob: string;
-    /**
-     * An array of globs to ignore.
-     */
-    ignore?: string[];
-    /**
-     * The input directory path in which to apply 'glob'. Defaults to the project root.
-     */
-    input: string;
-    /**
-     * Absolute path within the output.
-     */
-    output: string;
 }
 export interface FileReplacement {
     replace?: string;
