@@ -31,7 +31,6 @@ export interface ApplicationPresetOptions {
         jitMode: boolean;
         linkerPluginCreator: typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin;
     };
-    forcePresetEnv?: boolean;
     forceAsyncTransformation?: boolean;
     instrumentCode?: {
         includedBasePath: string;
