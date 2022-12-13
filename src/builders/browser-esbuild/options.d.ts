@@ -24,6 +24,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     cacheOptions: import("../../utils/normalize-cache").NormalizedCachedOptions;
     crossOrigin: import("./schema").CrossOrigin | undefined;
     externalDependencies: string[] | undefined;
+    inlineStyleLanguage: string;
     poll: number | undefined;
     preserveSymlinks: boolean;
     stylePreprocessorOptions: import("./schema").StylePreprocessorOptions | undefined;

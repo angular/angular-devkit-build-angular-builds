@@ -19,36 +19,24 @@ export interface BundleStylesheetOptions {
     externalDependencies?: string[];
     target: string[];
 }
-export declare function createStylesheetBundleOptions(options: BundleStylesheetOptions): BuildOptions & {
+export declare function createStylesheetBundleOptions(options: BundleStylesheetOptions, inlineComponentData?: Record<string, string>): BuildOptions & {
     plugins: NonNullable<BuildOptions['plugins']>;
 };
 /**
- * Bundle a stylesheet that exists as a file on the filesystem.
+ * Bundles a component stylesheet. The stylesheet can be either an inline stylesheet that
+ * is contained within the Component's metadata definition or an external file referenced
+ * from the Component's metadata definition.
  *
- * @param filename The path to the file to bundle.
- * @param options The stylesheet bundling options to use.
- * @returns The bundle result object.
+ * @param identifier A unique string identifier for the component stylesheet.
+ * @param language The language of the stylesheet such as `css` or `scss`.
+ * @param data The string content of the stylesheet.
+ * @param filename The filename representing the source of the stylesheet content.
+ * @param inline If true, the stylesheet source is within the component metadata;
+ * if false, the source is a stylesheet file.
+ * @param options An object containing the stylesheet bundling options.
+ * @returns An object containing the output of the bundling operation.
  */
-export declare function bundleStylesheetFile(filename: string, options: BundleStylesheetOptions): Promise<{
-    errors: import("esbuild").Message[];
-    warnings: import("esbuild").Message[];
-    contents: string;
-    map: string | undefined;
-    path: string | undefined;
-    resourceFiles: OutputFile[];
-}>;
-/**
- * Bundle stylesheet text data from a string.
- *
- * @param data The string content of a stylesheet to bundle.
- * @param dataOptions The options to use to resolve references and name output of the stylesheet data.
- * @param bundleOptions  The stylesheet bundling options to use.
- * @returns The bundle result object.
- */
-export declare function bundleStylesheetText(data: string, dataOptions: {
-    resolvePath: string;
-    virtualName?: string;
-}, bundleOptions: BundleStylesheetOptions): Promise<{
+export declare function bundleComponentStylesheet(identifier: string, language: string, data: string, filename: string, inline: boolean, options: BundleStylesheetOptions): Promise<{
     errors: import("esbuild").Message[];
     warnings: import("esbuild").Message[];
     contents: string;

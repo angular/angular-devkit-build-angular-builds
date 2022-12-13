@@ -22,4 +22,6 @@ export interface CompilerPluginOptions {
     fileReplacements?: Record<string, string>;
     sourceFileCache?: SourceFileCache;
 }
-export declare function createCompilerPlugin(pluginOptions: CompilerPluginOptions, styleOptions: BundleStylesheetOptions): Plugin;
+export declare function createCompilerPlugin(pluginOptions: CompilerPluginOptions, styleOptions: BundleStylesheetOptions & {
+    inlineStyleLanguage: string;
+}): Plugin;
