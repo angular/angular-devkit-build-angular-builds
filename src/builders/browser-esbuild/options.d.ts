@@ -25,7 +25,6 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     crossOrigin: import("./schema").CrossOrigin | undefined;
     externalDependencies: string[] | undefined;
     inlineStyleLanguage: string;
-    stats: boolean;
     poll: number | undefined;
     preserveSymlinks: boolean;
     stylePreprocessorOptions: import("./schema").StylePreprocessorOptions | undefined;

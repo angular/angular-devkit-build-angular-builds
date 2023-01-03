@@ -82,13 +82,7 @@ interface OptimizeRequest {
  */
 export default function ({ asset, options }: OptimizeRequest): Promise<{
     name: string;
-    errors: string[];
-    code?: undefined;
-    map?: undefined;
-} | {
-    name: string;
     code: string;
     map: import("@ampproject/remapping/dist/types/source-map").default | undefined;
-    errors?: undefined;
 }>;
 export {};
