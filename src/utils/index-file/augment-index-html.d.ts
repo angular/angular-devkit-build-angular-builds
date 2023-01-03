@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-export declare type LoadOutputFileFunctionType = (file: string) => Promise<string>;
-export declare type CrossOriginValue = 'none' | 'anonymous' | 'use-credentials';
-export declare type Entrypoint = [name: string, isModule: boolean];
+export type LoadOutputFileFunctionType = (file: string) => Promise<string>;
+export type CrossOriginValue = 'none' | 'anonymous' | 'use-credentials';
+export type Entrypoint = [name: string, isModule: boolean];
 export interface AugmentIndexHtmlOptions {
     html: string;
     baseHref?: string;

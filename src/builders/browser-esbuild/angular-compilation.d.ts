@@ -13,7 +13,7 @@ export interface EmitFileResult {
     map?: string;
     dependencies: readonly string[];
 }
-export declare type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
+export type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
 export declare class AngularCompilation {
     #private;
     static loadCompilerCli(): Promise<typeof ng>;

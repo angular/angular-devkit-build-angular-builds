@@ -24,7 +24,7 @@ export interface IndexHtmlGeneratorOptions {
     optimization?: NormalizedOptimizationOptions;
     cache?: NormalizedCachedOptions;
 }
-export declare type IndexHtmlTransform = (content: string) => Promise<string>;
+export type IndexHtmlTransform = (content: string) => Promise<string>;
 export interface IndexHtmlTransformResult {
     content: string;
     warnings: string[];

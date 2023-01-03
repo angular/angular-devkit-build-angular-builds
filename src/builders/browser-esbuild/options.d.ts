@@ -7,7 +7,7 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { Schema as BrowserBuilderOptions } from './schema';
-export declare type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+export type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 /**
  * Normalize the user provided options by creating full paths for all path based options
  * and converting multi-form options into a single form that can be directly used
@@ -25,6 +25,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     crossOrigin: import("./schema").CrossOrigin | undefined;
     externalDependencies: string[] | undefined;
     inlineStyleLanguage: string;
+    stats: boolean;
     poll: number | undefined;
     preserveSymlinks: boolean;
     stylePreprocessorOptions: import("./schema").StylePreprocessorOptions | undefined;

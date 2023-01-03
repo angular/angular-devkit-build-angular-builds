@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { Diagnostics } from '@angular/localize/tools';
-export declare type TranslationLoader = (path: string) => {
+export type TranslationLoader = (path: string) => {
     translations: Record<string, import('@angular/localize').ɵParsedTranslation>;
     format: string;
     locale?: string;

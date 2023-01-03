@@ -15,9 +15,9 @@ export interface HashFormat {
     file: string;
     script: string;
 }
-export declare type WebpackStatsOptions = Exclude<Configuration['stats'], string | boolean | undefined>;
+export type WebpackStatsOptions = Exclude<Configuration['stats'], string | boolean | undefined>;
 export declare function getOutputHashFormat(outputHashing?: OutputHashing, length?: number): HashFormat;
-export declare type NormalizedEntryPoint = Required<Exclude<ScriptElement | StyleElement, string>>;
+export type NormalizedEntryPoint = Required<Exclude<ScriptElement | StyleElement, string>>;
 export declare function normalizeExtraEntryPoints(extraEntryPoints: (ScriptElement | StyleElement)[], defaultBundleName: string): NormalizedEntryPoint[];
 export declare function assetNameTemplateFactory(hashFormat: HashFormat): (resourcePath: string) => string;
 export declare function getInstrumentationExcludedPaths(root: string, excludedPaths: string[]): Set<string>;

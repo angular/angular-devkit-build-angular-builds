@@ -43,4 +43,5 @@ export declare function bundleComponentStylesheet(identifier: string, language: 
     map: string | undefined;
     path: string | undefined;
     resourceFiles: OutputFile[];
+    metafile: import("esbuild").Metafile | undefined;
 }>;
