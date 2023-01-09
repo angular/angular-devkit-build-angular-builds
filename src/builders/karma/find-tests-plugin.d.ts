@@ -8,6 +8,7 @@
 import type { Compiler } from 'webpack';
 export interface FindTestsPluginOptions {
     include?: string[];
+    exclude?: string[];
     workspaceRoot: string;
     projectSourceRoot: string;
 }
