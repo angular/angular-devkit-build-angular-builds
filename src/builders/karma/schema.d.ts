@@ -19,11 +19,15 @@ export interface Schema {
      */
     codeCoverageExclude?: string[];
     /**
+     * Globs of files to exclude, relative to the project root.
+     */
+    exclude?: string[];
+    /**
      * Replace compilation source files with other compilation source files in the build.
      */
     fileReplacements?: FileReplacement[];
     /**
-     * Globs of files to include, relative to workspace or project root.
+     * Globs of files to include, relative to project root.
      * There are 2 special cases:
      * - when a path to directory is provided, all spec files ending ".spec.@(ts|tsx)" will be
      * included
