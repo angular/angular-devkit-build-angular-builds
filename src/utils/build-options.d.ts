@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { logging } from '@angular-devkit/core';
 import type { ParsedConfiguration } from '@angular/compiler-cli';
+import { logging } from '@angular-devkit/core';
 import { AssetPatternClass, Budget, CrossOrigin, I18NTranslation, IndexUnion, InlineStyleLanguage, Localize, OutputHashing, ScriptElement, SourceMapClass, StyleElement } from '../builders/browser/schema';
 import { Schema as DevServerSchema } from '../builders/dev-server/schema';
 import { NormalizedCachedOptions } from './normalize-cache';
