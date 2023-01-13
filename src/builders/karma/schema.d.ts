@@ -98,7 +98,7 @@ export interface Schema {
      */
     webWorkerTsConfig?: string;
 }
-export declare type AssetPattern = AssetPatternClass | string;
+export type AssetPattern = AssetPatternClass | string;
 export interface AssetPatternClass {
     /**
      * The pattern to match.
@@ -135,8 +135,8 @@ export declare enum InlineStyleLanguage {
 /**
  * Polyfills to be included in the build.
  */
-export declare type Polyfills = string[] | string;
-export declare type ScriptElement = ScriptClass | string;
+export type Polyfills = string[] | string;
+export type ScriptElement = ScriptClass | string;
 export interface ScriptClass {
     /**
      * The bundle name for this extra entry point.
@@ -155,7 +155,7 @@ export interface ScriptClass {
  * Output source maps for scripts and styles. For more information, see
  * https://angular.io/guide/workspace-config#source-map-configuration.
  */
-export declare type SourceMapUnion = boolean | SourceMapClass;
+export type SourceMapUnion = boolean | SourceMapClass;
 export interface SourceMapClass {
     /**
      * Output source maps for all scripts.
@@ -179,7 +179,7 @@ export interface StylePreprocessorOptions {
      */
     includePaths?: string[];
 }
-export declare type StyleElement = StyleClass | string;
+export type StyleElement = StyleClass | string;
 export interface StyleClass {
     /**
      * The bundle name for this extra entry point.

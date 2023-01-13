@@ -12,7 +12,7 @@ import { Schema as BrowserBuilderOptions } from '../../builders/browser/schema';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { WebpackStatsOptions } from './helpers';
 export declare function formatSize(size: number): string;
-export declare type BundleStatsData = [
+export type BundleStatsData = [
     files: string,
     names: string,
     rawSize: number | string,

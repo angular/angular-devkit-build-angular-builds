@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Compiler } from 'webpack';
-export declare type BuilderWatcherCallback = (events: Array<{
+export type BuilderWatcherCallback = (events: Array<{
     path: string;
     type: 'created' | 'modified' | 'deleted';
     time?: number;

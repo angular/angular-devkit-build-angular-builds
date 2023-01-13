@@ -13,7 +13,7 @@ import { NormalizedOptimizationOptions } from './normalize-optimization';
 /**
  * A normalized browser builder schema.
  */
-export declare type NormalizedBrowserBuilderSchema = BrowserBuilderSchema & BuildOptions & {
+export type NormalizedBrowserBuilderSchema = BrowserBuilderSchema & BuildOptions & {
     sourceMap: SourceMapClass;
     assets: AssetPatternClass[];
     fileReplacements: NormalizedFileReplacement[];

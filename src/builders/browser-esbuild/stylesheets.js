@@ -36,7 +36,7 @@ const css_resource_plugin_1 = require("./css-resource-plugin");
 const esbuild_1 = require("./esbuild");
 const sass_plugin_1 = require("./sass-plugin");
 function createStylesheetBundleOptions(options, inlineComponentData) {
-    var _a, _b;
+    var _a, _b, _c;
     return {
         absWorkingDir: options.workspaceRoot,
         bundle: true,
@@ -44,6 +44,7 @@ function createStylesheetBundleOptions(options, inlineComponentData) {
         assetNames: (_b = options.outputNames) === null || _b === void 0 ? void 0 : _b.media,
         logLevel: 'silent',
         minify: options.optimization,
+        metafile: true,
         sourcemap: options.sourcemap,
         outdir: options.workspaceRoot,
         write: false,
@@ -56,7 +57,8 @@ function createStylesheetBundleOptions(options, inlineComponentData) {
         plugins: [
             (0, sass_plugin_1.createSassPlugin)({
                 sourcemap: !!options.sourcemap,
-                loadPaths: options.includePaths,
+                // Ensure Sass load paths are absolute based on the workspace root
+                loadPaths: (_c = options.includePaths) === null || _c === void 0 ? void 0 : _c.map((includePath) => path.resolve(options.workspaceRoot, includePath)),
                 inlineComponentData,
             }),
             (0, css_resource_plugin_1.createCssResourcePlugin)(),
@@ -141,6 +143,7 @@ async function bundleComponentStylesheet(identifier, language, data, filename, i
         map,
         path: outputPath,
         resourceFiles,
+        metafile: result.outputFiles && result.metafile,
     };
 }
 exports.bundleComponentStylesheet = bundleComponentStylesheet;

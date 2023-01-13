@@ -114,7 +114,7 @@ export interface Schema {
      */
     watch?: boolean;
 }
-export declare type AssetPattern = AssetPatternClass | string;
+export type AssetPattern = AssetPatternClass | string;
 export interface AssetPatternClass {
     /**
      * Allow glob patterns to follow symlink directories. This allows subdirectories of the
@@ -166,13 +166,13 @@ export declare enum InlineStyleLanguage {
 /**
  * Translate the bundles in one or more locales.
  */
-export declare type Localize = string[] | boolean;
+export type Localize = string[] | boolean;
 /**
  * Enables optimization of the build output. Including minification of scripts and styles,
  * tree-shaking and dead-code elimination. For more information, see
  * https://angular.io/guide/workspace-config#optimization-configuration.
  */
-export declare type OptimizationUnion = boolean | OptimizationClass;
+export type OptimizationUnion = boolean | OptimizationClass;
 export interface OptimizationClass {
     /**
      * Enables optimization of the scripts output.
@@ -196,7 +196,7 @@ export declare enum OutputHashing {
  * Output source maps for scripts and styles. For more information, see
  * https://angular.io/guide/workspace-config#source-map-configuration.
  */
-export declare type SourceMapUnion = boolean | SourceMapClass;
+export type SourceMapUnion = boolean | SourceMapClass;
 export interface SourceMapClass {
     /**
      * Output source maps used for error reporting tools.

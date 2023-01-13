@@ -7,8 +7,8 @@
  */
 import ng from '@angular/compiler-cli';
 import ts from 'typescript';
-export declare type AngularCompilerOptions = ng.CompilerOptions;
-export declare type AngularCompilerHost = ng.CompilerHost;
+export type AngularCompilerOptions = ng.CompilerOptions;
+export type AngularCompilerHost = ng.CompilerHost;
 export interface AngularHostOptions {
     fileReplacements?: Record<string, string>;
     sourceFileCache?: Map<string, ts.SourceFile>;

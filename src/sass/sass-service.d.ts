@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { CompileResult, FileImporter, StringOptionsWithImporter, StringOptionsWithoutImporter } from 'sass';
-declare type FileImporterOptions = Parameters<FileImporter['findFileUrl']>[1];
+type FileImporterOptions = Parameters<FileImporter['findFileUrl']>[1];
 export interface FileImporterWithRequestContextOptions extends FileImporterOptions {
     /**
      * This is a custom option and is required as SASS does not provide context from which the file is being resolved.

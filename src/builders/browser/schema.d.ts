@@ -174,7 +174,7 @@ export interface Schema {
      */
     webWorkerTsConfig?: string;
 }
-export declare type AssetPattern = AssetPatternClass | string;
+export type AssetPattern = AssetPatternClass | string;
 export interface AssetPatternClass {
     /**
      * Allow glob patterns to follow symlink directories. This allows subdirectories of the
@@ -275,7 +275,7 @@ export declare enum I18NTranslation {
 /**
  * Configures the generation of the application's HTML index.
  */
-export declare type IndexUnion = IndexObject | string;
+export type IndexUnion = IndexObject | string;
 export interface IndexObject {
     /**
      * The path of a file to use for the application's generated HTML index.
@@ -299,14 +299,14 @@ export declare enum InlineStyleLanguage {
 /**
  * Translate the bundles in one or more locales.
  */
-export declare type Localize = string[] | boolean;
+export type Localize = string[] | boolean;
 /**
  * Enables optimization of the build output. Including minification of scripts and styles,
  * tree-shaking, dead-code elimination, inlining of critical CSS and fonts inlining. For
  * more information, see
  * https://angular.io/guide/workspace-config#optimization-configuration.
  */
-export declare type OptimizationUnion = boolean | OptimizationClass;
+export type OptimizationUnion = boolean | OptimizationClass;
 export interface OptimizationClass {
     /**
      * Enables optimization for fonts. This option requires internet access. `HTTPS_PROXY`
@@ -326,7 +326,7 @@ export interface OptimizationClass {
  * Enables optimization for fonts. This option requires internet access. `HTTPS_PROXY`
  * environment variable can be used to specify a proxy server.
  */
-export declare type FontsUnion = boolean | FontsClass;
+export type FontsUnion = boolean | FontsClass;
 export interface FontsClass {
     /**
      * Reduce render blocking requests by inlining external Google Fonts and Adobe Fonts CSS
@@ -338,7 +338,7 @@ export interface FontsClass {
 /**
  * Enables optimization of the styles output.
  */
-export declare type StylesUnion = boolean | StylesClass;
+export type StylesUnion = boolean | StylesClass;
 export interface StylesClass {
     /**
      * Extract and inline critical CSS definitions to improve first paint time.
@@ -362,8 +362,8 @@ export declare enum OutputHashing {
 /**
  * Polyfills to be included in the build.
  */
-export declare type Polyfills = string[] | string;
-export declare type ScriptElement = ScriptClass | string;
+export type Polyfills = string[] | string;
+export type ScriptElement = ScriptClass | string;
 export interface ScriptClass {
     /**
      * The bundle name for this extra entry point.
@@ -382,7 +382,7 @@ export interface ScriptClass {
  * Output source maps for scripts and styles. For more information, see
  * https://angular.io/guide/workspace-config#source-map-configuration.
  */
-export declare type SourceMapUnion = boolean | SourceMapClass;
+export type SourceMapUnion = boolean | SourceMapClass;
 export interface SourceMapClass {
     /**
      * Output source maps used for error reporting tools.
@@ -410,7 +410,7 @@ export interface StylePreprocessorOptions {
      */
     includePaths?: string[];
 }
-export declare type StyleElement = StyleClass | string;
+export type StyleElement = StyleClass | string;
 export interface StyleClass {
     /**
      * The bundle name for this extra entry point.

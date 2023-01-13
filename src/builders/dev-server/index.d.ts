@@ -14,11 +14,11 @@ import { ExecutionTransformer } from '../../transforms';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { BuildEventStats } from '../../webpack/utils/stats';
 import { Schema } from './schema';
-export declare type DevServerBuilderOptions = Schema;
+export type DevServerBuilderOptions = Schema;
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
-export declare type DevServerBuilderOutput = DevServerBuildOutput & {
+export type DevServerBuilderOutput = DevServerBuildOutput & {
     baseUrl: string;
     stats: BuildEventStats;
 };

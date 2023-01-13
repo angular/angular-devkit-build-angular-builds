@@ -16,7 +16,7 @@ import { Schema as BrowserBuilderSchema } from './schema';
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
-export declare type BrowserBuilderOutput = BuilderOutput & {
+export type BrowserBuilderOutput = BuilderOutput & {
     stats: BuildEventStats;
     baseOutputPath: string;
     /**

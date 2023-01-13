@@ -90,7 +90,7 @@ function execute(options, context, transforms = {}) {
         }
         const karmaOptions = options.karmaConfig
             ? {}
-            : getBuiltInKarmaConfig(karma, context.workspaceRoot, projectName);
+            : getBuiltInKarmaConfig(context.workspaceRoot, projectName);
         karmaOptions.singleRun = singleRun;
         // Convert browsers from a string to an array
         if (options.browsers) {
@@ -156,12 +156,13 @@ function execute(options, context, transforms = {}) {
     })), (0, operators_1.defaultIfEmpty)({ success: false }));
 }
 exports.execute = execute;
-function getBuiltInKarmaConfig(karma, workspaceRoot, projectName) {
+function getBuiltInKarmaConfig(workspaceRoot, projectName) {
     let coverageFolderName = projectName.charAt(0) === '@' ? projectName.slice(1) : projectName;
     if (/[A-Z]/.test(coverageFolderName)) {
         coverageFolderName = core_1.strings.dasherize(coverageFolderName);
     }
     const workspaceRootRequire = (0, module_1.createRequire)(workspaceRoot + '/');
+    // Any changes to the config here need to be synced to: packages/schematics/angular/config/files/karma.conf.js.template
     return {
         basePath: '',
         frameworks: ['jasmine', '@angular-devkit/build-angular'],
@@ -184,10 +185,6 @@ function getBuiltInKarmaConfig(karma, workspaceRoot, projectName) {
             reporters: [{ type: 'html' }, { type: 'text-summary' }],
         },
         reporters: ['progress', 'kjhtml'],
-        port: 9876,
-        colors: true,
-        logLevel: karma.constants.LOG_INFO,
-        autoWatch: true,
         browsers: ['Chrome'],
         restartOnFileChange: true,
     };

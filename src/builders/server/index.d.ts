@@ -13,7 +13,7 @@ import { Schema as ServerBuilderOptions } from './schema';
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
-export declare type ServerBuilderOutput = BuilderOutput & {
+export type ServerBuilderOutput = BuilderOutput & {
     baseOutputPath: string;
     /**
      * @deprecated in version 14. Use 'outputs' instead.

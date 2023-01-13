@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { ScriptElement, StyleElement } from '../builders/browser/schema';
-export declare type EntryPointsType = [name: string, isModule: boolean];
+export type EntryPointsType = [name: string, isModule: boolean];
 export declare function generateEntryPoints(options: {
     styles: StyleElement[];
     scripts: ScriptElement[];

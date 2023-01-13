@@ -9,7 +9,7 @@ import { LegacyResult as CompileResult, LegacyException as Exception, LegacyOpti
 /**
  * The callback type for the `dart-sass` asynchronous render function.
  */
-declare type RenderCallback = (error?: Exception, result?: CompileResult) => void;
+type RenderCallback = (error?: Exception, result?: CompileResult) => void;
 /**
  * A Sass renderer implementation that provides an interface that can be used by Webpack's
  * `sass-loader`. The implementation uses a Worker thread to perform the Sass rendering
