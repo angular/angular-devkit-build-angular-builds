@@ -20,6 +20,7 @@ export type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOption
  */
 export declare function normalizeOptions(context: BuilderContext, projectName: string, options: BrowserBuilderOptions): Promise<{
     advancedOptimizations: boolean | undefined;
+    allowedCommonJsDependencies: string[] | undefined;
     baseHref: string | undefined;
     cacheOptions: import("../../utils/normalize-cache").NormalizedCachedOptions;
     crossOrigin: import("./schema").CrossOrigin | undefined;

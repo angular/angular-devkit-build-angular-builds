@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
-import { BuildFailure, BuildInvalidate, BuildOptions, BuildResult, Message, OutputFile } from 'esbuild';
+import { BuildFailure, BuildInvalidate, BuildOptions, BuildResult, OutputFile, PartialMessage } from 'esbuild';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
 /**
  * Determines if an unknown value is an esbuild BuildFailure error object thrown by esbuild.
@@ -32,6 +32,6 @@ export declare function bundle(workspaceRoot: string, optionsOrInvalidate: Build
     outputFiles?: never;
 })>;
 export declare function logMessages(context: BuilderContext, { errors, warnings }: {
-    errors: Message[];
-    warnings: Message[];
+    errors: PartialMessage[];
+    warnings: PartialMessage[];
 }): Promise<void>;

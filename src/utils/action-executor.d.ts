@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { InlineOptions } from './bundle-inline-options';
 import { I18nOptions } from './i18n-options';
-import { InlineOptions } from './process-bundle';
 export declare class BundleActionExecutor {
     private workerOptions;
     private workerPool?;
