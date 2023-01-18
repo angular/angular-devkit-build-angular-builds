@@ -37,7 +37,7 @@ export declare function createStylesheetBundleOptions(options: BundleStylesheetO
  * @returns An object containing the output of the bundling operation.
  */
 export declare function bundleComponentStylesheet(identifier: string, language: string, data: string, filename: string, inline: boolean, options: BundleStylesheetOptions): Promise<{
-    errors: import("esbuild").Message[];
+    errors: import("esbuild").Message[] | undefined;
     warnings: import("esbuild").Message[];
     contents: string;
     map: string | undefined;
