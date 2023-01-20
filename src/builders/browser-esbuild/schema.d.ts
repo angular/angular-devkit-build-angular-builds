@@ -289,6 +289,7 @@ export interface IndexObject {
      * will be used and will be considered relative to the application's configured output path.
      */
     output?: string;
+    [property: string]: any;
 }
 /**
  * The stylesheet language to use for the application's inline component styles.
