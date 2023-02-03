@@ -17,6 +17,7 @@ export declare class SourceFileCache extends Map<string, ts.SourceFile> {
 export interface CompilerPluginOptions {
     sourcemap: boolean;
     tsconfig: string;
+    jit?: boolean;
     advancedOptimizations?: boolean;
     thirdPartySourcemaps?: boolean;
     fileReplacements?: Record<string, string>;

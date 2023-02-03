@@ -13,6 +13,7 @@ interface JavaScriptTransformRequest {
     advancedOptimizations: boolean;
     forceAsyncTransformation?: boolean;
     skipLinker: boolean;
+    jit: boolean;
 }
 export default function transformJavaScript(request: JavaScriptTransformRequest): Promise<Uint8Array>;
 export {};

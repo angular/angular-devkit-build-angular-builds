@@ -36,7 +36,7 @@ export declare function createStylesheetBundleOptions(options: BundleStylesheetO
  * @param options An object containing the stylesheet bundling options.
  * @returns An object containing the output of the bundling operation.
  */
-export declare function bundleComponentStylesheet(identifier: string, language: string, data: string, filename: string, inline: boolean, options: BundleStylesheetOptions): Promise<{
+export declare function bundleComponentStylesheet(language: string, data: string, filename: string, inline: boolean, options: BundleStylesheetOptions): Promise<{
     errors: import("esbuild").Message[] | undefined;
     warnings: import("esbuild").Message[];
     contents: string;

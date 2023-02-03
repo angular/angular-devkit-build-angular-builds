@@ -27,6 +27,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     externalDependencies: string[] | undefined;
     extractLicenses: boolean | undefined;
     inlineStyleLanguage: string;
+    jit: boolean;
     stats: boolean;
     poll: number | undefined;
     preserveSymlinks: boolean;

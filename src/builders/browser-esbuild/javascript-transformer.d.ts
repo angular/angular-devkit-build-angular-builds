@@ -12,6 +12,7 @@ export interface JavaScriptTransformerOptions {
     sourcemap: boolean;
     thirdPartySourcemaps?: boolean;
     advancedOptimizations?: boolean;
+    jit?: boolean;
 }
 /**
  * A class that performs transformation of JavaScript files and raw data.
