@@ -19,14 +19,6 @@ import { Schema as BrowserBuilderSchema } from './schema';
 export type BrowserBuilderOutput = BuilderOutput & {
     stats: BuildEventStats;
     baseOutputPath: string;
-    /**
-     * @deprecated in version 14. Use 'outputs' instead.
-     */
-    outputPaths: string[];
-    /**
-     * @deprecated in version 9. Use 'outputs' instead.
-     */
-    outputPath: string;
     outputs: {
         locale?: string;
         path: string;
