@@ -15,13 +15,6 @@ import { Schema as ServerBuilderOptions } from './schema';
  */
 export type ServerBuilderOutput = BuilderOutput & {
     baseOutputPath: string;
-    /**
-     * @deprecated in version 14. Use 'outputs' instead.
-     */
-    outputPaths: string[];
-    /**
-     * @deprecated in version 9. Use 'outputs' instead.
-     */
     outputPath: string;
     outputs: {
         locale?: string;
