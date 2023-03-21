@@ -12,7 +12,4 @@ export declare function copyAssets(entries: {
     output: string;
     flatten?: boolean;
     followSymlinks?: boolean;
-}[], basePaths: Iterable<string>, root: string, changed?: Set<string>): Promise<{
-    source: string;
-    destination: string;
-}[]>;
+}[], basePaths: Iterable<string>, root: string, changed?: Set<string>): Promise<void>;
