@@ -19,6 +19,10 @@ export interface BundleStylesheetOptions {
     externalDependencies?: string[];
     target: string[];
     browsers: string[];
+    tailwindConfiguration?: {
+        file: string;
+        package: string;
+    };
 }
 export declare function createStylesheetBundleOptions(options: BundleStylesheetOptions, inlineComponentData?: Record<string, string>): BuildOptions & {
     plugins: NonNullable<BuildOptions['plugins']>;

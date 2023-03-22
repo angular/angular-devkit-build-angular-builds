@@ -26,6 +26,10 @@ export interface CssPluginOptions {
      * of the esbuild formatted target.
      */
     browsers: string[];
+    tailwindConfiguration?: {
+        file: string;
+        package: string;
+    };
 }
 /**
  * Creates an esbuild plugin to process CSS stylesheets.
