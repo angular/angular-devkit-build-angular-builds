@@ -12,8 +12,7 @@ import webpack from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { BuildEventStats } from '../../webpack/utils/stats';
-import { Schema } from './schema';
-export type DevServerBuilderOptions = Schema;
+import { NormalizedDevServerOptions } from './options';
 /**
  * @experimental Direct usage of this type is considered experimental.
  */
@@ -24,13 +23,12 @@ export type DevServerBuilderOutput = DevServerBuildOutput & {
 /**
  * Reusable implementation of the Angular Webpack development server builder.
  * @param options Dev Server options.
+ * @param builderName The name of the builder used to build the application.
  * @param context The build context.
  * @param transforms A map of transforms that can be used to hook into some logic (such as
  *     transforming webpack configuration before passing it to webpack).
- *
- * @experimental Direct usage of this function is considered experimental.
  */
-export declare function serveWebpackBrowser(options: DevServerBuilderOptions, context: BuilderContext, transforms?: {
+export declare function serveWebpackBrowser(options: NormalizedDevServerOptions, builderName: string, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
     logging?: WebpackLoggingCallback;
     indexHtml?: IndexHtmlTransform;
