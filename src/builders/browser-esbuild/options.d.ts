@@ -29,6 +29,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     inlineStyleLanguage: string;
     jit: boolean;
     stats: boolean;
+    polyfills: string[] | undefined;
     poll: number | undefined;
     preserveSymlinks: boolean;
     stylePreprocessorOptions: import("./schema").StylePreprocessorOptions | undefined;
