@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuilderContext } from '@angular-devkit/architect';
+import type { BuilderContext } from '@angular-devkit/architect';
 import { Observable } from 'rxjs';
-import { ExecutionTransformer } from '../../transforms';
-import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
-import { Schema as DevServerBuilderOptions } from './schema';
-import { DevServerBuilderOutput } from './webpack-server';
+import type { ExecutionTransformer } from '../../transforms';
+import type { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
+import type { Schema as DevServerBuilderOptions } from './schema';
+import type { DevServerBuilderOutput } from './webpack-server';
 /**
  * A Builder that executes a development server based on the provided browser target option.
  * @param options Dev Server options.

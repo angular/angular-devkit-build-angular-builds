@@ -19,6 +19,10 @@ export declare function buildEsbuildBrowser(userOptions: BrowserBuilderOptions, 
     write?: boolean;
 }): AsyncIterable<BuilderOutput & {
     outputFiles?: OutputFile[];
+    assetFiles?: {
+        source: string;
+        destination: string;
+    }[];
 }>;
 declare const _default: import("../../../../architect/src/internal").Builder<BrowserBuilderOptions & import("../../../../core/src").JsonObject>;
 export default _default;

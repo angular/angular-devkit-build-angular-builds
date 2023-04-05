@@ -54,6 +54,11 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
         files: string[];
         initial: boolean;
     }[];
+    globalScripts: {
+        name: string;
+        files: string[];
+        initial: boolean;
+    }[];
     serviceWorkerOptions: string | undefined;
     indexHtmlOptions: {
         input: string;
