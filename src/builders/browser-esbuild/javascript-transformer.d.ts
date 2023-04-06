@@ -28,9 +28,10 @@ export declare class JavaScriptTransformer {
      * Performs JavaScript transformations on a file from the filesystem.
      * If no transformations are required, the data for the original file will be returned.
      * @param filename The full path to the file.
+     * @param skipLinker If true, bypass all Angular linker processing; if false, attempt linking.
      * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
      */
-    transformFile(filename: string): Promise<Uint8Array>;
+    transformFile(filename: string, skipLinker?: boolean): Promise<Uint8Array>;
     /**
      * Performs JavaScript transformations on the provided data of a file. The file does not need
      * to exist on the filesystem.

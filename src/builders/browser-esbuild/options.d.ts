@@ -31,6 +31,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     stats: boolean;
     polyfills: string[] | undefined;
     poll: number | undefined;
+    progress: boolean;
     preserveSymlinks: boolean;
     stylePreprocessorOptions: import("./schema").StylePreprocessorOptions | undefined;
     subresourceIntegrity: boolean | undefined;
@@ -50,6 +51,11 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     };
     fileReplacements: Record<string, string> | undefined;
     globalStyles: {
+        name: string;
+        files: string[];
+        initial: boolean;
+    }[];
+    globalScripts: {
         name: string;
         files: string[];
         initial: boolean;
