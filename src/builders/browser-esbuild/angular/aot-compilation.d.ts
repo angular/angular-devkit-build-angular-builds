@@ -7,17 +7,10 @@
  */
 import type ng from '@angular/compiler-cli';
 import ts from 'typescript';
+import { AngularCompilation, FileEmitter } from './angular-compilation';
 import { AngularHostOptions } from './angular-host';
-export interface EmitFileResult {
-    content?: string;
-    map?: string;
-    dependencies: readonly string[];
-}
-export type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
-export declare class AngularCompilation {
+export declare class AotCompilation extends AngularCompilation {
     #private;
-    static loadCompilerCli(): Promise<typeof ng>;
-    constructor();
     initialize(rootNames: string[], compilerOptions: ng.CompilerOptions, hostOptions: AngularHostOptions, configurationDiagnostics?: ts.Diagnostic[]): Promise<{
         affectedFiles: ReadonlySet<ts.SourceFile>;
     }>;
