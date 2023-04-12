@@ -7,7 +7,7 @@
  */
 import type { Plugin } from 'esbuild';
 import ts from 'typescript';
-import { BundleStylesheetOptions } from './stylesheets';
+import { BundleStylesheetOptions } from '../stylesheets';
 export declare class SourceFileCache extends Map<string, ts.SourceFile> {
     readonly modifiedFiles: Set<string>;
     readonly babelFileCache: Map<string, Uint8Array>;

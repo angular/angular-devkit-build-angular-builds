@@ -6,14 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
-import { AngularHostOptions } from '../angular-host';
-export interface EmitFileResult {
-    content?: string;
-    map?: string;
-    dependencies: readonly string[];
-}
-export type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
-export declare class JitCompilation {
+import { AngularCompilation, FileEmitter } from './angular-compilation';
+import { AngularHostOptions } from './angular-host';
+export declare class JitCompilation extends AngularCompilation {
     #private;
     initialize(rootNames: string[], compilerOptions: ts.CompilerOptions, hostOptions: AngularHostOptions, configurationDiagnostics?: ts.Diagnostic[]): Promise<{
         affectedFiles: ReadonlySet<ts.SourceFile>;
