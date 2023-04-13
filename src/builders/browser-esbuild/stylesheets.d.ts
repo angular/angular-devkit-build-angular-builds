@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { BuildOptions, OutputFile } from 'esbuild';
+import { LoadResultCache } from './load-result-cache';
 export interface BundleStylesheetOptions {
     workspaceRoot: string;
     optimization: boolean;
@@ -24,7 +25,7 @@ export interface BundleStylesheetOptions {
         package: string;
     };
 }
-export declare function createStylesheetBundleOptions(options: BundleStylesheetOptions, inlineComponentData?: Record<string, string>): BuildOptions & {
+export declare function createStylesheetBundleOptions(options: BundleStylesheetOptions, cache?: LoadResultCache, inlineComponentData?: Record<string, string>): BuildOptions & {
     plugins: NonNullable<BuildOptions['plugins']>;
 };
 /**
@@ -41,7 +42,7 @@ export declare function createStylesheetBundleOptions(options: BundleStylesheetO
  * @param options An object containing the stylesheet bundling options.
  * @returns An object containing the output of the bundling operation.
  */
-export declare function bundleComponentStylesheet(language: string, data: string, filename: string, inline: boolean, options: BundleStylesheetOptions): Promise<{
+export declare function bundleComponentStylesheet(language: string, data: string, filename: string, inline: boolean, options: BundleStylesheetOptions, cache?: LoadResultCache): Promise<{
     errors: import("esbuild").Message[] | undefined;
     warnings: import("esbuild").Message[];
     contents: string;
