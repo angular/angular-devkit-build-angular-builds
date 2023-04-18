@@ -11,8 +11,9 @@ import { AngularCompilation, FileEmitter } from './angular-compilation';
 import { AngularHostOptions } from './angular-host';
 export declare class AotCompilation extends AngularCompilation {
     #private;
-    initialize(rootNames: string[], compilerOptions: ng.CompilerOptions, hostOptions: AngularHostOptions, configurationDiagnostics?: ts.Diagnostic[]): Promise<{
+    initialize(tsconfig: string, hostOptions: AngularHostOptions, compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions): Promise<{
         affectedFiles: ReadonlySet<ts.SourceFile>;
+        compilerOptions: ng.CompilerOptions;
     }>;
     collectDiagnostics(): Iterable<ts.Diagnostic>;
     createFileEmitter(onAfterEmit?: (sourceFile: ts.SourceFile) => void): FileEmitter;

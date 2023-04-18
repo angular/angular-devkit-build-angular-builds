@@ -17,8 +17,10 @@ export type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
 export declare abstract class AngularCompilation {
     #private;
     static loadCompilerCli(): Promise<typeof ng>;
-    abstract initialize(rootNames: string[], compilerOptions: ts.CompilerOptions, hostOptions: AngularHostOptions, configurationDiagnostics?: ts.Diagnostic[]): Promise<{
+    protected loadConfiguration(tsconfig: string): Promise<ng.CompilerOptions>;
+    abstract initialize(tsconfig: string, hostOptions: AngularHostOptions, compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions): Promise<{
         affectedFiles: ReadonlySet<ts.SourceFile>;
+        compilerOptions: ng.CompilerOptions;
     }>;
     abstract collectDiagnostics(): Iterable<ts.Diagnostic>;
     abstract createFileEmitter(onAfterEmit?: (sourceFile: ts.SourceFile) => void): FileEmitter;
