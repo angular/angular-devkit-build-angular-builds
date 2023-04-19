@@ -7,4 +7,4 @@
  */
 import type { Configuration } from 'webpack';
 import { WebpackConfigOptions } from '../../utils/build-options';
-export declare function getStylesConfig(wco: WebpackConfigOptions): Configuration;
+export declare function getStylesConfig(wco: WebpackConfigOptions): Promise<Configuration>;
