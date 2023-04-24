@@ -8,6 +8,22 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { Schema as BrowserBuilderOptions } from './schema';
 export type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+/** Internal options hidden from builder schema but available when invoked programmatically. */
+interface InternalOptions {
+    /**
+     * Entry points to use for the compilation. Incompatible with `main`, which must not be provided. May be relative or absolute paths.
+     * If given a relative path, it is resolved relative to the current workspace and will generate an output at the same relative location
+     * in the output directory. If given an absolute path, the output will be generated in the root of the output directory with the same base
+     * name.
+     */
+    entryPoints?: Set<string>;
+    /** File extension to use for the generated output files. */
+    outExtension?: 'js' | 'mjs';
+}
+/** Full set of options for `browser-esbuild` builder. */
+export type BrowserEsbuildOptions = Omit<BrowserBuilderOptions & InternalOptions, 'main'> & {
+    main?: string;
+};
 /**
  * Normalize the user provided options by creating full paths for all path based options
  * and converting multi-form options into a single form that can be directly used
@@ -18,7 +34,7 @@ export type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOption
  * @param options An object containing the options to use for the build.
  * @returns An object containing normalized options required to perform the build.
  */
-export declare function normalizeOptions(context: BuilderContext, projectName: string, options: BrowserBuilderOptions): Promise<{
+export declare function normalizeOptions(context: BuilderContext, projectName: string, options: BrowserEsbuildOptions): Promise<{
     advancedOptimizations: boolean | undefined;
     allowedCommonJsDependencies: string[] | undefined;
     baseHref: string | undefined;
@@ -41,6 +57,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     entryPoints: Record<string, string>;
     optimizationOptions: import("../../utils").NormalizedOptimizationOptions;
     outputPath: string;
+    outExtension: "js" | "mjs" | undefined;
     sourcemapOptions: import("../..").SourceMapObject;
     tsconfig: string;
     projectRoot: string;
@@ -71,3 +88,4 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
         package: string;
     } | undefined;
 }>;
+export {};
