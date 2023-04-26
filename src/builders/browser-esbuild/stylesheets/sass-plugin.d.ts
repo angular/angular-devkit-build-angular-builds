@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { Plugin } from 'esbuild';
-import type { LoadResultCache } from './load-result-cache';
+import type { LoadResultCache } from '../load-result-cache';
 export interface SassPluginOptions {
     sourcemap: boolean;
     loadPaths?: string[];
