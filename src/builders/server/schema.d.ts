@@ -4,6 +4,10 @@ export interface Schema {
      */
     assets?: AssetPattern[];
     /**
+     * Enables advanced build optimizations.
+     */
+    buildOptimizer?: boolean;
+    /**
      * Delete the output path before building.
      */
     deleteOutputPath?: boolean;
