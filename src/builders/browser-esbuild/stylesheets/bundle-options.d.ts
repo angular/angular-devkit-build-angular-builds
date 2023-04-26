@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { BuildOptions, OutputFile } from 'esbuild';
-import { LoadResultCache } from './load-result-cache';
+import { LoadResultCache } from '../load-result-cache';
 export interface BundleStylesheetOptions {
     workspaceRoot: string;
     optimization: boolean;

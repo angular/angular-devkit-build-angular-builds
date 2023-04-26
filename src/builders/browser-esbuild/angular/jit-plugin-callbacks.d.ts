@@ -7,7 +7,7 @@
  */
 import type { OutputFile, PluginBuild } from 'esbuild';
 import { LoadResultCache } from '../load-result-cache';
-import { BundleStylesheetOptions } from '../stylesheets';
+import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
 /**
  * Sets up esbuild resolve and load callbacks to support Angular JIT mode processing
  * for both Component stylesheets and templates. These callbacks work alongside the JIT
