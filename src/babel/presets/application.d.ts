@@ -37,7 +37,6 @@ export interface ApplicationPresetOptions {
         inputSourceMap: unknown;
     };
     optimize?: {
-        looseEnums: boolean;
         pureTopLevel: boolean;
         wrapDecorators: boolean;
     };
