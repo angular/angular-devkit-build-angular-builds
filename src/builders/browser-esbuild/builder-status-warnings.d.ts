@@ -7,4 +7,4 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { BrowserEsbuildOptions } from './options';
-export declare function logExperimentalWarnings(options: BrowserEsbuildOptions, context: BuilderContext): void;
+export declare function logBuilderStatusWarnings(options: BrowserEsbuildOptions, context: BuilderContext): void;
