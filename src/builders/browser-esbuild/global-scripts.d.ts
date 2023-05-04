@@ -13,4 +13,4 @@ import { NormalizedBrowserOptions } from './options';
  * @param options The builder's user-provider normalized options.
  * @returns An esbuild BuildOptions object.
  */
-export declare function createGlobalScriptsBundleOptions(options: NormalizedBrowserOptions): BuildOptions;
+export declare function createGlobalScriptsBundleOptions(options: NormalizedBrowserOptions, initial: boolean): BuildOptions | undefined;
