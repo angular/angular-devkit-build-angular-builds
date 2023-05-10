@@ -7,7 +7,7 @@
  */
 import type ng from '@angular/compiler-cli';
 import ts from 'typescript';
-import { AngularCompilation, FileEmitter } from './angular-compilation';
+import { AngularCompilation, EmitFileResult } from './angular-compilation';
 import { AngularHostOptions } from './angular-host';
 export declare class JitCompilation extends AngularCompilation {
     #private;
@@ -16,5 +16,5 @@ export declare class JitCompilation extends AngularCompilation {
         compilerOptions: ng.CompilerOptions;
     }>;
     collectDiagnostics(): Iterable<ts.Diagnostic>;
-    createFileEmitter(onAfterEmit?: (sourceFile: ts.SourceFile) => void): FileEmitter;
+    emitAffectedFiles(): Iterable<EmitFileResult>;
 }

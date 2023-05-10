@@ -12,7 +12,7 @@ import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
 export declare class SourceFileCache extends Map<string, ts.SourceFile> {
     readonly modifiedFiles: Set<string>;
     readonly babelFileCache: Map<string, Uint8Array>;
-    readonly typeScriptFileCache: Map<string, Uint8Array>;
+    readonly typeScriptFileCache: Map<string, string | Uint8Array>;
     readonly loadResultCache: MemoryLoadResultCache;
     invalidate(files: Iterable<string>): void;
 }
