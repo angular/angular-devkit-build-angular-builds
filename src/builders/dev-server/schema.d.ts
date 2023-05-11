@@ -17,6 +17,11 @@ export interface Schema {
      */
     disableHostCheck?: boolean;
     /**
+     * Force the development server to use the 'browser-esbuild' builder when building. This is
+     * a developer preview option for the esbuild-based build system.
+     */
+    forceEsbuild?: boolean;
+    /**
      * Custom HTTP headers to be added to all responses.
      */
     headers?: {
