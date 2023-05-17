@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <reference types="node" />
 import type { BuilderContext } from '@angular-devkit/architect';
 import { InlineConfig } from 'vite';
 import type { NormalizedDevServerOptions } from './options';
