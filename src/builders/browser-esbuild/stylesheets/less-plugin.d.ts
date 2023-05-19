@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { Plugin } from 'esbuild';
+import { LoadResultCache } from '../load-result-cache';
 export interface LessPluginOptions {
     sourcemap: boolean;
     includePaths?: string[];
     inlineComponentData?: Record<string, string>;
 }
-export declare function createLessPlugin(options: LessPluginOptions): Plugin;
+export declare function createLessPlugin(options: LessPluginOptions, cache?: LoadResultCache): Plugin;

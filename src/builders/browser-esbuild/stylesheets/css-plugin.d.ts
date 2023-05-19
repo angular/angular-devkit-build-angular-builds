@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { Plugin } from 'esbuild';
+import { LoadResultCache } from '../load-result-cache';
 /**
  * An object containing the plugin options to use when processing CSS stylesheets.
  */
@@ -36,4 +37,4 @@ export interface CssPluginOptions {
  * @param options An object containing the plugin options.
  * @returns An esbuild Plugin instance.
  */
-export declare function createCssPlugin(options: CssPluginOptions): Plugin;
+export declare function createCssPlugin(options: CssPluginOptions, cache?: LoadResultCache): Plugin;
