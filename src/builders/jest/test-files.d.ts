@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import fastGlob from 'fast-glob';
 import { JestBuilderOptions } from './options';
-declare const globAsync: typeof import("glob").__promisify__;
 /**
  * Finds all test files in the project.
  *
@@ -16,5 +16,4 @@ declare const globAsync: typeof import("glob").__promisify__;
  *     testing purposes.
  * @returns A set of all test files in the project.
  */
-export declare function findTestFiles(options: JestBuilderOptions, workspaceRoot: string, glob?: typeof globAsync): Promise<Set<string>>;
-export {};
+export declare function findTestFiles(options: JestBuilderOptions, workspaceRoot: string, glob?: typeof fastGlob): Promise<Set<string>>;
