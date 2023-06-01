@@ -19,6 +19,11 @@ interface InternalOptions {
     entryPoints?: Set<string>;
     /** File extension to use for the generated output files. */
     outExtension?: 'js' | 'mjs';
+    /**
+     * Indicates whether all node packages should be marked as external.
+     * Currently used by the dev-server to support prebundling.
+     */
+    externalPackages?: boolean;
 }
 /** Full set of options for `browser-esbuild` builder. */
 export type BrowserEsbuildOptions = Omit<BrowserBuilderOptions & InternalOptions, 'main'> & {
@@ -48,6 +53,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     polyfills: string[] | undefined;
     poll: number | undefined;
     progress: boolean;
+    externalPackages: boolean | undefined;
     preserveSymlinks: boolean;
     stylePreprocessorOptions: import("./schema").StylePreprocessorOptions | undefined;
     subresourceIntegrity: boolean | undefined;
