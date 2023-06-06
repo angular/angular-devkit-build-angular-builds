@@ -8,11 +8,16 @@
 import { NormalizedCachedOptions } from '../normalize-cache';
 import { NormalizedOptimizationOptions } from '../normalize-optimization';
 import { CrossOriginValue, Entrypoint, FileInfo } from './augment-index-html';
+export type HintMode = 'prefetch' | 'preload' | 'modulepreload' | 'preconnect' | 'dns-prefetch';
 export interface IndexHtmlGeneratorProcessOptions {
     lang: string | undefined;
     baseHref: string | undefined;
     outputPath: string;
     files: FileInfo[];
+    hints?: {
+        url: string;
+        mode: HintMode;
+    }[];
 }
 export interface IndexHtmlGeneratorOptions {
     indexPath: string;

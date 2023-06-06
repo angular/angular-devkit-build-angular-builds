@@ -21,6 +21,10 @@ export interface AugmentIndexHtmlOptions {
     entrypoints: Entrypoint[];
     /** Used to set the document default locale */
     lang?: string;
+    hints?: {
+        url: string;
+        mode: string;
+    }[];
 }
 export interface FileInfo {
     file: string;
