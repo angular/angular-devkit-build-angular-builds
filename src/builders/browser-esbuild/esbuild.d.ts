@@ -7,7 +7,6 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuildFailure, BuildOptions, Message, Metafile, OutputFile, PartialMessage } from 'esbuild';
-import { FileInfo } from '../../utils/index-file/augment-index-html';
 export type BundleContextResult = {
     errors: Message[];
     warnings: Message[];
@@ -16,7 +15,7 @@ export type BundleContextResult = {
     warnings: Message[];
     metafile: Metafile;
     outputFiles: OutputFile[];
-    initialFiles: FileInfo[];
+    initialFiles: Map<string, InitialFileRecord>;
 };
 /**
  * Determines if an unknown value is an esbuild BuildFailure error object thrown by esbuild.
@@ -24,11 +23,18 @@ export type BundleContextResult = {
  * @returns `true` if the object is determined to be a BuildFailure object; otherwise, `false`.
  */
 export declare function isEsBuildFailure(value: unknown): value is BuildFailure;
+export interface InitialFileRecord {
+    entrypoint: boolean;
+    name?: string;
+    type: 'script' | 'style';
+    external?: boolean;
+}
 export declare class BundlerContext {
     #private;
     private workspaceRoot;
     private incremental;
-    constructor(workspaceRoot: string, incremental: boolean, options: BuildOptions);
+    private initialFilter?;
+    constructor(workspaceRoot: string, incremental: boolean, options: BuildOptions, initialFilter?: ((initial: Readonly<InitialFileRecord>) => boolean) | undefined);
     static bundleAll(contexts: Iterable<BundlerContext>): Promise<BundleContextResult>;
     /**
      * Executes the esbuild build function and normalizes the build result in the event of a
