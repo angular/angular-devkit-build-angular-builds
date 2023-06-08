@@ -28,7 +28,7 @@ export interface AugmentIndexHtmlOptions {
 }
 export interface FileInfo {
     file: string;
-    name: string;
+    name?: string;
     extension: string;
 }
 export declare function augmentIndexHtml(params: AugmentIndexHtmlOptions): Promise<{
