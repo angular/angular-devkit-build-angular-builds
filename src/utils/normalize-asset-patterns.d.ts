@@ -8,6 +8,6 @@
 import { BaseException } from '@angular-devkit/core';
 import { AssetPattern, AssetPatternClass } from '../builders/browser/schema';
 export declare class MissingAssetSourceRootException extends BaseException {
-    constructor(path: String);
+    constructor(path: string);
 }
 export declare function normalizeAssetPatterns(assetPatterns: AssetPattern[], workspaceRoot: string, projectRoot: string, projectSourceRoot: string | undefined): AssetPatternClass[];
