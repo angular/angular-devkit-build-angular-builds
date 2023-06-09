@@ -9,9 +9,9 @@ import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { Observable } from 'rxjs';
 import webpack from 'webpack';
+import { BuildEventStats } from '../../tools/webpack/utils/stats';
 import { ExecutionTransformer } from '../../transforms';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
-import { BuildEventStats } from '../../webpack/utils/stats';
 import { Schema as BrowserBuilderSchema } from './schema';
 /**
  * @experimental Direct usage of this type is considered experimental.

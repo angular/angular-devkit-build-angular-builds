@@ -8,7 +8,7 @@
 import { BaseException } from '@angular-devkit/core';
 import { FileReplacement } from '../builders/browser/schema';
 export declare class MissingFileReplacementException extends BaseException {
-    constructor(path: String);
+    constructor(path: string);
 }
 export interface NormalizedFileReplacement {
     replace: string;
