@@ -27,6 +27,7 @@ export declare class BundlerContext {
     private workspaceRoot;
     private incremental;
     private initialFilter?;
+    readonly watchFiles: Set<string>;
     constructor(workspaceRoot: string, incremental: boolean, options: BuildOptions, initialFilter?: ((initial: Readonly<InitialFileRecord>) => boolean) | undefined);
     static bundleAll(contexts: Iterable<BundlerContext>): Promise<BundleContextResult>;
     /**
