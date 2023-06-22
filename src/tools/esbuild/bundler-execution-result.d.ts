@@ -38,7 +38,7 @@ export declare class ExecutionResult {
             destination: string;
         }[];
     };
-    get watchFiles(): readonly string[];
+    get watchFiles(): string[];
     createRebuildState(fileChanges: ChangedFiles): RebuildState;
     dispose(): Promise<void>;
 }
