@@ -7,7 +7,6 @@
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { OutputFile } from 'esbuild';
-import { BrowserEsbuildOptions } from './options';
 import { Schema as BrowserBuilderOptions } from './schema';
 /**
  * Main execution function for the esbuild-based application builder.
@@ -17,22 +16,6 @@ import { Schema as BrowserBuilderOptions } from './schema';
  * @returns An async iterable with the builder result output
  */
 export declare function buildEsbuildBrowser(userOptions: BrowserBuilderOptions, context: BuilderContext, infrastructureSettings?: {
-    write?: boolean;
-}): AsyncIterable<BuilderOutput & {
-    outputFiles?: OutputFile[];
-    assetFiles?: {
-        source: string;
-        destination: string;
-    }[];
-}>;
-/**
- * Internal version of the main execution function for the esbuild-based application builder.
- * Exposes some additional "private" options in addition to those exposed by the schema.
- * @param userOptions The browser-esbuild builder options to use when setting up the application build
- * @param context The Architect builder context object
- * @returns An async iterable with the builder result output
- */
-export declare function buildEsbuildBrowserInternal(userOptions: BrowserEsbuildOptions, context: BuilderContext, infrastructureSettings?: {
     write?: boolean;
 }): AsyncIterable<BuilderOutput & {
     outputFiles?: OutputFile[];

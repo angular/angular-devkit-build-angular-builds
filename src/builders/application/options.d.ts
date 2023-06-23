@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
-import { Schema as BrowserBuilderOptions } from './schema';
-export type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+import { Schema as ApplicationBuilderOptions } from './schema';
+export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 /** Internal options hidden from builder schema but available when invoked programmatically. */
 interface InternalOptions {
     /**
@@ -26,8 +26,8 @@ interface InternalOptions {
     externalPackages?: boolean;
 }
 /** Full set of options for `browser-esbuild` builder. */
-export type BrowserEsbuildOptions = Omit<BrowserBuilderOptions & InternalOptions, 'main'> & {
-    main?: string;
+export type ApplicationBuilderInternalOptions = Omit<ApplicationBuilderOptions & InternalOptions, 'browser'> & {
+    browser?: string;
 };
 /**
  * Normalize the user provided options by creating full paths for all path based options
@@ -39,12 +39,13 @@ export type BrowserEsbuildOptions = Omit<BrowserBuilderOptions & InternalOptions
  * @param options An object containing the options to use for the build.
  * @returns An object containing normalized options required to perform the build.
  */
-export declare function normalizeOptions(context: BuilderContext, projectName: string, options: BrowserEsbuildOptions): Promise<{
-    advancedOptimizations: boolean | undefined;
+export declare function normalizeOptions(context: BuilderContext, projectName: string, options: ApplicationBuilderInternalOptions): Promise<{
+    advancedOptimizations: boolean;
     allowedCommonJsDependencies: string[] | undefined;
     baseHref: string | undefined;
     cacheOptions: import("../../utils/normalize-cache").NormalizedCachedOptions;
     crossOrigin: import("./schema").CrossOrigin | undefined;
+    deleteOutputPath: boolean | undefined;
     externalDependencies: string[] | undefined;
     extractLicenses: boolean | undefined;
     inlineStyleLanguage: string;
@@ -57,6 +58,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     preserveSymlinks: boolean;
     stylePreprocessorOptions: import("./schema").StylePreprocessorOptions | undefined;
     subresourceIntegrity: boolean | undefined;
+    server: string | false;
     verbose: boolean | undefined;
     watch: boolean | undefined;
     workspaceRoot: string;
@@ -83,7 +85,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
         files: string[];
         initial: boolean;
     }[];
-    serviceWorkerOptions: string | undefined;
+    serviceWorker: any;
     indexHtmlOptions: {
         input: string;
         output: string;

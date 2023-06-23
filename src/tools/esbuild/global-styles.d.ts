@@ -6,6 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { BuildOptions } from 'esbuild';
-import { NormalizedBrowserOptions } from '../../builders/browser-esbuild/options';
+import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { LoadResultCache } from './load-result-cache';
-export declare function createGlobalStylesBundleOptions(options: NormalizedBrowserOptions, target: string[], browsers: string[], initial: boolean, cache?: LoadResultCache): BuildOptions | undefined;
+export declare function createGlobalStylesBundleOptions(options: NormalizedApplicationBuildOptions, target: string[], browsers: string[], initial: boolean, cache?: LoadResultCache): BuildOptions | undefined;
