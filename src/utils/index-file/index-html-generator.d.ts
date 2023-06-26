@@ -17,6 +17,7 @@ export interface IndexHtmlGeneratorProcessOptions {
     hints?: {
         url: string;
         mode: HintMode;
+        as?: string;
     }[];
 }
 export interface IndexHtmlGeneratorOptions {

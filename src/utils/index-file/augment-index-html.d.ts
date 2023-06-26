@@ -24,6 +24,7 @@ export interface AugmentIndexHtmlOptions {
     hints?: {
         url: string;
         mode: string;
+        as?: string;
     }[];
 }
 export interface FileInfo {
