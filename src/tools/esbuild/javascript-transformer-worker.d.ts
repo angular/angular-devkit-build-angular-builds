@@ -11,6 +11,7 @@ interface JavaScriptTransformRequest {
     sourcemap: boolean;
     thirdPartySourcemaps: boolean;
     advancedOptimizations: boolean;
+    forceAsyncTransformation?: boolean;
     skipLinker: boolean;
     jit: boolean;
 }
