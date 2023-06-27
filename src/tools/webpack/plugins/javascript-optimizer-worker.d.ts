@@ -26,10 +26,6 @@ export interface OptimizeRequestOptions {
      */
     keepIdentifierNames: boolean;
     /**
-     * Controls whether to retain the original name of classes and functions.
-     */
-    keepNames: boolean;
-    /**
      * Controls whether license text is removed from the output code.
      * Within the CLI, this option is linked to the license extraction functionality.
      */

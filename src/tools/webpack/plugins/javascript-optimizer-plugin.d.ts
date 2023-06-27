@@ -39,12 +39,6 @@ export interface JavaScriptOptimizerOptions {
      */
     keepIdentifierNames: boolean;
     /**
-     * Enables the retention of original name of classes and functions.
-     *
-     * **Note**: this causes increase of bundle size as it causes dead-code elimination to not work fully.
-     */
-    keepNames: boolean;
-    /**
      * Enables the removal of all license comments from the output code.
      */
     removeLicenses?: boolean;
