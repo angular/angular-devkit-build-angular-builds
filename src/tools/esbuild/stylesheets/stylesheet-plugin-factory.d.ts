@@ -42,7 +42,6 @@ export interface StylesheetLanguage {
 export declare class StylesheetPluginFactory {
     private readonly options;
     private readonly cache?;
-    private autoprefixer;
     constructor(options: StylesheetPluginOptions, cache?: LoadResultCache | undefined);
     create(language: Readonly<StylesheetLanguage>): Plugin;
 }
