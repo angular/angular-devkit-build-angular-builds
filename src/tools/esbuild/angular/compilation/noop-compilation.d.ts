@@ -7,15 +7,14 @@
  */
 import type ng from '@angular/compiler-cli';
 import ts from 'typescript';
-import { AngularCompilation, EmitFileResult } from './angular-compilation';
-import { AngularHostOptions } from './angular-host';
-export declare class JitCompilation extends AngularCompilation {
-    #private;
+import { AngularHostOptions } from '../angular-host';
+import { AngularCompilation } from './angular-compilation';
+export declare class NoopCompilation extends AngularCompilation {
     initialize(tsconfig: string, hostOptions: AngularHostOptions, compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions): Promise<{
         affectedFiles: ReadonlySet<ts.SourceFile>;
         compilerOptions: ng.CompilerOptions;
         referencedFiles: readonly string[];
     }>;
-    collectDiagnostics(): Iterable<ts.Diagnostic>;
-    emitAffectedFiles(): Iterable<EmitFileResult>;
+    collectDiagnostics(): never;
+    emitAffectedFiles(): never;
 }

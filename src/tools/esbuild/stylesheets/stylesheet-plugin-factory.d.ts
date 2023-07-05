@@ -22,12 +22,6 @@ export interface StylesheetPluginOptions {
      * The key is an internal angular resource URI and the value is the stylesheet content.
      */
     inlineComponentData?: Record<string, string>;
-    /**
-     * The browsers to support in browserslist format when processing stylesheets.
-     * Some postcss plugins such as autoprefixer require the raw browserslist information instead
-     * of the esbuild formatted target.
-     */
-    browsers: string[];
     tailwindConfiguration?: {
         file: string;
         package: string;

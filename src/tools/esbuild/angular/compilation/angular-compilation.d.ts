@@ -7,7 +7,7 @@
  */
 import type ng from '@angular/compiler-cli';
 import type ts from 'typescript';
-import type { AngularHostOptions } from './angular-host';
+import type { AngularHostOptions } from '../angular-host';
 export interface EmitFileResult {
     filename: string;
     contents: string;

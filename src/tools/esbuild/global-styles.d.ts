@@ -8,4 +8,4 @@
 import type { BuildOptions } from 'esbuild';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { LoadResultCache } from './load-result-cache';
-export declare function createGlobalStylesBundleOptions(options: NormalizedApplicationBuildOptions, target: string[], browsers: string[], initial: boolean, cache?: LoadResultCache): BuildOptions | undefined;
+export declare function createGlobalStylesBundleOptions(options: NormalizedApplicationBuildOptions, target: string[], initial: boolean, cache?: LoadResultCache): BuildOptions | undefined;

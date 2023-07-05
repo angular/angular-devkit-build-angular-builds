@@ -11,7 +11,7 @@ export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normal
 /** Internal options hidden from builder schema but available when invoked programmatically. */
 interface InternalOptions {
     /**
-     * Entry points to use for the compilation. Incompatible with `main`, which must not be provided. May be relative or absolute paths.
+     * Entry points to use for the compilation. Incompatible with `browser`, which must not be provided. May be relative or absolute paths.
      * If given a relative path, it is resolved relative to the current workspace and will generate an output at the same relative location
      * in the output directory. If given an absolute path, the output will be generated in the root of the output directory with the same base
      * name.
@@ -25,7 +25,7 @@ interface InternalOptions {
      */
     externalPackages?: boolean;
 }
-/** Full set of options for `browser-esbuild` builder. */
+/** Full set of options for `application` builder. */
 export type ApplicationBuilderInternalOptions = Omit<ApplicationBuilderOptions & InternalOptions, 'browser'> & {
     browser?: string;
 };
@@ -58,7 +58,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     preserveSymlinks: boolean;
     stylePreprocessorOptions: import("./schema").StylePreprocessorOptions | undefined;
     subresourceIntegrity: boolean | undefined;
-    server: string | false;
+    serverEntryPoint: string | undefined;
     verbose: boolean | undefined;
     watch: boolean | undefined;
     workspaceRoot: string;

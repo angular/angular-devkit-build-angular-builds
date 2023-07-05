@@ -7,8 +7,8 @@
  */
 import type ng from '@angular/compiler-cli';
 import ts from 'typescript';
+import { AngularHostOptions } from '../angular-host';
 import { AngularCompilation, EmitFileResult } from './angular-compilation';
-import { AngularHostOptions } from './angular-host';
 export declare class AotCompilation extends AngularCompilation {
     #private;
     initialize(tsconfig: string, hostOptions: AngularHostOptions, compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions): Promise<{

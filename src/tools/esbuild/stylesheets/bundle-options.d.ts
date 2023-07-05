@@ -19,7 +19,6 @@ export interface BundleStylesheetOptions {
     includePaths?: string[];
     externalDependencies?: string[];
     target: string[];
-    browsers: string[];
     tailwindConfiguration?: {
         file: string;
         package: string;
