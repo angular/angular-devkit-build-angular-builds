@@ -103,10 +103,6 @@ export interface Schema {
      */
     progress?: boolean;
     /**
-     * The path where style resources will be placed, relative to outputPath.
-     */
-    resourcesOutputPath?: string;
-    /**
      * Global scripts to be included in the build.
      */
     scripts?: ScriptElement[];

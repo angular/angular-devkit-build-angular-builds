@@ -12,9 +12,9 @@ export interface BundleStylesheetOptions {
     optimization: boolean;
     preserveSymlinks?: boolean;
     sourcemap: boolean | 'external' | 'inline';
-    outputNames?: {
-        bundles?: string;
-        media?: string;
+    outputNames: {
+        bundles: string;
+        media: string;
     };
     includePaths?: string[];
     externalDependencies?: string[];
