@@ -11,6 +11,10 @@ export interface Schema {
      */
     aot?: boolean;
     /**
+     * Generates an application shell during build time.
+     */
+    appShell?: boolean;
+    /**
      * List of static application assets.
      */
     assets?: AssetPattern[];
@@ -60,7 +64,7 @@ export interface Schema {
     /**
      * Configures the generation of the application's HTML index.
      */
-    index: any;
+    index: IndexUnion;
     /**
      * The stylesheet language to use for the application's inline component styles.
      */
@@ -94,6 +98,10 @@ export interface Schema {
      */
     polyfills?: Polyfills;
     /**
+     * Prerender (SSG) pages of your application during build time.
+     */
+    prerender?: PrerenderUnion;
+    /**
      * Do not use the real path when resolving modules. If unset then will default to `true` if
      * NodeJS option --preserve-symlinks is set.
      */
@@ -114,7 +122,7 @@ export interface Schema {
     /**
      * Generates a service worker configuration.
      */
-    serviceWorker?: any;
+    serviceWorker?: ServiceWorker;
     /**
      * Output source maps for scripts and styles. For more information, see
      * https://angular.io/guide/workspace-config#source-map-configuration.
@@ -251,6 +259,22 @@ export declare enum I18NTranslation {
     Warning = "warning"
 }
 /**
+ * Configures the generation of the application's HTML index.
+ */
+export type IndexUnion = boolean | IndexObject | string;
+export interface IndexObject {
+    /**
+     * The path of a file to use for the application's generated HTML index.
+     */
+    input: string;
+    /**
+     * The output path of the application's generated HTML index file. The full provided path
+     * will be used and will be considered relative to the application's configured output path.
+     */
+    output?: string;
+    [property: string]: any;
+}
+/**
  * The stylesheet language to use for the application's inline component styles.
  */
 export declare enum InlineStyleLanguage {
@@ -326,6 +350,24 @@ export declare enum OutputHashing {
  * Polyfills to be included in the build.
  */
 export type Polyfills = string[] | string;
+/**
+ * Prerender (SSG) pages of your application during build time.
+ */
+export type PrerenderUnion = boolean | PrerenderClass;
+export interface PrerenderClass {
+    /**
+     * Whether the builder should statically discover routes.
+     */
+    discoverRoutes?: boolean;
+    /**
+     * The routes to render.
+     */
+    routes?: string[];
+    /**
+     * The path to a file containing routes separated by newlines.
+     */
+    routesFile?: string;
+}
 export type ScriptElement = ScriptClass | string;
 export interface ScriptClass {
     /**
@@ -341,6 +383,10 @@ export interface ScriptClass {
      */
     input: string;
 }
+/**
+ * Generates a service worker configuration.
+ */
+export type ServiceWorker = boolean | string;
 /**
  * Output source maps for scripts and styles. For more information, see
  * https://angular.io/guide/workspace-config#source-map-configuration.

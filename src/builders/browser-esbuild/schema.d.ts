@@ -69,7 +69,7 @@ export interface Schema {
     /**
      * Configures the generation of the application's HTML index.
      */
-    index: any;
+    index: IndexUnion;
     /**
      * The stylesheet language to use for the application's inline component styles.
      */
@@ -274,6 +274,22 @@ export declare enum I18NTranslation {
     Error = "error",
     Ignore = "ignore",
     Warning = "warning"
+}
+/**
+ * Configures the generation of the application's HTML index.
+ */
+export type IndexUnion = boolean | IndexObject | string;
+export interface IndexObject {
+    /**
+     * The path of a file to use for the application's generated HTML index.
+     */
+    input: string;
+    /**
+     * The output path of the application's generated HTML index file. The full provided path
+     * will be used and will be considered relative to the application's configured output path.
+     */
+    output?: string;
+    [property: string]: any;
 }
 /**
  * The stylesheet language to use for the application's inline component styles.

@@ -59,6 +59,14 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     stylePreprocessorOptions: import("./schema").StylePreprocessorOptions | undefined;
     subresourceIntegrity: boolean | undefined;
     serverEntryPoint: string | undefined;
+    prerenderOptions: {
+        discoverRoutes: boolean;
+        routes: string[];
+        routesFile: string | undefined;
+    } | undefined;
+    appShellOptions: {
+        route: string;
+    } | undefined;
     verbose: boolean | undefined;
     watch: boolean | undefined;
     workspaceRoot: string;
@@ -85,7 +93,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
         files: string[];
         initial: boolean;
     }[];
-    serviceWorker: any;
+    serviceWorker: string | undefined;
     indexHtmlOptions: {
         input: string;
         output: string;

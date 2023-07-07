@@ -6,5 +6,5 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
-import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { Schema as BrowserBuilderOptions } from './schema';
 export declare function logBuilderStatusWarnings(options: BrowserBuilderOptions, context: BuilderContext): void;
