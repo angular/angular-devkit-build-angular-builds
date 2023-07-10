@@ -16,12 +16,21 @@ export interface StylesheetPluginOptions {
      * If true, sourcemap processing is enabled; if false, disabled.
      */
     sourcemap: boolean;
+    /**
+     * An optional array of paths that will be searched for stylesheets if the default
+     * resolution process for the stylesheet language does not succeed.
+     */
     includePaths?: string[];
     /**
      * Optional component data for any inline styles from Component decorator `styles` fields.
      * The key is an internal angular resource URI and the value is the stylesheet content.
      */
     inlineComponentData?: Record<string, string>;
+    /**
+     * Optional information used to load and configure Tailwind CSS. If present, the postcss
+     * will be added to the stylesheet processing with the Tailwind plugin setup as provided
+     * by the configuration file.
+     */
     tailwindConfiguration?: {
         file: string;
         package: string;
@@ -36,6 +45,7 @@ export interface StylesheetLanguage {
 export declare class StylesheetPluginFactory {
     private readonly options;
     private readonly cache?;
+    private postcssProcessor?;
     constructor(options: StylesheetPluginOptions, cache?: LoadResultCache | undefined);
     create(language: Readonly<StylesheetLanguage>): Plugin;
 }
