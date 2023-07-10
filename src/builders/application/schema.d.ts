@@ -129,6 +129,10 @@ export interface Schema {
      */
     sourceMap?: SourceMapUnion;
     /**
+     * Server side render (SSR) pages of your application during runtime.
+     */
+    ssr?: SsrUnion;
+    /**
      * Generates a 'stats.json' file which can be analyzed using tools such as
      * 'webpack-bundle-analyzer'.
      */
@@ -409,6 +413,16 @@ export interface SourceMapClass {
      * Resolve vendor packages source maps.
      */
     vendor?: boolean;
+}
+/**
+ * Server side render (SSR) pages of your application during runtime.
+ */
+export type SsrUnion = boolean | SsrClass;
+export interface SsrClass {
+    /**
+     * The server entry-point that when executed will spawn the web server.
+     */
+    entry?: string;
 }
 /**
  * Options to pass to style preprocessors.

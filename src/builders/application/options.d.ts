@@ -67,6 +67,11 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     appShellOptions: {
         route: string;
     } | undefined;
+    ssrOptions: {
+        entry?: undefined;
+    } | {
+        entry: string | undefined;
+    } | undefined;
     verbose: boolean | undefined;
     watch: boolean | undefined;
     workspaceRoot: string;
