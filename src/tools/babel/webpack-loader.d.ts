@@ -14,6 +14,5 @@ interface AngularCustomOptions extends Omit<ApplicationPresetOptions, 'instrumen
     };
 }
 export type AngularBabelLoaderOptions = AngularCustomOptions & Record<string, unknown>;
-export declare function requiresLinking(path: string, source: string): Promise<boolean>;
 declare const _default: any;
 export default _default;

@@ -47,3 +47,4 @@ export default function (api: unknown, options: ApplicationPresetOptions): {
     presets: any[][];
     plugins: any[];
 };
+export declare function requiresLinking(path: string, source: string): Promise<boolean>;
