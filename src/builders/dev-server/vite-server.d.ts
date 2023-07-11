@@ -16,5 +16,5 @@ interface OutputFileRecord {
     updated: boolean;
 }
 export declare function serveWithVite(serverOptions: NormalizedDevServerOptions, builderName: string, context: BuilderContext): AsyncIterableIterator<DevServerBuilderOutput>;
-export declare function setupServer(serverOptions: NormalizedDevServerOptions, outputFiles: Map<string, OutputFileRecord>, assets: Map<string, string>, preserveSymlinks: boolean | undefined, prebundleExclude: string[] | undefined): Promise<InlineConfig>;
+export declare function setupServer(serverOptions: NormalizedDevServerOptions, outputFiles: Map<string, OutputFileRecord>, assets: Map<string, string>, preserveSymlinks: boolean | undefined, prebundleExclude: string[] | undefined, ssr: boolean): Promise<InlineConfig>;
 export {};
