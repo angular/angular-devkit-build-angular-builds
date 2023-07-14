@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { RawSourceMap } from '@ampproject/remapping';
-import type { FileImporter, Importer, ImporterResult } from 'sass';
+import type { Importer, ImporterResult } from 'sass';
 /**
  * A preprocessed cache entry for the files and directories within a previously searched
  * directory when performing Sass import resolution.
@@ -76,7 +76,10 @@ export declare class RelativeUrlRebasingImporter extends UrlRebasingImporter {
  */
 export declare class ModuleUrlRebasingImporter extends RelativeUrlRebasingImporter {
     private finder;
-    constructor(entryDirectory: string, directoryCache: Map<string, DirectoryEntry>, rebaseSourceMaps: Map<string, RawSourceMap> | undefined, finder: FileImporter<'sync'>['findFileUrl']);
+    constructor(entryDirectory: string, directoryCache: Map<string, DirectoryEntry>, rebaseSourceMaps: Map<string, RawSourceMap> | undefined, finder: (specifier: string, options: {
+        fromImport: boolean;
+        resolveDir?: string;
+    }) => URL | null);
     canonicalize(url: string, options: {
         fromImport: boolean;
     }): URL | null;
