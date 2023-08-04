@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { BuilderContext } from '@angular-devkit/architect';
-import { InlineConfig } from 'vite';
+import type { InlineConfig } from 'vite';
 import type { NormalizedDevServerOptions } from './options';
 import type { DevServerBuilderOutput } from './webpack-server';
 interface OutputFileRecord {
