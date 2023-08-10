@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type ng from '@angular/compiler-cli';
-import type ts from 'typescript';
+import type { PartialMessage } from 'esbuild';
+import ts from 'typescript';
 import type { AngularHostOptions } from '../angular-host';
 export interface EmitFileResult {
     filename: string;
@@ -22,6 +23,10 @@ export declare abstract class AngularCompilation {
         compilerOptions: ng.CompilerOptions;
         referencedFiles: readonly string[];
     }>;
-    abstract collectDiagnostics(): Iterable<ts.Diagnostic>;
     abstract emitAffectedFiles(): Iterable<EmitFileResult>;
+    protected abstract collectDiagnostics(): Iterable<ts.Diagnostic>;
+    diagnoseFiles(): Promise<{
+        errors?: PartialMessage[];
+        warnings?: PartialMessage[];
+    }>;
 }
