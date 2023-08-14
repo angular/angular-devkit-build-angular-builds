@@ -1,15 +1,15 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "17.0.0-next.0+sha-8b74a50",
+  "version": "17.0.0-next.0+sha-a60749f",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.2.1",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#8b74a50e7",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#8b74a50e7",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#8b74a50e7",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#a60749f3c",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#a60749f3c",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#a60749f3c",
     "@babel/core": "7.22.10",
     "@babel/generator": "7.22.10",
     "@babel/helper-annotate-as-pure": "7.22.5",
@@ -21,10 +21,10 @@
     "@babel/runtime": "7.22.10",
     "@babel/template": "7.22.5",
     "@discoveryjs/json-ext": "0.5.7",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#8b74a50e7",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#a60749f3c",
     "@vitejs/plugin-basic-ssl": "1.0.1",
     "ansi-colors": "4.1.3",
-    "autoprefixer": "10.4.14",
+    "autoprefixer": "10.4.15",
     "babel-loader": "9.1.3",
     "babel-plugin-istanbul": "6.1.1",
     "browserslist": "^4.21.5",
@@ -32,7 +32,7 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.20",
     "css-loader": "6.8.1",
-    "esbuild-wasm": "0.19.0",
+    "esbuild-wasm": "0.19.2",
     "fast-glob": "3.3.1",
     "guess-parser": "0.4.22",
     "https-proxy-agent": "5.0.1",
@@ -72,7 +72,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.19.0"
+    "esbuild": "0.19.2"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^16.0.0 || ^16.2.0-next.0",
@@ -128,7 +128,7 @@
     "url": "https://github.com/angular/angular-cli.git"
   },
   "engines": {
-    "node": "^16.14.0 || >=18.10.0",
+    "node": ">=18.13.0",
     "npm": "^6.11.0 || ^7.5.6 || >=8.0.0",
     "yarn": ">= 1.13.0"
   },
