@@ -14,7 +14,7 @@ interface PrerenderOptions {
 interface AppShellOptions {
     route?: string;
 }
-export declare function prerenderPages(tsConfigPath: string, appShellOptions: AppShellOptions | undefined, prerenderOptions: PrerenderOptions | undefined, outputFiles: Readonly<OutputFile[]>, document: string, inlineCriticalCss?: boolean, maxThreads?: number): Promise<{
+export declare function prerenderPages(workspaceRoot: string, tsConfigPath: string, appShellOptions: AppShellOptions | undefined, prerenderOptions: PrerenderOptions | undefined, outputFiles: Readonly<OutputFile[]>, document: string, inlineCriticalCss?: boolean, maxThreads?: number): Promise<{
     output: Record<string, string>;
     warnings: string[];
     errors: string[];
