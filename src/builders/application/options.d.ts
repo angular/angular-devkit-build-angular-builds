@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
-import { Schema as ApplicationBuilderOptions } from './schema';
+import { I18nOptions } from '../../utils/i18n-options';
+import { Schema as ApplicationBuilderOptions, I18NTranslation } from './schema';
 export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 /** Internal options hidden from builder schema but available when invoked programmatically. */
 interface InternalOptions {
@@ -108,5 +109,9 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
         file: string;
         package: string;
     } | undefined;
+    i18nOptions: I18nOptions & {
+        duplicateTranslationBehavior?: I18NTranslation | undefined;
+        missingTranslationBehavior?: I18NTranslation | undefined;
+    };
 }>;
 export {};
