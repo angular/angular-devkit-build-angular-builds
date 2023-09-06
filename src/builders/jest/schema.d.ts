@@ -11,15 +11,12 @@ export interface Schema {
      */
     include?: string[];
     /**
-     * Polyfills to be included in the build.
+     * A list of polyfills to include in the build. Can be a full path for a file, relative to
+     * the current workspace or module specifier. Example: 'zone.js'.
      */
-    polyfills?: Polyfills;
+    polyfills?: string[];
     /**
      * The name of the TypeScript configuration file.
      */
     tsConfig: string;
 }
-/**
- * Polyfills to be included in the build.
- */
-export type Polyfills = string[] | string;

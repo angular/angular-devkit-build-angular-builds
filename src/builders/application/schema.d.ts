@@ -94,9 +94,10 @@ export interface Schema {
      */
     poll?: number;
     /**
-     * Polyfills to be included in the build.
+     * A list of polyfills to include in the build. Can be a full path for a file, relative to
+     * the current workspace or module specifier. Example: 'zone.js'.
      */
-    polyfills?: Polyfills;
+    polyfills?: string[];
     /**
      * Prerender (SSG) pages of your application during build time.
      */
@@ -350,10 +351,6 @@ export declare enum OutputHashing {
     Media = "media",
     None = "none"
 }
-/**
- * Polyfills to be included in the build.
- */
-export type Polyfills = string[] | string;
 /**
  * Prerender (SSG) pages of your application during build time.
  */
