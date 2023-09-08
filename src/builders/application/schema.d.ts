@@ -134,8 +134,8 @@ export interface Schema {
      */
     ssr?: SsrUnion;
     /**
-     * Generates a 'stats.json' file which can be analyzed using tools such as
-     * 'webpack-bundle-analyzer'.
+     * Generates a 'stats.json' file which can be analyzed with
+     * https://esbuild.github.io/analyze/.
      */
     statsJson?: boolean;
     /**
