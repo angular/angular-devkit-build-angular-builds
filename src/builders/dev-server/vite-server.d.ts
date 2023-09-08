@@ -7,6 +7,7 @@
  */
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { InlineConfig } from 'vite';
+import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
 import type { NormalizedDevServerOptions } from './options';
 import type { DevServerBuilderOutput } from './webpack-server';
 interface OutputFileRecord {
@@ -16,5 +17,5 @@ interface OutputFileRecord {
     updated: boolean;
 }
 export declare function serveWithVite(serverOptions: NormalizedDevServerOptions, builderName: string, context: BuilderContext): AsyncIterableIterator<DevServerBuilderOutput>;
-export declare function setupServer(serverOptions: NormalizedDevServerOptions, outputFiles: Map<string, OutputFileRecord>, assets: Map<string, string>, preserveSymlinks: boolean | undefined, prebundleExclude: string[] | undefined, ssr: boolean): Promise<InlineConfig>;
+export declare function setupServer(serverOptions: NormalizedDevServerOptions, outputFiles: Map<string, OutputFileRecord>, assets: Map<string, string>, preserveSymlinks: boolean | undefined, prebundleExclude: string[] | undefined, ssr: boolean, prebundleTransformer: JavaScriptTransformer): Promise<InlineConfig>;
 export {};
