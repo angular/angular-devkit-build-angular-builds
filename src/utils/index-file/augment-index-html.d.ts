@@ -26,6 +26,7 @@ export interface AugmentIndexHtmlOptions {
         mode: string;
         as?: string;
     }[];
+    imageDomains?: string[];
 }
 export interface FileInfo {
     file: string;
