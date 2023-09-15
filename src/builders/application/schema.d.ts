@@ -132,7 +132,7 @@ export interface Schema {
     /**
      * Server side render (SSR) pages of your application during runtime.
      */
-    ssr?: SsrUnion;
+    ssr?: ServiceWorker;
     /**
      * Generates a 'stats.json' file which can be analyzed with
      * https://esbuild.github.io/analyze/.
@@ -386,6 +386,8 @@ export interface ScriptClass {
 }
 /**
  * Generates a service worker configuration.
+ *
+ * Server side render (SSR) pages of your application during runtime.
  */
 export type ServiceWorker = boolean | string;
 /**
@@ -410,16 +412,6 @@ export interface SourceMapClass {
      * Resolve vendor packages source maps.
      */
     vendor?: boolean;
-}
-/**
- * Server side render (SSR) pages of your application during runtime.
- */
-export type SsrUnion = boolean | SsrClass;
-export interface SsrClass {
-    /**
-     * The server entry-point that when executed will spawn the web server.
-     */
-    entry?: string;
 }
 /**
  * Options to pass to style preprocessors.

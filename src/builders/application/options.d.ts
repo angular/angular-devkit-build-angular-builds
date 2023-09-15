@@ -71,7 +71,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     ssrOptions: {
         entry?: undefined;
     } | {
-        entry: string | undefined;
+        entry: string;
     } | undefined;
     verbose: boolean | undefined;
     watch: boolean | undefined;
