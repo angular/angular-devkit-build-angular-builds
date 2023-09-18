@@ -62,7 +62,6 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     serverEntryPoint: string | undefined;
     prerenderOptions: {
         discoverRoutes: boolean;
-        routes: string[];
         routesFile: string | undefined;
     } | undefined;
     appShellOptions: {
