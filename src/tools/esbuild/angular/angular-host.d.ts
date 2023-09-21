@@ -14,6 +14,7 @@ export interface AngularHostOptions {
     sourceFileCache?: Map<string, ts.SourceFile>;
     modifiedFiles?: Set<string>;
     transformStylesheet(data: string, containingFile: string, stylesheetFile?: string): Promise<string | null>;
+    processWebWorker(workerFile: string, containingFile: string): string;
 }
 /**
  * Patches in-place the `getSourceFiles` function on an instance of a TypeScript
