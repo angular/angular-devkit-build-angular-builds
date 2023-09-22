@@ -20,8 +20,8 @@ export interface RebuildState {
 export declare class ExecutionResult {
     private rebuildContexts;
     private codeBundleCache?;
-    readonly outputFiles: OutputFile[];
-    readonly assetFiles: {
+    outputFiles: OutputFile[];
+    assetFiles: {
         source: string;
         destination: string;
     }[];

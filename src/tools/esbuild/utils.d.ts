@@ -28,6 +28,8 @@ export declare function writeResultFiles(outputFiles: OutputFile[], assetFiles: 
     destination: string;
 }[] | undefined, outputPath: string): Promise<void>;
 export declare function createOutputFileFromText(path: string, text: string): OutputFile;
+export declare function createOutputFileFromData(path: string, data: Uint8Array): OutputFile;
+export declare function cloneOutputFile(file: OutputFile): OutputFile;
 /**
  * Transform browserlists result to esbuild target.
  * @see https://esbuild.github.io/api/#target

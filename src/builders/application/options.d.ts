@@ -25,6 +25,11 @@ interface InternalOptions {
      * Currently used by the dev-server to support prebundling.
      */
     externalPackages?: boolean;
+    /**
+     * Forces the output from the localize post-processing to not create nested directories per locale output.
+     * This is only used by the development server which currently only supports a single locale per build.
+     */
+    forceI18nFlatOutput?: boolean;
 }
 /** Full set of options for `application` builder. */
 export type ApplicationBuilderInternalOptions = Omit<ApplicationBuilderOptions & InternalOptions, 'browser'> & {

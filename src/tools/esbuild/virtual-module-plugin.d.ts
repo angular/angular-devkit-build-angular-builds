@@ -19,6 +19,8 @@ export interface VirtualModulePluginOptions {
     transformPath?: (path: string) => string;
     /** Method to provide the module content. */
     loadContent: (args: OnLoadArgs, build: PluginBuild) => ReturnType<Parameters<PluginBuild['onLoad']>[1]>;
+    /** Restrict to only entry points. Defaults to `true`. */
+    entryPointOnly?: boolean;
 }
 /**
  * Creates an esbuild plugin that generated virtual modules.
