@@ -19,4 +19,5 @@ export interface MainServerBundleExports {
     default: (() => Promise<ApplicationRef>) | Type<unknown>;
     /** Method to extract routes from the router config. */
     extractRoutes: typeof extractRoutes;
+    ɵresetCompiledComponents?: () => void;
 }
