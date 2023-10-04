@@ -16,7 +16,10 @@ import { NormalizedApplicationBuildOptions } from './options';
  * @param executionResult The result of an executed build.
  * @param initialFiles A map containing initial file information for the executed build.
  */
-export declare function inlineI18n(options: NormalizedApplicationBuildOptions, executionResult: ExecutionResult, initialFiles: Map<string, InitialFileRecord>): Promise<void>;
+export declare function inlineI18n(options: NormalizedApplicationBuildOptions, executionResult: ExecutionResult, initialFiles: Map<string, InitialFileRecord>): Promise<{
+    errors: string[];
+    warnings: string[];
+}>;
 /**
  * Loads all active translations using the translation loaders from the `@angular/localize` package.
  * @param context The architect builder context for the current build.
