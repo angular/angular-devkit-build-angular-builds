@@ -9,7 +9,9 @@ import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { OutputFile } from 'esbuild';
 import { ApplicationBuilderInternalOptions } from './options';
 import { Schema as ApplicationBuilderOptions } from './schema';
-export declare function buildApplicationInternal(options: ApplicationBuilderInternalOptions, context: BuilderContext, infrastructureSettings?: {
+export declare function buildApplicationInternal(options: ApplicationBuilderInternalOptions, context: BuilderContext & {
+    signal?: AbortSignal;
+}, infrastructureSettings?: {
     write?: boolean;
 }): AsyncIterable<BuilderOutput & {
     outputFiles?: OutputFile[];
