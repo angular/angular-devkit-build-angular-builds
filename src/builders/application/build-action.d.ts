@@ -21,5 +21,4 @@ export declare function runEsBuildBuildAction(action: (rebuildState?: RebuildSta
     progress?: boolean;
     deleteOutputPath?: boolean;
     poll?: number;
-    signal?: AbortSignal;
 }): AsyncIterable<(ExecutionResult['outputWithFiles'] | ExecutionResult['output']) & BuilderOutput>;
