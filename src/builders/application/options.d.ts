@@ -117,5 +117,6 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
         duplicateTranslationBehavior?: I18NTranslation | undefined;
         missingTranslationBehavior?: I18NTranslation | undefined;
     };
+    namedChunks: boolean | undefined;
 }>;
 export {};

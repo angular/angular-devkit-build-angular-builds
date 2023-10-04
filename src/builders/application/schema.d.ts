@@ -74,6 +74,10 @@ export interface Schema {
      */
     localize?: Localize;
     /**
+     * Use file name for lazy loaded chunks.
+     */
+    namedChunks?: boolean;
+    /**
      * Enables optimization of the build output. Including minification of scripts and styles,
      * tree-shaking, dead-code elimination, inlining of critical CSS and fonts inlining. For
      * more information, see
