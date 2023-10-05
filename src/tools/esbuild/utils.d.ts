@@ -35,3 +35,8 @@ export declare function cloneOutputFile(file: OutputFile): OutputFile;
  * @see https://esbuild.github.io/api/#target
  */
 export declare function transformSupportedBrowsersToTargets(supportedBrowsers: string[]): string[];
+/**
+ * Transform supported Node.js versions to esbuild target.
+ * @see https://esbuild.github.io/api/#target
+ */
+export declare function getSupportedNodeTargets(): string[];
