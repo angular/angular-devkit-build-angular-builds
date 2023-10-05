@@ -5,13 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import type { OutputFile } from 'esbuild';
+import { BuildOutputFile } from './bundler-context';
 /**
  * Inlining options that should apply to all transformed code.
  */
 export interface I18nInlinerOptions {
     missingTranslation: 'error' | 'warning' | 'ignore';
-    outputFiles: OutputFile[];
+    outputFiles: BuildOutputFile[];
     shouldOptimize?: boolean;
 }
 /**
@@ -31,7 +31,7 @@ export declare class I18nInliner {
      * @param translation The translation messages to use when inlining.
      * @returns A promise that resolves to an array of OutputFiles representing a translated result.
      */
-    inlineForLocale(locale: string, translation: Record<string, unknown> | undefined): Promise<OutputFile[]>;
+    inlineForLocale(locale: string, translation: Record<string, unknown> | undefined): Promise<BuildOutputFile[]>;
     /**
      * Stops all active transformation tasks and shuts down all workers.
      * @returns A void promise that resolves when closing is complete.

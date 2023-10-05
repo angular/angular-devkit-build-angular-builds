@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
-import type { OutputFile } from 'esbuild';
+import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { ApplicationBuilderInternalOptions } from './options';
 import { Schema as ApplicationBuilderOptions } from './schema';
 export declare function buildApplicationInternal(options: ApplicationBuilderInternalOptions, context: BuilderContext & {
@@ -14,14 +14,14 @@ export declare function buildApplicationInternal(options: ApplicationBuilderInte
 }, infrastructureSettings?: {
     write?: boolean;
 }): AsyncIterable<BuilderOutput & {
-    outputFiles?: OutputFile[];
+    outputFiles?: BuildOutputFile[];
     assetFiles?: {
         source: string;
         destination: string;
     }[];
 }>;
 export declare function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext): AsyncIterable<BuilderOutput & {
-    outputFiles?: OutputFile[];
+    outputFiles?: BuildOutputFile[];
     assetFiles?: {
         source: string;
         destination: string;

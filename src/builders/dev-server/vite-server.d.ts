@@ -15,6 +15,7 @@ interface OutputFileRecord {
     size: number;
     hash?: Buffer;
     updated: boolean;
+    servable: boolean;
 }
 export declare function serveWithVite(serverOptions: NormalizedDevServerOptions, builderName: string, context: BuilderContext): AsyncIterableIterator<DevServerBuilderOutput>;
 export declare function setupServer(serverOptions: NormalizedDevServerOptions, outputFiles: Map<string, OutputFileRecord>, assets: Map<string, string>, preserveSymlinks: boolean | undefined, prebundleExclude: string[] | undefined, ssr: boolean, prebundleTransformer: JavaScriptTransformer): Promise<InlineConfig>;
