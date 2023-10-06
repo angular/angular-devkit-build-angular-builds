@@ -7,8 +7,9 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuildOptions, Metafile, OutputFile, PartialMessage } from 'esbuild';
+import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
-export declare function logBuildStats(context: BuilderContext, metafile: Metafile, initial: Map<string, InitialFileRecord>, estimatedTransferSizes?: Map<string, number>): void;
+export declare function logBuildStats(context: BuilderContext, metafile: Metafile, initial: Map<string, InitialFileRecord>, budgetFailures: BudgetCalculatorResult[] | undefined, estimatedTransferSizes?: Map<string, number>): void;
 export declare function calculateEstimatedTransferSizes(outputFiles: OutputFile[]): Promise<Map<string, number>>;
 export declare function withSpinner<T>(text: string, action: () => T | Promise<T>): Promise<T>;
 export declare function withNoProgress<T>(test: string, action: () => T | Promise<T>): Promise<T>;

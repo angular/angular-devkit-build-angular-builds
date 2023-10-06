@@ -118,5 +118,6 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
         missingTranslationBehavior?: I18NTranslation | undefined;
     };
     namedChunks: boolean | undefined;
+    budgets: import("./schema").Budget[] | undefined;
 }>;
 export {};
