@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
-import type { SourceFileCache, createCompilerPlugin } from './angular/compiler-plugin';
+import type { createCompilerPlugin } from './angular/compiler-plugin';
+import type { SourceFileCache } from './angular/source-file-cache';
 type CreateCompilerPluginParameters = Parameters<typeof createCompilerPlugin>;
 export declare function createCompilerPluginOptions(options: NormalizedApplicationBuildOptions, target: string[], sourceFileCache?: SourceFileCache): {
     pluginOptions: CreateCompilerPluginParameters[0];

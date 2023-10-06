@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { ChangedFiles } from '../../tools/esbuild/watcher';
-import type { SourceFileCache } from './angular/compiler-plugin';
+import type { SourceFileCache } from './angular/source-file-cache';
 import type { BuildOutputFile, BuildOutputFileType, BundlerContext } from './bundler-context';
 export interface RebuildState {
     rebuildContexts: BundlerContext[];
