@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { OutputFile, PluginBuild } from 'esbuild';
-import { LoadResultCache } from '../load-result-cache';
-import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
+import { ComponentStylesheetBundler } from './component-stylesheets';
 /**
  * Sets up esbuild resolve and load callbacks to support Angular JIT mode processing
  * for both Component stylesheets and templates. These callbacks work alongside the JIT
@@ -17,6 +16,4 @@ import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
  * @param styleOptions The options to use when bundling stylesheets.
  * @param stylesheetResourceFiles An array where stylesheet resources will be added.
  */
-export declare function setupJitPluginCallbacks(build: PluginBuild, styleOptions: BundleStylesheetOptions & {
-    inlineStyleLanguage: string;
-}, stylesheetResourceFiles: OutputFile[], cache?: LoadResultCache): void;
+export declare function setupJitPluginCallbacks(build: PluginBuild, stylesheetBundler: ComponentStylesheetBundler, stylesheetResourceFiles: OutputFile[], inlineStyleLanguage: string): void;
