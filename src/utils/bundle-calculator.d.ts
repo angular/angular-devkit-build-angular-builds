@@ -32,13 +32,12 @@ export interface BudgetChunk {
 export interface BudgetAsset {
     name: string;
     size: number;
-    componentStyle?: boolean;
 }
 export interface BudgetStats {
     chunks?: BudgetChunk[];
     assets?: BudgetAsset[];
 }
 export declare function calculateThresholds(budget: Budget): IterableIterator<Threshold>;
-export declare function checkBudgets(budgets: Budget[], stats: BudgetStats, checkComponentStyles?: boolean): IterableIterator<BudgetCalculatorResult>;
+export declare function checkBudgets(budgets: Budget[], stats: BudgetStats): IterableIterator<BudgetCalculatorResult>;
 export declare function checkThresholds(thresholds: IterableIterator<Threshold>, size: number, label?: string): IterableIterator<BudgetCalculatorResult>;
 export {};
