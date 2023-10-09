@@ -1,0 +1,16 @@
+"use strict";
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+// TODO: remove the below once @types/node are version 20.x.x
+// @ts-expect-error "node:module"' has no exported member 'register'.ts(2305)
+const node_module_1 = require("node:module");
+const node_url_1 = require("node:url");
+const node_worker_threads_1 = require("node:worker_threads");
+(0, node_module_1.register)('./loader-hooks.js', (0, node_url_1.pathToFileURL)(__filename), { data: node_worker_threads_1.workerData });
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicmVnaXN0ZXItaG9va3MuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9wYWNrYWdlcy9hbmd1bGFyX2RldmtpdC9idWlsZF9hbmd1bGFyL3NyYy91dGlscy9zZXJ2ZXItcmVuZGVyaW5nL2VzbS1pbi1tZW1vcnktbG9hZGVyL3JlZ2lzdGVyLWhvb2tzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFBQTs7Ozs7O0dBTUc7O0FBRUgsNkRBQTZEO0FBQzdELDZFQUE2RTtBQUM3RSw2Q0FBdUM7QUFDdkMsdUNBQXlDO0FBQ3pDLDZEQUFpRDtBQUVqRCxJQUFBLHNCQUFRLEVBQUMsbUJBQW1CLEVBQUUsSUFBQSx3QkFBYSxFQUFDLFVBQVUsQ0FBQyxFQUFFLEVBQUUsSUFBSSxFQUFFLGdDQUFVLEVBQUUsQ0FBQyxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiLyoqXG4gKiBAbGljZW5zZVxuICogQ29weXJpZ2h0IEdvb2dsZSBMTEMgQWxsIFJpZ2h0cyBSZXNlcnZlZC5cbiAqXG4gKiBVc2Ugb2YgdGhpcyBzb3VyY2UgY29kZSBpcyBnb3Zlcm5lZCBieSBhbiBNSVQtc3R5bGUgbGljZW5zZSB0aGF0IGNhbiBiZVxuICogZm91bmQgaW4gdGhlIExJQ0VOU0UgZmlsZSBhdCBodHRwczovL2FuZ3VsYXIuaW8vbGljZW5zZVxuICovXG5cbi8vIFRPRE86IHJlbW92ZSB0aGUgYmVsb3cgb25jZSBAdHlwZXMvbm9kZSBhcmUgdmVyc2lvbiAyMC54Lnhcbi8vIEB0cy1leHBlY3QtZXJyb3IgXCJub2RlOm1vZHVsZVwiJyBoYXMgbm8gZXhwb3J0ZWQgbWVtYmVyICdyZWdpc3RlcicudHMoMjMwNSlcbmltcG9ydCB7IHJlZ2lzdGVyIH0gZnJvbSAnbm9kZTptb2R1bGUnO1xuaW1wb3J0IHsgcGF0aFRvRmlsZVVSTCB9IGZyb20gJ25vZGU6dXJsJztcbmltcG9ydCB7IHdvcmtlckRhdGEgfSBmcm9tICdub2RlOndvcmtlcl90aHJlYWRzJztcblxucmVnaXN0ZXIoJy4vbG9hZGVyLWhvb2tzLmpzJywgcGF0aFRvRmlsZVVSTChfX2ZpbGVuYW1lKSwgeyBkYXRhOiB3b3JrZXJEYXRhIH0pO1xuIl19

@@ -13,6 +13,7 @@ export interface ESMInMemoryFileLoaderWorkerData {
     outputFiles: Record<string, string>;
     workspaceRoot: string;
 }
+export declare function initialize(data: ESMInMemoryFileLoaderWorkerData): void;
 export declare function resolve(specifier: string, context: {
     parentURL: undefined | string;
 }, nextResolve: Function): any;
