@@ -30,6 +30,10 @@ interface InternalOptions {
      * This is only used by the development server which currently only supports a single locale per build.
      */
     forceI18nFlatOutput?: boolean;
+    /**
+     * Allows for usage of the deprecated `deployUrl` option with the compatibility builder `browser-esbuild`.
+     */
+    deployUrl?: string;
 }
 /** Full set of options for `application` builder. */
 export type ApplicationBuilderInternalOptions = Omit<ApplicationBuilderOptions & InternalOptions, 'browser'> & {
@@ -119,5 +123,6 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     };
     namedChunks: boolean | undefined;
     budgets: import("./schema").Budget[] | undefined;
+    publicPath: string | undefined;
 }>;
 export {};

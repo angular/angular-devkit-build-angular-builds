@@ -23,6 +23,7 @@ export interface BundleStylesheetOptions {
         file: string;
         package: string;
     };
+    publicPath?: string;
 }
 export declare function createStylesheetBundleOptions(options: BundleStylesheetOptions, cache?: LoadResultCache, inlineComponentData?: Record<string, string>): BuildOptions & {
     plugins: NonNullable<BuildOptions['plugins']>;
