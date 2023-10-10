@@ -61,7 +61,7 @@ export interface BuildOptions {
     codeCoverageExclude?: string[];
     supportedBrowsers?: string[];
 }
-export interface WebpackDevServerOptions extends BuildOptions, Omit<DevServerSchema, 'optimization' | 'sourceMap' | 'browserTarget'> {
+export interface WebpackDevServerOptions extends BuildOptions, Omit<DevServerSchema, 'optimization' | 'sourceMap' | 'buildTarget' | 'browserTarget'> {
 }
 export interface WebpackConfigOptions<T = BuildOptions> {
     root: string;
