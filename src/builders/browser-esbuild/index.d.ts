@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import type { Plugin } from 'esbuild';
 import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { Schema as BrowserBuilderOptions } from './schema';
 /**
@@ -17,7 +18,7 @@ import { Schema as BrowserBuilderOptions } from './schema';
  */
 export declare function buildEsbuildBrowser(userOptions: BrowserBuilderOptions, context: BuilderContext, infrastructureSettings?: {
     write?: boolean;
-}): AsyncIterable<BuilderOutput & {
+}, plugins?: Plugin[]): AsyncIterable<BuilderOutput & {
     outputFiles?: BuildOutputFile[];
     assetFiles?: {
         source: string;

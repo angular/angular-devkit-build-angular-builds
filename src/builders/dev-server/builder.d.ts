@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { BuilderContext } from '@angular-devkit/architect';
+import type { Plugin } from 'esbuild';
 import { Observable } from 'rxjs';
 import type { ExecutionTransformer } from '../../transforms';
 import type { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
@@ -24,4 +25,4 @@ export declare function execute(options: DevServerBuilderOptions, context: Build
     webpackConfiguration?: ExecutionTransformer<import('webpack').Configuration>;
     logging?: import('@angular-devkit/build-webpack').WebpackLoggingCallback;
     indexHtml?: IndexHtmlTransform;
-}): Observable<DevServerBuilderOutput>;
+}, plugins?: Plugin[]): Observable<DevServerBuilderOutput>;
