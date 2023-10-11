@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
+import type { Plugin } from 'esbuild';
 import { I18nOptions } from '../../utils/i18n-options';
 import { Schema as ApplicationBuilderOptions, I18NTranslation } from './schema';
 export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normalizeOptions>>;
@@ -47,9 +48,10 @@ export type ApplicationBuilderInternalOptions = Omit<ApplicationBuilderOptions &
  * @param context The context for current builder execution.
  * @param projectName The name of the project for the current execution.
  * @param options An object containing the options to use for the build.
+ * @param plugins An optional array of programmatically supplied build plugins.
  * @returns An object containing normalized options required to perform the build.
  */
-export declare function normalizeOptions(context: BuilderContext, projectName: string, options: ApplicationBuilderInternalOptions): Promise<{
+export declare function normalizeOptions(context: BuilderContext, projectName: string, options: ApplicationBuilderInternalOptions, plugins?: Plugin[]): Promise<{
     advancedOptimizations: boolean;
     allowedCommonJsDependencies: string[] | undefined;
     baseHref: string | undefined;
@@ -124,5 +126,6 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     namedChunks: boolean | undefined;
     budgets: import("./schema").Budget[] | undefined;
     publicPath: string | undefined;
+    plugins: Plugin[] | undefined;
 }>;
 export {};
