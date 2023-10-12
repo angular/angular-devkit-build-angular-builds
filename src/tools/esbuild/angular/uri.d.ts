@@ -49,6 +49,6 @@ export declare function generateJitInlineUri(data: string | Uint8Array, type: 's
 export declare function parseJitUri(uri: string): {
     namespace: string;
     type: "style" | "template";
-    origin: "inline" | "file";
+    origin: "file" | "inline";
     specifier: string;
 } | undefined;

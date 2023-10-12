@@ -19,7 +19,7 @@ export type NormalizedDevServerOptions = Awaited<ReturnType<typeof normalizeOpti
  * @returns An object containing normalized options required to perform the build.
  */
 export declare function normalizeOptions(context: BuilderContext, projectName: string, options: DevServerOptions): Promise<{
-    browserTarget: import("@angular-devkit/architect").Target;
+    buildTarget: import("@angular-devkit/architect").Target;
     host: string;
     port: number;
     poll: number | undefined;

@@ -14,4 +14,4 @@ import type { Plugin } from 'esbuild';
  * For more information, see https://developer.chrome.com/articles/x-google-ignore-list/
  * @returns An esbuild plugin.
  */
-export declare function createSourcemapIngorelistPlugin(): Plugin;
+export declare function createSourcemapIgnorelistPlugin(): Plugin;

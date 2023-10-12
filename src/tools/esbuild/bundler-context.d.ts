@@ -13,7 +13,7 @@ export type BundleContextResult = {
     errors: undefined;
     warnings: Message[];
     metafile: Metafile;
-    outputFiles: OutputFile[];
+    outputFiles: BuildOutputFile[];
     initialFiles: Map<string, InitialFileRecord>;
 };
 export interface InitialFileRecord {
@@ -21,6 +21,17 @@ export interface InitialFileRecord {
     name?: string;
     type: 'script' | 'style';
     external?: boolean;
+}
+export declare enum BuildOutputFileType {
+    Browser = 1,
+    Media = 2,
+    Server = 3,
+    Root = 4
+}
+export interface BuildOutputFile extends OutputFile {
+    type: BuildOutputFileType;
+    fullOutputPath: string;
+    clone: () => BuildOutputFile;
 }
 export declare class BundlerContext {
     #private;

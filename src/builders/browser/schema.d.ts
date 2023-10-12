@@ -98,7 +98,6 @@ export interface Schema {
     outputHashing?: OutputHashing;
     /**
      * The full path for the new output directory, relative to the current workspace.
-     * By default, writes output to a folder named dist/ in the current project.
      */
     outputPath: string;
     /**

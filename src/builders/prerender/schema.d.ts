@@ -4,9 +4,9 @@ export interface Schema {
      */
     browserTarget: string;
     /**
-     * Whether or not the builder should extract routes and guess which paths to render.
+     * Whether the builder should discover routers using the Angular Router.
      */
-    guessRoutes?: boolean;
+    discoverRoutes?: boolean;
     /**
      * The routes to render.
      */

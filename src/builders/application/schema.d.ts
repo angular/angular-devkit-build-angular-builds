@@ -74,6 +74,10 @@ export interface Schema {
      */
     localize?: Localize;
     /**
+     * Use file name for lazy loaded chunks.
+     */
+    namedChunks?: boolean;
+    /**
      * Enables optimization of the build output. Including minification of scripts and styles,
      * tree-shaking, dead-code elimination, inlining of critical CSS and fonts inlining. For
      * more information, see
@@ -86,7 +90,6 @@ export interface Schema {
     outputHashing?: OutputHashing;
     /**
      * The full path for the new output directory, relative to the current workspace.
-     * By default, writes output to a folder named dist/ in the current project.
      */
     outputPath: string;
     /**
@@ -132,7 +135,7 @@ export interface Schema {
     /**
      * Server side render (SSR) pages of your application during runtime.
      */
-    ssr?: SsrUnion;
+    ssr?: ServiceWorker;
     /**
      * Generates a 'stats.json' file which can be analyzed with
      * https://esbuild.github.io/analyze/.
@@ -357,13 +360,9 @@ export declare enum OutputHashing {
 export type PrerenderUnion = boolean | PrerenderClass;
 export interface PrerenderClass {
     /**
-     * Whether the builder should statically discover routes.
+     * Whether the builder should discover routers using the Angular Router.
      */
     discoverRoutes?: boolean;
-    /**
-     * The routes to render.
-     */
-    routes?: string[];
     /**
      * The path to a file containing routes separated by newlines.
      */
@@ -386,6 +385,8 @@ export interface ScriptClass {
 }
 /**
  * Generates a service worker configuration.
+ *
+ * Server side render (SSR) pages of your application during runtime.
  */
 export type ServiceWorker = boolean | string;
 /**
@@ -410,16 +411,6 @@ export interface SourceMapClass {
      * Resolve vendor packages source maps.
      */
     vendor?: boolean;
-}
-/**
- * Server side render (SSR) pages of your application during runtime.
- */
-export type SsrUnion = boolean | SsrClass;
-export interface SsrClass {
-    /**
-     * The server entry-point that when executed will spawn the web server.
-     */
-    entry?: string;
 }
 /**
  * Options to pass to style preprocessors.

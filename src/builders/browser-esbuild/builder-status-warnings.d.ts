@@ -7,4 +7,4 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { Schema as BrowserBuilderOptions } from './schema';
-export declare function logBuilderStatusWarnings(options: BrowserBuilderOptions, context: BuilderContext): void;
+export declare function logBuilderStatusWarnings(options: BrowserBuilderOptions, { logger }: BuilderContext): void;

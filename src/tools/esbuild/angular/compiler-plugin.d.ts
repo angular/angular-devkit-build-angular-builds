@@ -6,19 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { Plugin } from 'esbuild';
-import ts from 'typescript';
-import { LoadResultCache, MemoryLoadResultCache } from '../load-result-cache';
+import { LoadResultCache } from '../load-result-cache';
 import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
-export declare class SourceFileCache extends Map<string, ts.SourceFile> {
-    readonly persistentCachePath?: string | undefined;
-    readonly modifiedFiles: Set<string>;
-    readonly babelFileCache: Map<string, Uint8Array>;
-    readonly typeScriptFileCache: Map<string, string | Uint8Array>;
-    readonly loadResultCache: MemoryLoadResultCache;
-    referencedFiles?: readonly string[];
-    constructor(persistentCachePath?: string | undefined);
-    invalidate(files: Iterable<string>): void;
-}
+import { SourceFileCache } from './source-file-cache';
 export interface CompilerPluginOptions {
     sourcemap: boolean;
     tsconfig: string;

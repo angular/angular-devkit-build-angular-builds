@@ -209,7 +209,7 @@
     },
     "outputPath": {
       "type": "string",
-      "description": "The full path for the new output directory, relative to the current workspace.\nBy default, writes output to a folder named dist/ in the current project."
+      "description": "The full path for the new output directory, relative to the current workspace."
     },
     "aot": {
       "type": "boolean",
@@ -325,6 +325,11 @@
       "description": "Extract all licenses in a separate file.",
       "default": true
     },
+    "namedChunks": {
+      "type": "boolean",
+      "description": "Use file name for lazy loaded chunks.",
+      "default": false
+    },
     "subresourceIntegrity": {
       "type": "boolean",
       "description": "Enables the use of subresource integrity validation.",
@@ -423,19 +428,9 @@
               "type": "string",
               "description": "The path to a file containing routes separated by newlines."
             },
-            "routes": {
-              "type": "array",
-              "description": "The routes to render.",
-              "items": {
-                "minItems": 1,
-                "type": "string",
-                "uniqueItems": true
-              },
-              "default": []
-            },
             "discoverRoutes": {
               "type": "boolean",
-              "description": "Whether the builder should statically discover routes.",
+              "description": "Whether the builder should discover routers using the Angular Router.",
               "default": true
             }
           },
@@ -452,14 +447,8 @@
           "description": "Enable the server bundles to be written to disk."
         },
         {
-          "type": "object",
-          "properties": {
-            "entry": {
-              "type": "string",
-              "description": "The server entry-point that when executed will spawn the web server."
-            }
-          },
-          "additionalProperties": false
+          "type": "string",
+          "description": "The server entry-point that when executed will spawn the web server."
         }
       ]
     },

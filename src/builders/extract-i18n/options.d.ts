@@ -21,7 +21,7 @@ export type NormalizedExtractI18nOptions = Awaited<ReturnType<typeof normalizeOp
 export declare function normalizeOptions(context: BuilderContext, projectName: string, options: ExtractI18nOptions): Promise<{
     workspaceRoot: string;
     projectRoot: string;
-    browserTarget: import("@angular-devkit/architect").Target;
+    buildTarget: import("@angular-devkit/architect").Target;
     i18nOptions: import("../../utils/i18n-options").I18nOptions;
     format: Format.Arb | Format.Json | Format.LegacyMigrate | Format.Xliff | Format.Xliff2 | Format.Xmb;
     outFile: string;

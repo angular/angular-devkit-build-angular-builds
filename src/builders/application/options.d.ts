@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
+import type { Plugin } from 'esbuild';
 import { I18nOptions } from '../../utils/i18n-options';
 import { Schema as ApplicationBuilderOptions, I18NTranslation } from './schema';
 export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normalizeOptions>>;
@@ -25,6 +26,15 @@ interface InternalOptions {
      * Currently used by the dev-server to support prebundling.
      */
     externalPackages?: boolean;
+    /**
+     * Forces the output from the localize post-processing to not create nested directories per locale output.
+     * This is only used by the development server which currently only supports a single locale per build.
+     */
+    forceI18nFlatOutput?: boolean;
+    /**
+     * Allows for usage of the deprecated `deployUrl` option with the compatibility builder `browser-esbuild`.
+     */
+    deployUrl?: string;
 }
 /** Full set of options for `application` builder. */
 export type ApplicationBuilderInternalOptions = Omit<ApplicationBuilderOptions & InternalOptions, 'browser'> & {
@@ -38,9 +48,10 @@ export type ApplicationBuilderInternalOptions = Omit<ApplicationBuilderOptions &
  * @param context The context for current builder execution.
  * @param projectName The name of the project for the current execution.
  * @param options An object containing the options to use for the build.
+ * @param plugins An optional array of programmatically supplied build plugins.
  * @returns An object containing normalized options required to perform the build.
  */
-export declare function normalizeOptions(context: BuilderContext, projectName: string, options: ApplicationBuilderInternalOptions): Promise<{
+export declare function normalizeOptions(context: BuilderContext, projectName: string, options: ApplicationBuilderInternalOptions, plugins?: Plugin[]): Promise<{
     advancedOptimizations: boolean;
     allowedCommonJsDependencies: string[] | undefined;
     baseHref: string | undefined;
@@ -62,7 +73,6 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     serverEntryPoint: string | undefined;
     prerenderOptions: {
         discoverRoutes: boolean;
-        routes: string[];
         routesFile: string | undefined;
     } | undefined;
     appShellOptions: {
@@ -71,7 +81,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     ssrOptions: {
         entry?: undefined;
     } | {
-        entry: string | undefined;
+        entry: string;
     } | undefined;
     verbose: boolean | undefined;
     watch: boolean | undefined;
@@ -113,5 +123,9 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
         duplicateTranslationBehavior?: I18NTranslation | undefined;
         missingTranslationBehavior?: I18NTranslation | undefined;
     };
+    namedChunks: boolean | undefined;
+    budgets: import("./schema").Budget[] | undefined;
+    publicPath: string | undefined;
+    plugins: Plugin[] | undefined;
 }>;
 export {};
