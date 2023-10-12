@@ -9,6 +9,7 @@ import { BuilderContext } from '@angular-devkit/architect';
 import { BuildOptions, Metafile, OutputFile, PartialMessage } from 'esbuild';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
+import { BuildOutputAsset } from './bundler-execution-result';
 export declare function logBuildStats(context: BuilderContext, metafile: Metafile, initial: Map<string, InitialFileRecord>, budgetFailures: BudgetCalculatorResult[] | undefined, estimatedTransferSizes?: Map<string, number>): void;
 export declare function calculateEstimatedTransferSizes(outputFiles: OutputFile[]): Promise<Map<string, number>>;
 export declare function withSpinner<T>(text: string, action: () => T | Promise<T>): Promise<T>;
@@ -24,10 +25,8 @@ export declare function logMessages(context: BuilderContext, { errors, warnings 
  * @returns An object that can be used with the esbuild build `supported` option.
  */
 export declare function getFeatureSupport(target: string[]): BuildOptions['supported'];
-export declare function writeResultFiles(outputFiles: BuildOutputFile[], assetFiles: {
-    source: string;
-    destination: string;
-}[] | undefined, outputPath: string): Promise<void>;
+export declare function writeResultFiles(outputFiles: BuildOutputFile[], assetFiles: BuildOutputAsset[] | undefined, outputPath: string): Promise<void>;
+export declare function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(files: T[], writeFileCallback: (file: T) => Promise<void>): Promise<void>;
 export declare function createOutputFileFromText(path: string, text: string, type: BuildOutputFileType): BuildOutputFile;
 export declare function createOutputFileFromData(path: string, data: Uint8Array, type: BuildOutputFileType): BuildOutputFile;
 export declare function getFullOutputPath(file: BuildOutputFile): string;
