@@ -12,7 +12,7 @@ import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundl
 export declare function logBuildStats(context: BuilderContext, metafile: Metafile, initial: Map<string, InitialFileRecord>, budgetFailures: BudgetCalculatorResult[] | undefined, estimatedTransferSizes?: Map<string, number>): void;
 export declare function calculateEstimatedTransferSizes(outputFiles: OutputFile[]): Promise<Map<string, number>>;
 export declare function withSpinner<T>(text: string, action: () => T | Promise<T>): Promise<T>;
-export declare function withNoProgress<T>(test: string, action: () => T | Promise<T>): Promise<T>;
+export declare function withNoProgress<T>(text: string, action: () => T | Promise<T>): Promise<T>;
 export declare function logMessages(context: BuilderContext, { errors, warnings }: {
     errors?: PartialMessage[];
     warnings?: PartialMessage[];
