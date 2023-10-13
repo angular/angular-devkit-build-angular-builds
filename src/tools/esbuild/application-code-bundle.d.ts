@@ -9,6 +9,7 @@ import type { BuildOptions } from 'esbuild';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { SourceFileCache } from './angular/source-file-cache';
 export declare function createBrowserCodeBundleOptions(options: NormalizedApplicationBuildOptions, target: string[], sourceFileCache?: SourceFileCache): BuildOptions;
+export declare function createBrowserPolyfillBundleOptions(options: NormalizedApplicationBuildOptions, target: string[], sourceFileCache?: SourceFileCache): BuildOptions | undefined;
 /**
  * Create an esbuild 'build' options object for the server bundle.
  * @param options The builder's user-provider normalized options.
