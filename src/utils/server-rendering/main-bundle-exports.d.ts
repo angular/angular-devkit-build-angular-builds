@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import type { ApplicationRef, Type } from '@angular/core';
+import type { ApplicationRef, Type, ɵConsole } from '@angular/core';
 import type { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import type { extractRoutes } from '../routes-extractor/extractor';
 export interface MainServerBundleExports {
@@ -20,4 +20,6 @@ export interface MainServerBundleExports {
     /** Method to extract routes from the router config. */
     extractRoutes: typeof extractRoutes;
     ɵresetCompiledComponents?: () => void;
+    /** Angular Console token/class. */
+    ɵConsole: typeof ɵConsole;
 }
