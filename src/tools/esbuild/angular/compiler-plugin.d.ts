@@ -20,6 +20,7 @@ export interface CompilerPluginOptions {
     fileReplacements?: Record<string, string>;
     sourceFileCache?: SourceFileCache;
     loadResultCache?: LoadResultCache;
+    incremental: boolean;
 }
 export declare function createCompilerPlugin(pluginOptions: CompilerPluginOptions, styleOptions: BundleStylesheetOptions & {
     inlineStyleLanguage: string;
