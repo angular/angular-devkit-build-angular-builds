@@ -16,13 +16,14 @@ import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
 export declare class ComponentStylesheetBundler {
     #private;
     private readonly options;
+    private readonly incremental;
     private readonly cache?;
     /**
      *
      * @param options An object containing the stylesheet bundling options.
      * @param cache A load result cache to use when bundling.
      */
-    constructor(options: BundleStylesheetOptions, cache?: LoadResultCache | undefined);
+    constructor(options: BundleStylesheetOptions, incremental: boolean, cache?: LoadResultCache | undefined);
     bundleFile(entry: string): Promise<{
         errors: import("esbuild").Message[] | undefined;
         warnings: import("esbuild").Message[];
