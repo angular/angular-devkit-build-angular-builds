@@ -19,6 +19,7 @@ import { NormalizedApplicationBuildOptions } from './options';
 export declare function inlineI18n(options: NormalizedApplicationBuildOptions, executionResult: ExecutionResult, initialFiles: Map<string, InitialFileRecord>): Promise<{
     errors: string[];
     warnings: string[];
+    prerenderedRoutes: string[];
 }>;
 /**
  * Loads all active translations using the translation loaders from the `@angular/localize` package.

@@ -23,10 +23,12 @@ export declare abstract class AngularCompilation {
         compilerOptions: ng.CompilerOptions;
         referencedFiles: readonly string[];
     }>;
-    abstract emitAffectedFiles(): Iterable<EmitFileResult>;
-    protected abstract collectDiagnostics(): Iterable<ts.Diagnostic>;
+    abstract emitAffectedFiles(): Iterable<EmitFileResult> | Promise<Iterable<EmitFileResult>>;
+    protected abstract collectDiagnostics(): Iterable<ts.Diagnostic> | Promise<Iterable<ts.Diagnostic>>;
     diagnoseFiles(): Promise<{
         errors?: PartialMessage[];
         warnings?: PartialMessage[];
     }>;
+    update?(files: Set<string>): Promise<void>;
+    close?(): Promise<void>;
 }

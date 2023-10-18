@@ -9,5 +9,6 @@ export declare const allowMangle: boolean;
 export declare const shouldBeautify: boolean;
 export declare const allowMinify: boolean;
 export declare const maxWorkers: number;
+export declare const useParallelTs: boolean;
 export declare const useLegacySass: boolean;
 export declare const debugPerformance: boolean;
