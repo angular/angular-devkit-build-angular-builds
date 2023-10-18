@@ -21,4 +21,5 @@ export declare function executePostBundleSteps(options: NormalizedApplicationBui
     warnings: string[];
     additionalOutputFiles: BuildOutputFile[];
     additionalAssets: BuildOutputAsset[];
+    prerenderedRoutes: string[];
 }>;

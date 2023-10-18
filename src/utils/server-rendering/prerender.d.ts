@@ -17,5 +17,6 @@ export declare function prerenderPages(workspaceRoot: string, appShellOptions: A
     output: Record<string, string>;
     warnings: string[];
     errors: string[];
+    prerenderedRoutes: Set<string>;
 }>;
 export {};
