@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <reference types="node" />
+import type { PartialMessage } from 'esbuild';
 import { type MessagePort } from 'node:worker_threads';
 export interface InitRequest {
     jit: boolean;
@@ -24,8 +25,8 @@ export declare function initialize(request: InitRequest): Promise<{
     };
 }>;
 export declare function diagnose(): Promise<{
-    errors?: import("esbuild/lib/main").PartialMessage[] | undefined;
-    warnings?: import("esbuild/lib/main").PartialMessage[] | undefined;
+    errors?: PartialMessage[];
+    warnings?: PartialMessage[];
 }>;
 export declare function emit(): Promise<import("./angular-compilation").EmitFileResult[]>;
 export declare function update(files: Set<string>): void;
