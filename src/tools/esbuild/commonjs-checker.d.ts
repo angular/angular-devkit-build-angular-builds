@@ -15,7 +15,7 @@ import type { Metafile, PartialMessage } from 'esbuild';
  *
  * If any allowed dependencies are provided via the `allowedCommonJsDependencies`
  * parameter, both the direct import and any deep imports will be ignored and no
- * diagnostic will be generated.
+ * diagnostic will be generated. Use `'*'` as entry to skip the check.
  *
  * If a module has been issued a diagnostic message, then all descendant modules
  * will not be checked. This prevents a potential massive amount of inactionable

@@ -7,7 +7,7 @@
  */
 import { Compiler } from 'webpack';
 export interface CommonJsUsageWarnPluginOptions {
-    /** A list of CommonJS packages that are allowed to be used without a warning. */
+    /** A list of CommonJS or AMD packages that are allowed to be used without a warning. Use `'*'` to allow all. */
     allowedDependencies?: string[];
 }
 export declare class CommonJsUsageWarnPlugin {
