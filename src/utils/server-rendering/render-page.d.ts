@@ -5,14 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { MainServerBundleExports } from './main-bundle-exports';
+import { MainServerBundleExports, RenderUtilsServerBundleExports } from './main-bundle-exports';
 export interface RenderOptions {
     route: string;
     serverContext: ServerContext;
     outputFiles: Record<string, string>;
     document: string;
     inlineCriticalCss?: boolean;
-    loadBundle?: (path: string) => Promise<MainServerBundleExports>;
+    loadBundle?: ((path: './main.server.mjs') => Promise<MainServerBundleExports>) & ((path: './render-utils.server.mjs') => Promise<RenderUtilsServerBundleExports>);
 }
 export interface RenderResult {
     errors?: string[];
