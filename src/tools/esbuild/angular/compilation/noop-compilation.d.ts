@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type ng from '@angular/compiler-cli';
-import ts from 'typescript';
+import type ts from 'typescript';
 import { AngularHostOptions } from '../angular-host';
 import { AngularCompilation } from './angular-compilation';
 export declare class NoopCompilation extends AngularCompilation {
