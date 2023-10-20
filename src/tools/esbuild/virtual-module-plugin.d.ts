@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { OnLoadArgs, Plugin, PluginBuild } from 'esbuild';
+import { LoadResultCache } from './load-result-cache';
 /**
  * Options for the createVirtualModulePlugin
  * @see createVirtualModulePlugin
@@ -21,6 +22,8 @@ export interface VirtualModulePluginOptions {
     loadContent: (args: OnLoadArgs, build: PluginBuild) => ReturnType<Parameters<PluginBuild['onLoad']>[1]>;
     /** Restrict to only entry points. Defaults to `true`. */
     entryPointOnly?: boolean;
+    /** Load results cache. */
+    cache?: LoadResultCache;
 }
 /**
  * Creates an esbuild plugin that generated virtual modules.

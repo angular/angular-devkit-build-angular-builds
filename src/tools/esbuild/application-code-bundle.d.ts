@@ -16,3 +16,4 @@ export declare function createBrowserPolyfillBundleOptions(options: NormalizedAp
  * @returns An esbuild BuildOptions object.
  */
 export declare function createServerCodeBundleOptions(options: NormalizedApplicationBuildOptions, target: string[], sourceFileCache: SourceFileCache): BuildOptions;
+export declare function createServerPolyfillBundleOptions(options: NormalizedApplicationBuildOptions, target: string[], sourceFileCache?: SourceFileCache): BuildOptions | undefined;
