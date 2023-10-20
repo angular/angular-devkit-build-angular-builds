@@ -29,6 +29,7 @@ export declare function writeResultFiles(outputFiles: BuildOutputFile[], assetFi
 export declare function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(files: T[], writeFileCallback: (file: T) => Promise<void>): Promise<void>;
 export declare function createOutputFileFromText(path: string, text: string, type: BuildOutputFileType): BuildOutputFile;
 export declare function createOutputFileFromData(path: string, data: Uint8Array, type: BuildOutputFileType): BuildOutputFile;
+export declare function convertOutputFile(file: OutputFile, type: BuildOutputFileType): BuildOutputFile;
 export declare function getFullOutputPath(file: BuildOutputFile): string;
 /**
  * Transform browserlists result to esbuild target.

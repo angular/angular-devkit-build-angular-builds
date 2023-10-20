@@ -7,7 +7,7 @@
  */
 import type ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
-import ts from 'typescript';
+import type ts from 'typescript';
 import type { AngularHostOptions } from '../angular-host';
 export interface EmitFileResult {
     filename: string;
@@ -17,6 +17,7 @@ export interface EmitFileResult {
 export declare abstract class AngularCompilation {
     #private;
     static loadCompilerCli(): Promise<typeof ng>;
+    static loadTypescript(): Promise<typeof ts>;
     protected loadConfiguration(tsconfig: string): Promise<ng.CompilerOptions>;
     abstract initialize(tsconfig: string, hostOptions: AngularHostOptions, compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions): Promise<{
         affectedFiles: ReadonlySet<ts.SourceFile>;

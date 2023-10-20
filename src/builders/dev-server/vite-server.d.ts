@@ -14,7 +14,7 @@ import type { DevServerBuilderOutput } from './webpack-server';
 interface OutputFileRecord {
     contents: Uint8Array;
     size: number;
-    hash?: Buffer;
+    hash?: string;
     updated: boolean;
     servable: boolean;
 }
