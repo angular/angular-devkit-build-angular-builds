@@ -76,9 +76,7 @@ export declare class RelativeUrlRebasingImporter extends UrlRebasingImporter {
  */
 export declare class ModuleUrlRebasingImporter extends RelativeUrlRebasingImporter {
     private finder;
-    constructor(entryDirectory: string, directoryCache: Map<string, DirectoryEntry>, rebaseSourceMaps: Map<string, RawSourceMap> | undefined, finder: (specifier: string, options: CanonicalizeContext & {
-        resolveDir?: string;
-    }) => URL | null);
+    constructor(entryDirectory: string, directoryCache: Map<string, DirectoryEntry>, rebaseSourceMaps: Map<string, RawSourceMap> | undefined, finder: (specifier: string, options: CanonicalizeContext) => URL | null);
     canonicalize(url: string, options: CanonicalizeContext): URL | null;
 }
 /**
