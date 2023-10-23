@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { OutputFile } from 'esbuild';
-import { LoadResultCache } from '../load-result-cache';
 import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
 /**
  * Bundles component stylesheets. A stylesheet can be either an inline stylesheet that
@@ -17,13 +16,12 @@ export declare class ComponentStylesheetBundler {
     #private;
     private readonly options;
     private readonly incremental;
-    private readonly cache?;
     /**
      *
      * @param options An object containing the stylesheet bundling options.
      * @param cache A load result cache to use when bundling.
      */
-    constructor(options: BundleStylesheetOptions, incremental: boolean, cache?: LoadResultCache | undefined);
+    constructor(options: BundleStylesheetOptions, incremental: boolean);
     bundleFile(entry: string): Promise<{
         errors: import("esbuild").Message[] | undefined;
         warnings: import("esbuild").Message[];
@@ -44,5 +42,6 @@ export declare class ComponentStylesheetBundler {
         metafile: import("esbuild").Metafile | undefined;
         referencedFiles: Set<string> | undefined;
     }>;
+    invalidate(files: Iterable<string>): void;
     dispose(): Promise<void>;
 }

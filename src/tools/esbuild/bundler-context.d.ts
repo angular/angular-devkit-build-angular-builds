@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuildOptions, Message, Metafile, OutputFile } from 'esbuild';
+import { LoadResultCache } from './load-result-cache';
 export type BundleContextResult = {
     errors: Message[];
     warnings: Message[];
@@ -33,13 +34,14 @@ export interface BuildOutputFile extends OutputFile {
     fullOutputPath: string;
     clone: () => BuildOutputFile;
 }
+export type BundlerOptionsFactory<T extends BuildOptions = BuildOptions> = (loadCache: LoadResultCache | undefined) => T;
 export declare class BundlerContext {
     #private;
     private workspaceRoot;
     private incremental;
     private initialFilter?;
     readonly watchFiles: Set<string>;
-    constructor(workspaceRoot: string, incremental: boolean, options: BuildOptions, initialFilter?: ((initial: Readonly<InitialFileRecord>) => boolean) | undefined);
+    constructor(workspaceRoot: string, incremental: boolean, options: BuildOptions | BundlerOptionsFactory, initialFilter?: ((initial: Readonly<InitialFileRecord>) => boolean) | undefined);
     static bundleAll(contexts: Iterable<BundlerContext>): Promise<BundleContextResult>;
     /**
      * Executes the esbuild build function and normalizes the build result in the event of a
@@ -51,6 +53,7 @@ export declare class BundlerContext {
      * warnings and errors for the attempted build.
      */
     bundle(): Promise<BundleContextResult>;
+    invalidate(files: Iterable<string>): boolean;
     /**
      * Disposes incremental build resources present in the context.
      *
