@@ -361,11 +361,13 @@ export declare enum OutputHashing {
 export type PrerenderUnion = boolean | PrerenderClass;
 export interface PrerenderClass {
     /**
-     * Whether the builder should discover routers using the Angular Router.
+     * Whether the builder should process the Angular Router configuration to find all
+     * unparameterized routes and prerender them.
      */
     discoverRoutes?: boolean;
     /**
-     * The path to a file containing routes separated by newlines.
+     * The path to a file that contains a list of all routes to prerender, separated by
+     * newlines. This option is useful if you want to prerender routes with parameterized URLs.
      */
     routesFile?: string;
 }
