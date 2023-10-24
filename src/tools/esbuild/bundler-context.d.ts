@@ -53,6 +53,13 @@ export declare class BundlerContext {
      * warnings and errors for the attempted build.
      */
     bundle(): Promise<BundleContextResult>;
+    /**
+     * Invalidate a stored bundler result based on the previous watch files
+     * and a list of changed files.
+     * The context must be created with incremental mode enabled for results
+     * to be stored.
+     * @returns True, if the result was invalidated; False, otherwise.
+     */
     invalidate(files: Iterable<string>): boolean;
     /**
      * Disposes incremental build resources present in the context.
