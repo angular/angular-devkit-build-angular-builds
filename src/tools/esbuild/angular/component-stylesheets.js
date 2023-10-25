@@ -98,12 +98,11 @@ class ComponentStylesheetBundler {
         if (!this.incremental) {
             return;
         }
-        const normalizedFiles = [...files].map(node_path_1.default.normalize);
         for (const bundler of this.#fileContexts.values()) {
-            bundler.invalidate(normalizedFiles);
+            bundler.invalidate(files);
         }
         for (const bundler of this.#inlineContexts.values()) {
-            bundler.invalidate(normalizedFiles);
+            bundler.invalidate(files);
         }
     }
     async dispose() {
