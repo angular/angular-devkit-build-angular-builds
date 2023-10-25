@@ -9,6 +9,8 @@ import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loa
 export interface RoutesExtractorWorkerData extends ESMInMemoryFileLoaderWorkerData {
     document: string;
     verbose: boolean;
+    url: string;
+    assetsServerAddress: string;
 }
 export interface RoutersExtractorWorkerResult {
     routes: string[];

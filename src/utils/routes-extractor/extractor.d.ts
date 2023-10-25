@@ -11,5 +11,5 @@ interface RouterResult {
     success: boolean;
     redirect: boolean;
 }
-export declare function extractRoutes(bootstrapAppFnOrModule: (() => Promise<ApplicationRef>) | Type<unknown>, document: string): AsyncIterableIterator<RouterResult>;
+export declare function extractRoutes(bootstrapAppFnOrModule: (() => Promise<ApplicationRef>) | Type<unknown>, document: string, url: string): AsyncIterableIterator<RouterResult>;
 export {};
