@@ -85,11 +85,6 @@ async function executeBuild(options, context, rebuildState) {
         executionResult.addErrors(bundlingResult.errors);
         return executionResult;
     }
-    // Analyze external imports if external options are enabled
-    if (options.externalPackages || options.externalDependencies?.length) {
-        // TODO: Filter externalImports to generate second argument to support wildcard externalDependency values
-        executionResult.setExternalMetadata([...bundlingResult.externalImports], options.externalDependencies);
-    }
     const { metafile, initialFiles, outputFiles } = bundlingResult;
     executionResult.outputFiles.push(...outputFiles);
     // Check metafile for CommonJS module usage if optimizing scripts

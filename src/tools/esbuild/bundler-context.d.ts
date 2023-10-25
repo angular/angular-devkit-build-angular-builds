@@ -16,7 +16,6 @@ export type BundleContextResult = {
     metafile: Metafile;
     outputFiles: BuildOutputFile[];
     initialFiles: Map<string, InitialFileRecord>;
-    externalImports: Set<string>;
 };
 export interface InitialFileRecord {
     entrypoint: boolean;

@@ -100,10 +100,6 @@ async function* serveWithVite(serverOptions, builderName, context, plugins) {
     let hadError = false;
     const generatedFiles = new Map();
     const assetFiles = new Map();
-    const externalMetadata = {
-        implicit: [],
-        explicit: [],
-    };
     const build = builderName === '@angular-devkit/build-angular:application'
         ? application_1.buildApplicationInternal
         : browser_esbuild_1.buildEsbuildBrowser;
@@ -146,14 +142,6 @@ async function* serveWithVite(serverOptions, builderName, context, plugins) {
                 assetFiles.set('/' + normalizePath(asset.destination), asset.source);
             }
         }
-        // To avoid disconnecting the array objects from the option, these arrays need to be mutated
-        // instead of replaced.
-        if (result.externalMetadata.explicit) {
-            externalMetadata.explicit.push(...result.externalMetadata.explicit);
-        }
-        if (result.externalMetadata.implicit) {
-            externalMetadata.implicit.push(...result.externalMetadata.implicit);
-        }
         if (server) {
             handleUpdate(generatedFiles, server, serverOptions, context.logger);
         }
@@ -167,7 +155,7 @@ async function* serveWithVite(serverOptions, builderName, context, plugins) {
             const browsers = (0, supported_browsers_1.getSupportedBrowsers)(projectRoot, context.logger);
             const target = (0, utils_1.transformSupportedBrowsersToTargets)(browsers);
             // Setup server and start listening
-            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target);
+            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, browserOptions.externalDependencies, !!browserOptions.ssr, prebundleTransformer, target);
             server = await createServer(serverConfiguration);
             await server.listen();
             listeningAddress = server.httpServer?.address();
@@ -276,7 +264,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
     }
 }
 // eslint-disable-next-line max-lines-per-function
-async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target) {
+async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, prebundleExclude, ssr, prebundleTransformer, target) {
     const proxy = await (0, load_proxy_config_1.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig, true);
     // dynamically import Vite for ESM compatibility
     const { normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
@@ -311,7 +299,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
         },
         ssr: {
             // Exclude any provided dependencies (currently build defined externals)
-            external: externalMetadata.implicit,
+            external: prebundleExclude,
         },
         plugins: [
             (0, i18n_locale_plugin_1.createAngularLocaleDataPlugin)(),
@@ -480,10 +468,8 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
         optimizeDeps: {
             // Only enable with caching since it causes prebundle dependencies to be cached
             disabled: !serverOptions.cacheOptions.enabled,
-            // Exclude any explicitly defined dependencies (currently build defined externals)
-            exclude: externalMetadata.explicit,
-            // Include all implict dependencies from the external packages internal option
-            include: externalMetadata.implicit,
+            // Exclude any provided dependencies (currently build defined externals)
+            exclude: prebundleExclude,
             // Skip automatic file-based entry point discovery
             entries: [],
             // Add an esbuild plugin to run the Angular linker on dependencies
