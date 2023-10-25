@@ -63,6 +63,7 @@ class BundlerContext {
         const warnings = [];
         const metafile = { inputs: {}, outputs: {} };
         const initialFiles = new Map();
+        const externalImports = new Set();
         const outputFiles = [];
         for (const result of individualResults) {
             warnings.push(...result.warnings);
@@ -78,6 +79,7 @@ class BundlerContext {
             }
             result.initialFiles.forEach((value, key) => initialFiles.set(key, value));
             outputFiles.push(...result.outputFiles);
+            result.externalImports.forEach((value) => externalImports.add(value));
         }
         if (errors !== undefined) {
             return { errors, warnings };
@@ -88,6 +90,7 @@ class BundlerContext {
             metafile,
             initialFiles,
             outputFiles,
+            externalImports,
         };
     }
     /**
@@ -222,6 +225,17 @@ class BundlerContext {
                 }
             }
         }
+        // Collect all external package names
+        const externalImports = new Set();
+        for (const { imports } of Object.values(result.metafile.outputs)) {
+            for (const importData of imports) {
+                if (!importData.external ||
+                    (importData.kind !== 'import-statement' && importData.kind !== 'dynamic-import')) {
+                    continue;
+                }
+                externalImports.add(importData.path);
+            }
+        }
         const outputFiles = result.outputFiles.map((file) => {
             let fileType;
             if ((0, node_path_1.dirname)(file.path) === 'media') {
@@ -240,6 +254,7 @@ class BundlerContext {
             ...result,
             outputFiles,
             initialFiles,
+            externalImports,
             errors: undefined,
         };
     }

@@ -18,6 +18,7 @@ class ExecutionResult {
     outputFiles = [];
     assetFiles = [];
     errors = [];
+    externalMetadata;
     constructor(rebuildContexts, codeBundleCache) {
         this.rebuildContexts = rebuildContexts;
         this.codeBundleCache = codeBundleCache;
@@ -31,6 +32,15 @@ class ExecutionResult {
     addErrors(errors) {
         this.errors.push(...errors);
     }
+    /**
+     * Add external JavaScript import metadata to the result. This is currently used
+     * by the development server to optimize the prebundling process.
+     * @param implicit External dependencies due to the external packages option.
+     * @param explicit External dependencies due to explicit project configuration.
+     */
+    setExternalMetadata(implicit, explicit) {
+        this.externalMetadata = { implicit, explicit };
+    }
     get output() {
         return {
             success: this.errors.length === 0,
@@ -42,6 +52,7 @@ class ExecutionResult {
             outputFiles: this.outputFiles,
             assetFiles: this.assetFiles,
             errors: this.errors,
+            externalMetadata: this.externalMetadata,
         };
     }
     get watchFiles() {
