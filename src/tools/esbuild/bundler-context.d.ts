@@ -43,7 +43,7 @@ export declare class BundlerContext {
     private initialFilter?;
     readonly watchFiles: Set<string>;
     constructor(workspaceRoot: string, incremental: boolean, options: BuildOptions | BundlerOptionsFactory, initialFilter?: ((initial: Readonly<InitialFileRecord>) => boolean) | undefined);
-    static bundleAll(contexts: Iterable<BundlerContext>): Promise<BundleContextResult>;
+    static bundleAll(contexts: Iterable<BundlerContext>, changedFiles?: Iterable<string>): Promise<BundleContextResult>;
     /**
      * Executes the esbuild build function and normalizes the build result in the event of a
      * build failure that results in no output being generated.

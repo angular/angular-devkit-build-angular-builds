@@ -13,6 +13,9 @@ class ChangedFiles {
     added = new Set();
     modified = new Set();
     removed = new Set();
+    get all() {
+        return [...this.added, ...this.modified, ...this.removed];
+    }
     toDebugString() {
         const content = {
             added: Array.from(this.added),

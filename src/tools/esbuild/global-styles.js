@@ -14,7 +14,7 @@ exports.createGlobalStylesBundleOptions = void 0;
 const node_assert_1 = __importDefault(require("node:assert"));
 const bundle_options_1 = require("./stylesheets/bundle-options");
 const virtual_module_plugin_1 = require("./virtual-module-plugin");
-function createGlobalStylesBundleOptions(options, target, initial, cache) {
+function createGlobalStylesBundleOptions(options, target, initial) {
     const { workspaceRoot, optimizationOptions, sourcemapOptions, outputNames, globalStyles, preserveSymlinks, externalDependencies, stylePreprocessorOptions, tailwindConfiguration, } = options;
     const namespace = 'angular:styles/global';
     const entryPoints = {};
@@ -29,38 +29,40 @@ function createGlobalStylesBundleOptions(options, target, initial, cache) {
     if (found === false) {
         return;
     }
-    const buildOptions = (0, bundle_options_1.createStylesheetBundleOptions)({
-        workspaceRoot,
-        optimization: !!optimizationOptions.styles.minify,
-        sourcemap: !!sourcemapOptions.styles,
-        preserveSymlinks,
-        target,
-        externalDependencies,
-        outputNames: initial
-            ? outputNames
-            : {
-                ...outputNames,
-                bundles: '[name]',
+    return (loadCache) => {
+        const buildOptions = (0, bundle_options_1.createStylesheetBundleOptions)({
+            workspaceRoot,
+            optimization: !!optimizationOptions.styles.minify,
+            sourcemap: !!sourcemapOptions.styles,
+            preserveSymlinks,
+            target,
+            externalDependencies,
+            outputNames: initial
+                ? outputNames
+                : {
+                    ...outputNames,
+                    bundles: '[name]',
+                },
+            includePaths: stylePreprocessorOptions?.includePaths,
+            tailwindConfiguration,
+            publicPath: options.publicPath,
+        }, loadCache);
+        buildOptions.legalComments = options.extractLicenses ? 'none' : 'eof';
+        buildOptions.entryPoints = entryPoints;
+        buildOptions.plugins.unshift((0, virtual_module_plugin_1.createVirtualModulePlugin)({
+            namespace,
+            transformPath: (path) => path.split(';', 2)[1],
+            loadContent: (args) => {
+                const files = globalStyles.find(({ name }) => name === args.path)?.files;
+                (0, node_assert_1.default)(files, `global style name should always be found [${args.path}]`);
+                return {
+                    contents: files.map((file) => `@import '${file.replace(/\\/g, '/')}';`).join('\n'),
+                    loader: 'css',
+                    resolveDir: workspaceRoot,
+                };
             },
-        includePaths: stylePreprocessorOptions?.includePaths,
-        tailwindConfiguration,
-        publicPath: options.publicPath,
-    }, cache);
-    buildOptions.legalComments = options.extractLicenses ? 'none' : 'eof';
-    buildOptions.entryPoints = entryPoints;
-    buildOptions.plugins.unshift((0, virtual_module_plugin_1.createVirtualModulePlugin)({
-        namespace,
-        transformPath: (path) => path.split(';', 2)[1],
-        loadContent: (args) => {
-            const files = globalStyles.find(({ name }) => name === args.path)?.files;
-            (0, node_assert_1.default)(files, `global style name should always be found [${args.path}]`);
-            return {
-                contents: files.map((file) => `@import '${file.replace(/\\/g, '/')}';`).join('\n'),
-                loader: 'css',
-                resolveDir: workspaceRoot,
-            };
-        },
-    }));
-    return buildOptions;
+        }));
+        return buildOptions;
+    };
 }
 exports.createGlobalStylesBundleOptions = createGlobalStylesBundleOptions;

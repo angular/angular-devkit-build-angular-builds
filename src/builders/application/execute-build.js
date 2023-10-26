@@ -49,7 +49,7 @@ async function executeBuild(options, context, rebuildState) {
         // Global Stylesheets
         if (options.globalStyles.length > 0) {
             for (const initial of [true, false]) {
-                const bundleOptions = (0, global_styles_1.createGlobalStylesBundleOptions)(options, target, initial, codeBundleCache?.loadResultCache);
+                const bundleOptions = (0, global_styles_1.createGlobalStylesBundleOptions)(options, target, initial);
                 if (bundleOptions) {
                     bundlerContexts.push(new bundler_context_1.BundlerContext(workspaceRoot, !!options.watch, bundleOptions, () => initial));
                 }
@@ -76,7 +76,7 @@ async function executeBuild(options, context, rebuildState) {
             }
         }
     }
-    const bundlingResult = await bundler_context_1.BundlerContext.bundleAll(bundlerContexts);
+    const bundlingResult = await bundler_context_1.BundlerContext.bundleAll(bundlerContexts, rebuildState?.fileChanges.all);
     // Log all warnings and errors generated during bundling
     await (0, utils_1.logMessages)(context, bundlingResult);
     const executionResult = new bundler_execution_result_1.ExecutionResult(bundlerContexts, codeBundleCache);
