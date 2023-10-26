@@ -428,9 +428,11 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                                 return;
                             }
                             transformIndexHtmlAndAddHeaders(url, rawHtml, res, next, async (html) => {
+                                const protocol = serverOptions.ssl ? 'https' : 'http';
+                                const route = `${protocol}://${req.headers.host}${req.originalUrl}`;
                                 const { content } = await (0, render_page_1.renderPage)({
                                     document: html,
-                                    route: pathnameWithoutServePath(url, serverOptions),
+                                    route,
                                     serverContext: 'ssr',
                                     loadBundle: (path) => 
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
