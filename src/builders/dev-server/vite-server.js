@@ -308,6 +308,9 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
             watch: {
                 ignored: ['**/*'],
             },
+            // This is needed when `externalDependencies` is used to prevent Vite load errors.
+            // NOTE: If Vite adds direct support for externals, this can be removed.
+            preTransformRequests: externalMetadata.explicit.length === 0,
         },
         ssr: {
             // Exclude any provided dependencies (currently build defined externals)
@@ -320,6 +323,12 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                 // Ensures plugin hooks run before built-in Vite hooks
                 enforce: 'pre',
                 async resolveId(source, importer) {
+                    // Prevent vite from resolving an explicit external dependency (`externalDependencies` option)
+                    if (externalMetadata.explicit.includes(source)) {
+                        // This is still not ideal since Vite will still transform the import specifier to
+                        // `/@id/${source}` but is currently closer to a raw external than a resolved file path.
+                        return source;
+                    }
                     if (importer && source.startsWith('.')) {
                         // Remove query if present
                         const [importerFile] = importer.split('?', 1);
