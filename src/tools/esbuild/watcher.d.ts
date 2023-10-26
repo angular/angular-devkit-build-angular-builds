@@ -9,6 +9,7 @@ export declare class ChangedFiles {
     readonly added: Set<string>;
     readonly modified: Set<string>;
     readonly removed: Set<string>;
+    get all(): string[];
     toDebugString(): string;
 }
 export interface BuildWatcher extends AsyncIterableIterator<ChangedFiles> {
