@@ -32,6 +32,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkPort = void 0;
 const net = __importStar(require("net"));
+const load_esm_1 = require("./load-esm");
 const tty_1 = require("./tty");
 function createInUseError(port) {
     return new Error(`Port ${port} is already in use. Use '--port' to specify a different port.`);
@@ -52,7 +53,8 @@ async function checkPort(port, host) {
                 reject(createInUseError(port));
                 return;
             }
-            Promise.resolve().then(() => __importStar(require('inquirer'))).then(({ prompt }) => prompt({
+            (0, load_esm_1.loadEsmModule)('inquirer')
+                .then(({ default: { prompt } }) => prompt({
                 type: 'confirm',
                 name: 'useDifferent',
                 message: `Port ${port} is already in use.\nWould you like to use a different port?`,
