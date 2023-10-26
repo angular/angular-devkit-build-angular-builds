@@ -19,7 +19,6 @@ const environment_options_1 = require("../../utils/environment-options");
 const compiler_plugin_1 = require("./angular/compiler-plugin");
 const compiler_plugin_options_1 = require("./compiler-plugin-options");
 const i18n_locale_plugin_1 = require("./i18n-locale-plugin");
-const javascript_transfomer_plugin_1 = require("./javascript-transfomer-plugin");
 const rxjs_esm_resolution_plugin_1 = require("./rxjs-esm-resolution-plugin");
 const sourcemap_ignorelist_plugin_1 = require("./sourcemap-ignorelist-plugin");
 const utils_1 = require("./utils");
@@ -195,7 +194,7 @@ function createServerPolyfillBundleOptions(options, target, sourceFileCache) {
     if (!polyfillBundleOptions) {
         return;
     }
-    const { workspaceRoot, jit, sourcemapOptions, advancedOptimizations } = options;
+    const { workspaceRoot } = options;
     const buildOptions = {
         ...polyfillBundleOptions,
         platform: 'node',
@@ -232,13 +231,7 @@ function createServerPolyfillBundleOptions(options, target, sourceFileCache) {
             }),
         }));
     }
-    buildOptions.plugins.push((0, rxjs_esm_resolution_plugin_1.createRxjsEsmResolutionPlugin)(), (0, javascript_transfomer_plugin_1.createJavaScriptTransformerPlugin)({
-        jit,
-        sourcemap: !!sourcemapOptions.scripts,
-        babelFileCache: sourceFileCache?.babelFileCache,
-        advancedOptimizations,
-        maxWorkers: 1,
-    }));
+    buildOptions.plugins.push((0, rxjs_esm_resolution_plugin_1.createRxjsEsmResolutionPlugin)());
     return buildOptions;
 }
 exports.createServerPolyfillBundleOptions = createServerPolyfillBundleOptions;
