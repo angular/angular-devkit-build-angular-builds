@@ -20,7 +20,7 @@ interface RenderRequest {
     /**
      * An optional URL path that represents the Angular route that should be rendered.
      */
-    url: string;
+    url: string | undefined;
 }
 /**
  * Renders an application based on a provided server bundle path, initial document, and optional URL route.

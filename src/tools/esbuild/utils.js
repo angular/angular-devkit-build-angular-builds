@@ -46,9 +46,8 @@ const spinner_1 = require("../../utils/spinner");
 const stats_1 = require("../webpack/utils/stats");
 const bundler_context_1 = require("./bundler-context");
 const compressAsync = (0, node_util_1.promisify)(node_zlib_1.brotliCompress);
-function logBuildStats(context, metafile, initial, budgetFailures, changedFiles, estimatedTransferSizes) {
+function logBuildStats(context, metafile, initial, budgetFailures, estimatedTransferSizes) {
     const stats = [];
-    let unchangedCount = 0;
     for (const [file, output] of Object.entries(metafile.outputs)) {
         // Only display JavaScript and CSS files
         if (!file.endsWith('.js') && !file.endsWith('.css')) {
@@ -57,11 +56,6 @@ function logBuildStats(context, metafile, initial, budgetFailures, changedFiles,
         // Skip internal component resources
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (output['ng-component']) {
-            continue;
-        }
-        // Show only changed files if a changed list is provided
-        if (changedFiles && !changedFiles.has(file)) {
-            ++unchangedCount;
             continue;
         }
         let name = initial.get(file)?.name;
@@ -76,16 +70,8 @@ function logBuildStats(context, metafile, initial, budgetFailures, changedFiles,
             stats: [file, name ?? '-', output.bytes, estimatedTransferSizes?.get(file) ?? '-'],
         });
     }
-    if (stats.length > 0) {
-        const tableText = (0, stats_1.generateBuildStatsTable)(stats, true, unchangedCount === 0, !!estimatedTransferSizes, budgetFailures);
-        context.logger.info('\n' + tableText + '\n');
-    }
-    else if (changedFiles !== undefined) {
-        context.logger.info('\nNo output file changes.\n');
-    }
-    if (unchangedCount > 0) {
-        context.logger.info(`Unchanged output files: ${unchangedCount}`);
-    }
+    const tableText = (0, stats_1.generateBuildStatsTable)(stats, true, true, !!estimatedTransferSizes, budgetFailures);
+    context.logger.info('\n' + tableText + '\n');
 }
 exports.logBuildStats = logBuildStats;
 async function calculateEstimatedTransferSizes(outputFiles) {

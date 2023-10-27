@@ -54,30 +54,23 @@ async function render({ serverBundlePath, document, url }) {
             useValue: 'app-shell',
         },
     ];
-    let renderAppPromise;
     // Render platform server module
     if (isBootstrapFn(bootstrapAppFn)) {
         (0, node_assert_1.default)(renderApplication, `renderApplication was not exported from: ${serverBundlePath}.`);
-        renderAppPromise = renderApplication(bootstrapAppFn, {
+        return renderApplication(bootstrapAppFn, {
             document,
             url,
             platformProviders,
         });
     }
-    else {
-        (0, node_assert_1.default)(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
-        const moduleClass = bootstrapAppFn || AppServerModule;
-        (0, node_assert_1.default)(moduleClass, `Neither an AppServerModule nor a bootstrapping function was exported from: ${serverBundlePath}.`);
-        renderAppPromise = renderModule(moduleClass, {
-            document,
-            url,
-            extraProviders: platformProviders,
-        });
-    }
-    // The below should really handled by the framework!!!.
-    let timer;
-    const renderingTimeout = new Promise((_, reject) => (timer = setTimeout(() => reject(new Error(`Page ${new URL(url, 'resolve://').pathname} did not render in 30 seconds.`)), 30000)));
-    return Promise.race([renderAppPromise, renderingTimeout]).finally(() => clearTimeout(timer));
+    (0, node_assert_1.default)(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
+    const moduleClass = bootstrapAppFn || AppServerModule;
+    (0, node_assert_1.default)(moduleClass, `Neither an AppServerModule nor a bootstrapping function was exported from: ${serverBundlePath}.`);
+    return renderModule(moduleClass, {
+        document,
+        url,
+        extraProviders: platformProviders,
+    });
 }
 function isBootstrapFn(value) {
     // We can differentiate between a module and a bootstrap function by reading compiler-generated `ɵmod` static property:
