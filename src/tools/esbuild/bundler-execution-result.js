@@ -68,7 +68,18 @@ class ExecutionResult {
             rebuildContexts: this.rebuildContexts,
             codeBundleCache: this.codeBundleCache,
             fileChanges,
+            previousOutputHashes: new Map(this.outputFiles.map((file) => [file.path, file.hash])),
         };
+    }
+    findChangedFiles(previousOutputHashes) {
+        const changed = new Set();
+        for (const file of this.outputFiles) {
+            const previousHash = previousOutputHashes.get(file.path);
+            if (previousHash === undefined || previousHash !== file.hash) {
+                changed.add(file.path);
+            }
+        }
+        return changed;
     }
     async dispose() {
         await Promise.allSettled(this.rebuildContexts.map((context) => context.dispose()));

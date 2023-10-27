@@ -17,6 +17,7 @@ export interface RebuildState {
     rebuildContexts: BundlerContext[];
     codeBundleCache?: SourceFileCache;
     fileChanges: ChangedFiles;
+    previousOutputHashes: Map<string, string>;
 }
 /**
  * Represents the result of a single builder execute call.
@@ -57,5 +58,6 @@ export declare class ExecutionResult {
     };
     get watchFiles(): string[];
     createRebuildState(fileChanges: ChangedFiles): RebuildState;
+    findChangedFiles(previousOutputHashes: Map<string, string>): Set<string>;
     dispose(): Promise<void>;
 }

@@ -150,7 +150,8 @@ async function executeBuild(options, context, rebuildState) {
         executionResult.addOutputFile('prerendered-routes.json', JSON.stringify({ routes: prerenderedRoutes.sort((a, b) => a.localeCompare(b)) }, null, 2), bundler_context_1.BuildOutputFileType.Root);
     }
     printWarningsAndErrorsToConsole(context, warnings, errors);
-    (0, utils_1.logBuildStats)(context, metafile, initialFiles, budgetFailures, estimatedTransferSizes);
+    const changedFiles = rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputHashes);
+    (0, utils_1.logBuildStats)(context, metafile, initialFiles, budgetFailures, changedFiles, estimatedTransferSizes);
     // Write metafile if stats option is enabled
     if (options.stats) {
         executionResult.addOutputFile('stats.json', JSON.stringify(metafile, null, 2), bundler_context_1.BuildOutputFileType.Root);
