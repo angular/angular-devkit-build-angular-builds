@@ -351,9 +351,6 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                     const relativeFile = normalizePath(node_path_1.default.relative(virtualProjectRoot, file));
                     const codeContents = outputFiles.get(relativeFile)?.contents;
                     if (codeContents === undefined) {
-                        if (relativeFile.endsWith('/node_modules/vite/dist/client/client.mjs')) {
-                            return loadViteClientCode(file);
-                        }
                         return;
                     }
                     const code = Buffer.from(codeContents).toString('utf-8');
@@ -547,23 +544,6 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
     return configuration;
 }
 exports.setupServer = setupServer;
-/**
- * Reads the resolved Vite client code from disk and updates the content to remove
- * an unactionable suggestion to update the Vite configuration file to disable the
- * error overlay. The Vite configuration file is not present when used in the Angular
- * CLI.
- * @param file The absolute path to the Vite client code.
- * @returns
- */
-async function loadViteClientCode(file) {
-    const originalContents = await (0, promises_1.readFile)(file, 'utf-8');
-    let contents = originalContents.replace('You can also disable this overlay by setting', '');
-    contents = contents.replace(
-    // eslint-disable-next-line max-len
-    '<code part="config-option-name">server.hmr.overlay</code> to <code part="config-option-value">false</code> in <code part="config-file-name">vite.config.js.</code>', '');
-    (0, node_assert_1.default)(originalContents !== contents, 'Failed to update Vite client error overlay text.');
-    return contents;
-}
 function pathnameWithoutServePath(url, serverOptions) {
     const parsedUrl = new URL(url, 'http://localhost');
     let pathname = decodeURIComponent(parsedUrl.pathname);
