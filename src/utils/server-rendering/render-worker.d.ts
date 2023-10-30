@@ -10,11 +10,13 @@ import { RenderResult, ServerContext } from './render-page';
 export interface RenderWorkerData extends ESMInMemoryFileLoaderWorkerData {
     document: string;
     inlineCriticalCss?: boolean;
-    baseUrl: string;
+    assetFiles: Record</** Destination */ string, /** Source */ string>;
 }
 export interface RenderOptions {
     route: string;
     serverContext: ServerContext;
 }
 /** Renders an application based on a provided options. */
-export default function (options: RenderOptions): Promise<RenderResult>;
+declare function render(options: RenderOptions): Promise<RenderResult>;
+declare const _default: typeof render;
+export default _default;

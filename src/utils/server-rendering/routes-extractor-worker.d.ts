@@ -9,11 +9,13 @@ import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loa
 export interface RoutesExtractorWorkerData extends ESMInMemoryFileLoaderWorkerData {
     document: string;
     verbose: boolean;
-    url: string;
-    assetsServerAddress: string;
+    assetFiles: Record</** Destination */ string, /** Source */ string>;
 }
 export interface RoutersExtractorWorkerResult {
     routes: string[];
     warnings?: string[];
 }
-export default function (): Promise<RoutersExtractorWorkerResult>;
+/** Renders an application based on a provided options. */
+declare function extractRoutes(): Promise<RoutersExtractorWorkerResult>;
+declare const _default: typeof extractRoutes;
+export default _default;

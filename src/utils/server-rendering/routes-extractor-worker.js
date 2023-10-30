@@ -9,17 +9,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_worker_threads_1 = require("node:worker_threads");
 const load_esm_1 = require("../load-esm");
+const fetch_patch_1 = require("./fetch-patch");
 /**
  * This is passed as workerData when setting up the worker via the `piscina` package.
  */
-const { document, verbose, url } = node_worker_threads_1.workerData;
-async function default_1() {
+const { document, verbose } = node_worker_threads_1.workerData;
+/** Renders an application based on a provided options. */
+async function extractRoutes() {
     const { extractRoutes } = await (0, load_esm_1.loadEsmModule)('./render-utils.server.mjs');
     const { default: bootstrapAppFnOrModule } = await (0, load_esm_1.loadEsmModule)('./main.server.mjs');
     const skippedRedirects = [];
     const skippedOthers = [];
     const routes = [];
-    for await (const { route, success, redirect } of extractRoutes(bootstrapAppFnOrModule, document, url)) {
+    for await (const { route, success, redirect } of extractRoutes(bootstrapAppFnOrModule, document)) {
         if (success) {
             routes.push(route);
             continue;
@@ -44,4 +46,8 @@ async function default_1() {
     }
     return { routes, warnings };
 }
-exports.default = default_1;
+function initialize() {
+    (0, fetch_patch_1.patchFetchToLoadInMemoryAssets)();
+    return extractRoutes;
+}
+exports.default = initialize();
