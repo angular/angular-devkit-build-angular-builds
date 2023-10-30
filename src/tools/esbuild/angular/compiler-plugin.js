@@ -172,8 +172,7 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                         // Return bundled worker file entry name to be used in the built output
                         const workerCodeFile = workerResult.outputFiles.find((file) => file.path.endsWith('.js'));
                         (0, node_assert_1.default)(workerCodeFile, 'Web Worker bundled code file should always be present.');
-                        const workerCodePath = path.relative(build.initialOptions.outdir ?? '', workerCodeFile.path);
-                        return workerCodePath.replaceAll('\\', '/');
+                        return path.relative(build.initialOptions.outdir ?? '', workerCodeFile.path);
                     },
                 };
                 // Initialize the Angular compilation for the current build.

@@ -37,7 +37,6 @@ exports.setupServer = exports.serveWithVite = void 0;
 const remapping_1 = __importDefault(require("@ampproject/remapping"));
 const mrmime_1 = require("mrmime");
 const node_assert_1 = __importDefault(require("node:assert"));
-const node_crypto_1 = require("node:crypto");
 const promises_1 = require("node:fs/promises");
 const node_path_1 = __importDefault(require("node:path"));
 const bundler_context_1 = require("../../tools/esbuild/bundler-context");
@@ -158,7 +157,7 @@ async function* serveWithVite(serverOptions, builderName, context, plugins) {
             }
         }
         if (server) {
-            handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
+            handleUpdate(generatedFiles, server, serverOptions, context.logger);
         }
         else {
             const projectName = context.target?.project;
@@ -190,13 +189,13 @@ async function* serveWithVite(serverOptions, builderName, context, plugins) {
     await new Promise((resolve) => (deferred = resolve));
 }
 exports.serveWithVite = serveWithVite;
-function handleUpdate(normalizePath, generatedFiles, server, serverOptions, logger) {
+function handleUpdate(generatedFiles, server, serverOptions, logger) {
     const updatedFiles = [];
     // Invalidate any updated files
     for (const [file, record] of generatedFiles) {
         if (record.updated) {
             updatedFiles.push(file);
-            const updatedModules = server.moduleGraph.getModulesByFile(normalizePath(node_path_1.default.join(server.config.root, file)));
+            const updatedModules = server.moduleGraph.getModulesByFile(file);
             updatedModules?.forEach((m) => server?.moduleGraph.invalidateModule(m));
         }
     }
@@ -208,7 +207,8 @@ function handleUpdate(normalizePath, generatedFiles, server, serverOptions, logg
             const timestamp = Date.now();
             server.ws.send({
                 type: 'update',
-                updates: updatedFiles.map((filePath) => {
+                updates: updatedFiles.map((f) => {
+                    const filePath = f.slice(1); // Remove leading slash.
                     return {
                         type: 'css-update',
                         timestamp,
@@ -240,7 +240,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
             filePath = '/index.html';
         }
         else {
-            filePath = normalizePath(file.path);
+            filePath = '/' + normalizePath(file.path);
         }
         seen.add(filePath);
         // Skip analysis of sourcemaps
@@ -282,13 +282,11 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
     const proxy = await (0, load_proxy_config_1.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig, true);
     // dynamically import Vite for ESM compatibility
     const { normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
-    // Path will not exist on disk and only used to provide separate path for Vite requests
-    const virtualProjectRoot = normalizePath(node_path_1.default.join(serverOptions.workspaceRoot, `.angular/vite-root/${(0, node_crypto_1.randomUUID)()}/`));
     const configuration = {
         configFile: false,
         envFile: false,
         cacheDir: node_path_1.default.join(serverOptions.cacheOptions.path, 'vite'),
-        root: virtualProjectRoot,
+        root: serverOptions.workspaceRoot,
         publicDir: false,
         esbuild: false,
         mode: 'development',
@@ -318,7 +316,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
         },
         ssr: {
             // Exclude any provided dependencies (currently build defined externals)
-            external: externalMetadata.explicit,
+            external: externalMetadata.implicit,
         },
         plugins: [
             (0, i18n_locale_plugin_1.createAngularLocaleDataPlugin)(),
@@ -333,28 +331,24 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                         // `/@id/${source}` but is currently closer to a raw external than a resolved file path.
                         return source;
                     }
-                    if (importer && source[0] === '.' && importer.startsWith(virtualProjectRoot)) {
+                    if (importer && source.startsWith('.')) {
                         // Remove query if present
                         const [importerFile] = importer.split('?', 1);
-                        source = normalizePath(node_path_1.default.join(node_path_1.default.dirname(node_path_1.default.relative(virtualProjectRoot, importerFile)), source));
-                    }
-                    if (source[0] === '/') {
-                        source = source.slice(1);
+                        source = normalizePath(node_path_1.default.join(node_path_1.default.dirname(importerFile), source));
                     }
                     const [file] = source.split('?', 1);
                     if (outputFiles.has(file)) {
-                        return node_path_1.default.join(virtualProjectRoot, source);
+                        return source;
                     }
                 },
                 load(id) {
                     const [file] = id.split('?', 1);
-                    const relativeFile = normalizePath(node_path_1.default.relative(virtualProjectRoot, file));
-                    const codeContents = outputFiles.get(relativeFile)?.contents;
+                    const codeContents = outputFiles.get(file)?.contents;
                     if (codeContents === undefined) {
                         return;
                     }
                     const code = Buffer.from(codeContents).toString('utf-8');
-                    const mapContents = outputFiles.get(relativeFile + '.map')?.contents;
+                    const mapContents = outputFiles.get(file + '.map')?.contents;
                     return {
                         // Remove source map URL comments from the code if a sourcemap is present.
                         // Vite will inline and add an additional sourcemap URL for the sourcemap.
@@ -428,7 +422,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                                 next();
                                 return;
                             }
-                            const rawHtml = outputFiles.get('index.server.html')?.contents;
+                            const rawHtml = outputFiles.get('/index.server.html')?.contents;
                             if (!rawHtml) {
                                 next();
                                 return;
