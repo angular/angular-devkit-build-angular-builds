@@ -63,6 +63,7 @@ function createBrowserPolyfillBundleOptions(options, target, sourceFileCache) {
         return;
     }
     const { outputNames, polyfills } = options;
+    const hasTypeScriptEntries = polyfills?.some((entry) => /\.[cm]?tsx?$/.test(entry));
     const buildOptions = {
         ...polyfillBundleOptions,
         platform: 'browser',
@@ -78,7 +79,6 @@ function createBrowserPolyfillBundleOptions(options, target, sourceFileCache) {
         },
     };
     // Only add the Angular TypeScript compiler if TypeScript files are provided in the polyfills
-    const hasTypeScriptEntries = polyfills?.some((entry) => /\.[cm]?tsx?$/.test(entry));
     if (hasTypeScriptEntries) {
         buildOptions.plugins ??= [];
         const { pluginOptions, styleOptions } = (0, compiler_plugin_options_1.createCompilerPluginOptions)(options, target, sourceFileCache);
@@ -88,7 +88,10 @@ function createBrowserPolyfillBundleOptions(options, target, sourceFileCache) {
         // Component stylesheet options are unused for polyfills but required by the plugin
         styleOptions));
     }
-    return buildOptions;
+    // Use an options factory to allow fully incremental bundling when no TypeScript files are present.
+    // The TypeScript compilation is not currently integrated into the bundler invalidation so
+    // cannot be used with fully incremental bundling yet.
+    return hasTypeScriptEntries ? buildOptions : () => buildOptions;
 }
 exports.createBrowserPolyfillBundleOptions = createBrowserPolyfillBundleOptions;
 /**
