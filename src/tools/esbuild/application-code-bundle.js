@@ -235,7 +235,7 @@ function createServerPolyfillBundleOptions(options, target, sourceFileCache) {
         }));
     }
     buildOptions.plugins.push((0, rxjs_esm_resolution_plugin_1.createRxjsEsmResolutionPlugin)());
-    return buildOptions;
+    return () => buildOptions;
 }
 exports.createServerPolyfillBundleOptions = createServerPolyfillBundleOptions;
 function getEsBuildCommonOptions(options) {
