@@ -19,6 +19,7 @@ const global_styles_1 = require("../../tools/esbuild/global-styles");
 const license_extractor_1 = require("../../tools/esbuild/license-extractor");
 const utils_1 = require("../../tools/esbuild/utils");
 const bundle_calculator_1 = require("../../utils/bundle-calculator");
+const color_1 = require("../../utils/color");
 const copy_assets_1 = require("../../utils/copy-assets");
 const supported_browsers_1 = require("../../utils/supported-browsers");
 const execute_post_bundle_1 = require("./execute-post-bundle");
@@ -148,10 +149,18 @@ async function executeBuild(options, context, rebuildState) {
         executionResult.outputFiles.push(...result.additionalOutputFiles);
         executionResult.assetFiles.push(...result.additionalAssets);
     }
+    await printWarningsAndErrorsToConsole(context, warnings, errors);
     if (prerenderOptions) {
         executionResult.addOutputFile('prerendered-routes.json', JSON.stringify({ routes: prerenderedRoutes.sort((a, b) => a.localeCompare(b)) }, null, 2), bundler_context_1.BuildOutputFileType.Root);
+        let prerenderMsg = `Prerendered ${prerenderedRoutes.length} static route`;
+        if (prerenderedRoutes.length > 1) {
+            prerenderMsg += 's.';
+        }
+        else {
+            prerenderMsg += '.';
+        }
+        context.logger.info(color_1.colors.magenta(prerenderMsg) + '\n');
     }
-    await printWarningsAndErrorsToConsole(context, warnings, errors);
     const changedFiles = rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputHashes);
     (0, utils_1.logBuildStats)(context, metafile, initialFiles, budgetFailures, changedFiles, estimatedTransferSizes);
     // Write metafile if stats option is enabled
