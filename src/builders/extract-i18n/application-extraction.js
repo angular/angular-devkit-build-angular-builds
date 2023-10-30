@@ -22,6 +22,7 @@ async function extractMessages(options, builderName, context, extractorConstruct
     buildOptions.optimization = false;
     buildOptions.sourceMap = { scripts: true, vendor: true };
     buildOptions.localize = false;
+    buildOptions.budgets = undefined;
     let build;
     if (builderName === '@angular-devkit/build-angular:application') {
         build = application_1.buildApplicationInternal;

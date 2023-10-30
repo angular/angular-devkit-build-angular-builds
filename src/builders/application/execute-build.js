@@ -112,13 +112,15 @@ async function executeBuild(options, context, rebuildState) {
     if (options.budgets) {
         const compatStats = (0, budget_stats_1.generateBudgetStats)(metafile, initialFiles);
         budgetFailures = [...(0, bundle_calculator_1.checkBudgets)(options.budgets, compatStats, true)];
-        for (const { severity, message } of budgetFailures) {
-            if (severity === 'error') {
-                context.logger.error(message);
-            }
-            else {
-                context.logger.warn(message);
-            }
+        if (budgetFailures.length > 0) {
+            await (0, utils_1.logMessages)(context, {
+                errors: budgetFailures
+                    .filter((failure) => failure.severity === 'error')
+                    .map((failure) => ({ text: failure.message, location: null })),
+                warnings: budgetFailures
+                    .filter((failure) => failure.severity !== 'error')
+                    .map((failure) => ({ text: failure.message, location: null })),
+            });
         }
     }
     // Calculate estimated transfer size if scripts are optimized
@@ -149,7 +151,7 @@ async function executeBuild(options, context, rebuildState) {
     if (prerenderOptions) {
         executionResult.addOutputFile('prerendered-routes.json', JSON.stringify({ routes: prerenderedRoutes.sort((a, b) => a.localeCompare(b)) }, null, 2), bundler_context_1.BuildOutputFileType.Root);
     }
-    printWarningsAndErrorsToConsole(context, warnings, errors);
+    await printWarningsAndErrorsToConsole(context, warnings, errors);
     const changedFiles = rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputHashes);
     (0, utils_1.logBuildStats)(context, metafile, initialFiles, budgetFailures, changedFiles, estimatedTransferSizes);
     // Write metafile if stats option is enabled
@@ -159,11 +161,9 @@ async function executeBuild(options, context, rebuildState) {
     return executionResult;
 }
 exports.executeBuild = executeBuild;
-function printWarningsAndErrorsToConsole(context, warnings, errors) {
-    for (const error of errors) {
-        context.logger.error(error);
-    }
-    for (const warning of warnings) {
-        context.logger.warn(warning);
-    }
+async function printWarningsAndErrorsToConsole(context, warnings, errors) {
+    await (0, utils_1.logMessages)(context, {
+        errors: errors.map((text) => ({ text, location: null })),
+        warnings: warnings.map((text) => ({ text, location: null })),
+    });
 }
