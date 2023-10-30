@@ -16,7 +16,6 @@ const node_path_1 = require("node:path");
 const piscina_1 = __importDefault(require("piscina"));
 const bundler_context_1 = require("../../tools/esbuild/bundler-context");
 const node_18_utils_1 = require("./esm-in-memory-loader/node-18-utils");
-const prerender_server_1 = require("./prerender-server");
 async function prerenderPages(workspaceRoot, appShellOptions = {}, prerenderOptions = {}, outputFiles, assets, document, sourcemap = false, inlineCriticalCss = false, maxThreads = 1, verbose = false) {
     const outputFilesForWorker = {};
     const serverBundlesSourceMaps = new Map();
@@ -45,37 +44,33 @@ async function prerenderPages(workspaceRoot, appShellOptions = {}, prerenderOpti
         }
     }
     serverBundlesSourceMaps.clear();
-    // Start server to handle HTTP requests to assets.
-    // TODO: consider starting this is a seperate process to avoid any blocks to the main thread.
-    const { address: assetsServerAddress, close: closeAssetsServer } = await (0, prerender_server_1.startServer)(assets);
-    try {
-        // Get routes to prerender
-        const { routes: allRoutes, warnings: routesWarnings } = await getAllRoutes(workspaceRoot, outputFilesForWorker, document, appShellOptions, prerenderOptions, sourcemap, verbose, assetsServerAddress);
-        if (routesWarnings?.length) {
-            warnings.push(...routesWarnings);
-        }
-        if (allRoutes.size < 1) {
-            return {
-                errors,
-                warnings,
-                output: {},
-                prerenderedRoutes: allRoutes,
-            };
-        }
-        // Render routes
-        const { warnings: renderingWarnings, errors: renderingErrors, output, } = await renderPages(sourcemap, allRoutes, maxThreads, workspaceRoot, outputFilesForWorker, inlineCriticalCss, document, assetsServerAddress, appShellOptions);
-        errors.push(...renderingErrors);
-        warnings.push(...renderingWarnings);
+    const assetsReversed = {};
+    for (const { source, destination } of assets) {
+        assetsReversed[addLeadingSlash(destination.replace(/\\/g, node_path_1.posix.sep))] = source;
+    }
+    // Get routes to prerender
+    const { routes: allRoutes, warnings: routesWarnings } = await getAllRoutes(workspaceRoot, outputFilesForWorker, assetsReversed, document, appShellOptions, prerenderOptions, sourcemap, verbose);
+    if (routesWarnings?.length) {
+        warnings.push(...routesWarnings);
+    }
+    if (allRoutes.size < 1) {
         return {
             errors,
             warnings,
-            output,
+            output: {},
             prerenderedRoutes: allRoutes,
         };
     }
-    finally {
-        void closeAssetsServer?.();
-    }
+    // Render routes
+    const { warnings: renderingWarnings, errors: renderingErrors, output, } = await renderPages(sourcemap, allRoutes, maxThreads, workspaceRoot, outputFilesForWorker, assetsReversed, inlineCriticalCss, document, appShellOptions);
+    errors.push(...renderingErrors);
+    warnings.push(...renderingWarnings);
+    return {
+        errors,
+        warnings,
+        output,
+        prerenderedRoutes: allRoutes,
+    };
 }
 exports.prerenderPages = prerenderPages;
 class RoutesSet extends Set {
@@ -83,7 +78,7 @@ class RoutesSet extends Set {
         return super.add(addLeadingSlash(value));
     }
 }
-async function renderPages(sourcemap, allRoutes, maxThreads, workspaceRoot, outputFilesForWorker, inlineCriticalCss, document, baseUrl, appShellOptions) {
+async function renderPages(sourcemap, allRoutes, maxThreads, workspaceRoot, outputFilesForWorker, assetFilesForWorker, inlineCriticalCss, document, appShellOptions) {
     const output = {};
     const warnings = [];
     const errors = [];
@@ -97,9 +92,9 @@ async function renderPages(sourcemap, allRoutes, maxThreads, workspaceRoot, outp
         workerData: {
             workspaceRoot,
             outputFiles: outputFilesForWorker,
+            assetFiles: assetFilesForWorker,
             inlineCriticalCss,
             document,
-            baseUrl,
         },
         execArgv: workerExecArgv,
     });
@@ -139,7 +134,7 @@ async function renderPages(sourcemap, allRoutes, maxThreads, workspaceRoot, outp
         output,
     };
 }
-async function getAllRoutes(workspaceRoot, outputFilesForWorker, document, appShellOptions, prerenderOptions, sourcemap, verbose, assetsServerAddress) {
+async function getAllRoutes(workspaceRoot, outputFilesForWorker, assetFilesForWorker, document, appShellOptions, prerenderOptions, sourcemap, verbose) {
     const { routesFile, discoverRoutes } = prerenderOptions;
     const routes = new RoutesSet();
     const { route: appShellRoute } = appShellOptions;
@@ -165,9 +160,9 @@ async function getAllRoutes(workspaceRoot, outputFilesForWorker, document, appSh
         workerData: {
             workspaceRoot,
             outputFiles: outputFilesForWorker,
+            assetFiles: assetFilesForWorker,
             document,
             verbose,
-            url: assetsServerAddress,
         },
         execArgv: workerExecArgv,
     });

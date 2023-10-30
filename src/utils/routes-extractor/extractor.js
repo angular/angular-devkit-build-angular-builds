@@ -38,11 +38,11 @@ async function* getRoutesFromRouterConfig(routes, compiler, parentInjector, pare
         }
     }
 }
-export async function* extractRoutes(bootstrapAppFnOrModule, document, url) {
+export async function* extractRoutes(bootstrapAppFnOrModule, document) {
     const platformRef = createPlatformFactory(platformCore, 'server', [
         {
             provide: INITIAL_CONFIG,
-            useValue: { document, url },
+            useValue: { document, url: '' },
         },
         {
             provide: ɵConsole,

@@ -45,7 +45,7 @@ async function extract() {
     const bootstrapAppFnOrModule = bootstrapAppFn || AppServerModule;
     (0, node_assert_1.default)(bootstrapAppFnOrModule, `Neither an AppServerModule nor a bootstrapping function was exported from: ${serverBundlePath}.`);
     const routes = [];
-    for await (const { route, success } of extractRoutes(bootstrapAppFnOrModule, document, '')) {
+    for await (const { route, success } of extractRoutes(bootstrapAppFnOrModule, document)) {
         if (success) {
             routes.push(route);
         }
