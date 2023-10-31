@@ -47,7 +47,9 @@ function resolve(specifier, context, nextResolve) {
 }
 exports.resolve = resolve;
 async function load(url, context, nextLoad) {
-    if (isFileProtocol(url)) {
+    const { format } = context;
+    // CommonJs modules require no transformations and are not in memory.
+    if (format !== 'commonjs' && isFileProtocol(url)) {
         const filePath = (0, url_1.fileURLToPath)(url);
         // Remove '/' or drive letter for Windows that was added in the above 'resolve'.
         let source = outputFiles[(0, node_path_1.relative)('/', filePath)] ?? TRANSFORMED_FILES[filePath];
@@ -55,7 +57,6 @@ async function load(url, context, nextLoad) {
             source = TRANSFORMED_FILES[filePath] = Buffer.from(await javascriptTransformer.transformFile(filePath)).toString('utf-8');
         }
         if (source !== undefined) {
-            const { format } = context;
             return {
                 format,
                 shortCircuit: true,
