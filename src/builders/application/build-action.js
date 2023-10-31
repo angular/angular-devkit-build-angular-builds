@@ -38,6 +38,7 @@ const promises_1 = __importDefault(require("node:fs/promises"));
 const node_path_1 = __importDefault(require("node:path"));
 const sass_language_1 = require("../../tools/esbuild/stylesheets/sass-language");
 const utils_1 = require("../../tools/esbuild/utils");
+const environment_options_1 = require("../../utils/environment-options");
 const error_1 = require("../../utils/error");
 async function* runEsBuildBuildAction(action, options) {
     const { writeToFileSystemFilter, writeToFileSystem = true, watch, poll, logger, deleteOutputPath, cacheOptions, outputPath, verbose, projectRoot, workspaceRoot, progress, } = options;
@@ -95,8 +96,10 @@ async function* runEsBuildBuildAction(action, options) {
         });
         // Setup abort support
         options.signal?.addEventListener('abort', () => void watcher?.close());
-        // Temporarily watch the entire project
-        watcher.add(projectRoot);
+        // Watch the entire project root if 'NG_BUILD_WATCH_ROOT' environment variable is set
+        if (environment_options_1.shouldWatchRoot) {
+            watcher.add(projectRoot);
+        }
         // Watch workspace for package manager changes
         const packageWatchFiles = [
             // manifest can affect module resolution

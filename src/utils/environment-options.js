@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.debugPerformance = exports.useLegacySass = exports.useParallelTs = exports.maxWorkers = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
+exports.shouldWatchRoot = exports.debugPerformance = exports.useLegacySass = exports.useParallelTs = exports.maxWorkers = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
 const color_1 = require("./color");
 function isDisabled(variable) {
     return variable === '0' || variable.toLowerCase() === 'false';
@@ -81,3 +81,5 @@ exports.useLegacySass = (() => {
 })();
 const debugPerfVariable = process.env['NG_BUILD_DEBUG_PERF'];
 exports.debugPerformance = isPresent(debugPerfVariable) && isEnabled(debugPerfVariable);
+const watchRootVariable = process.env['NG_BUILD_WATCH_ROOT'];
+exports.shouldWatchRoot = isPresent(watchRootVariable) && isEnabled(watchRootVariable);
