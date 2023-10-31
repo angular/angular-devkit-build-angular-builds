@@ -23,6 +23,7 @@ export interface JavaScriptTransformerOptions {
  */
 export declare class JavaScriptTransformer {
     #private;
+    readonly maxThreads: number;
     constructor(options: JavaScriptTransformerOptions, maxThreads: number);
     /**
      * Performs JavaScript transformations on a file from the filesystem.

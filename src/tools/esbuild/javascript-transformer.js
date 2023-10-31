@@ -20,16 +20,11 @@ const piscina_1 = __importDefault(require("piscina"));
  * and advanced optimizations.
  */
 class JavaScriptTransformer {
+    maxThreads;
     #workerPool;
     #commonOptions;
     constructor(options, maxThreads) {
-        this.#workerPool = new piscina_1.default({
-            filename: require.resolve('./javascript-transformer-worker'),
-            minThreads: 1,
-            maxThreads,
-            // Shutdown idle threads after 1 second of inactivity
-            idleTimeout: 1000,
-        });
+        this.maxThreads = maxThreads;
         // Extract options to ensure only the named options are serialized and sent to the worker
         const { sourcemap, thirdPartySourcemaps = false, advancedOptimizations = false, jit = false, } = options;
         this.#commonOptions = {
@@ -38,6 +33,16 @@ class JavaScriptTransformer {
             advancedOptimizations,
             jit,
         };
+    }
+    #ensureWorkerPool() {
+        this.#workerPool ??= new piscina_1.default({
+            filename: require.resolve('./javascript-transformer-worker'),
+            minThreads: 1,
+            maxThreads: this.maxThreads,
+            // Shutdown idle threads after 1 second of inactivity
+            idleTimeout: 1000,
+        });
+        return this.#workerPool;
     }
     /**
      * Performs JavaScript transformations on a file from the filesystem.
@@ -49,7 +54,7 @@ class JavaScriptTransformer {
     transformFile(filename, skipLinker) {
         // Always send the request to a worker. Files are almost always from node modules which means
         // they may need linking. The data is also not yet available to perform most transformation checks.
-        return this.#workerPool.run({
+        return this.#ensureWorkerPool().run({
             filename,
             skipLinker,
             ...this.#commonOptions,
@@ -71,7 +76,7 @@ class JavaScriptTransformer {
                 (!!this.#commonOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
             return Buffer.from(keepSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, ''), 'utf-8');
         }
-        return this.#workerPool.run({
+        return this.#ensureWorkerPool().run({
             filename,
             data,
             skipLinker,
@@ -82,10 +87,17 @@ class JavaScriptTransformer {
      * Stops all active transformation tasks and shuts down all workers.
      * @returns A void promise that resolves when closing is complete.
      */
-    close() {
-        // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
-        this.#workerPool.options.minThreads = 0;
-        return this.#workerPool.destroy();
+    async close() {
+        if (this.#workerPool) {
+            // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
+            this.#workerPool.options.minThreads = 0;
+            try {
+                await this.#workerPool.destroy();
+            }
+            finally {
+                this.#workerPool = undefined;
+            }
+        }
     }
 }
 exports.JavaScriptTransformer = JavaScriptTransformer;
