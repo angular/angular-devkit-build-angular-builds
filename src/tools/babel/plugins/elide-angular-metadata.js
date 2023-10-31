@@ -18,13 +18,17 @@ const SET_CLASS_METADATA_NAME = 'ɵsetClassMetadata';
  */
 const SET_CLASS_METADATA_ASYNC_NAME = 'ɵsetClassMetadataAsync';
 /**
+ * Name of the function that sets debug information on classes.
+ */
+const SET_CLASS_DEBUG_INFO_NAME = 'ɵsetClassDebugInfo';
+/**
  * Provides one or more keywords that if found within the content of a source file indicate
  * that this plugin should be used with a source file.
  *
  * @returns An a string iterable containing one or more keywords.
  */
 function getKeywords() {
-    return [SET_CLASS_METADATA_NAME, SET_CLASS_METADATA_ASYNC_NAME];
+    return [SET_CLASS_METADATA_NAME, SET_CLASS_METADATA_ASYNC_NAME, SET_CLASS_DEBUG_INFO_NAME];
 }
 exports.getKeywords = getKeywords;
 /**
@@ -48,7 +52,8 @@ function default_1() {
                 }
                 if (calleeName !== undefined &&
                     (isRemoveClassMetadataCall(calleeName, callArguments) ||
-                        isRemoveClassmetadataAsyncCall(calleeName, callArguments))) {
+                        isRemoveClassmetadataAsyncCall(calleeName, callArguments) ||
+                        isSetClassDebugInfoCall(calleeName, callArguments))) {
                     // The metadata function is always emitted inside a function expression
                     const parent = path.getFunctionParent();
                     if (parent && (parent.isFunctionExpression() || parent.isArrowFunctionExpression())) {
@@ -83,6 +88,13 @@ function isRemoveClassmetadataAsyncCall(name, args) {
         core_1.types.isIdentifier(args[0]) &&
         isInlineFunction(args[1]) &&
         isInlineFunction(args[2]));
+}
+/** Determines if a function call is a call to `setClassDebugInfo`. */
+function isSetClassDebugInfoCall(name, args) {
+    return (name === SET_CLASS_DEBUG_INFO_NAME &&
+        args.length === 2 &&
+        core_1.types.isIdentifier(args[0]) &&
+        core_1.types.isObjectExpression(args[1]));
 }
 /** Determines if a node is an inline function expression. */
 function isInlineFunction(node) {
