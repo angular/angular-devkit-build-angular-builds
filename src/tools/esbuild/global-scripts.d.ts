@@ -13,4 +13,4 @@ import { BundlerOptionsFactory } from './bundler-context';
  * @param options The builder's user-provider normalized options.
  * @returns An esbuild BuildOptions object.
  */
-export declare function createGlobalScriptsBundleOptions(options: NormalizedApplicationBuildOptions, initial: boolean): BundlerOptionsFactory | undefined;
+export declare function createGlobalScriptsBundleOptions(options: NormalizedApplicationBuildOptions, target: string[], initial: boolean): BundlerOptionsFactory | undefined;

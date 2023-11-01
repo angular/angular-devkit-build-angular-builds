@@ -97,7 +97,7 @@ async function* serveWithVite(serverOptions, builderName, context, plugins) {
     // dynamically import Vite for ESM compatibility
     const { createServer, normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
     let server;
-    let listeningAddress;
+    let serverUrl;
     let hadError = false;
     const generatedFiles = new Map();
     const assetFiles = new Map();
@@ -173,12 +173,19 @@ async function* serveWithVite(serverOptions, builderName, context, plugins) {
             const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target);
             server = await createServer(serverConfiguration);
             await server.listen();
-            listeningAddress = server.httpServer?.address();
+            const urls = server.resolvedUrls;
+            if (urls && (urls.local.length || urls.network.length)) {
+                serverUrl = new URL(urls.local[0] ?? urls.network[0]);
+            }
             // log connection information
             server.printUrls();
         }
         // TODO: adjust output typings to reflect both development servers
-        yield { success: true, port: listeningAddress?.port };
+        yield {
+            success: true,
+            port: serverUrl?.port,
+            baseUrl: serverUrl?.href,
+        };
     }
     // Add cleanup logic via a builder teardown
     let deferred;
