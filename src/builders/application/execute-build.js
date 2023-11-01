@@ -93,6 +93,27 @@ async function executeBuild(options, context, rebuildState) {
     }
     const { metafile, initialFiles, outputFiles } = bundlingResult;
     executionResult.outputFiles.push(...outputFiles);
+    const changedFiles = rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputHashes);
+    // Analyze files for bundle budget failures if present
+    let budgetFailures;
+    if (options.budgets) {
+        const compatStats = (0, budget_stats_1.generateBudgetStats)(metafile, initialFiles);
+        budgetFailures = [...(0, bundle_calculator_1.checkBudgets)(options.budgets, compatStats, true)];
+        if (budgetFailures.length > 0) {
+            const errors = budgetFailures
+                .filter((failure) => failure.severity === 'error')
+                .map(({ message }) => message);
+            const warnings = budgetFailures
+                .filter((failure) => failure.severity !== 'error')
+                .map(({ message }) => message);
+            await printWarningsAndErrorsToConsoleAndAddToResult(context, executionResult, warnings, errors);
+        }
+    }
+    // Calculate estimated transfer size if scripts are optimized
+    let estimatedTransferSizes;
+    if (optimizationOptions.scripts || optimizationOptions.styles.minify) {
+        estimatedTransferSizes = await (0, utils_1.calculateEstimatedTransferSizes)(executionResult.outputFiles);
+    }
     // Check metafile for CommonJS module usage if optimizing scripts
     if (optimizationOptions.scripts) {
         const messages = (0, commonjs_checker_1.checkCommonJSModules)(metafile, options.allowedCommonJsDependencies);
@@ -107,27 +128,6 @@ async function executeBuild(options, context, rebuildState) {
     // Extract and write licenses for used packages
     if (options.extractLicenses) {
         executionResult.addOutputFile('3rdpartylicenses.txt', await (0, license_extractor_1.extractLicenses)(metafile, workspaceRoot), bundler_context_1.BuildOutputFileType.Root);
-    }
-    // Analyze files for bundle budget failures if present
-    let budgetFailures;
-    if (options.budgets) {
-        const compatStats = (0, budget_stats_1.generateBudgetStats)(metafile, initialFiles);
-        budgetFailures = [...(0, bundle_calculator_1.checkBudgets)(options.budgets, compatStats, true)];
-        if (budgetFailures.length > 0) {
-            await (0, utils_1.logMessages)(context, {
-                errors: budgetFailures
-                    .filter((failure) => failure.severity === 'error')
-                    .map((failure) => ({ text: failure.message, location: null })),
-                warnings: budgetFailures
-                    .filter((failure) => failure.severity !== 'error')
-                    .map((failure) => ({ text: failure.message, location: null })),
-            });
-        }
-    }
-    // Calculate estimated transfer size if scripts are optimized
-    let estimatedTransferSizes;
-    if (optimizationOptions.scripts || optimizationOptions.styles.minify) {
-        estimatedTransferSizes = await (0, utils_1.calculateEstimatedTransferSizes)(executionResult.outputFiles);
     }
     // Perform i18n translation inlining if enabled
     let prerenderedRoutes;
@@ -149,7 +149,7 @@ async function executeBuild(options, context, rebuildState) {
         executionResult.outputFiles.push(...result.additionalOutputFiles);
         executionResult.assetFiles.push(...result.additionalAssets);
     }
-    await printWarningsAndErrorsToConsole(context, warnings, errors);
+    await printWarningsAndErrorsToConsoleAndAddToResult(context, executionResult, warnings, errors);
     if (prerenderOptions) {
         executionResult.addOutputFile('prerendered-routes.json', JSON.stringify({ routes: prerenderedRoutes.sort((a, b) => a.localeCompare(b)) }, null, 2), bundler_context_1.BuildOutputFileType.Root);
         let prerenderMsg = `Prerendered ${prerenderedRoutes.length} static route`;
@@ -161,7 +161,6 @@ async function executeBuild(options, context, rebuildState) {
         }
         context.logger.info(color_1.colors.magenta(prerenderMsg) + '\n');
     }
-    const changedFiles = rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputHashes);
     (0, utils_1.logBuildStats)(context, metafile, initialFiles, budgetFailures, changedFiles, estimatedTransferSizes);
     // Write metafile if stats option is enabled
     if (options.stats) {
@@ -170,9 +169,13 @@ async function executeBuild(options, context, rebuildState) {
     return executionResult;
 }
 exports.executeBuild = executeBuild;
-async function printWarningsAndErrorsToConsole(context, warnings, errors) {
+async function printWarningsAndErrorsToConsoleAndAddToResult(context, executionResult, warnings, errors) {
+    const errorMessages = errors.map((text) => ({ text, location: null }));
+    if (errorMessages.length) {
+        executionResult.addErrors(errorMessages);
+    }
     await (0, utils_1.logMessages)(context, {
-        errors: errors.map((text) => ({ text, location: null })),
+        errors: errorMessages,
         warnings: warnings.map((text) => ({ text, location: null })),
     });
 }
