@@ -59,7 +59,7 @@ async function executeBuild(options, context, rebuildState) {
         // Global Scripts
         if (options.globalScripts.length > 0) {
             for (const initial of [true, false]) {
-                const bundleOptions = (0, global_scripts_1.createGlobalScriptsBundleOptions)(options, initial);
+                const bundleOptions = (0, global_scripts_1.createGlobalScriptsBundleOptions)(options, target, initial);
                 if (bundleOptions) {
                     bundlerContexts.push(new bundler_context_1.BundlerContext(workspaceRoot, !!options.watch, bundleOptions, () => initial));
                 }

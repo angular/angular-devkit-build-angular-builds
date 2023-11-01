@@ -14,7 +14,7 @@ const url_1 = require("url");
 const javascript_transformer_1 = require("../../../tools/esbuild/javascript-transformer");
 const node_18_utils_1 = require("./node-18-utils");
 const TRANSFORMED_FILES = {};
-const CHUNKS_REGEXP = /file:\/\/\/(main\.server|chunk-\w+)\.mjs/;
+const CHUNKS_REGEXP = /file:\/\/\/((?:main|render-utils)\.server|chunk-\w+)\.mjs/;
 let workspaceRootFile;
 let outputFiles;
 const javascriptTransformer = new javascript_transformer_1.JavaScriptTransformer(
