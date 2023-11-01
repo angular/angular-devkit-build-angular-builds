@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import type { Message } from 'esbuild';
+import type { Message, PartialMessage } from 'esbuild';
 import type { ChangedFiles } from '../../tools/esbuild/watcher';
 import type { SourceFileCache } from './angular/source-file-cache';
 import type { BuildOutputFile, BuildOutputFileType, BundlerContext } from './bundler-context';
@@ -27,7 +27,7 @@ export declare class ExecutionResult {
     private codeBundleCache?;
     outputFiles: BuildOutputFile[];
     assetFiles: BuildOutputAsset[];
-    errors: Message[];
+    errors: (Message | PartialMessage)[];
     externalMetadata?: {
         implicit: string[];
         explicit?: string[];
@@ -35,7 +35,7 @@ export declare class ExecutionResult {
     constructor(rebuildContexts: BundlerContext[], codeBundleCache?: SourceFileCache | undefined);
     addOutputFile(path: string, content: string, type: BuildOutputFileType): void;
     addAssets(assets: BuildOutputAsset[]): void;
-    addErrors(errors: Message[]): void;
+    addErrors(errors: (Message | PartialMessage)[]): void;
     /**
      * Add external JavaScript import metadata to the result. This is currently used
      * by the development server to optimize the prebundling process.
@@ -50,7 +50,7 @@ export declare class ExecutionResult {
         success: boolean;
         outputFiles: BuildOutputFile[];
         assetFiles: BuildOutputAsset[];
-        errors: Message[];
+        errors: (PartialMessage | Message)[];
         externalMetadata: {
             implicit: string[];
             explicit?: string[] | undefined;

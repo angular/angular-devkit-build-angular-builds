@@ -228,7 +228,7 @@ class AnyComponentStyleCalculator extends Calculator {
  * Calculate the bytes given a string value.
  */
 function calculateBytes(input, baseline, factor = 1) {
-    const matches = input.match(/^\s*(\d+(?:\.\d+)?)\s*(%|(?:[mM]|[kK]|[gG])?[bB])?\s*$/);
+    const matches = input.trim().match(/^(\d+(?:\.\d+)?)[ \t]*(%|[kmg]?b)?$/i);
     if (!matches) {
         return NaN;
     }
