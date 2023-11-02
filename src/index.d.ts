@@ -14,4 +14,5 @@ export { execute as executeExtractI18nBuilder, ExtractI18nBuilderOptions, } from
 export { execute as executeKarmaBuilder, KarmaBuilderOptions, KarmaConfigOptions, } from './builders/karma';
 export { execute as executeProtractorBuilder, ProtractorBuilderOptions, } from './builders/protractor';
 export { execute as executeServerBuilder, ServerBuilderOptions, ServerBuilderOutput, } from './builders/server';
+export { execute as executeSSRDevServerBuilder, SSRDevServerBuilderOptions, SSRDevServerBuilderOutput, } from './builders/ssr-dev-server';
 export { execute as executeNgPackagrBuilder, NgPackagrBuilderOptions } from './builders/ng-packagr';
