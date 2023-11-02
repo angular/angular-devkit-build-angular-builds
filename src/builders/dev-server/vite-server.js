@@ -42,6 +42,7 @@ const promises_1 = require("node:fs/promises");
 const node_path_1 = __importDefault(require("node:path"));
 const bundler_context_1 = require("../../tools/esbuild/bundler-context");
 const javascript_transformer_1 = require("../../tools/esbuild/javascript-transformer");
+const rxjs_esm_resolution_plugin_1 = require("../../tools/esbuild/rxjs-esm-resolution-plugin");
 const utils_1 = require("../../tools/esbuild/utils");
 const i18n_locale_plugin_1 = require("../../tools/vite/i18n-locale-plugin");
 const render_page_1 = require("../../utils/server-rendering/render-page");
@@ -149,6 +150,8 @@ async function* serveWithVite(serverOptions, builderName, context, plugins) {
         }
         // To avoid disconnecting the array objects from the option, these arrays need to be mutated
         // instead of replaced.
+        // TODO: split explicit imports by platform to avoid having Vite optimize server-only/browser-only
+        // dependencies twice when SSR is enabled.
         if (result.externalMetadata) {
             if (result.externalMetadata.explicit) {
                 externalMetadata.explicit.push(...result.externalMetadata.explicit);
@@ -291,6 +294,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
     const { normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
     // Path will not exist on disk and only used to provide separate path for Vite requests
     const virtualProjectRoot = normalizePath(node_path_1.default.join(serverOptions.workspaceRoot, `.angular/vite-root/${(0, node_crypto_1.randomUUID)()}/`));
+    const { builtinModules } = await Promise.resolve().then(() => __importStar(require('node:module')));
     const configuration = {
         configFile: false,
         envFile: false,
@@ -324,8 +328,21 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
             preTransformRequests: externalMetadata.explicit.length === 0,
         },
         ssr: {
-            // Exclude any provided dependencies (currently build defined externals)
-            external: externalMetadata.explicit,
+            // Note: `true` and `/.*/` have different sematics. When true, the `external` option is ignored.
+            noExternal: /.*/,
+            // Exclude any Node.js built in module and provided dependencies (currently build defined externals)
+            external: [...builtinModules, ...externalMetadata.explicit],
+            optimizeDeps: getDepOptimizationConfig({
+                // Only enable with caching since it causes prebundle dependencies to be cached
+                disabled: !serverOptions.cacheOptions.enabled,
+                // Exclude any explicitly defined dependencies (currently build defined externals)
+                exclude: externalMetadata.explicit,
+                // Include all implict dependencies from the external packages internal option
+                include: externalMetadata.implicit,
+                ssr: true,
+                prebundleTransformer,
+                target,
+            }),
         },
         plugins: [
             (0, i18n_locale_plugin_1.createAngularLocaleDataPlugin)(),
@@ -506,35 +523,18 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                 },
             },
         ],
-        optimizeDeps: {
+        // Browser only optimizeDeps. (This does not run for SSR dependencies).
+        optimizeDeps: getDepOptimizationConfig({
             // Only enable with caching since it causes prebundle dependencies to be cached
             disabled: !serverOptions.cacheOptions.enabled,
             // Exclude any explicitly defined dependencies (currently build defined externals)
             exclude: externalMetadata.explicit,
             // Include all implict dependencies from the external packages internal option
             include: externalMetadata.implicit,
-            // Skip automatic file-based entry point discovery
-            entries: [],
-            // Add an esbuild plugin to run the Angular linker on dependencies
-            esbuildOptions: {
-                // Set esbuild supported targets.
-                target,
-                supported: (0, utils_1.getFeatureSupport)(target),
-                plugins: [
-                    {
-                        name: 'angular-vite-optimize-deps',
-                        setup(build) {
-                            build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
-                                return {
-                                    contents: await prebundleTransformer.transformFile(args.path),
-                                    loader: 'js',
-                                };
-                            });
-                        },
-                    },
-                ],
-            },
-        },
+            ssr: false,
+            prebundleTransformer,
+            target,
+        }),
     };
     if (serverOptions.ssl) {
         if (serverOptions.sslCert && serverOptions.sslKey) {
@@ -581,4 +581,37 @@ function pathnameWithoutServePath(url, serverOptions) {
         }
     }
     return pathname;
+}
+function getDepOptimizationConfig({ disabled, exclude, include, target, prebundleTransformer, ssr, }) {
+    const plugins = [
+        {
+            name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}`,
+            setup(build) {
+                build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
+                    return {
+                        contents: await prebundleTransformer.transformFile(args.path),
+                        loader: 'js',
+                    };
+                });
+            },
+        },
+    ];
+    if (ssr) {
+        plugins.unshift((0, rxjs_esm_resolution_plugin_1.createRxjsEsmResolutionPlugin)());
+    }
+    return {
+        // Only enable with caching since it causes prebundle dependencies to be cached
+        disabled,
+        // Exclude any explicitly defined dependencies (currently build defined externals)
+        exclude,
+        // Include all implict dependencies from the external packages internal option
+        include,
+        // Add an esbuild plugin to run the Angular linker on dependencies
+        esbuildOptions: {
+            // Set esbuild supported targets.
+            target,
+            supported: (0, utils_1.getFeatureSupport)(target),
+            plugins,
+        },
+    };
 }
