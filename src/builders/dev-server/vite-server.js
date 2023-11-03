@@ -247,7 +247,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
             filePath = '/index.html';
         }
         else {
-            filePath = normalizePath(file.path);
+            filePath = '/' + normalizePath(file.path);
         }
         seen.add(filePath);
         // Skip analysis of sourcemaps
@@ -357,10 +357,9 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                     if (importer && source[0] === '.' && importer.startsWith(virtualProjectRoot)) {
                         // Remove query if present
                         const [importerFile] = importer.split('?', 1);
-                        source = normalizePath((0, node_path_1.join)((0, node_path_1.dirname)((0, node_path_1.relative)(virtualProjectRoot, importerFile)), source));
-                    }
-                    if (source[0] === '/') {
-                        source = source.slice(1);
+                        source =
+                            '/' +
+                                normalizePath((0, node_path_1.join)((0, node_path_1.dirname)((0, node_path_1.relative)(virtualProjectRoot, importerFile)), source));
                     }
                     const [file] = source.split('?', 1);
                     if (outputFiles.has(file)) {
@@ -369,7 +368,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                 },
                 load(id) {
                     const [file] = id.split('?', 1);
-                    const relativeFile = normalizePath((0, node_path_1.relative)(virtualProjectRoot, file));
+                    const relativeFile = '/' + normalizePath((0, node_path_1.relative)(virtualProjectRoot, file));
                     const codeContents = outputFiles.get(relativeFile)?.contents;
                     if (codeContents === undefined) {
                         if (relativeFile.endsWith('/node_modules/vite/dist/client/client.mjs')) {
@@ -460,7 +459,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                                 next();
                                 return;
                             }
-                            const rawHtml = outputFiles.get('index.server.html')?.contents;
+                            const rawHtml = outputFiles.get('/index.server.html')?.contents;
                             if (!rawHtml) {
                                 next();
                                 return;
