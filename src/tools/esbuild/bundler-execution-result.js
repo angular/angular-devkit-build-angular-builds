@@ -35,11 +35,12 @@ class ExecutionResult {
     /**
      * Add external JavaScript import metadata to the result. This is currently used
      * by the development server to optimize the prebundling process.
-     * @param implicit External dependencies due to the external packages option.
+     * @param implicitBrowser External dependencies for the browser bundles due to the external packages option.
+     * @param implicitServer External dependencies for the server bundles due to the external packages option.
      * @param explicit External dependencies due to explicit project configuration.
      */
-    setExternalMetadata(implicit, explicit) {
-        this.externalMetadata = { implicit, explicit };
+    setExternalMetadata(implicitBrowser, implicitServer, explicit) {
+        this.externalMetadata = { implicitBrowser, implicitServer, explicit: explicit ?? [] };
     }
     get output() {
         return {

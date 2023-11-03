@@ -19,6 +19,11 @@ export interface RebuildState {
     fileChanges: ChangedFiles;
     previousOutputHashes: Map<string, string>;
 }
+export interface ExternalResultMetadata {
+    implicitBrowser: string[];
+    implicitServer: string[];
+    explicit: string[];
+}
 /**
  * Represents the result of a single builder execute call.
  */
@@ -28,10 +33,7 @@ export declare class ExecutionResult {
     outputFiles: BuildOutputFile[];
     assetFiles: BuildOutputAsset[];
     errors: (Message | PartialMessage)[];
-    externalMetadata?: {
-        implicit: string[];
-        explicit?: string[];
-    };
+    externalMetadata?: ExternalResultMetadata;
     constructor(rebuildContexts: BundlerContext[], codeBundleCache?: SourceFileCache | undefined);
     addOutputFile(path: string, content: string, type: BuildOutputFileType): void;
     addAssets(assets: BuildOutputAsset[]): void;
@@ -39,10 +41,11 @@ export declare class ExecutionResult {
     /**
      * Add external JavaScript import metadata to the result. This is currently used
      * by the development server to optimize the prebundling process.
-     * @param implicit External dependencies due to the external packages option.
+     * @param implicitBrowser External dependencies for the browser bundles due to the external packages option.
+     * @param implicitServer External dependencies for the server bundles due to the external packages option.
      * @param explicit External dependencies due to explicit project configuration.
      */
-    setExternalMetadata(implicit: string[], explicit: string[] | undefined): void;
+    setExternalMetadata(implicitBrowser: string[], implicitServer: string[], explicit: string[] | undefined): void;
     get output(): {
         success: boolean;
     };
@@ -51,10 +54,7 @@ export declare class ExecutionResult {
         outputFiles: BuildOutputFile[];
         assetFiles: BuildOutputAsset[];
         errors: (PartialMessage | Message)[];
-        externalMetadata: {
-            implicit: string[];
-            explicit?: string[] | undefined;
-        } | undefined;
+        externalMetadata: ExternalResultMetadata | undefined;
     };
     get watchFiles(): string[];
     createRebuildState(fileChanges: ChangedFiles): RebuildState;

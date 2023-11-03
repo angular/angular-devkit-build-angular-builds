@@ -16,7 +16,10 @@ export type BundleContextResult = {
     metafile: Metafile;
     outputFiles: BuildOutputFile[];
     initialFiles: Map<string, InitialFileRecord>;
-    externalImports: Set<string>;
+    externalImports: {
+        server?: Set<string>;
+        browser?: Set<string>;
+    };
 };
 export interface InitialFileRecord {
     entrypoint: boolean;
