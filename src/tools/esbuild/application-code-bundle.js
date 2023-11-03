@@ -177,12 +177,9 @@ function createServerCodeBundleOptions(options, target, sourceFileCache) {
 exports.createServerCodeBundleOptions = createServerCodeBundleOptions;
 function createServerPolyfillBundleOptions(options, target, sourceFileCache) {
     const polyfills = [];
-    const zoneFlagsNamespace = 'angular:zone-flags/placeholder';
     const polyfillsFromConfig = new Set(options.polyfills);
-    let hasZoneJs = false;
     if (polyfillsFromConfig.has('zone.js')) {
-        hasZoneJs = true;
-        polyfills.push(zoneFlagsNamespace, 'zone.js/node');
+        polyfills.push('zone.js/node');
     }
     if (polyfillsFromConfig.has('@angular/localize') ||
         polyfillsFromConfig.has('@angular/localize/init')) {
@@ -222,18 +219,6 @@ function createServerPolyfillBundleOptions(options, target, sourceFileCache) {
         },
     };
     buildOptions.plugins ??= [];
-    // Disable Zone.js uncaught promise rejections to provide cleaner stacktraces.
-    if (hasZoneJs) {
-        buildOptions.plugins.unshift((0, virtual_module_plugin_1.createVirtualModulePlugin)({
-            namespace: zoneFlagsNamespace,
-            entryPointOnly: false,
-            loadContent: () => ({
-                contents: `globalThis.__zone_symbol__DISABLE_WRAPPING_UNCAUGHT_PROMISE_REJECTION = true;`,
-                loader: 'js',
-                resolveDir: workspaceRoot,
-            }),
-        }));
-    }
     buildOptions.plugins.push((0, rxjs_esm_resolution_plugin_1.createRxjsEsmResolutionPlugin)());
     return () => buildOptions;
 }
