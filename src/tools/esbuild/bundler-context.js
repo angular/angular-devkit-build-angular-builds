@@ -68,7 +68,8 @@ class BundlerContext {
         const warnings = [];
         const metafile = { inputs: {}, outputs: {} };
         const initialFiles = new Map();
-        const externalImports = new Set();
+        const externalImportsBrowser = new Set();
+        const externalImportsServer = new Set();
         const outputFiles = [];
         for (const result of individualResults) {
             warnings.push(...result.warnings);
@@ -84,7 +85,8 @@ class BundlerContext {
             }
             result.initialFiles.forEach((value, key) => initialFiles.set(key, value));
             outputFiles.push(...result.outputFiles);
-            result.externalImports.forEach((value) => externalImports.add(value));
+            result.externalImports.browser?.forEach((value) => externalImportsBrowser.add(value));
+            result.externalImports.server?.forEach((value) => externalImportsServer.add(value));
         }
         if (errors !== undefined) {
             return { errors, warnings };
@@ -95,7 +97,10 @@ class BundlerContext {
             metafile,
             initialFiles,
             outputFiles,
-            externalImports,
+            externalImports: {
+                browser: externalImportsBrowser,
+                server: externalImportsServer,
+            },
         };
     }
     /**
@@ -241,16 +246,14 @@ class BundlerContext {
                 externalImports.add(importData.path);
             }
         }
+        const platformIsServer = this.#esbuildOptions?.platform === 'node';
         const outputFiles = result.outputFiles.map((file) => {
             let fileType;
             if ((0, node_path_1.dirname)(file.path) === 'media') {
                 fileType = BuildOutputFileType.Media;
             }
             else {
-                fileType =
-                    this.#esbuildOptions?.platform === 'node'
-                        ? BuildOutputFileType.Server
-                        : BuildOutputFileType.Browser;
+                fileType = platformIsServer ? BuildOutputFileType.Server : BuildOutputFileType.Browser;
             }
             return (0, utils_1.convertOutputFile)(file, fileType);
         });
@@ -259,7 +262,9 @@ class BundlerContext {
             ...result,
             outputFiles,
             initialFiles,
-            externalImports,
+            externalImports: {
+                [platformIsServer ? 'server' : 'browser']: externalImports,
+            },
             errors: undefined,
         };
     }

@@ -104,7 +104,8 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
     const generatedFiles = new Map();
     const assetFiles = new Map();
     const externalMetadata = {
-        implicit: [],
+        implicitBrowser: [],
+        implicitServer: [],
         explicit: [],
     };
     const build = builderName === '@angular-devkit/build-angular:application'
@@ -149,17 +150,12 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
                 assetFiles.set('/' + normalizePath(asset.destination), asset.source);
             }
         }
-        // To avoid disconnecting the array objects from the option, these arrays need to be mutated
-        // instead of replaced.
-        // TODO: split explicit imports by platform to avoid having Vite optimize server-only/browser-only
-        // dependencies twice when SSR is enabled.
+        // To avoid disconnecting the array objects from the option, these arrays need to be mutated instead of replaced.
         if (result.externalMetadata) {
-            if (result.externalMetadata.explicit) {
-                externalMetadata.explicit.push(...result.externalMetadata.explicit);
-            }
-            if (result.externalMetadata.implicit) {
-                externalMetadata.implicit.push(...result.externalMetadata.implicit);
-            }
+            const { implicitBrowser, implicitServer, explicit } = result.externalMetadata;
+            externalMetadata.explicit.push(...explicit);
+            externalMetadata.implicitServer.push(...implicitServer);
+            externalMetadata.implicitBrowser.push(...implicitBrowser);
         }
         if (server) {
             handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
@@ -339,7 +335,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                 // Exclude any explicitly defined dependencies (currently build defined externals)
                 exclude: externalMetadata.explicit,
                 // Include all implict dependencies from the external packages internal option
-                include: externalMetadata.implicit,
+                include: externalMetadata.implicitServer,
                 ssr: true,
                 prebundleTransformer,
                 target,
@@ -541,7 +537,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
             // Exclude any explicitly defined dependencies (currently build defined externals)
             exclude: externalMetadata.explicit,
             // Include all implict dependencies from the external packages internal option
-            include: externalMetadata.implicit,
+            include: externalMetadata.implicitBrowser,
             ssr: false,
             prebundleTransformer,
             target,
