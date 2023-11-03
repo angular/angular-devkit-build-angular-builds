@@ -15,7 +15,7 @@ const render_page_1 = require("./render-page");
  */
 const { outputFiles, document, inlineCriticalCss } = node_worker_threads_1.workerData;
 /** Renders an application based on a provided options. */
-async function render(options) {
+function render(options) {
     return (0, render_page_1.renderPage)({
         ...options,
         outputFiles,
