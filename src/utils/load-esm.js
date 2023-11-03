@@ -9,6 +9,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadEsmModule = void 0;
 /**
+ * Lazily compiled dynamic import loader function.
+ */
+let load;
+/**
  * This uses a dynamic import to load a module which may be ESM.
  * CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
  * will currently, unconditionally downlevel dynamic import into a require call.
@@ -21,6 +25,7 @@ exports.loadEsmModule = void 0;
  * @returns A Promise that resolves to the dynamically imported module.
  */
 function loadEsmModule(modulePath) {
-    return new Function('modulePath', `return import(modulePath);`)(modulePath);
+    load ??= new Function('modulePath', `return import(modulePath);`);
+    return load(modulePath);
 }
 exports.loadEsmModule = loadEsmModule;
