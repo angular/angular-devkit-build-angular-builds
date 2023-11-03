@@ -38,6 +38,10 @@ function checkCommonJSModules(metafile, allowedCommonJsDependencies) {
     // Used by '@angular/platform-server' and is in a seperate chunk that is unused when
     // using `provideHttpClient(withFetch())`.
     allowedRequests.add('xhr2');
+    // Packages used by @angular/ssr.
+    // While critters is ESM it has a number of direct and transtive CJS deps.
+    allowedRequests.add('express');
+    allowedRequests.add('critters');
     // Find all entry points that contain code (JS/TS)
     const files = [];
     for (const { entryPoint } of Object.values(metafile.outputs)) {
@@ -62,6 +66,10 @@ function checkCommonJSModules(metafile, allowedCommonJsDependencies) {
                 continue;
             }
             seenFiles.add(imported.path);
+            // If the dependency is allowed ignore all other checks
+            if (allowedRequests.has(imported.original)) {
+                continue;
+            }
             // Only check actual code files
             if (!isPathCode(imported.path)) {
                 continue;
@@ -117,10 +125,7 @@ function isPathCode(name) {
  * @returns True, if specifier is potentially relative; false, otherwise.
  */
 function isPotentialRelative(specifier) {
-    if (specifier[0] === '.') {
-        return true;
-    }
-    return false;
+    return specifier[0] === '.';
 }
 /**
  * Creates an esbuild diagnostic message for a given non-ESM module request.
