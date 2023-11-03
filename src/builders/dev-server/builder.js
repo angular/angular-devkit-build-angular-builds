@@ -37,14 +37,20 @@ const purge_cache_1 = require("../../utils/purge-cache");
 const options_1 = require("./options");
 /**
  * A Builder that executes a development server based on the provided browser target option.
+ *
+ * Usage of the `transforms` and/or `extensions` parameters is NOT supported and may cause
+ * unexpected build output or build failures.
+ *
  * @param options Dev Server options.
  * @param context The build context.
  * @param transforms A map of transforms that can be used to hook into some logic (such as
  * transforming webpack configuration before passing it to webpack).
+ * @param extensions An optional object containing an array of build plugins (esbuild-based)
+ * and/or HTTP request middleware.
  *
  * @experimental Direct usage of this function is considered experimental.
  */
-function execute(options, context, transforms = {}, plugins) {
+function execute(options, context, transforms = {}, extensions) {
     // Determine project name from builder context target
     const projectName = context.target?.project;
     if (!projectName) {
@@ -56,13 +62,16 @@ function execute(options, context, transforms = {}, plugins) {
         if (builderName === '@angular-devkit/build-angular:application' ||
             builderName === '@angular-devkit/build-angular:browser-esbuild' ||
             normalizedOptions.forceEsbuild) {
-            if (Object.keys(transforms).length > 0) {
+            if (transforms?.logging || transforms?.webpackConfiguration) {
                 throw new Error('The `application` and `browser-esbuild` builders do not support Webpack transforms.');
             }
-            return (0, rxjs_1.defer)(() => Promise.resolve().then(() => __importStar(require('./vite-server')))).pipe((0, rxjs_1.switchMap)(({ serveWithVite }) => serveWithVite(normalizedOptions, builderName, context, plugins)));
+            return (0, rxjs_1.defer)(() => Promise.resolve().then(() => __importStar(require('./vite-server')))).pipe((0, rxjs_1.switchMap)(({ serveWithVite }) => serveWithVite(normalizedOptions, builderName, context, transforms, extensions)));
         }
-        if (plugins?.length) {
+        if (extensions?.buildPlugins?.length) {
             throw new Error('Only the `application` and `browser-esbuild` builders support plugins.');
+        }
+        if (extensions?.middleware?.length) {
+            throw new Error('Only the `application` and `browser-esbuild` builders support middleware.');
         }
         // Use Webpack for all other browser targets
         return (0, rxjs_1.defer)(() => Promise.resolve().then(() => __importStar(require('./webpack-server')))).pipe((0, rxjs_1.switchMap)(({ serveWebpackBrowser }) => serveWebpackBrowser(normalizedOptions, builderName, context, transforms)));

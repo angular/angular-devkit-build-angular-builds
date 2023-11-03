@@ -51,7 +51,8 @@ const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const application_1 = require("../application");
 const browser_esbuild_1 = require("../browser-esbuild");
 const load_proxy_config_1 = require("./load-proxy-config");
-async function* serveWithVite(serverOptions, builderName, context, plugins) {
+// eslint-disable-next-line max-lines-per-function
+async function* serveWithVite(serverOptions, builderName, context, transformers, extensions) {
     // Get the browser configuration from the target name.
     const rawBrowserOptions = (await context.getTargetOptions(serverOptions.buildTarget));
     const browserOptions = (await context.validateOptions({
@@ -114,7 +115,7 @@ async function* serveWithVite(serverOptions, builderName, context, plugins) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     browserOptions, context, {
         write: false,
-    }, plugins)) {
+    }, extensions?.buildPlugins)) {
         (0, node_assert_1.default)(result.outputFiles, 'Builder did not provide result files.');
         // If build failed, nothing to serve
         if (!result.success) {
@@ -173,7 +174,7 @@ async function* serveWithVite(serverOptions, builderName, context, plugins) {
             const browsers = (0, supported_browsers_1.getSupportedBrowsers)(projectRoot, context.logger);
             const target = (0, utils_1.transformSupportedBrowsersToTargets)(browsers);
             // Setup server and start listening
-            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target);
+            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target, extensions?.middleware, transformers?.indexHtml);
             server = await createServer(serverConfiguration);
             await server.listen();
             const urls = server.resolvedUrls;
@@ -288,7 +289,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
     }
 }
 // eslint-disable-next-line max-lines-per-function
-async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target) {
+async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target, extensionMiddleware, indexHtmlTransformer) {
     const proxy = await (0, load_proxy_config_1.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig, true);
     // dynamically import Vite for ESM compatibility
     const { normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
@@ -446,6 +447,9 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                         }
                         next();
                     });
+                    if (extensionMiddleware?.length) {
+                        extensionMiddleware.forEach((middleware) => server.middlewares.use(middleware));
+                    }
                     // Returning a function, installs middleware after the main transform middleware but
                     // before the built-in HTML middleware
                     return () => {
@@ -475,7 +479,9 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                                     // TODO: add support for critical css inlining.
                                     inlineCriticalCss: false,
                                 });
-                                return content;
+                                return indexHtmlTransformer && content
+                                    ? await indexHtmlTransformer(content)
+                                    : content;
                             });
                         }
                         if (ssr) {
@@ -492,7 +498,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                             if (pathname === '/' || pathname === `/index.html`) {
                                 const rawHtml = outputFiles.get('/index.html')?.contents;
                                 if (rawHtml) {
-                                    transformIndexHtmlAndAddHeaders(req.url, rawHtml, res, next);
+                                    transformIndexHtmlAndAddHeaders(req.url, rawHtml, res, next, indexHtmlTransformer);
                                     return;
                                 }
                             }
