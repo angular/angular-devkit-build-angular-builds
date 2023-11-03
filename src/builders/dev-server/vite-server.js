@@ -39,7 +39,7 @@ const mrmime_1 = require("mrmime");
 const node_assert_1 = __importDefault(require("node:assert"));
 const node_crypto_1 = require("node:crypto");
 const promises_1 = require("node:fs/promises");
-const node_path_1 = __importDefault(require("node:path"));
+const node_path_1 = require("node:path");
 const bundler_context_1 = require("../../tools/esbuild/bundler-context");
 const javascript_transformer_1 = require("../../tools/esbuild/javascript-transformer");
 const rxjs_esm_resolution_plugin_1 = require("../../tools/esbuild/rxjs-esm-resolution-plugin");
@@ -170,7 +170,7 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
                 throw new Error('The builder requires a target.');
             }
             const { root = '' } = await context.getProjectMetadata(projectName);
-            const projectRoot = node_path_1.default.join(context.workspaceRoot, root);
+            const projectRoot = (0, node_path_1.join)(context.workspaceRoot, root);
             const browsers = (0, supported_browsers_1.getSupportedBrowsers)(projectRoot, context.logger);
             const target = (0, utils_1.transformSupportedBrowsersToTargets)(browsers);
             // Setup server and start listening
@@ -207,7 +207,7 @@ function handleUpdate(normalizePath, generatedFiles, server, serverOptions, logg
     for (const [file, record] of generatedFiles) {
         if (record.updated) {
             updatedFiles.push(file);
-            const updatedModules = server.moduleGraph.getModulesByFile(normalizePath(node_path_1.default.join(server.config.root, file)));
+            const updatedModules = server.moduleGraph.getModulesByFile(normalizePath((0, node_path_1.join)(server.config.root, file)));
             updatedModules?.forEach((m) => server?.moduleGraph.invalidateModule(m));
         }
     }
@@ -294,12 +294,12 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
     // dynamically import Vite for ESM compatibility
     const { normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
     // Path will not exist on disk and only used to provide separate path for Vite requests
-    const virtualProjectRoot = normalizePath(node_path_1.default.join(serverOptions.workspaceRoot, `.angular/vite-root/${(0, node_crypto_1.randomUUID)()}/`));
+    const virtualProjectRoot = normalizePath((0, node_path_1.join)(serverOptions.workspaceRoot, `.angular/vite-root/${(0, node_crypto_1.randomUUID)()}/`));
     const { builtinModules } = await Promise.resolve().then(() => __importStar(require('node:module')));
     const configuration = {
         configFile: false,
         envFile: false,
-        cacheDir: node_path_1.default.join(serverOptions.cacheOptions.path, 'vite'),
+        cacheDir: (0, node_path_1.join)(serverOptions.cacheOptions.path, 'vite'),
         root: virtualProjectRoot,
         publicDir: false,
         esbuild: false,
@@ -361,19 +361,19 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                     if (importer && source[0] === '.' && importer.startsWith(virtualProjectRoot)) {
                         // Remove query if present
                         const [importerFile] = importer.split('?', 1);
-                        source = normalizePath(node_path_1.default.join(node_path_1.default.dirname(node_path_1.default.relative(virtualProjectRoot, importerFile)), source));
+                        source = normalizePath((0, node_path_1.join)((0, node_path_1.dirname)((0, node_path_1.relative)(virtualProjectRoot, importerFile)), source));
                     }
                     if (source[0] === '/') {
                         source = source.slice(1);
                     }
                     const [file] = source.split('?', 1);
                     if (outputFiles.has(file)) {
-                        return node_path_1.default.join(virtualProjectRoot, source);
+                        return (0, node_path_1.join)(virtualProjectRoot, source);
                     }
                 },
                 load(id) {
                     const [file] = id.split('?', 1);
-                    const relativeFile = normalizePath(node_path_1.default.relative(virtualProjectRoot, file));
+                    const relativeFile = normalizePath((0, node_path_1.relative)(virtualProjectRoot, file));
                     const codeContents = outputFiles.get(relativeFile)?.contents;
                     if (codeContents === undefined) {
                         if (relativeFile.endsWith('/node_modules/vite/dist/client/client.mjs')) {
@@ -417,7 +417,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                         // Parse the incoming request.
                         // The base of the URL is unused but required to parse the URL.
                         const pathname = pathnameWithoutServePath(req.url, serverOptions);
-                        const extension = node_path_1.default.extname(pathname);
+                        const extension = (0, node_path_1.extname)(pathname);
                         // Rewrite all build assets to a vite raw fs URL
                         const assetSourcePath = assets.get(pathname);
                         if (assetSourcePath !== undefined) {
@@ -455,7 +455,12 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                     return () => {
                         function angularSSRMiddleware(req, res, next) {
                             const url = req.originalUrl;
-                            if (!url || url.endsWith('.html')) {
+                            if (
+                            // Skip if path is not defined.
+                            !url ||
+                                // Skip if path is like a file.
+                                // NOTE: We use a regexp to mitigate against matching requests like: /browse/pl.0ef59752c0cd457dbf1391f08cbd936f
+                                /^\.[a-z]{2,4}$/i.test((0, node_path_1.extname)(url.split('?')[0]))) {
                                 next();
                                 return;
                             }
@@ -471,9 +476,9 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                                     document: html,
                                     route,
                                     serverContext: 'ssr',
-                                    loadBundle: (path) => 
+                                    loadBundle: (uri) => 
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    server.ssrLoadModule(path.slice(1)),
+                                    server.ssrLoadModule(uri.slice(1)),
                                     // Files here are only needed for critical CSS inlining.
                                     outputFiles: {},
                                     // TODO: add support for critical css inlining.
