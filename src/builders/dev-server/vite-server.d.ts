@@ -7,7 +7,7 @@
  */
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
-import type { InlineConfig } from 'vite';
+import type { Connect, InlineConfig } from 'vite';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
 import type { NormalizedDevServerOptions } from './options';
 import type { DevServerBuilderOutput } from './webpack-server';
@@ -18,9 +18,14 @@ interface OutputFileRecord {
     updated: boolean;
     servable: boolean;
 }
-export declare function serveWithVite(serverOptions: NormalizedDevServerOptions, builderName: string, context: BuilderContext, plugins?: Plugin[]): AsyncIterableIterator<DevServerBuilderOutput>;
+export declare function serveWithVite(serverOptions: NormalizedDevServerOptions, builderName: string, context: BuilderContext, transformers?: {
+    indexHtml?: (content: string) => Promise<string>;
+}, extensions?: {
+    middleware?: Connect.NextHandleFunction[];
+    buildPlugins?: Plugin[];
+}): AsyncIterableIterator<DevServerBuilderOutput>;
 export declare function setupServer(serverOptions: NormalizedDevServerOptions, outputFiles: Map<string, OutputFileRecord>, assets: Map<string, string>, preserveSymlinks: boolean | undefined, externalMetadata: {
     implicit: string[];
     explicit: string[];
-}, ssr: boolean, prebundleTransformer: JavaScriptTransformer, target: string[]): Promise<InlineConfig>;
+}, ssr: boolean, prebundleTransformer: JavaScriptTransformer, target: string[], extensionMiddleware?: Connect.NextHandleFunction[], indexHtmlTransformer?: (content: string) => Promise<string>): Promise<InlineConfig>;
 export {};
