@@ -173,6 +173,17 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
             const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target, extensions?.middleware, transformers?.indexHtml);
             server = await createServer(serverConfiguration);
             await server.listen();
+            if (browserOptions.ssr) {
+                /**
+                 * Vite will only start dependency optimization of SSR modules when the first request comes in.
+                 * In some cases, this causes a long waiting time. To mitigate this, we call `ssrLoadModule` to
+                 * initiate this process before the first request.
+                 *
+                 * NOTE: This will intentionally fail from the unknown module, but currently there is no other way
+                 * to initiate the SSR dep optimizer.
+                 */
+                void server.ssrLoadModule('<deps-caller>').catch(() => { });
+            }
             const urls = server.resolvedUrls;
             if (urls && (urls.local.length || urls.network.length)) {
                 serverUrl = new URL(urls.local[0] ?? urls.network[0]);
@@ -291,7 +302,10 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
     const { normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
     // Path will not exist on disk and only used to provide separate path for Vite requests
     const virtualProjectRoot = normalizePath((0, node_path_1.join)(serverOptions.workspaceRoot, `.angular/vite-root/${(0, node_crypto_1.randomUUID)()}/`));
-    const { builtinModules } = await Promise.resolve().then(() => __importStar(require('node:module')));
+    const serverExplicitExternal = [
+        ...(await Promise.resolve().then(() => __importStar(require('node:module')))).builtinModules,
+        ...externalMetadata.explicit,
+    ];
     const configuration = {
         configFile: false,
         envFile: false,
@@ -328,12 +342,12 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
             // Note: `true` and `/.*/` have different sematics. When true, the `external` option is ignored.
             noExternal: /.*/,
             // Exclude any Node.js built in module and provided dependencies (currently build defined externals)
-            external: [...builtinModules, ...externalMetadata.explicit],
+            external: serverExplicitExternal,
             optimizeDeps: getDepOptimizationConfig({
                 // Only enable with caching since it causes prebundle dependencies to be cached
                 disabled: !serverOptions.cacheOptions.enabled,
-                // Exclude any explicitly defined dependencies (currently build defined externals)
-                exclude: externalMetadata.explicit,
+                // Exclude any explicitly defined dependencies (currently build defined externals and node.js built-ins)
+                exclude: serverExplicitExternal,
                 // Include all implict dependencies from the external packages internal option
                 include: externalMetadata.implicitServer,
                 ssr: true,
