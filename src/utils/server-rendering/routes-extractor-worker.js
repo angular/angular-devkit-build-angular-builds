@@ -16,8 +16,8 @@ const fetch_patch_1 = require("./fetch-patch");
 const { document, verbose } = node_worker_threads_1.workerData;
 /** Renders an application based on a provided options. */
 async function extractRoutes() {
-    const { extractRoutes } = await (0, load_esm_1.loadEsmModule)('./render-utils.server.mjs');
-    const { default: bootstrapAppFnOrModule } = await (0, load_esm_1.loadEsmModule)('./main.server.mjs');
+    const { extractRoutes } = await (0, load_esm_1.loadEsmModule)(new URL('./render-utils.server.mjs', 'memory://'));
+    const { default: bootstrapAppFnOrModule } = await (0, load_esm_1.loadEsmModule)(new URL('./main.server.mjs', 'memory://'));
     const skippedRedirects = [];
     const skippedOthers = [];
     const routes = [];

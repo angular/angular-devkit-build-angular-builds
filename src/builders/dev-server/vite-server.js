@@ -291,7 +291,10 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
     const { normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
     // Path will not exist on disk and only used to provide separate path for Vite requests
     const virtualProjectRoot = normalizePath((0, node_path_1.join)(serverOptions.workspaceRoot, `.angular/vite-root/${(0, node_crypto_1.randomUUID)()}/`));
-    const { builtinModules } = await Promise.resolve().then(() => __importStar(require('node:module')));
+    const serverExplicitExternal = [
+        ...(await Promise.resolve().then(() => __importStar(require('node:module')))).builtinModules,
+        ...externalMetadata.explicit,
+    ];
     const configuration = {
         configFile: false,
         envFile: false,
@@ -328,12 +331,12 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
             // Note: `true` and `/.*/` have different sematics. When true, the `external` option is ignored.
             noExternal: /.*/,
             // Exclude any Node.js built in module and provided dependencies (currently build defined externals)
-            external: [...builtinModules, ...externalMetadata.explicit],
+            external: serverExplicitExternal,
             optimizeDeps: getDepOptimizationConfig({
                 // Only enable with caching since it causes prebundle dependencies to be cached
                 disabled: !serverOptions.cacheOptions.enabled,
-                // Exclude any explicitly defined dependencies (currently build defined externals)
-                exclude: externalMetadata.explicit,
+                // Exclude any explicitly defined dependencies (currently build defined externals and node.js built-ins)
+                exclude: serverExplicitExternal,
                 // Include all implict dependencies from the external packages internal option
                 include: externalMetadata.implicitServer,
                 ssr: true,

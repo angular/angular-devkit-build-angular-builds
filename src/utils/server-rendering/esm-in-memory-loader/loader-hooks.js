@@ -6,16 +6,24 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.load = exports.resolve = exports.initialize = void 0;
+const node_assert_1 = __importDefault(require("node:assert"));
+const node_crypto_1 = require("node:crypto");
 const node_path_1 = require("node:path");
 const node_url_1 = require("node:url");
 const url_1 = require("url");
 const javascript_transformer_1 = require("../../../tools/esbuild/javascript-transformer");
 const node_18_utils_1 = require("./node-18-utils");
-const TRANSFORMED_FILES = {};
-const CHUNKS_REGEXP = /file:\/\/\/((?:main|render-utils)\.server|chunk-\w+)\.mjs/;
-let workspaceRootFile;
+/**
+ * Node.js ESM loader to redirect imports to in memory files.
+ * @see: https://nodejs.org/api/esm.html#loaders for more information about loaders.
+ */
+const MEMORY_URL_SCHEME = 'memory://';
+let memoryVirtualRootUrl;
 let outputFiles;
 const javascriptTransformer = new javascript_transformer_1.JavaScriptTransformer(
 // Always enable JIT linking to support applications built with and without AOT.
@@ -24,45 +32,89 @@ const javascriptTransformer = new javascript_transformer_1.JavaScriptTransformer
 { sourcemap: true, jit: true }, 1);
 (0, node_18_utils_1.callInitializeIfNeeded)(initialize);
 function initialize(data) {
-    workspaceRootFile = (0, node_url_1.pathToFileURL)((0, node_path_1.join)(data.workspaceRoot, 'index.mjs')).href;
+    // This path does not actually exist but is used to overlay the in memory files with the
+    // actual filesystem for resolution purposes.
+    // A custom URL schema (such as `memory://`) cannot be used for the resolve output because
+    // the in-memory files may use `import.meta.url` in ways that assume a file URL.
+    // `createRequire` is one example of this usage.
+    memoryVirtualRootUrl = (0, node_url_1.pathToFileURL)((0, node_path_1.join)(data.workspaceRoot, `.angular/prerender-root/${(0, node_crypto_1.randomUUID)()}/`)).href;
     outputFiles = data.outputFiles;
 }
 exports.initialize = initialize;
 function resolve(specifier, context, nextResolve) {
-    if (!isFileProtocol(specifier)) {
-        const normalizedSpecifier = specifier.replace(/^\.\//, '');
-        if (normalizedSpecifier in outputFiles) {
+    // In-memory files loaded from external code will contain a memory scheme
+    if (specifier.startsWith(MEMORY_URL_SCHEME)) {
+        let memoryUrl;
+        try {
+            memoryUrl = new URL(specifier);
+        }
+        catch {
+            node_assert_1.default.fail('External code attempted to use malformed memory scheme: ' + specifier);
+        }
+        // Resolve with a URL based from the virtual filesystem root
+        return {
+            format: 'module',
+            shortCircuit: true,
+            url: new URL(memoryUrl.pathname.slice(1), memoryVirtualRootUrl).href,
+        };
+    }
+    // Use next/default resolve if the parent is not from the virtual root
+    if (!context.parentURL?.startsWith(memoryVirtualRootUrl)) {
+        return nextResolve(specifier, context);
+    }
+    // Check for `./` and `../` relative specifiers
+    const isRelative = specifier[0] === '.' &&
+        (specifier[1] === '/' || (specifier[1] === '.' && specifier[2] === '/'));
+    // Relative specifiers from memory file should be based from the parent memory location
+    if (isRelative) {
+        let specifierUrl;
+        try {
+            specifierUrl = new URL(specifier, context.parentURL);
+        }
+        catch { }
+        if (specifierUrl?.pathname &&
+            Object.hasOwn(outputFiles, specifierUrl.href.slice(memoryVirtualRootUrl.length))) {
             return {
                 format: 'module',
                 shortCircuit: true,
-                // File URLs need to absolute. In Windows these also need to include the drive.
-                // The `/` will be resolved to the drive letter.
-                url: (0, node_url_1.pathToFileURL)('/' + normalizedSpecifier).href,
+                url: specifierUrl.href,
             };
         }
+        node_assert_1.default.fail(`In-memory ESM relative file should always exist: '${context.parentURL}' --> '${specifier}'`);
     }
+    // Update the parent URL to allow for module resolution for the workspace.
+    // This handles bare specifiers (npm packages) and absolute paths.
     // Defer to the next hook in the chain, which would be the
     // Node.js default resolve if this is the last user-specified loader.
-    return nextResolve(specifier, isBundleEntryPointOrChunk(context) ? { ...context, parentURL: workspaceRootFile } : context);
+    return nextResolve(specifier, {
+        ...context,
+        parentURL: new URL('index.js', memoryVirtualRootUrl).href,
+    });
 }
 exports.resolve = resolve;
 async function load(url, context, nextLoad) {
     const { format } = context;
-    // CommonJs modules require no transformations and are not in memory.
-    if (format !== 'commonjs' && isFileProtocol(url)) {
+    // Load the file from memory if the URL is based in the virtual root
+    if (url.startsWith(memoryVirtualRootUrl)) {
+        const source = outputFiles[url.slice(memoryVirtualRootUrl.length)];
+        (0, node_assert_1.default)(source !== undefined, 'Resolved in-memory ESM file should always exist: ' + url);
+        // In-memory files have already been transformer during bundling and can be returned directly
+        return {
+            format,
+            shortCircuit: true,
+            source,
+        };
+    }
+    // Only module files potentially require transformation. Angular libraries that would
+    // need linking are ESM only.
+    if (format === 'module' && isFileProtocol(url)) {
         const filePath = (0, url_1.fileURLToPath)(url);
-        // Remove '/' or drive letter for Windows that was added in the above 'resolve'.
-        let source = outputFiles[(0, node_path_1.relative)('/', filePath)] ?? TRANSFORMED_FILES[filePath];
-        if (source === undefined) {
-            source = TRANSFORMED_FILES[filePath] = Buffer.from(await javascriptTransformer.transformFile(filePath)).toString('utf-8');
-        }
-        if (source !== undefined) {
-            return {
-                format,
-                shortCircuit: true,
-                source,
-            };
-        }
+        const source = await javascriptTransformer.transformFile(filePath);
+        return {
+            format,
+            shortCircuit: true,
+            source,
+        };
     }
     // Let Node.js handle all other URLs.
     return nextLoad(url);
@@ -73,9 +125,6 @@ function isFileProtocol(url) {
 }
 function handleProcessExit() {
     void javascriptTransformer.close();
-}
-function isBundleEntryPointOrChunk(context) {
-    return !!context.parentURL && CHUNKS_REGEXP.test(context.parentURL);
 }
 process.once('exit', handleProcessExit);
 process.once('SIGINT', handleProcessExit);
