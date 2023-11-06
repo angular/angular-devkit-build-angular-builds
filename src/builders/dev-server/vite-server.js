@@ -37,7 +37,6 @@ exports.setupServer = exports.serveWithVite = void 0;
 const remapping_1 = __importDefault(require("@ampproject/remapping"));
 const mrmime_1 = require("mrmime");
 const node_assert_1 = __importDefault(require("node:assert"));
-const node_crypto_1 = require("node:crypto");
 const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
 const bundler_context_1 = require("../../tools/esbuild/bundler-context");
@@ -160,6 +159,11 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
             externalMetadata.explicit.push(...explicit);
             externalMetadata.implicitServer.push(...implicitServer);
             externalMetadata.implicitBrowser.push(...implicitBrowser);
+            // The below needs to be sorted as Vite uses these options are part of the hashing invalidation algorithm.
+            // See: https://github.com/vitejs/vite/blob/0873bae0cfe0f0718ad2f5743dd34a17e4ab563d/packages/vite/src/node/optimizer/index.ts#L1203-L1239
+            externalMetadata.explicit.sort();
+            externalMetadata.implicitServer.sort();
+            externalMetadata.implicitBrowser.sort();
         }
         if (server) {
             handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
@@ -305,7 +309,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
     // dynamically import Vite for ESM compatibility
     const { normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
     // Path will not exist on disk and only used to provide separate path for Vite requests
-    const virtualProjectRoot = normalizePath((0, node_path_1.join)(serverOptions.workspaceRoot, `.angular/vite-root/${(0, node_crypto_1.randomUUID)()}/`));
+    const virtualProjectRoot = normalizePath((0, node_path_1.join)(serverOptions.workspaceRoot, `.angular/vite-root`, serverOptions.buildTarget.project));
     const serverExplicitExternal = [
         ...(await Promise.resolve().then(() => __importStar(require('node:module')))).builtinModules,
         ...externalMetadata.explicit,
