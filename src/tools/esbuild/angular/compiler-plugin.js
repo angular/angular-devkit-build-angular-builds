@@ -203,6 +203,7 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                 }
                 if (compilation instanceof compilation_1.NoopCompilation) {
                     await sharedTSCompilationState.waitUntilReady;
+                    hasCompilationErrors = false;
                     return result;
                 }
                 const diagnostics = await compilation.diagnoseFiles();
