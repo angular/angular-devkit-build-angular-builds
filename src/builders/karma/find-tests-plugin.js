@@ -89,18 +89,26 @@ async function findTests(include, exclude, workspaceRoot, projectSourceRoot) {
     return [...new Set(files.flat())];
 }
 const normalizePath = (path) => path.replace(/\\/g, '/');
+const removeLeadingSlash = (pattern) => {
+    if (pattern.charAt(0) === '/') {
+        return pattern.substring(1);
+    }
+    return pattern;
+};
+const removeRelativeRoot = (path, root) => {
+    if (path.startsWith(root)) {
+        return path.substring(root.length);
+    }
+    return path;
+};
 async function findMatchingTests(pattern, ignore, workspaceRoot, projectSourceRoot) {
     // normalize pattern, glob lib only accepts forward slashes
     let normalizedPattern = normalizePath(pattern);
-    if (normalizedPattern.charAt(0) === '/') {
-        normalizedPattern = normalizedPattern.substring(1);
-    }
+    normalizedPattern = removeLeadingSlash(normalizedPattern);
     const relativeProjectRoot = normalizePath((0, path_1.relative)(workspaceRoot, projectSourceRoot) + '/');
     // remove relativeProjectRoot to support relative paths from root
     // such paths are easy to get when running scripts via IDEs
-    if (normalizedPattern.startsWith(relativeProjectRoot)) {
-        normalizedPattern = normalizedPattern.substring(relativeProjectRoot.length);
-    }
+    normalizedPattern = removeRelativeRoot(normalizedPattern, relativeProjectRoot);
     // special logic when pattern does not look like a glob
     if (!(0, fast_glob_1.isDynamicPattern)(normalizedPattern)) {
         if (await isDirectory((0, path_1.join)(projectSourceRoot, normalizedPattern))) {
@@ -116,10 +124,12 @@ async function findMatchingTests(pattern, ignore, workspaceRoot, projectSourceRo
             }
         }
     }
+    // normalize the patterns in the ignore list
+    const normalizedIgnorePatternList = ignore.map((pattern) => removeRelativeRoot(removeLeadingSlash(normalizePath(pattern)), relativeProjectRoot));
     return (0, fast_glob_1.default)(normalizedPattern, {
         cwd: projectSourceRoot,
         absolute: true,
-        ignore: ['**/node_modules/**', ...ignore],
+        ignore: ['**/node_modules/**', ...normalizedIgnorePatternList],
     });
 }
 async function isDirectory(path) {
