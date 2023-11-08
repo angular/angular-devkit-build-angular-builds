@@ -35,6 +35,9 @@ class ParallelCompilation extends angular_compilation_1.AngularCompilation {
             minThreads: 1,
             maxThreads: 1,
             idleTimeout: Infinity,
+            // Web containers do not support transferable objects with receiveOnMessagePort which
+            // is used when the Atomics based wait loop is enable.
+            useAtomics: !process.versions.webcontainer,
             filename: localRequire.resolve('./parallel-worker'),
         });
     }
