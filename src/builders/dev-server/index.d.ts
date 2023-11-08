@@ -11,4 +11,4 @@ import { DevServerBuilderOutput } from './webpack-server';
 export { DevServerBuilderOptions, DevServerBuilderOutput, execute as executeDevServerBuilder };
 declare const _default: import("../../../../architect/src/internal").Builder<DevServerBuilderOptions & import("../../../../core/src").JsonObject>;
 export default _default;
-export { execute as serveWebpackBrowser };
+export { execute as executeDevServer };
