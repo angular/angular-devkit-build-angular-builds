@@ -107,6 +107,13 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
         implicitServer: [],
         explicit: [],
     };
+    // Add cleanup logic via a builder teardown.
+    let deferred;
+    context.addTeardown(async () => {
+        await server?.close();
+        await prebundleTransformer.close();
+        deferred?.();
+    });
     const build = builderName === '@angular-devkit/build-angular:application'
         ? application_1.buildApplicationInternal
         : browser_esbuild_1.buildEsbuildBrowser;
@@ -206,13 +213,6 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
             baseUrl: serverUrl?.href,
         };
     }
-    // Add cleanup logic via a builder teardown
-    let deferred;
-    context.addTeardown(async () => {
-        await server?.close();
-        await prebundleTransformer.close();
-        deferred?.();
-    });
     await new Promise((resolve) => (deferred = resolve));
 }
 exports.serveWithVite = serveWithVite;
