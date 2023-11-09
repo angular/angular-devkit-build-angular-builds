@@ -41,6 +41,20 @@ function deleteOutputDir(root, outputPath) {
     if (resolvedOutputPath === root) {
         throw new Error('Output path MUST not be project root directory!');
     }
-    fs.rmSync(resolvedOutputPath, { force: true, recursive: true, maxRetries: 3 });
+    // Avoid removing the actual directory to avoid errors in cases where the output
+    // directory is mounted or symlinked. Instead the contents are removed.
+    let entries;
+    try {
+        entries = fs.readdirSync(resolvedOutputPath);
+    }
+    catch (error) {
+        if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+            return;
+        }
+        throw error;
+    }
+    for (const entry of entries) {
+        fs.rmSync((0, path_1.join)(resolvedOutputPath, entry), { force: true, recursive: true, maxRetries: 3 });
+    }
 }
 exports.deleteOutputDir = deleteOutputDir;
