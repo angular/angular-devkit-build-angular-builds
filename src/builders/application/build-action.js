@@ -34,32 +34,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.runEsBuildBuildAction = void 0;
-const promises_1 = __importDefault(require("node:fs/promises"));
 const node_path_1 = __importDefault(require("node:path"));
 const sass_language_1 = require("../../tools/esbuild/stylesheets/sass-language");
 const utils_1 = require("../../tools/esbuild/utils");
+const delete_output_dir_1 = require("../../utils/delete-output-dir");
 const environment_options_1 = require("../../utils/environment-options");
-const error_1 = require("../../utils/error");
 async function* runEsBuildBuildAction(action, options) {
     const { writeToFileSystemFilter, writeToFileSystem = true, watch, poll, logger, deleteOutputPath, cacheOptions, outputPath, verbose, projectRoot, workspaceRoot, progress, } = options;
-    if (writeToFileSystem) {
-        // Clean output path if enabled
-        if (deleteOutputPath) {
-            if (outputPath === workspaceRoot) {
-                logger.error('Output path MUST not be workspace root directory!');
-                return;
-            }
-            await promises_1.default.rm(outputPath, { force: true, recursive: true, maxRetries: 3 });
-        }
-        // Create output directory if needed
-        try {
-            await promises_1.default.mkdir(outputPath, { recursive: true });
-        }
-        catch (e) {
-            (0, error_1.assertIsError)(e);
-            logger.error('Unable to create output directory: ' + e.message);
-            return;
-        }
+    if (deleteOutputPath && writeToFileSystem) {
+        await (0, delete_output_dir_1.deleteOutputDir)(workspaceRoot, outputPath);
     }
     const withProgress = progress ? utils_1.withSpinner : utils_1.withNoProgress;
     // Initial build

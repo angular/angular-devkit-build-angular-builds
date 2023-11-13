@@ -150,7 +150,7 @@ async function initialize(options, context, webpackConfigurationTransform) {
         return [getPlatformServerExportsConfig(wco), (0, configs_1.getCommonConfig)(wco), (0, configs_1.getStylesConfig)(wco)];
     });
     if (options.deleteOutputPath) {
-        (0, utils_1.deleteOutputDir)(context.workspaceRoot, originalOutputPath);
+        await (0, utils_1.deleteOutputDir)(context.workspaceRoot, originalOutputPath);
     }
     const transformedConfig = (await webpackConfigurationTransform?.(config)) ?? config;
     return { config: transformedConfig, i18n, projectRoot, projectSourceRoot };

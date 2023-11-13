@@ -194,7 +194,6 @@ function createServerPolyfillBundleOptions(options, target, sourceFileCache) {
     if (!polyfillBundleOptions) {
         return;
     }
-    const { workspaceRoot } = options;
     const buildOptions = {
         ...polyfillBundleOptions,
         platform: 'node',
@@ -218,8 +217,6 @@ function createServerPolyfillBundleOptions(options, target, sourceFileCache) {
             'polyfills.server': namespace,
         },
     };
-    buildOptions.plugins ??= [];
-    buildOptions.plugins.push((0, rxjs_esm_resolution_plugin_1.createRxjsEsmResolutionPlugin)());
     return () => buildOptions;
 }
 exports.createServerPolyfillBundleOptions = createServerPolyfillBundleOptions;
