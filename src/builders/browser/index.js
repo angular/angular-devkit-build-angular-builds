@@ -74,7 +74,7 @@ async function initialize(options, context, webpackConfigurationTransform) {
         transformedConfig = await webpackConfigurationTransform(config);
     }
     if (options.deleteOutputPath) {
-        (0, utils_1.deleteOutputDir)(context.workspaceRoot, originalOutputPath);
+        await (0, utils_1.deleteOutputDir)(context.workspaceRoot, originalOutputPath);
     }
     return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
 }

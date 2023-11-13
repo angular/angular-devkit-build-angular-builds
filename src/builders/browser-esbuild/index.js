@@ -16,6 +16,7 @@ const node_fs_1 = require("node:fs");
 const promises_1 = __importDefault(require("node:fs/promises"));
 const node_path_1 = __importDefault(require("node:path"));
 const utils_1 = require("../../tools/esbuild/utils");
+const utils_2 = require("../../utils");
 const application_1 = require("../application");
 const builder_status_warnings_1 = require("./builder-status-warnings");
 /**
@@ -29,7 +30,11 @@ async function* buildEsbuildBrowser(userOptions, context, infrastructureSettings
     // Inform user of status of builder and options
     (0, builder_status_warnings_1.logBuilderStatusWarnings)(userOptions, context);
     const normalizedOptions = normalizeOptions(userOptions);
-    const fullOutputPath = node_path_1.default.join(context.workspaceRoot, normalizedOptions.outputPath);
+    const { deleteOutputPath, outputPath } = normalizedOptions;
+    const fullOutputPath = node_path_1.default.join(context.workspaceRoot, outputPath);
+    if (deleteOutputPath && infrastructureSettings?.write !== false) {
+        await (0, utils_2.deleteOutputDir)(context.workspaceRoot, outputPath);
+    }
     for await (const result of (0, application_1.buildApplicationInternal)(normalizedOptions, context, {
         write: false,
     }, plugins)) {
