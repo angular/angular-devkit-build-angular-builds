@@ -421,19 +421,15 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                     const originalssrTransform = server.ssrTransform;
                     server.ssrTransform = async (code, map, url, originalCode) => {
                         const result = await originalssrTransform(code, null, url, originalCode);
-                        if (!result) {
-                            return null;
+                        if (!result || !result.map || !map) {
+                            return result;
                         }
-                        let transformedCode = result.code;
-                        if (result.map && map) {
-                            transformedCode +=
-                                `\n//# sourceMappingURL=` +
-                                    `data:application/json;base64,${Buffer.from(JSON.stringify((0, remapping_1.default)([result.map, map], () => null))).toString('base64')}`;
-                        }
+                        const remappedMap = (0, remapping_1.default)([result.map, map], () => null);
+                        // Set the sourcemap root to the workspace root. This is needed since we set a virtual path as root.
+                        remappedMap.sourceRoot = serverOptions.workspaceRoot + '/';
                         return {
                             ...result,
-                            map: null,
-                            code: transformedCode,
+                            map: remappedMap,
                         };
                     };
                     // Assets and resources get handled first
