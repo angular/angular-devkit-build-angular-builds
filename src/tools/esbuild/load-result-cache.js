@@ -18,8 +18,8 @@ function createCachedLoad(cache, callback) {
         let result = cache.get(loadCacheKey);
         if (result === undefined) {
             result = await callback(args);
-            // Do not cache null or undefined or results with errors
-            if (result && result.errors === undefined) {
+            // Do not cache null or undefined
+            if (result) {
                 await cache.put(loadCacheKey, result);
             }
         }

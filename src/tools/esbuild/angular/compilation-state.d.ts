@@ -7,8 +7,8 @@
  */
 export declare class SharedTSCompilationState {
     #private;
-    get waitUntilReady(): Promise<void>;
-    markAsReady(): void;
+    get waitUntilReady(): Promise<boolean>;
+    markAsReady(hasErrors: boolean): void;
     markAsInProgress(): void;
     dispose(): void;
 }

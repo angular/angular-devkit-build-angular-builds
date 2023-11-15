@@ -161,22 +161,26 @@ class BundlerContext {
                 throw failure;
             }
         }
+        finally {
+            if (this.incremental) {
+                // When incremental always add any files from the load result cache
+                if (this.#loadCache) {
+                    this.#loadCache.watchFiles
+                        .filter((file) => !isInternalAngularFile(file))
+                        // watch files are fully resolved paths
+                        .forEach((file) => this.watchFiles.add(file));
+                }
+            }
+        }
         // Update files that should be watched.
         // While this should technically not be linked to incremental mode, incremental is only
         // currently enabled with watch mode where watch files are needed.
         if (this.incremental) {
             // Add input files except virtual angular files which do not exist on disk
             Object.keys(result.metafile.inputs)
-                .filter((input) => !input.startsWith('angular:'))
+                .filter((input) => !isInternalAngularFile(input))
                 // input file paths are always relative to the workspace root
                 .forEach((input) => this.watchFiles.add((0, node_path_1.join)(this.workspaceRoot, input)));
-            // Also add any files from the load result cache
-            if (this.#loadCache) {
-                this.#loadCache.watchFiles
-                    .filter((file) => !file.startsWith('angular:'))
-                    // watch files are fully resolved paths
-                    .forEach((file) => this.watchFiles.add(file));
-            }
         }
         // Return if the build encountered any errors
         if (result.errors.length) {
@@ -271,12 +275,12 @@ class BundlerContext {
     #addErrorsToWatch(result) {
         for (const error of result.errors) {
             let file = error.location?.file;
-            if (file) {
+            if (file && !isInternalAngularFile(file)) {
                 this.watchFiles.add((0, node_path_1.join)(this.workspaceRoot, file));
             }
             for (const note of error.notes) {
                 file = note.location?.file;
-                if (file) {
+                if (file && !isInternalAngularFile(file)) {
                     this.watchFiles.add((0, node_path_1.join)(this.workspaceRoot, file));
                 }
             }
@@ -324,3 +328,6 @@ class BundlerContext {
     }
 }
 exports.BundlerContext = BundlerContext;
+function isInternalAngularFile(file) {
+    return file.startsWith('angular:');
+}

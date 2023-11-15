@@ -202,8 +202,7 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                     return result;
                 }
                 if (compilation instanceof compilation_1.NoopCompilation) {
-                    await sharedTSCompilationState.waitUntilReady;
-                    hasCompilationErrors = false;
+                    hasCompilationErrors = await sharedTSCompilationState.waitUntilReady;
                     return result;
                 }
                 const diagnostics = await compilation.diagnoseFiles();
@@ -250,7 +249,7 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                 hasCompilationErrors = !!result.errors?.length;
                 // Reset the setup warnings so that they are only shown during the first build.
                 setupWarnings = undefined;
-                sharedTSCompilationState.markAsReady();
+                sharedTSCompilationState.markAsReady(hasCompilationErrors);
                 return result;
             });
             build.onLoad({ filter: /\.[cm]?[jt]sx?$/ }, async (args) => {
@@ -314,7 +313,7 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
             }
             build.onEnd((result) => {
                 // Ensure other compilations are unblocked if the main compilation throws during start
-                sharedTSCompilationState?.markAsReady();
+                sharedTSCompilationState?.markAsReady(hasCompilationErrors);
                 for (const { outputFiles, metafile } of additionalResults.values()) {
                     // Add any additional output files to the main output files
                     if (outputFiles?.length) {

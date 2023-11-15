@@ -53,7 +53,7 @@ export declare class ExecutionResult {
         success: boolean;
         outputFiles: BuildOutputFile[];
         assetFiles: BuildOutputAsset[];
-        errors: (PartialMessage | Message)[];
+        errors: (Message | PartialMessage)[];
         externalMetadata: ExternalResultMetadata | undefined;
     };
     get watchFiles(): string[];
