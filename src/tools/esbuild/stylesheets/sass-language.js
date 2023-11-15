@@ -170,7 +170,7 @@ async function compileString(data, filePath, syntax, options, resolveUrl) {
     }
     catch (error) {
         if (isSassException(error)) {
-            const file = error.span.url ? (0, node_url_1.fileURLToPath)(error.span.url) : undefined;
+            const fileWithError = error.span.url ? (0, node_url_1.fileURLToPath)(error.span.url) : undefined;
             return {
                 loader: 'css',
                 errors: [
@@ -179,7 +179,7 @@ async function compileString(data, filePath, syntax, options, resolveUrl) {
                     },
                 ],
                 warnings,
-                watchFiles: file ? [file] : undefined,
+                watchFiles: fileWithError ? [filePath, fileWithError] : [filePath],
             };
         }
         throw error;
