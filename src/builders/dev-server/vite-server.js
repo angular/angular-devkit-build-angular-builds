@@ -44,6 +44,7 @@ const javascript_transformer_1 = require("../../tools/esbuild/javascript-transfo
 const rxjs_esm_resolution_plugin_1 = require("../../tools/esbuild/rxjs-esm-resolution-plugin");
 const utils_1 = require("../../tools/esbuild/utils");
 const i18n_locale_plugin_1 = require("../../tools/vite/i18n-locale-plugin");
+const load_esm_1 = require("../../utils/load-esm");
 const render_page_1 = require("../../utils/server-rendering/render-page");
 const supported_browsers_1 = require("../../utils/supported-browsers");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
@@ -97,7 +98,7 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const htmlIndexPath = (0, webpack_browser_config_1.getIndexOutputFile)(browserOptions.index);
     // dynamically import Vite for ESM compatibility
-    const { createServer, normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
+    const { createServer, normalizePath } = await (0, load_esm_1.loadEsmModule)('vite');
     let server;
     let serverUrl;
     let hadError = false;
@@ -308,7 +309,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
 async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target, extensionMiddleware, indexHtmlTransformer) {
     const proxy = await (0, load_proxy_config_1.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig, true);
     // dynamically import Vite for ESM compatibility
-    const { normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
+    const { normalizePath } = await (0, load_esm_1.loadEsmModule)('vite');
     // Path will not exist on disk and only used to provide separate path for Vite requests
     const virtualProjectRoot = normalizePath((0, node_path_1.join)(serverOptions.workspaceRoot, `.angular/vite-root`, serverOptions.buildTarget.project));
     const serverExplicitExternal = [
