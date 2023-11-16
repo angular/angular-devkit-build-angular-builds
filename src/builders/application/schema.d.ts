@@ -71,6 +71,15 @@ export interface Schema {
      */
     inlineStyleLanguage?: InlineStyleLanguage;
     /**
+     * Defines the type of loader to use with a specified file extension when used with a
+     * JavaScript `import`. `text` inlines the content as a string; `binary` inlines the content
+     * as a Uint8Array; `file` emits the file and provides the runtime location of the file;
+     * `empty` considers the content to be empty and not include it in bundles.
+     */
+    loader?: {
+        [key: string]: any;
+    };
+    /**
      * Translate the bundles in one or more locales.
      */
     localize?: Localize;

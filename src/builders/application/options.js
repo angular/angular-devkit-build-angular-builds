@@ -79,6 +79,19 @@ async function normalizeOptions(context, projectName, options, plugins) {
             fileReplacements[node_path_1.default.join(workspaceRoot, replacement.replace)] = fileReplaceWith;
         }
     }
+    let loaderExtensions;
+    if (options.loader) {
+        for (const [extension, value] of Object.entries(options.loader)) {
+            if (extension[0] !== '.' || /\.[cm]?[jt]sx?$/.test(extension)) {
+                continue;
+            }
+            if (value !== 'text' && value !== 'binary' && value !== 'file' && value !== 'empty') {
+                continue;
+            }
+            loaderExtensions ??= {};
+            loaderExtensions[extension] = value;
+        }
+    }
     const globalStyles = [];
     if (options.styles?.length) {
         const { entryPoints: stylesheetEntrypoints, noInjectNames } = (0, helpers_1.normalizeGlobalStyles)(options.styles || []);
@@ -205,6 +218,7 @@ async function normalizeOptions(context, projectName, options, plugins) {
         budgets: budgets?.length ? budgets : undefined,
         publicPath: deployUrl ? deployUrl : undefined,
         plugins: plugins?.length ? plugins : undefined,
+        loaderExtensions,
     };
 }
 exports.normalizeOptions = normalizeOptions;
