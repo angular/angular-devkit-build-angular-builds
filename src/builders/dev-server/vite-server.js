@@ -44,6 +44,7 @@ const javascript_transformer_1 = require("../../tools/esbuild/javascript-transfo
 const rxjs_esm_resolution_plugin_1 = require("../../tools/esbuild/rxjs-esm-resolution-plugin");
 const utils_1 = require("../../tools/esbuild/utils");
 const i18n_locale_plugin_1 = require("../../tools/vite/i18n-locale-plugin");
+const load_esm_1 = require("../../utils/load-esm");
 const render_page_1 = require("../../utils/server-rendering/render-page");
 const supported_browsers_1 = require("../../utils/supported-browsers");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
@@ -60,11 +61,12 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
         poll: serverOptions.poll,
         verbose: serverOptions.verbose,
     }, builderName));
-    if (browserOptions.prerender) {
+    if (browserOptions.prerender || browserOptions.ssr) {
         // Disable prerendering if enabled and force SSR.
         // This is so instead of prerendering all the routes for every change, the page is "prerendered" when it is requested.
-        browserOptions.ssr = true;
         browserOptions.prerender = false;
+        // Avoid bundling and processing the ssr entry-point as this is not used by the dev-server.
+        browserOptions.ssr = true;
         // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         process.setSourceMapsEnabled(true);
@@ -90,13 +92,13 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
     // Always enable JIT linking to support applications built with and without AOT.
     // In a development environment the additional scope information does not
     // have a negative effect unlike production where final output size is relevant.
-    { sourcemap: true, jit: true }, 1, true);
+    { sourcemap: true, jit: true, thirdPartySourcemaps: true }, 1, true);
     // Extract output index from options
     // TODO: Provide this info from the build results
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const htmlIndexPath = (0, webpack_browser_config_1.getIndexOutputFile)(browserOptions.index);
     // dynamically import Vite for ESM compatibility
-    const { createServer, normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
+    const { createServer, normalizePath } = await (0, load_esm_1.loadEsmModule)('vite');
     let server;
     let serverUrl;
     let hadError = false;
@@ -185,7 +187,7 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
             const browsers = (0, supported_browsers_1.getSupportedBrowsers)(projectRoot, context.logger);
             const target = (0, utils_1.transformSupportedBrowsersToTargets)(browsers);
             // Setup server and start listening
-            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target, extensions?.middleware, transformers?.indexHtml);
+            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target, browserOptions.loader, extensions?.middleware, transformers?.indexHtml);
             server = await createServer(serverConfiguration);
             await server.listen();
             if (serverConfiguration.ssr?.optimizeDeps?.disabled === false) {
@@ -304,10 +306,10 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
     }
 }
 // eslint-disable-next-line max-lines-per-function
-async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target, extensionMiddleware, indexHtmlTransformer) {
+async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target, prebundleLoaderExtensions, extensionMiddleware, indexHtmlTransformer) {
     const proxy = await (0, load_proxy_config_1.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig, true);
     // dynamically import Vite for ESM compatibility
-    const { normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
+    const { normalizePath } = await (0, load_esm_1.loadEsmModule)('vite');
     // Path will not exist on disk and only used to provide separate path for Vite requests
     const virtualProjectRoot = normalizePath((0, node_path_1.join)(serverOptions.workspaceRoot, `.angular/vite-root`, serverOptions.buildTarget.project));
     const serverExplicitExternal = [
@@ -371,6 +373,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                 ssr: true,
                 prebundleTransformer,
                 target,
+                loader: prebundleLoaderExtensions,
             }),
         },
         plugins: [
@@ -426,7 +429,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                         }
                         const remappedMap = (0, remapping_1.default)([result.map, map], () => null);
                         // Set the sourcemap root to the workspace root. This is needed since we set a virtual path as root.
-                        remappedMap.sourceRoot = serverOptions.workspaceRoot + '/';
+                        remappedMap.sourceRoot = normalizePath(serverOptions.workspaceRoot) + '/';
                         return {
                             ...result,
                             map: remappedMap,
@@ -568,6 +571,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
             ssr: false,
             prebundleTransformer,
             target,
+            loader: prebundleLoaderExtensions,
         }),
     };
     if (serverOptions.ssl) {
@@ -616,7 +620,7 @@ function pathnameWithoutServePath(url, serverOptions) {
     }
     return pathname;
 }
-function getDepOptimizationConfig({ disabled, exclude, include, target, prebundleTransformer, ssr, }) {
+function getDepOptimizationConfig({ disabled, exclude, include, target, prebundleTransformer, ssr, loader, }) {
     const plugins = [
         {
             name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}`,
@@ -646,6 +650,7 @@ function getDepOptimizationConfig({ disabled, exclude, include, target, prebundl
             target,
             supported: (0, utils_1.getFeatureSupport)(target),
             plugins,
+            loader,
         },
     };
 }

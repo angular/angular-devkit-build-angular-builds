@@ -37,9 +37,9 @@ exports.createCompilerPlugin = void 0;
 const node_assert_1 = __importDefault(require("node:assert"));
 const promises_1 = require("node:fs/promises");
 const path = __importStar(require("node:path"));
-const node_url_1 = require("node:url");
 const environment_options_1 = require("../../../utils/environment-options");
 const javascript_transformer_1 = require("../javascript-transformer");
+const load_result_cache_1 = require("../load-result-cache");
 const profiling_1 = require("../profiling");
 const compilation_1 = require("./compilation");
 const compilation_state_1 = require("./compilation-state");
@@ -216,7 +216,7 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                 try {
                     await (0, profiling_1.profileAsync)('NG_EMIT_TS', async () => {
                         for (const { filename, contents } of await compilation.emitAffectedFiles()) {
-                            typeScriptFileCache.set((0, node_url_1.pathToFileURL)(filename).href, contents);
+                            typeScriptFileCache.set(path.normalize(filename), contents);
                         }
                     });
                 }
@@ -253,7 +253,7 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                 return result;
             });
             build.onLoad({ filter: /\.[cm]?[jt]sx?$/ }, async (args) => {
-                const request = pluginOptions.fileReplacements?.[args.path] ?? args.path;
+                const request = path.normalize(pluginOptions.fileReplacements?.[path.normalize(args.path)] ?? args.path);
                 // Skip TS load attempt if JS TypeScript compilation not enabled and file is JS
                 if (shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
                     return undefined;
@@ -262,7 +262,7 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                 // the options cannot change and do not need to be represented in the key. If the
                 // cache is later stored to disk, then the options that affect transform output
                 // would need to be added to the key as well as a check for any change of content.
-                let contents = typeScriptFileCache.get((0, node_url_1.pathToFileURL)(request).href);
+                let contents = typeScriptFileCache.get(request);
                 if (contents === undefined) {
                     // If the Angular compilation had errors the file may not have been emitted.
                     // To avoid additional errors about missing files, return empty contents.
@@ -285,28 +285,22 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                     // A string indicates untransformed output from the TS/NG compiler
                     contents = await javascriptTransformer.transformData(request, contents, true /* skipLinker */);
                     // Store as the returned Uint8Array to allow caching the fully transformed code
-                    typeScriptFileCache.set((0, node_url_1.pathToFileURL)(request).href, contents);
+                    typeScriptFileCache.set(request, contents);
                 }
                 return {
                     contents,
                     loader: 'js',
                 };
             });
-            build.onLoad({ filter: /\.[cm]?js$/ }, (args) => (0, profiling_1.profileAsync)('NG_EMIT_JS*', async () => {
-                // The filename is currently used as a cache key. Since the cache is memory only,
-                // the options cannot change and do not need to be represented in the key. If the
-                // cache is later stored to disk, then the options that affect transform output
-                // would need to be added to the key as well as a check for any change of content.
-                let contents = pluginOptions.sourceFileCache?.babelFileCache.get(args.path);
-                if (contents === undefined) {
-                    contents = await javascriptTransformer.transformFile(args.path, pluginOptions.jit);
-                    pluginOptions.sourceFileCache?.babelFileCache.set(args.path, contents);
-                }
-                return {
-                    contents,
-                    loader: 'js',
-                };
-            }, true));
+            build.onLoad({ filter: /\.[cm]?js$/ }, (0, load_result_cache_1.createCachedLoad)(pluginOptions.loadResultCache, async (args) => {
+                return (0, profiling_1.profileAsync)('NG_EMIT_JS*', async () => {
+                    const contents = await javascriptTransformer.transformFile(args.path, pluginOptions.jit);
+                    return {
+                        contents,
+                        loader: 'js',
+                    };
+                }, true);
+            }));
             // Setup bundling of component templates and stylesheets when in JIT mode
             if (pluginOptions.jit) {
                 (0, jit_plugin_callbacks_1.setupJitPluginCallbacks)(build, stylesheetBundler, additionalResults, styleOptions.inlineStyleLanguage);
@@ -415,17 +409,19 @@ function bundleWebWorker(build, pluginOptions, workerFile) {
     }
 }
 function createMissingFileError(request, original, root) {
+    const relativeRequest = path.relative(root, request);
     const error = {
-        text: `File '${path.relative(root, request)}' is missing from the TypeScript compilation.`,
+        text: `File '${relativeRequest}' is missing from the TypeScript compilation.`,
         notes: [
             {
                 text: `Ensure the file is part of the TypeScript program via the 'files' or 'include' property.`,
             },
         ],
     };
-    if (request !== original) {
+    const relativeOriginal = path.relative(root, original);
+    if (relativeRequest !== relativeOriginal) {
         error.notes.push({
-            text: `File is requested from a file replacement of '${path.relative(root, original)}'.`,
+            text: `File is requested from a file replacement of '${relativeOriginal}'.`,
         });
     }
     return error;

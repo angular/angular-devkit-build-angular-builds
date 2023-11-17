@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExecutionResult = void 0;
+const node_path_1 = require("node:path");
 const utils_1 = require("./utils");
 /**
  * Represents the result of a single builder execute call.
@@ -57,11 +58,15 @@ class ExecutionResult {
         };
     }
     get watchFiles() {
+        // Bundler contexts internally normalize file dependencies
         const files = this.rebuildContexts.flatMap((context) => [...context.watchFiles]);
         if (this.codeBundleCache?.referencedFiles) {
-            files.push(...this.codeBundleCache.referencedFiles);
+            // These files originate from TS/NG and can have POSIX path separators even on Windows.
+            // To ensure path comparisons are valid, all these paths must be normalized.
+            files.push(...this.codeBundleCache.referencedFiles.map(node_path_1.normalize));
         }
         if (this.codeBundleCache?.loadResultCache) {
+            // Load result caches internally normalize file dependencies
             files.push(...this.codeBundleCache.loadResultCache.watchFiles);
         }
         return files;
