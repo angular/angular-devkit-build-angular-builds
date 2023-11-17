@@ -10,7 +10,6 @@ import { MemoryLoadResultCache } from '../load-result-cache';
 export declare class SourceFileCache extends Map<string, ts.SourceFile> {
     readonly persistentCachePath?: string | undefined;
     readonly modifiedFiles: Set<string>;
-    readonly babelFileCache: Map<string, Uint8Array>;
     readonly typeScriptFileCache: Map<string, string | Uint8Array>;
     readonly loadResultCache: MemoryLoadResultCache;
     referencedFiles?: readonly string[];
