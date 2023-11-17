@@ -18,8 +18,6 @@ const UNSUPPORTED_OPTIONS = [
     'webWorkerTsConfig',
 ];
 function logBuilderStatusWarnings(options, { logger }) {
-    logger.warn(`The 'browser-esbuild' builder is a compatibility builder which will be removed in a future major ` +
-        `version in favor of the 'application' builder.`);
     // Validate supported options
     for (const unsupportedOption of UNSUPPORTED_OPTIONS) {
         const value = options[unsupportedOption];
