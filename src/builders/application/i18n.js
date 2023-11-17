@@ -9,7 +9,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadActiveTranslations = exports.inlineI18n = void 0;
 const node_path_1 = require("node:path");
-const bundler_context_1 = require("../../tools/esbuild/bundler-context");
 const i18n_inliner_1 = require("../../tools/esbuild/i18n-inliner");
 const environment_options_1 = require("../../utils/environment-options");
 const i18n_options_1 = require("../../utils/i18n-options");
@@ -73,13 +72,8 @@ async function inlineI18n(options, executionResult, initialFiles) {
     finally {
         await inliner.close();
     }
-    // Update the result with all localized files.
-    executionResult.outputFiles = [
-        // Root files are not modified.
-        ...executionResult.outputFiles.filter(({ type }) => type === bundler_context_1.BuildOutputFileType.Root),
-        // Updated files for each locale.
-        ...updatedOutputFiles,
-    ];
+    // Update the result with all localized files
+    executionResult.outputFiles = updatedOutputFiles;
     // Assets are only changed if not using the flat output option
     if (options.i18nOptions.flatOutput !== true) {
         executionResult.assetFiles = updatedAssetFiles;

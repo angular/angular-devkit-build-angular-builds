@@ -127,6 +127,5 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     budgets: import("./schema").Budget[] | undefined;
     publicPath: string | undefined;
     plugins: Plugin[] | undefined;
-    loaderExtensions: Record<string, "binary" | "file" | "text"> | undefined;
 }>;
 export {};

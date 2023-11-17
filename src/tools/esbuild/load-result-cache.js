@@ -18,13 +18,8 @@ function createCachedLoad(cache, callback) {
         let result = cache.get(loadCacheKey);
         if (result === undefined) {
             result = await callback(args);
-            // Do not cache null or undefined
-            if (result) {
-                // Ensure requested path is included if it was a resolved file
-                if (args.namespace === 'file') {
-                    result.watchFiles ??= [];
-                    result.watchFiles.push(args.path);
-                }
+            // Do not cache null or undefined or results with errors
+            if (result && result.errors === undefined) {
                 await cache.put(loadCacheKey, result);
             }
         }
@@ -64,9 +59,7 @@ class MemoryLoadResultCache {
         return found;
     }
     get watchFiles() {
-        // this.#loadResults.keys() is not included here because the keys
-        // are namespaced request paths and not disk-based file paths.
-        return [...this.#fileDependencies.keys()];
+        return [...this.#loadResults.keys(), ...this.#fileDependencies.keys()];
     }
 }
 exports.MemoryLoadResultCache = MemoryLoadResultCache;

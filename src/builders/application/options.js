@@ -11,7 +11,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeOptions = void 0;
-const promises_1 = require("node:fs/promises");
 const node_module_1 = require("node:module");
 const node_path_1 = __importDefault(require("node:path"));
 const helpers_1 = require("../../tools/webpack/utils/helpers");
@@ -68,28 +67,8 @@ async function normalizeOptions(context, projectName, options, plugins) {
     let fileReplacements;
     if (options.fileReplacements) {
         for (const replacement of options.fileReplacements) {
-            const fileReplaceWith = node_path_1.default.join(workspaceRoot, replacement.with);
-            try {
-                await (0, promises_1.access)(fileReplaceWith, promises_1.constants.F_OK);
-            }
-            catch {
-                throw new Error(`The ${fileReplaceWith} path in file replacements does not exist.`);
-            }
             fileReplacements ??= {};
-            fileReplacements[node_path_1.default.join(workspaceRoot, replacement.replace)] = fileReplaceWith;
-        }
-    }
-    let loaderExtensions;
-    if (options.loader) {
-        for (const [extension, value] of Object.entries(options.loader)) {
-            if (extension[0] !== '.' || /\.[cm]?[jt]sx?$/.test(extension)) {
-                continue;
-            }
-            if (value !== 'text' && value !== 'binary' && value !== 'file' && value !== 'empty') {
-                continue;
-            }
-            loaderExtensions ??= {};
-            loaderExtensions[extension] = value;
+            fileReplacements[node_path_1.default.join(workspaceRoot, replacement.replace)] = node_path_1.default.join(workspaceRoot, replacement.with);
         }
     }
     const globalStyles = [];
@@ -218,7 +197,6 @@ async function normalizeOptions(context, projectName, options, plugins) {
         budgets: budgets?.length ? budgets : undefined,
         publicPath: deployUrl ? deployUrl : undefined,
         plugins: plugins?.length ? plugins : undefined,
-        loaderExtensions,
     };
 }
 exports.normalizeOptions = normalizeOptions;

@@ -118,7 +118,7 @@ async function* runEsBuildBuildAction(action, options) {
         return;
     }
     // Wait for changes and rebuild as needed
-    const currentWatchFiles = new Set(result.watchFiles);
+    let previousWatchFiles = new Set(result.watchFiles);
     try {
         for await (const changes of watcher) {
             if (options.signal?.aborted) {
@@ -129,22 +129,12 @@ async function* runEsBuildBuildAction(action, options) {
             }
             result = await withProgress('Changes detected. Rebuilding...', () => action(result.createRebuildState(changes)));
             // Update watched locations provided by the new build result.
-            // Keep watching all previous files if there are any errors; otherwise consider all
-            // files stale until confirmed present in the new result's watch files.
-            const staleWatchFiles = result.errors.length > 0 ? undefined : new Set(currentWatchFiles);
-            for (const watchFile of result.watchFiles) {
-                if (!currentWatchFiles.has(watchFile)) {
-                    // Add new watch location
-                    watcher.add(watchFile);
-                    currentWatchFiles.add(watchFile);
-                }
-                // Present so remove from stale locations
-                staleWatchFiles?.delete(watchFile);
-            }
-            // Remove any stale locations if the build was successful
-            if (staleWatchFiles?.size) {
-                watcher.remove([...staleWatchFiles]);
-            }
+            // Add any new locations
+            watcher.add(result.watchFiles.filter((watchFile) => !previousWatchFiles.has(watchFile)));
+            const newWatchFiles = new Set(result.watchFiles);
+            // Remove any old locations
+            watcher.remove([...previousWatchFiles].filter((watchFile) => !newWatchFiles.has(watchFile)));
+            previousWatchFiles = newWatchFiles;
             if (writeToFileSystem) {
                 // Write output files
                 const filesToWrite = writeToFileSystemFilter
