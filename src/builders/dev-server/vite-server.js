@@ -116,9 +116,9 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
         await prebundleTransformer.close();
         deferred?.();
     });
-    const build = builderName === '@angular-devkit/build-angular:application'
-        ? application_1.buildApplicationInternal
-        : browser_esbuild_1.buildEsbuildBrowser;
+    const build = builderName === '@angular-devkit/build-angular:browser-esbuild'
+        ? browser_esbuild_1.buildEsbuildBrowser
+        : application_1.buildApplicationInternal;
     // TODO: Switch this to an architect schedule call when infrastructure settings are supported
     for await (const result of build(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
