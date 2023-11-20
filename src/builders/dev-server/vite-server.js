@@ -44,6 +44,7 @@ const javascript_transformer_1 = require("../../tools/esbuild/javascript-transfo
 const rxjs_esm_resolution_plugin_1 = require("../../tools/esbuild/rxjs-esm-resolution-plugin");
 const utils_1 = require("../../tools/esbuild/utils");
 const i18n_locale_plugin_1 = require("../../tools/vite/i18n-locale-plugin");
+const utils_2 = require("../../utils");
 const render_page_1 = require("../../utils/server-rendering/render-page");
 const supported_browsers_1 = require("../../utils/supported-browsers");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
@@ -86,12 +87,13 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
         // When localization is enabled with a single locale, force a flat path to maintain behavior with the existing Webpack-based dev server.
         browserOptions.forceI18nFlatOutput = true;
     }
+    const { vendor: thirdPartySourcemaps } = (0, utils_2.normalizeSourceMaps)(browserOptions.sourceMap ?? false);
     // Setup the prebundling transformer that will be shared across Vite prebundling requests
     const prebundleTransformer = new javascript_transformer_1.JavaScriptTransformer(
     // Always enable JIT linking to support applications built with and without AOT.
     // In a development environment the additional scope information does not
     // have a negative effect unlike production where final output size is relevant.
-    { sourcemap: true, jit: true, thirdPartySourcemaps: true }, 1, true);
+    { sourcemap: true, jit: true, thirdPartySourcemaps }, 1, true);
     // Extract output index from options
     // TODO: Provide this info from the build results
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -186,7 +188,7 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
             const browsers = (0, supported_browsers_1.getSupportedBrowsers)(projectRoot, context.logger);
             const target = (0, utils_1.transformSupportedBrowsersToTargets)(browsers);
             // Setup server and start listening
-            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target, extensions?.middleware, transformers?.indexHtml);
+            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target, extensions?.middleware, transformers?.indexHtml, thirdPartySourcemaps);
             server = await createServer(serverConfiguration);
             await server.listen();
             if (serverConfiguration.ssr?.optimizeDeps?.disabled === false) {
@@ -305,7 +307,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
     }
 }
 // eslint-disable-next-line max-lines-per-function
-async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target, extensionMiddleware, indexHtmlTransformer) {
+async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target, extensionMiddleware, indexHtmlTransformer, thirdPartySourcemaps = false) {
     const proxy = await (0, load_proxy_config_1.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig, true);
     // dynamically import Vite for ESM compatibility
     const { normalizePath } = await Promise.resolve().then(() => __importStar(require('vite')));
@@ -372,6 +374,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                 ssr: true,
                 prebundleTransformer,
                 target,
+                thirdPartySourcemaps,
             }),
         },
         plugins: [
@@ -569,6 +572,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
             ssr: false,
             prebundleTransformer,
             target,
+            thirdPartySourcemaps,
         }),
     };
     if (serverOptions.ssl) {
@@ -617,10 +621,10 @@ function pathnameWithoutServePath(url, serverOptions) {
     }
     return pathname;
 }
-function getDepOptimizationConfig({ disabled, exclude, include, target, prebundleTransformer, ssr, }) {
+function getDepOptimizationConfig({ disabled, exclude, include, target, prebundleTransformer, ssr, thirdPartySourcemaps, }) {
     const plugins = [
         {
-            name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}`,
+            name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}${thirdPartySourcemaps ? '-vendor-sourcemap' : ''}`,
             setup(build) {
                 build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
                     return {
