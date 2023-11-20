@@ -8,23 +8,26 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FileReferenceTracker = void 0;
+const node_path_1 = require("node:path");
 class FileReferenceTracker {
     #referencingFiles = new Map();
     get referencedFiles() {
         return this.#referencingFiles.keys();
     }
     add(containingFile, referencedFiles) {
+        const normalizedContainingFile = (0, node_path_1.normalize)(containingFile);
         for (const file of referencedFiles) {
-            if (file === containingFile) {
+            const normalizedReferencedFile = (0, node_path_1.normalize)(file);
+            if (normalizedReferencedFile === normalizedContainingFile) {
                 // Containing file is already known to the AOT compiler
                 continue;
             }
-            const referencing = this.#referencingFiles.get(file);
+            const referencing = this.#referencingFiles.get(normalizedReferencedFile);
             if (referencing === undefined) {
-                this.#referencingFiles.set(file, new Set([containingFile]));
+                this.#referencingFiles.set(normalizedReferencedFile, new Set([normalizedContainingFile]));
             }
             else {
-                referencing.add(containingFile);
+                referencing.add(normalizedContainingFile);
             }
         }
     }
@@ -37,14 +40,15 @@ class FileReferenceTracker {
         let allChangedFiles;
         // Add referencing files to fully notify the AOT compiler of required component updates
         for (const modifiedFile of changed) {
-            const referencing = this.#referencingFiles.get(modifiedFile);
+            const normalizedModifiedFile = (0, node_path_1.normalize)(modifiedFile);
+            const referencing = this.#referencingFiles.get(normalizedModifiedFile);
             if (referencing) {
                 allChangedFiles ??= new Set(changed);
                 for (const referencingFile of referencing) {
                     allChangedFiles.add(referencingFile);
                 }
                 // Cleanup the stale record which will be updated by new resource transforms
-                this.#referencingFiles.delete(modifiedFile);
+                this.#referencingFiles.delete(normalizedModifiedFile);
             }
         }
         return allChangedFiles ?? changed;
