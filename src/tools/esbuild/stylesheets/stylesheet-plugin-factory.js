@@ -50,6 +50,10 @@ let postcss;
  * Based on https://tailwindcss.com/docs/functions-and-directives
  */
 const TAILWIND_KEYWORDS = ['@tailwind', '@layer', '@apply', '@config', 'theme(', 'screen('];
+/**
+ * Cached postcss instances that can be re-used between various StylesheetPluginFactory instances.
+ */
+const postcssProcessor = new Map();
 class StylesheetPluginFactory {
     options;
     cache;
@@ -73,9 +77,15 @@ class StylesheetPluginFactory {
                 return this.postcssProcessor;
             }
             if (options.tailwindConfiguration) {
-                postcss ??= (await Promise.resolve().then(() => __importStar(require('postcss')))).default;
-                const tailwind = await Promise.resolve(`${options.tailwindConfiguration.package}`).then(s => __importStar(require(s)));
-                this.postcssProcessor = postcss().use(tailwind.default({ config: options.tailwindConfiguration.file }));
+                const { package: tailwindPackage, file: config } = options.tailwindConfiguration;
+                const postCssInstanceKey = tailwindPackage + ':' + config;
+                this.postcssProcessor = postcssProcessor.get(postCssInstanceKey)?.deref();
+                if (!this.postcssProcessor) {
+                    postcss ??= (await Promise.resolve().then(() => __importStar(require('postcss')))).default;
+                    const tailwind = await Promise.resolve(`${tailwindPackage}`).then(s => __importStar(require(s)));
+                    this.postcssProcessor = postcss().use(tailwind.default({ config }));
+                    postcssProcessor.set(postCssInstanceKey, new WeakRef(this.postcssProcessor));
+                }
             }
             return this.postcssProcessor;
         };
