@@ -81,5 +81,8 @@ exports.useLegacySass = (() => {
 })();
 const debugPerfVariable = process.env['NG_BUILD_DEBUG_PERF'];
 exports.debugPerformance = isPresent(debugPerfVariable) && isEnabled(debugPerfVariable);
+// Default to true on Windows to workaround Visual Studio atomic file saving watch issues
 const watchRootVariable = process.env['NG_BUILD_WATCH_ROOT'];
-exports.shouldWatchRoot = isPresent(watchRootVariable) && isEnabled(watchRootVariable);
+exports.shouldWatchRoot = process.platform === 'win32'
+    ? !isPresent(watchRootVariable) || !isDisabled(watchRootVariable)
+    : isPresent(watchRootVariable) && isEnabled(watchRootVariable);
