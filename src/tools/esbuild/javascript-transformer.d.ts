@@ -30,18 +30,20 @@ export declare class JavaScriptTransformer {
      * If no transformations are required, the data for the original file will be returned.
      * @param filename The full path to the file.
      * @param skipLinker If true, bypass all Angular linker processing; if false, attempt linking.
+     * @param sideEffects If false, and `advancedOptimizations` is enabled tslib decorators are wrapped.
      * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
      */
-    transformFile(filename: string, skipLinker?: boolean): Promise<Uint8Array>;
+    transformFile(filename: string, skipLinker?: boolean, sideEffects?: boolean): Promise<Uint8Array>;
     /**
      * Performs JavaScript transformations on the provided data of a file. The file does not need
      * to exist on the filesystem.
      * @param filename The full path of the file represented by the data.
      * @param data The data of the file that should be transformed.
      * @param skipLinker If true, bypass all Angular linker processing; if false, attempt linking.
+     * @param sideEffects If false, and `advancedOptimizations` is enabled tslib decorators are wrapped.
      * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
      */
-    transformData(filename: string, data: string, skipLinker: boolean): Promise<Uint8Array>;
+    transformData(filename: string, data: string, skipLinker: boolean, sideEffects?: boolean): Promise<Uint8Array>;
     /**
      * Stops all active transformation tasks and shuts down all workers.
      * @returns A void promise that resolves when closing is complete.

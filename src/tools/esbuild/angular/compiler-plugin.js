@@ -283,7 +283,8 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                 }
                 else if (typeof contents === 'string') {
                     // A string indicates untransformed output from the TS/NG compiler
-                    contents = await javascriptTransformer.transformData(request, contents, true /* skipLinker */);
+                    const sideEffects = await hasSideEffects(request);
+                    contents = await javascriptTransformer.transformData(request, contents, true /* skipLinker */, sideEffects);
                     // Store as the returned Uint8Array to allow caching the fully transformed code
                     typeScriptFileCache.set(request, contents);
                 }
@@ -294,7 +295,8 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
             });
             build.onLoad({ filter: /\.[cm]?js$/ }, (0, load_result_cache_1.createCachedLoad)(pluginOptions.loadResultCache, async (args) => {
                 return (0, profiling_1.profileAsync)('NG_EMIT_JS*', async () => {
-                    const contents = await javascriptTransformer.transformFile(args.path, pluginOptions.jit);
+                    const sideEffects = await hasSideEffects(args.path);
+                    const contents = await javascriptTransformer.transformFile(args.path, pluginOptions.jit, sideEffects);
                     return {
                         contents,
                         loader: 'js',
@@ -326,6 +328,19 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                 void stylesheetBundler.dispose();
                 void compilation.close?.();
             });
+            /**
+             * Checks if the file has side-effects when `advancedOptimizations` is enabled.
+             */
+            async function hasSideEffects(path) {
+                if (!pluginOptions.advancedOptimizations) {
+                    return undefined;
+                }
+                const { sideEffects } = await build.resolve(path, {
+                    kind: 'import-statement',
+                    resolveDir: build.initialOptions.absWorkingDir ?? '',
+                });
+                return sideEffects;
+            }
         },
     };
 }

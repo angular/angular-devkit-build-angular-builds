@@ -54,9 +54,10 @@ class JavaScriptTransformer {
      * If no transformations are required, the data for the original file will be returned.
      * @param filename The full path to the file.
      * @param skipLinker If true, bypass all Angular linker processing; if false, attempt linking.
+     * @param sideEffects If false, and `advancedOptimizations` is enabled tslib decorators are wrapped.
      * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
      */
-    transformFile(filename, skipLinker) {
+    transformFile(filename, skipLinker, sideEffects) {
         const pendingKey = `${!!skipLinker}--${filename}`;
         let pending = this.#pendingfileResults?.get(pendingKey);
         if (pending === undefined) {
@@ -65,6 +66,7 @@ class JavaScriptTransformer {
             pending = this.#ensureWorkerPool().run({
                 filename,
                 skipLinker,
+                sideEffects,
                 ...this.#commonOptions,
             });
             this.#pendingfileResults?.set(pendingKey, pending);
@@ -77,9 +79,10 @@ class JavaScriptTransformer {
      * @param filename The full path of the file represented by the data.
      * @param data The data of the file that should be transformed.
      * @param skipLinker If true, bypass all Angular linker processing; if false, attempt linking.
+     * @param sideEffects If false, and `advancedOptimizations` is enabled tslib decorators are wrapped.
      * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
      */
-    async transformData(filename, data, skipLinker) {
+    async transformData(filename, data, skipLinker, sideEffects) {
         // Perform a quick test to determine if the data needs any transformations.
         // This allows directly returning the data without the worker communication overhead.
         if (skipLinker && !this.#commonOptions.advancedOptimizations) {
@@ -91,6 +94,7 @@ class JavaScriptTransformer {
             filename,
             data,
             skipLinker,
+            sideEffects,
             ...this.#commonOptions,
         });
     }
