@@ -177,6 +177,10 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
             externalMetadata.implicitBrowser.sort();
         }
         if (server) {
+            // Update fs allow list to include any new assets from the build option.
+            server.config.server.fs.allow = [
+                ...new Set(...server.config.server.fs.allow, ...assetFiles.values()),
+            ];
             handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
         }
         else {
@@ -318,10 +322,11 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
         ...(await Promise.resolve().then(() => __importStar(require('node:module')))).builtinModules,
         ...externalMetadata.explicit,
     ];
+    const cacheDir = (0, node_path_1.join)(serverOptions.cacheOptions.path, 'vite');
     const configuration = {
         configFile: false,
         envFile: false,
-        cacheDir: (0, node_path_1.join)(serverOptions.cacheOptions.path, 'vite'),
+        cacheDir,
         root: virtualProjectRoot,
         publicDir: false,
         esbuild: false,
@@ -344,6 +349,13 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
             proxy,
             // File watching is handled by the build directly. `null` disables file watching for Vite.
             watch: null,
+            fs: {
+                // Ensure cache directory, node modules, and all assets are accessible by the client.
+                // The first two are required for Vite to function in prebundling mode (the default) and to load
+                // the Vite client-side code for browser reloading. These would be available by default but when
+                // the `allow` option is explicitly configured, they must be included manually.
+                allow: [cacheDir, (0, node_path_1.join)(serverOptions.workspaceRoot, 'node_modules'), ...assets.values()],
+            },
             // This is needed when `externalDependencies` is used to prevent Vite load errors.
             // NOTE: If Vite adds direct support for externals, this can be removed.
             preTransformRequests: externalMetadata.explicit.length === 0,
