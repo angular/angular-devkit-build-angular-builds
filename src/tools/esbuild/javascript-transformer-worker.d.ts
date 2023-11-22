@@ -11,7 +11,8 @@ interface JavaScriptTransformRequest {
     sourcemap: boolean;
     thirdPartySourcemaps: boolean;
     advancedOptimizations: boolean;
-    skipLinker: boolean;
+    skipLinker?: boolean;
+    sideEffects?: boolean;
     jit: boolean;
 }
 export default function transformJavaScript(request: JavaScriptTransformRequest): Promise<Uint8Array>;
