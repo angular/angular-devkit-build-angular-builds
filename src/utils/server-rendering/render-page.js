@@ -82,7 +82,7 @@ async function renderPage({ route, serverContext, document, inlineCriticalCss, o
     if (inlineCriticalCss) {
         const { InlineCriticalCssProcessor } = await Promise.resolve().then(() => __importStar(require('../../utils/index-file/inline-critical-css')));
         const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-            minify: false,
+            minify: false, // CSS has already been minified during the build.
             readAsset: async (filePath) => {
                 filePath = (0, node_path_1.basename)(filePath);
                 const content = outputFiles[filePath];

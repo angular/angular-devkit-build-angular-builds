@@ -5,6 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <reference path="../../../../../../../../../../packages/angular_devkit/build_angular/src/babel-bazel.d.ts" />
+/// <reference types="@angular/compiler-cli/private/babel" />
 import { PluginObj } from '@babel/core';
 /**
  * Provides one or more keywords that if found within the content of a source file indicate

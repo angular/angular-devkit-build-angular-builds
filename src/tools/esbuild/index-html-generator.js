@@ -109,7 +109,7 @@ async function generateIndexHtml(initialFiles, outputFiles, buildOptions, lang) 
     }
     const { InlineCriticalCssProcessor } = await Promise.resolve().then(() => __importStar(require('../../utils/index-file/inline-critical-css')));
     const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-        minify: false,
+        minify: false, // CSS has already been minified during the build.
         readAsset,
     });
     const { content, errors, warnings } = await inlineCriticalCssProcessor.process(contentWithoutCriticalCssInlined, {

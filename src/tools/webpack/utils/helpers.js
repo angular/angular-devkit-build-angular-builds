@@ -240,16 +240,16 @@ function assetPatterns(root, assets) {
 exports.assetPatterns = assetPatterns;
 function getStatsOptions(verbose = false) {
     const webpackOutputOptions = {
-        all: false,
+        all: false, // Fallback value for stats options when an option is not defined. It has precedence over local webpack defaults.
         colors: true,
-        hash: true,
-        timings: true,
-        chunks: true,
-        builtAt: true,
+        hash: true, // required by custom stat output
+        timings: true, // required by custom stat output
+        chunks: true, // required by custom stat output
+        builtAt: true, // required by custom stat output
         warnings: true,
         errors: true,
-        assets: true,
-        cachedAssets: true,
+        assets: true, // required by custom stat output
+        cachedAssets: true, // required for bundle size calculators
         // Needed for markAsyncChunksNonInitial.
         ids: true,
         entrypoints: true,

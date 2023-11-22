@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <reference types="node" />
+/// <reference types="@types/node/worker_threads" />
+/// <reference types="@types/node/ts4.8/worker_threads" />
 import type { PartialMessage } from 'esbuild';
 import { type MessagePort } from 'node:worker_threads';
 export interface InitRequest {

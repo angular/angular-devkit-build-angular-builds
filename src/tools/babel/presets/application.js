@@ -70,7 +70,7 @@ function createI18nPlugins(locale, translation, missingTranslationBehavior, diag
 }
 function createNgtscLogger(reporter) {
     return {
-        level: 1,
+        level: 1, // Info level
         debug(...args) { },
         info(...args) {
             reporter?.('info', args.join());

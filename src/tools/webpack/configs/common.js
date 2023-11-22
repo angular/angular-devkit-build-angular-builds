@@ -270,7 +270,7 @@ async function getCommonConfig(wco) {
         externals: externalDependencies,
         output: {
             uniqueName: projectName,
-            hashFunction: 'xxhash64',
+            hashFunction: 'xxhash64', // todo: remove in webpack 6. This is part of `futureDefaults`.
             clean: buildOptions.deleteOutputPath ?? true,
             path: path.resolve(root, buildOptions.outputPath),
             publicPath: buildOptions.deployUrl ?? '',

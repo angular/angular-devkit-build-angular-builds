@@ -377,7 +377,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                  * - Breaks RxJs (Unless it is added as external). See: https://github.com/angular/angular-cli/issues/26235
                  */
                 // Only enable with caching since it causes prebundle dependencies to be cached
-                disabled: true,
+                disabled: true, // !serverOptions.cacheOptions.enabled,
                 // Exclude any explicitly defined dependencies (currently build defined externals and node.js built-ins)
                 exclude: serverExplicitExternal,
                 // Include all implict dependencies from the external packages internal option

@@ -78,7 +78,7 @@ exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
         aot: false,
         index: false,
         outputHashing: schema_1.OutputHashing.None,
-        outExtension: 'mjs',
+        outExtension: 'mjs', // Force native ESM.
         optimization: false,
         sourceMap: {
             scripts: true,

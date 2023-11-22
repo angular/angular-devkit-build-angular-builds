@@ -25,7 +25,7 @@ exports.callInitializeIfNeeded = callInitializeIfNeeded;
 function getESMLoaderArgs() {
     if (isNode18()) {
         return [
-            '--no-warnings',
+            '--no-warnings', // Suppress `ExperimentalWarning: Custom ESM Loaders is an experimental feature...`.
             '--loader',
             (0, node_url_1.pathToFileURL)((0, node_path_1.join)(__dirname, 'loader-hooks.js')).href, // Loader cannot be an absolute path on Windows.
         ];

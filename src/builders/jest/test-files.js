@@ -25,7 +25,7 @@ async function findTestFiles(options, workspaceRoot, glob = fast_glob_1.default)
     const globOptions = {
         cwd: workspaceRoot,
         ignore: ['node_modules/**'].concat(options.exclude),
-        braceExpansion: false,
+        braceExpansion: false, // Do not expand `a{b,c}` to `ab,ac`.
         extglob: false, // Disable "extglob" patterns.
     };
     const included = await Promise.all(options.include.map((pattern) => glob(pattern, globOptions)));
