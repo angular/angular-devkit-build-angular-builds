@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCompilerPlugin = void 0;
 const node_assert_1 = __importDefault(require("node:assert"));
-const promises_1 = require("node:fs/promises");
+const node_fs_1 = require("node:fs");
 const path = __importStar(require("node:path"));
 const environment_options_1 = require("../../../utils/environment-options");
 const javascript_transformer_1 = require("../javascript-transformer");
@@ -58,8 +58,11 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
             if (!preserveSymlinks) {
                 // Use the real path of the tsconfig if not preserving symlinks.
                 // This ensures the TS source file paths are based on the real path of the configuration.
+                // NOTE: promises.realpath should not be used here since it uses realpath.native which
+                // can cause case conversion and other undesirable behavior on Windows systems.
+                // ref: https://github.com/nodejs/node/issues/7726
                 try {
-                    tsconfigPath = await (0, promises_1.realpath)(tsconfigPath);
+                    tsconfigPath = (0, node_fs_1.realpathSync)(tsconfigPath);
                 }
                 catch { }
             }

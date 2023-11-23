@@ -11,6 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeOptions = void 0;
+const node_fs_1 = require("node:fs");
 const promises_1 = require("node:fs/promises");
 const node_module_1 = require("node:module");
 const node_path_1 = __importDefault(require("node:path"));
@@ -35,7 +36,15 @@ const schema_1 = require("./schema");
  */
 // eslint-disable-next-line max-lines-per-function
 async function normalizeOptions(context, projectName, options, plugins) {
-    const workspaceRoot = context.workspaceRoot;
+    // If not explicitly set, default to the Node.js process argument
+    const preserveSymlinks = options.preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks');
+    // Setup base paths based on workspace root and project information
+    const workspaceRoot = preserveSymlinks
+        ? context.workspaceRoot
+        : // NOTE: promises.realpath should not be used here since it uses realpath.native which
+            // can cause case conversion and other undesirable behavior on Windows systems.
+            // ref: https://github.com/nodejs/node/issues/7726
+            (0, node_fs_1.realpathSync)(context.workspaceRoot);
     const projectMetadata = await context.getProjectMetadata(projectName);
     const projectRoot = normalizeDirectoryPath(node_path_1.default.join(workspaceRoot, projectMetadata.root ?? ''));
     const projectSourceRoot = normalizeDirectoryPath(node_path_1.default.join(workspaceRoot, projectMetadata.sourceRoot ?? 'src'));
@@ -156,7 +165,7 @@ async function normalizeOptions(context, projectName, options, plugins) {
         };
     }
     // Initial options to keep
-    const { allowedCommonJsDependencies, aot, baseHref, crossOrigin, externalDependencies, extractLicenses, inlineStyleLanguage = 'css', outExtension, serviceWorker, poll, polyfills, preserveSymlinks, statsJson, stylePreprocessorOptions, subresourceIntegrity, verbose, watch, progress = true, externalPackages, deleteOutputPath, namedChunks, budgets, deployUrl, } = options;
+    const { allowedCommonJsDependencies, aot, baseHref, crossOrigin, externalDependencies, extractLicenses, inlineStyleLanguage = 'css', outExtension, serviceWorker, poll, polyfills, statsJson, stylePreprocessorOptions, subresourceIntegrity, verbose, watch, progress = true, externalPackages, deleteOutputPath, namedChunks, budgets, deployUrl, } = options;
     // Return all the normalized options
     return {
         advancedOptimizations: !!aot,
@@ -174,8 +183,7 @@ async function normalizeOptions(context, projectName, options, plugins) {
         poll,
         progress,
         externalPackages,
-        // If not explicitly set, default to the Node.js process argument
-        preserveSymlinks: preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks'),
+        preserveSymlinks,
         stylePreprocessorOptions,
         subresourceIntegrity,
         serverEntryPoint,
