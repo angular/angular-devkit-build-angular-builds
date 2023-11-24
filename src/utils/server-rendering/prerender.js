@@ -124,8 +124,6 @@ async function renderPages(sourcemap, allRoutes, maxThreads, workspaceRoot, outp
         await Promise.all(renderingPromises);
     }
     finally {
-        // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
-        renderWorker.options.minThreads = 0;
         void renderWorker.destroy();
     }
     return {
@@ -169,8 +167,6 @@ async function getAllRoutes(workspaceRoot, outputFilesForWorker, assetFilesForWo
     const { routes: extractedRoutes, warnings } = await renderWorker
         .run({})
         .finally(() => {
-        // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
-        renderWorker.options.minThreads = 0;
         void renderWorker.destroy();
     });
     for (const route of extractedRoutes) {

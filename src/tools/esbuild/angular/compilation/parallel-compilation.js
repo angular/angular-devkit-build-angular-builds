@@ -116,8 +116,6 @@ class ParallelCompilation extends angular_compilation_1.AngularCompilation {
         return this.#worker.run(files, { name: 'update' });
     }
     close() {
-        // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
-        this.#worker.options.minThreads = 0;
         return this.#worker.destroy();
     }
 }

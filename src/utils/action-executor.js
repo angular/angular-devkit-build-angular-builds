@@ -52,8 +52,6 @@ class BundleActionExecutor {
     }
     stop() {
         if (this.workerPool) {
-            // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
-            this.workerPool.options.minThreads = 0;
             void this.workerPool.destroy();
         }
     }
