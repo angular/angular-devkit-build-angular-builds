@@ -74,7 +74,7 @@ async function* runEsBuildBuildAction(action, options) {
                 // Ignore all node modules directories to avoid excessive file watchers.
                 // Package changes are handled below by watching manifest and lock files.
                 '**/node_modules/**',
-                '**/.*/**',
+                `${workspaceRoot.replace(/\\/g, '/')}/**/.*/**`,
             ],
         });
         // Setup abort support
