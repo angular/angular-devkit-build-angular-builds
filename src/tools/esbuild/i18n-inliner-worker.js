@@ -32,13 +32,12 @@ async function inlineLocale(request) {
     const code = await data.text();
     const map = await files.get(request.filename + '.map')?.text();
     const result = await transformWithBabel(code, map && JSON.parse(map), request);
-    // TODO: Return diagnostics
-    // TODO: Consider buffer transfer instead of string copying
-    const response = [{ file: request.filename, contents: result.code }];
-    if (result.map) {
-        response.push({ file: request.filename + '.map', contents: result.map });
-    }
-    return response;
+    return {
+        file: request.filename,
+        code: result.code,
+        map: result.map,
+        messages: result.diagnostics.messages,
+    };
 }
 exports.default = inlineLocale;
 /**

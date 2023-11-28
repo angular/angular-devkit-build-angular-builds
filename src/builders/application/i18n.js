@@ -41,7 +41,10 @@ async function inlineI18n(options, executionResult, initialFiles) {
     try {
         for (const locale of options.i18nOptions.inlineLocales) {
             // A locale specific set of files is returned from the inliner.
-            const localeOutputFiles = await inliner.inlineForLocale(locale, options.i18nOptions.locales[locale].translation);
+            const localeInlineResult = await inliner.inlineForLocale(locale, options.i18nOptions.locales[locale].translation);
+            const localeOutputFiles = localeInlineResult.outputFiles;
+            inlineResult.errors.push(...localeInlineResult.errors);
+            inlineResult.warnings.push(...localeInlineResult.warnings);
             const baseHref = getLocaleBaseHref(options.baseHref, options.i18nOptions, locale) ?? options.baseHref;
             const { errors, warnings, additionalAssets, additionalOutputFiles, prerenderedRoutes: generatedRoutes, } = await (0, execute_post_bundle_1.executePostBundleSteps)({
                 ...options,

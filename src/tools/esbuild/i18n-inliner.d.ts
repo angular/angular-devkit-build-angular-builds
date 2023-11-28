@@ -31,7 +31,11 @@ export declare class I18nInliner {
      * @param translation The translation messages to use when inlining.
      * @returns A promise that resolves to an array of OutputFiles representing a translated result.
      */
-    inlineForLocale(locale: string, translation: Record<string, unknown> | undefined): Promise<BuildOutputFile[]>;
+    inlineForLocale(locale: string, translation: Record<string, unknown> | undefined): Promise<{
+        outputFiles: BuildOutputFile[];
+        errors: string[];
+        warnings: string[];
+    }>;
     /**
      * Stops all active transformation tasks and shuts down all workers.
      * @returns A void promise that resolves when closing is complete.

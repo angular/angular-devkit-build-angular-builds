@@ -11,6 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.I18nInliner = void 0;
+const node_assert_1 = __importDefault(require("node:assert"));
 const piscina_1 = __importDefault(require("piscina"));
 const bundler_context_1 = require("./bundler-context");
 const utils_1 = require("./utils");
@@ -109,12 +110,33 @@ class I18nInliner {
         // Wait for all file requests to complete
         const rawResults = await Promise.all(requests);
         // Convert raw results to output file objects and include all unmodified files
-        return [
-            ...rawResults.flat().map(({ file, contents }) => 
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            (0, utils_1.createOutputFileFromText)(file, contents, this.#fileToType.get(file))),
+        const errors = [];
+        const warnings = [];
+        const outputFiles = [
+            ...rawResults.flatMap(({ file, code, map, messages }) => {
+                const type = this.#fileToType.get(file);
+                (0, node_assert_1.default)(type !== undefined, 'localized file should always have a type' + file);
+                const resultFiles = [(0, utils_1.createOutputFileFromText)(file, code, type)];
+                if (map) {
+                    resultFiles.push((0, utils_1.createOutputFileFromText)(file + '.map', map, type));
+                }
+                for (const message of messages) {
+                    if (message.type === 'error') {
+                        errors.push(message.message);
+                    }
+                    else {
+                        warnings.push(message.message);
+                    }
+                }
+                return resultFiles;
+            }),
             ...this.#unmodifiedFiles.map((file) => file.clone()),
         ];
+        return {
+            outputFiles,
+            errors,
+            warnings,
+        };
     }
     /**
      * Stops all active transformation tasks and shuts down all workers.

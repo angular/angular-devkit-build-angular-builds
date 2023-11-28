@@ -32,6 +32,11 @@ interface InlineRequest {
  */
 export default function inlineLocale(request: InlineRequest): Promise<{
     file: string;
-    contents: string;
-}[]>;
+    code: string;
+    map: string | undefined;
+    messages: {
+        type: "error" | "warning";
+        message: string;
+    }[];
+}>;
 export {};
