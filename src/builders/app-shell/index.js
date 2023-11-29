@@ -132,6 +132,8 @@ async function _appShellBuilder(options, context) {
     const browserOptions = (await context.getTargetOptions(browserTarget));
     const optimization = (0, utils_1.normalizeOptimization)(browserOptions.optimization);
     optimization.styles.inlineCritical = false;
+    // Webpack based builders do not have the `removeSpecialComments` option.
+    delete optimization.styles.removeSpecialComments;
     const browserTargetRun = await context.scheduleTarget(browserTarget, {
         watch: false,
         serviceWorker: false,
