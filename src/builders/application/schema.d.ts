@@ -354,6 +354,11 @@ export interface StylesClass {
      * identifiers and minimizing values.
      */
     minify?: boolean;
+    /**
+     * Remove comments in global CSS that contains '@license' or '@preserve' or that starts with
+     * '//!' or '/*!'.
+     */
+    removeSpecialComments?: boolean;
 }
 /**
  * Define the output filename cache-busting hashing mode.

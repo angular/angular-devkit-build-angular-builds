@@ -10,13 +10,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeOptimization = void 0;
 function normalizeOptimization(optimization = true) {
     if (typeof optimization === 'object') {
+        const styleOptimization = !!optimization.styles;
         return {
             scripts: !!optimization.scripts,
             styles: typeof optimization.styles === 'object'
                 ? optimization.styles
                 : {
-                    minify: !!optimization.styles,
-                    inlineCritical: !!optimization.styles,
+                    minify: styleOptimization,
+                    removeSpecialComments: styleOptimization,
+                    inlineCritical: styleOptimization,
                 },
             fonts: typeof optimization.fonts === 'object'
                 ? optimization.fonts
@@ -30,6 +32,7 @@ function normalizeOptimization(optimization = true) {
         styles: {
             minify: optimization,
             inlineCritical: optimization,
+            removeSpecialComments: optimization,
         },
         fonts: {
             inline: optimization,
