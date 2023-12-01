@@ -21,7 +21,7 @@ class Spinner {
     #isTTY = (0, tty_1.isTTY)();
     constructor(text) {
         this.spinner = (0, ora_1.default)({
-            text,
+            text: text === undefined ? undefined : text + '\n',
             // The below 2 options are needed because otherwise CTRL+C will be delayed
             // when the underlying process is sync.
             hideCursor: false,
