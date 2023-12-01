@@ -29,6 +29,13 @@ context, infrastructureSettings, plugins) {
         return;
     }
     const normalizedOptions = await (0, options_1.normalizeOptions)(context, projectName, options, plugins);
+    // Setup an abort controller with a builder teardown if no signal is present
+    let signal = context.signal;
+    if (!signal) {
+        const controller = new AbortController();
+        signal = controller.signal;
+        context.addTeardown(() => controller.abort('builder-teardown'));
+    }
     yield* (0, build_action_1.runEsBuildBuildAction)(async (rebuildState) => {
         const startTime = process.hrtime.bigint();
         const result = await (0, execute_build_1.executeBuild)(normalizedOptions, context, rebuildState);
@@ -53,7 +60,7 @@ context, infrastructureSettings, plugins) {
             ? undefined
             : (file) => file.type !== bundler_context_1.BuildOutputFileType.Server,
         logger: context.logger,
-        signal: context.signal,
+        signal,
     });
 }
 exports.buildApplicationInternal = buildApplicationInternal;
