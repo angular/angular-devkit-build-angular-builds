@@ -168,7 +168,7 @@ async function normalizeOptions(context, projectName, options, plugins) {
     const { allowedCommonJsDependencies, aot, baseHref, crossOrigin, externalDependencies, extractLicenses, inlineStyleLanguage = 'css', outExtension, serviceWorker, poll, polyfills, statsJson, stylePreprocessorOptions, subresourceIntegrity, verbose, watch, progress = true, externalPackages, deleteOutputPath, namedChunks, budgets, deployUrl, } = options;
     // Return all the normalized options
     return {
-        advancedOptimizations: !!aot,
+        advancedOptimizations: !!aot && optimizationOptions.scripts,
         allowedCommonJsDependencies,
         baseHref,
         cacheOptions,
