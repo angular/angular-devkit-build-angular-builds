@@ -157,7 +157,7 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
         assetFiles.clear();
         if (result.assetFiles) {
             for (const asset of result.assetFiles) {
-                assetFiles.set('/' + normalizePath(asset.destination), asset.source);
+                assetFiles.set('/' + normalizePath(asset.destination), normalizePath(asset.source));
             }
         }
         // To avoid disconnecting the array objects from the option, these arrays need to be mutated instead of replaced.
