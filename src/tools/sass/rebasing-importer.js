@@ -17,6 +17,25 @@ const node_path_1 = require("node:path");
 const node_url_1 = require("node:url");
 const lexer_1 = require("./lexer");
 /**
+ * Ensures that a bare specifier URL path that is intended to be treated as
+ * a relative path has a leading `./` or `../` prefix.
+ *
+ * @param url A bare specifier URL path that should be considered relative.
+ * @returns
+ */
+function ensureRelative(url) {
+    // Empty
+    if (!url) {
+        return url;
+    }
+    // Already relative
+    if (url[0] === '.' && (url[1] === '/' || (url[1] === '.' && url[2] === '/'))) {
+        return url;
+    }
+    // Needs prefix
+    return './' + url;
+}
+/**
  * A Sass Importer base class that provides the load logic to rebase all `url()` functions
  * within a stylesheet. The rebasing will ensure that the URLs in the output of the Sass compiler
  * reflect the final filesystem location of the output CSS file.
@@ -46,8 +65,13 @@ class UrlRebasingImporter {
         // Rebase any URLs that are found
         let updatedContents;
         for (const { start, end, value } of (0, lexer_1.findUrls)(contents)) {
-            // Skip if value is empty, a Sass variable, or Webpack-specific prefix
-            if (value.length === 0 || value[0] === '$' || value[0] === '~' || value[0] === '^') {
+            // Skip if value is empty or Webpack-specific prefix
+            if (value.length === 0 || value[0] === '~' || value[0] === '^') {
+                continue;
+            }
+            // Skip if value is a Sass variable.
+            // Sass variable usage either starts with a `$` or contains a namespace and a `.$`
+            if (value[0] === '$' || /^\w+\.\$/.test(value)) {
                 continue;
             }
             // Skip if root-relative, absolute or protocol relative url
@@ -57,9 +81,10 @@ class UrlRebasingImporter {
             const rebasedPath = (0, node_path_1.relative)(this.entryDirectory, (0, node_path_1.join)(stylesheetDirectory, value));
             // Normalize path separators and escape characters
             // https://developer.mozilla.org/en-US/docs/Web/CSS/url#syntax
-            const rebasedUrl = './' + rebasedPath.replace(/\\/g, '/').replace(/[()\s'"]/g, '\\$&');
+            const rebasedUrl = ensureRelative(rebasedPath.replace(/\\/g, '/').replace(/[()\s'"]/g, '\\$&'));
             updatedContents ??= new magic_string_1.default(contents);
-            updatedContents.update(start, end, rebasedUrl);
+            // Always quote the URL to avoid potential downstream parsing problems
+            updatedContents.update(start, end, `"${rebasedUrl}"`);
         }
         if (updatedContents) {
             contents = updatedContents.toString();
