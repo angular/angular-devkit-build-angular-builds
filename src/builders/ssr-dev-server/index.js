@@ -35,7 +35,6 @@ const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
 const rxjs_1 = require("rxjs");
-const operators_1 = require("rxjs/operators");
 const url = __importStar(require("url"));
 const error_1 = require("../../utils/error");
 const utils_1 = require("./utils");
@@ -69,35 +68,35 @@ function execute(options, context) {
   DON'T USE IT FOR PRODUCTION!
   ****************************************************************************************
  `);
-    return (0, rxjs_1.zip)(browserTargetRun, serverTargetRun, (0, utils_1.getAvailablePort)()).pipe((0, operators_1.switchMap)(([br, sr, nodeServerPort]) => {
+    return (0, rxjs_1.zip)(browserTargetRun, serverTargetRun, (0, utils_1.getAvailablePort)()).pipe((0, rxjs_1.switchMap)(([br, sr, nodeServerPort]) => {
         return (0, rxjs_1.combineLatest)([br.output, sr.output]).pipe(
         // This is needed so that if both server and browser emit close to each other
         // we only emit once. This typically happens on the first build.
-        (0, operators_1.debounceTime)(120), (0, operators_1.switchMap)(([b, s]) => {
+        (0, rxjs_1.debounceTime)(120), (0, rxjs_1.switchMap)(([b, s]) => {
             if (!s.success || !b.success) {
                 return (0, rxjs_1.of)([b, s]);
             }
-            return startNodeServer(s, nodeServerPort, context.logger, !!options.inspect).pipe((0, operators_1.mapTo)([b, s]), (0, operators_1.catchError)((err) => {
+            return startNodeServer(s, nodeServerPort, context.logger, !!options.inspect).pipe((0, rxjs_1.map)(() => [b, s]), (0, rxjs_1.catchError)((err) => {
                 context.logger.error(`A server error has occurred.\n${mapErrorToMessage(err)}`);
                 return rxjs_1.EMPTY;
             }));
-        }), (0, operators_1.map)(([b, s]) => [
+        }), (0, rxjs_1.map)(([b, s]) => [
             {
                 success: b.success && s.success,
                 error: b.error || s.error,
             },
             nodeServerPort,
-        ]), (0, operators_1.tap)(([builderOutput]) => {
+        ]), (0, rxjs_1.tap)(([builderOutput]) => {
             if (builderOutput.success) {
                 context.logger.info('\nCompiled successfully.');
             }
-        }), (0, operators_1.debounce)(([builderOutput]) => builderOutput.success && !options.inspect
+        }), (0, rxjs_1.debounce)(([builderOutput]) => builderOutput.success && !options.inspect
             ? (0, utils_1.waitUntilServerIsListening)(nodeServerPort)
-            : rxjs_1.EMPTY), (0, operators_1.finalize)(() => {
+            : rxjs_1.EMPTY), (0, rxjs_1.finalize)(() => {
             void br.stop();
             void sr.stop();
         }));
-    }), (0, operators_1.concatMap)(([builderOutput, nodeServerPort]) => {
+    }), (0, rxjs_1.concatMap)(([builderOutput, nodeServerPort]) => {
         if (!builderOutput.success) {
             return (0, rxjs_1.of)(builderOutput);
         }
@@ -106,7 +105,7 @@ function execute(options, context) {
             return (0, rxjs_1.of)(builderOutput);
         }
         else {
-            return (0, rxjs_1.from)(initBrowserSync(bsInstance, nodeServerPort, options, context)).pipe((0, operators_1.tap)((bs) => {
+            return (0, rxjs_1.from)(initBrowserSync(bsInstance, nodeServerPort, options, context)).pipe((0, rxjs_1.tap)((bs) => {
                 const baseUrl = getBaseUrl(bs);
                 context.logger.info(core_1.tags.oneLine `
                 **
@@ -114,19 +113,19 @@ function execute(options, context) {
                 open your browser on ${baseUrl}
                 **
               `);
-            }), (0, operators_1.mapTo)(builderOutput));
+            }), (0, rxjs_1.map)(() => builderOutput));
         }
-    }), (0, operators_1.map)((builderOutput) => ({
+    }), (0, rxjs_1.map)((builderOutput) => ({
         success: builderOutput.success,
         error: builderOutput.error,
         baseUrl: getBaseUrl(bsInstance),
         port: bsInstance.getOption('port'),
-    })), (0, operators_1.finalize)(() => {
+    })), (0, rxjs_1.finalize)(() => {
         if (bsInstance) {
             bsInstance.exit();
             bsInstance.cleanup();
         }
-    }), (0, operators_1.catchError)((error) => (0, rxjs_1.of)({
+    }), (0, rxjs_1.catchError)((error) => (0, rxjs_1.of)({
         success: false,
         error: mapErrorToMessage(error),
     })));
@@ -152,10 +151,10 @@ function startNodeServer(serverOutput, port, logger, inspectMode = false) {
     if (inspectMode) {
         args.unshift('--inspect-brk');
     }
-    return (0, rxjs_1.of)(null).pipe((0, operators_1.delay)(0), // Avoid EADDRINUSE error since it will cause the kill event to be finish.
-    (0, operators_1.switchMap)(() => (0, utils_1.spawnAsObservable)('node', args, { env, shell: true })), (0, operators_1.tap)((res) => log({ stderr: res.stderr, stdout: res.stdout }, logger)), (0, operators_1.ignoreElements)(), 
+    return (0, rxjs_1.of)(null).pipe((0, rxjs_1.delay)(0), // Avoid EADDRINUSE error since it will cause the kill event to be finish.
+    (0, rxjs_1.switchMap)(() => (0, utils_1.spawnAsObservable)('node', args, { env, shell: true })), (0, rxjs_1.tap)((res) => log({ stderr: res.stderr, stdout: res.stdout }, logger)), (0, rxjs_1.ignoreElements)(), 
     // Emit a signal after the process has been started
-    (0, operators_1.startWith)(undefined));
+    (0, rxjs_1.startWith)(undefined));
 }
 async function initBrowserSync(browserSyncInstance, nodeServerPort, options, context) {
     if (browserSyncInstance.active) {
