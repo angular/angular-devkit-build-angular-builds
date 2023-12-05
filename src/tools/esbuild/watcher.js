@@ -32,6 +32,7 @@ function createWatcher(options) {
         usePolling: options?.polling,
         interval: options?.interval,
         ignored: options?.ignored,
+        followSymlinks: options?.followSymlinks,
         disableGlobbing: true,
         ignoreInitial: true,
     });
