@@ -45,6 +45,7 @@ context, infrastructureSettings, plugins) {
         return result;
     }, {
         watch: normalizedOptions.watch,
+        preserveSymlinks: normalizedOptions.preserveSymlinks,
         poll: normalizedOptions.poll,
         deleteOutputPath: normalizedOptions.deleteOutputPath,
         cacheOptions: normalizedOptions.cacheOptions,

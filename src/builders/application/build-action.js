@@ -40,7 +40,7 @@ const utils_1 = require("../../tools/esbuild/utils");
 const delete_output_dir_1 = require("../../utils/delete-output-dir");
 const environment_options_1 = require("../../utils/environment-options");
 async function* runEsBuildBuildAction(action, options) {
-    const { writeToFileSystemFilter, writeToFileSystem = true, watch, poll, logger, deleteOutputPath, cacheOptions, outputPath, verbose, projectRoot, workspaceRoot, progress, } = options;
+    const { writeToFileSystemFilter, writeToFileSystem = true, watch, poll, logger, deleteOutputPath, cacheOptions, outputPath, verbose, projectRoot, workspaceRoot, progress, preserveSymlinks, } = options;
     if (deleteOutputPath && writeToFileSystem) {
         await (0, delete_output_dir_1.deleteOutputDir)(workspaceRoot, outputPath);
     }
@@ -67,6 +67,7 @@ async function* runEsBuildBuildAction(action, options) {
         watcher = createWatcher({
             polling: typeof poll === 'number',
             interval: poll,
+            followSymlinks: preserveSymlinks,
             ignored: [
                 // Ignore the output and cache paths to avoid infinite rebuild cycles
                 outputPath,

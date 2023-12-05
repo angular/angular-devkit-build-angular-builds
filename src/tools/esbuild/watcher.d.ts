@@ -21,4 +21,5 @@ export declare function createWatcher(options?: {
     polling?: boolean;
     interval?: number;
     ignored?: string[];
+    followSymlinks?: boolean;
 }): BuildWatcher;
