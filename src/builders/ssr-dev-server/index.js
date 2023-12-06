@@ -59,7 +59,17 @@ function execute(options, context) {
         progress: options.progress,
         verbose: options.verbose,
     });
-    const bsInstance = require('browser-sync').create();
+    let browserSync;
+    try {
+        browserSync = require('browser-sync');
+    }
+    catch {
+        return (0, rxjs_1.of)({
+            success: false,
+            error: '"browser-sync" is not installed, most likely you need to run `npm install browser-sync --save-dev` in your project.',
+        });
+    }
+    const bsInstance = browserSync.create();
     context.logger.error(core_1.tags.stripIndents `
   ****************************************************************************************
   This is a simple server for use in testing or debugging Angular applications locally.
