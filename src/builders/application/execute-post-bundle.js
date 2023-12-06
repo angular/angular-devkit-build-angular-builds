@@ -39,9 +39,11 @@ async function executePostBundleSteps(options, outputFiles, assetFiles, initialF
      * NOTE: we don't perform critical CSS inlining as this will be done during server rendering.
      */
     let indexContentOutputNoCssInlining;
+    // When using prerender/app-shell the index HTML file can be regenerated.
+    // Thus, we use a Map so that we do not generate 2 files with the same filename.
+    const additionalHtmlOutputFiles = new Map();
     // Generate index HTML file
     // If localization is enabled, index generation is handled in the inlining process.
-    // NOTE: Localization with SSR is not currently supported.
     if (indexHtmlOptions) {
         const { content, contentWithoutCriticalCssInlined, errors, warnings } = await (0, index_html_generator_1.generateIndexHtml)(initialFiles, outputFiles, {
             ...options,
@@ -50,9 +52,10 @@ async function executePostBundleSteps(options, outputFiles, assetFiles, initialF
         indexContentOutputNoCssInlining = contentWithoutCriticalCssInlined;
         allErrors.push(...errors);
         allWarnings.push(...warnings);
-        additionalOutputFiles.push((0, utils_1.createOutputFileFromText)(indexHtmlOptions.output, content, bundler_context_1.BuildOutputFileType.Browser));
+        additionalHtmlOutputFiles.set(indexHtmlOptions.output, (0, utils_1.createOutputFileFromText)(indexHtmlOptions.output, content, bundler_context_1.BuildOutputFileType.Browser));
         if (ssrOptions) {
-            additionalOutputFiles.push((0, utils_1.createOutputFileFromText)('index.server.html', contentWithoutCriticalCssInlined, bundler_context_1.BuildOutputFileType.Server));
+            const serverIndexHtmlFilename = 'index.server.html';
+            additionalHtmlOutputFiles.set(serverIndexHtmlFilename, (0, utils_1.createOutputFileFromText)(serverIndexHtmlFilename, contentWithoutCriticalCssInlined, bundler_context_1.BuildOutputFileType.Server));
         }
     }
     // Pre-render (SSG) and App-shell
@@ -64,9 +67,10 @@ async function executePostBundleSteps(options, outputFiles, assetFiles, initialF
         allWarnings.push(...warnings);
         prerenderedRoutes.push(...Array.from(generatedRoutes));
         for (const [path, content] of Object.entries(output)) {
-            additionalOutputFiles.push((0, utils_1.createOutputFileFromText)(path, content, bundler_context_1.BuildOutputFileType.Browser));
+            additionalHtmlOutputFiles.set(path, (0, utils_1.createOutputFileFromText)(path, content, bundler_context_1.BuildOutputFileType.Browser));
         }
     }
+    additionalOutputFiles.push(...additionalHtmlOutputFiles.values());
     // Augment the application with service worker support
     // If localization is enabled, service worker is handled in the inlining process.
     if (serviceWorker) {
