@@ -90,8 +90,11 @@ function execute(options, context, transforms = {}) {
             : getBuiltInKarmaConfig(context.workspaceRoot, projectName);
         karmaOptions.singleRun = singleRun;
         // Convert browsers from a string to an array
-        if (options.browsers) {
+        if (typeof options.browsers === 'string' && options.browsers) {
             karmaOptions.browsers = options.browsers.split(',');
+        }
+        else if (options.browsers === false) {
+            karmaOptions.browsers = [];
         }
         if (options.reporters) {
             // Split along commas to make it more natural, and remove empty strings.

@@ -7,9 +7,9 @@ export interface Schema {
      */
     assets?: AssetPattern[];
     /**
-     * Override which browsers tests are run against.
+     * Override which browsers tests are run against. Set to `false` to not use any browser.
      */
-    browsers?: string;
+    browsers?: Browsers;
     /**
      * Output a code coverage report.
      */
@@ -117,6 +117,10 @@ export interface AssetPatternClass {
      */
     output: string;
 }
+/**
+ * Override which browsers tests are run against. Set to `false` to not use any browser.
+ */
+export type Browsers = boolean | string;
 export interface FileReplacement {
     replace?: string;
     replaceWith?: string;
