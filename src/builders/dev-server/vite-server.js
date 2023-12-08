@@ -74,8 +74,11 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
     }
     // Set all packages as external to support Vite's prebundle caching
     browserOptions.externalPackages = serverOptions.cacheOptions.enabled;
-    if (serverOptions.servePath === undefined && browserOptions.baseHref !== undefined) {
-        serverOptions.servePath = browserOptions.baseHref;
+    const baseHref = browserOptions.baseHref;
+    if (serverOptions.servePath === undefined && baseHref !== undefined) {
+        // Remove trailing slash
+        serverOptions.servePath =
+            baseHref[baseHref.length - 1] === '/' ? baseHref.slice(0, -1) : baseHref;
     }
     // The development server currently only supports a single locale when localizing.
     // This matches the behavior of the Webpack-based development server but could be expanded in the future.
@@ -350,7 +353,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
         css: {
             devSourcemap: true,
         },
-        // Vite will normalize the `base` option by adding a leading and trailing forward slash.
+        // Vite will normalize the `base` option by adding a leading slash.
         base: serverOptions.servePath,
         resolve: {
             mainFields: ['es2020', 'browser', 'module', 'main'],
