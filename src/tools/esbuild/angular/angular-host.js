@@ -28,6 +28,12 @@ exports.ensureSourceFileVersions = ensureSourceFileVersions;
 function createAngularCompilerHost(compilerOptions, hostOptions) {
     // Create TypeScript compiler host
     const host = typescript_1.default.createIncrementalCompilerHost(compilerOptions);
+    // Set the parsing mode to the same as TS 5.3 default for tsc. This provides a parse
+    // performance improvement by skipping non-type related JSDoc parsing.
+    // NOTE: The check for this enum can be removed when TS 5.3 support is the minimum.
+    if (typescript_1.default.JSDocParsingMode) {
+        host.jsDocParsingMode = typescript_1.default.JSDocParsingMode.ParseForTypeErrors;
+    }
     // The AOT compiler currently requires this hook to allow for a transformResource hook.
     // Once the AOT compiler allows only a transformResource hook, this can be reevaluated.
     host.readResource = async function (filename) {
