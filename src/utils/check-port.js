@@ -6,43 +6,26 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkPort = void 0;
-const net = __importStar(require("net"));
+const node_assert_1 = __importDefault(require("node:assert"));
+const node_net_1 = require("node:net");
 const load_esm_1 = require("./load-esm");
 const tty_1 = require("./tty");
 function createInUseError(port) {
     return new Error(`Port ${port} is already in use. Use '--port' to specify a different port.`);
 }
 async function checkPort(port, host) {
-    if (port === 0) {
-        return 0;
-    }
+    // Disabled due to Vite not handling port 0 and instead always using the default value (5173)
+    // TODO: Enable this again once Vite is fixed
+    // if (port === 0) {
+    //   return 0;
+    // }
     return new Promise((resolve, reject) => {
-        const server = net.createServer();
+        const server = (0, node_net_1.createServer)();
         server
             .once('error', (err) => {
             if (err.code !== 'EADDRINUSE') {
@@ -60,11 +43,14 @@ async function checkPort(port, host) {
                 message: `Port ${port} is already in use.\nWould you like to use a different port?`,
                 default: true,
             }))
-                .then((answers) => (answers.useDifferent ? resolve(0) : reject(createInUseError(port))), () => reject(createInUseError(port)));
+                .then((answers) => answers.useDifferent ? resolve(checkPort(0, host)) : reject(createInUseError(port)), () => reject(createInUseError(port)));
         })
             .once('listening', () => {
+            // Get the actual address from the listening server instance
+            const address = server.address();
+            (0, node_assert_1.default)(address && typeof address !== 'string', 'Port check server address should always be an object.');
             server.close();
-            resolve(port);
+            resolve(address.port);
         })
             .listen(port, host);
     });
