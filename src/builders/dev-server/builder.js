@@ -65,6 +65,11 @@ function execute(options, context, transforms = {}, extensions) {
             if (transforms?.logging || transforms?.webpackConfiguration) {
                 throw new Error('The `application` and `browser-esbuild` builders do not support Webpack transforms.');
             }
+            if (normalizedOptions.forceEsbuild &&
+                builderName === '@angular-devkit/build-angular:browser') {
+                // The compatibility builder should be used if esbuild is force enabled with the official Webpack-based builder.
+                builderName = '@angular-devkit/build-angular:browser-esbuild';
+            }
             return (0, rxjs_1.defer)(() => Promise.resolve().then(() => __importStar(require('./vite-server')))).pipe((0, rxjs_1.switchMap)(({ serveWithVite }) => serveWithVite(normalizedOptions, builderName, context, transforms, extensions)));
         }
         if (extensions?.buildPlugins?.length) {
