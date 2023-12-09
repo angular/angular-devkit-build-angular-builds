@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createStylesheetBundleOptions = void 0;
 const node_path_1 = __importDefault(require("node:path"));
+const css_inline_fonts_plugin_1 = require("./css-inline-fonts-plugin");
 const css_language_1 = require("./css-language");
 const css_resource_plugin_1 = require("./css-resource-plugin");
 const less_language_1 = require("./less-language");
@@ -26,6 +27,15 @@ function createStylesheetBundleOptions(options, cache, inlineComponentData) {
         inlineComponentData,
         tailwindConfiguration: options.tailwindConfiguration,
     }, cache);
+    const plugins = [
+        pluginFactory.create(sass_language_1.SassStylesheetLanguage),
+        pluginFactory.create(less_language_1.LessStylesheetLanguage),
+        pluginFactory.create(css_language_1.CssStylesheetLanguage),
+        (0, css_resource_plugin_1.createCssResourcePlugin)(cache),
+    ];
+    if (options.inlineFonts) {
+        plugins.push((0, css_inline_fonts_plugin_1.createCssInlineFontsPlugin)({ cache, cacheOptions: options.cacheOptions }));
+    }
     return {
         absWorkingDir: options.workspaceRoot,
         bundle: true,
@@ -44,12 +54,7 @@ function createStylesheetBundleOptions(options, cache, inlineComponentData) {
         publicPath: options.publicPath,
         conditions: ['style', 'sass', 'less'],
         mainFields: ['style', 'sass'],
-        plugins: [
-            pluginFactory.create(sass_language_1.SassStylesheetLanguage),
-            pluginFactory.create(less_language_1.LessStylesheetLanguage),
-            pluginFactory.create(css_language_1.CssStylesheetLanguage),
-            (0, css_resource_plugin_1.createCssResourcePlugin)(cache),
-        ],
+        plugins,
     };
 }
 exports.createStylesheetBundleOptions = createStylesheetBundleOptions;

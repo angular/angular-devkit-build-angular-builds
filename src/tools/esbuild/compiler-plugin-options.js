@@ -9,7 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCompilerPluginOptions = void 0;
 function createCompilerPluginOptions(options, target, sourceFileCache) {
-    const { workspaceRoot, optimizationOptions, sourcemapOptions, tsconfig, outputNames, fileReplacements, externalDependencies, preserveSymlinks, stylePreprocessorOptions, advancedOptimizations, inlineStyleLanguage, jit, tailwindConfiguration, } = options;
+    const { workspaceRoot, optimizationOptions, sourcemapOptions, tsconfig, outputNames, fileReplacements, externalDependencies, preserveSymlinks, stylePreprocessorOptions, advancedOptimizations, inlineStyleLanguage, jit, cacheOptions, tailwindConfiguration, publicPath, } = options;
     return {
         // JS/TS options
         pluginOptions: {
@@ -26,6 +26,7 @@ function createCompilerPluginOptions(options, target, sourceFileCache) {
         // Component stylesheet options
         styleOptions: {
             workspaceRoot,
+            inlineFonts: !!optimizationOptions.fonts.inline,
             optimization: !!optimizationOptions.styles.minify,
             sourcemap: 
             // Hidden component stylesheet sourcemaps are inaccessible which is effectively
@@ -39,7 +40,8 @@ function createCompilerPluginOptions(options, target, sourceFileCache) {
             inlineStyleLanguage,
             preserveSymlinks,
             tailwindConfiguration,
-            publicPath: options.publicPath,
+            cacheOptions,
+            publicPath,
         },
     };
 }

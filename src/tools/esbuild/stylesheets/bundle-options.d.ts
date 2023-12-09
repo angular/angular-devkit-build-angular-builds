@@ -6,10 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { BuildOptions } from 'esbuild';
+import { NormalizedCachedOptions } from '../../../utils/normalize-cache';
 import { LoadResultCache } from '../load-result-cache';
 export interface BundleStylesheetOptions {
     workspaceRoot: string;
     optimization: boolean;
+    inlineFonts: boolean;
     preserveSymlinks?: boolean;
     sourcemap: boolean | 'external' | 'inline';
     outputNames: {
@@ -24,6 +26,7 @@ export interface BundleStylesheetOptions {
         package: string;
     };
     publicPath?: string;
+    cacheOptions: NormalizedCachedOptions;
 }
 export declare function createStylesheetBundleOptions(options: BundleStylesheetOptions, cache?: LoadResultCache, inlineComponentData?: Record<string, string>): BuildOptions & {
     plugins: NonNullable<BuildOptions['plugins']>;

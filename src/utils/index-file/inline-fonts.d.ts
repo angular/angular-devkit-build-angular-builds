@@ -5,6 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <reference types="node" />
+/// <reference types="@types/node/url" />
+/// <reference types="@types/node/ts4.8/url" />
+import { URL } from 'node:url';
 import { NormalizedCachedOptions } from '../normalize-cache';
 export interface InlineFontsOptions {
     minify?: boolean;
@@ -16,7 +20,8 @@ export declare class InlineFontsProcessor {
     constructor(options: InlineFontsOptions);
     process(content: string): Promise<string>;
     private getResponse;
-    private processHref;
+    processURL(url: string | URL): Promise<string | undefined>;
+    canInlineRequest(url: string): boolean;
     private getFontProviderDetails;
     private createNormalizedUrl;
 }

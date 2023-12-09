@@ -114,7 +114,7 @@ class InlineFontsProcessor {
             if (!url) {
                 continue;
             }
-            const content = await this.processHref(url);
+            const content = await this.processURL(url);
             if (content === undefined) {
                 continue;
             }
@@ -225,12 +225,16 @@ class InlineFontsProcessor {
         }
         return data;
     }
-    async processHref(url) {
-        const provider = this.getFontProviderDetails(url);
+    async processURL(url) {
+        const normalizedURL = url instanceof node_url_1.URL ? url : this.createNormalizedUrl(url);
+        if (!normalizedURL) {
+            return;
+        }
+        const provider = this.getFontProviderDetails(normalizedURL);
         if (!provider) {
             return undefined;
         }
-        let cssContent = await this.getResponse(url);
+        let cssContent = await this.getResponse(normalizedURL);
         if (this.options.minify) {
             cssContent = cssContent
                 // Comments.
@@ -242,21 +246,24 @@ class InlineFontsProcessor {
         }
         return cssContent;
     }
+    canInlineRequest(url) {
+        const normalizedUrl = this.createNormalizedUrl(url);
+        return normalizedUrl ? !!this.getFontProviderDetails(normalizedUrl) : false;
+    }
     getFontProviderDetails(url) {
         return SUPPORTED_PROVIDERS[url.hostname];
     }
     createNormalizedUrl(value) {
         // Need to convert '//' to 'https://' because the URL parser will fail with '//'.
-        const normalizedHref = value.startsWith('//') ? `https:${value}` : value;
-        if (!normalizedHref.startsWith('http')) {
-            // Non valid URL.
-            // Example: relative path styles.css.
-            return undefined;
+        const url = new node_url_1.URL(value.startsWith('//') ? `https:${value}` : value, 'resolve://');
+        switch (url.protocol) {
+            case 'http:':
+            case 'https:':
+                url.protocol = 'https:';
+                return url;
+            default:
+                return undefined;
         }
-        const url = new node_url_1.URL(normalizedHref);
-        // Force HTTPS protocol
-        url.protocol = 'https:';
-        return url;
     }
 }
 exports.InlineFontsProcessor = InlineFontsProcessor;

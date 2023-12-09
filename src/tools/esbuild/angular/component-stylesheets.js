@@ -79,7 +79,7 @@ class ComponentStylesheetBundler {
                                 namespace,
                             };
                         });
-                        build.onLoad({ filter: /^css;/, namespace }, async () => {
+                        build.onLoad({ filter: /^css;/, namespace }, () => {
                             return {
                                 contents: data,
                                 loader: 'css',
