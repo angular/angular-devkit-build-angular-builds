@@ -62,21 +62,25 @@ async function* runEsBuildBuildAction(action, options) {
         if (progress) {
             logger.info('Watch mode enabled. Watching for file changes...');
         }
+        const ignored = [
+            // Ignore the output and cache paths to avoid infinite rebuild cycles
+            outputPath,
+            cacheOptions.basePath,
+            `${workspaceRoot.replace(/\\/g, '/')}/**/.*/**`,
+        ];
+        if (!preserveSymlinks) {
+            // Ignore all node modules directories to avoid excessive file watchers.
+            // Package changes are handled below by watching manifest and lock files.
+            // NOTE: this is not enable when preserveSymlinks is true as this would break `npm link` usages.
+            ignored.push('**/node_modules/**');
+        }
         // Setup a watcher
         const { createWatcher } = await Promise.resolve().then(() => __importStar(require('../../tools/esbuild/watcher')));
         watcher = createWatcher({
             polling: typeof poll === 'number',
             interval: poll,
             followSymlinks: preserveSymlinks,
-            ignored: [
-                // Ignore the output and cache paths to avoid infinite rebuild cycles
-                outputPath,
-                cacheOptions.basePath,
-                // Ignore all node modules directories to avoid excessive file watchers.
-                // Package changes are handled below by watching manifest and lock files.
-                '**/node_modules/**',
-                `${workspaceRoot.replace(/\\/g, '/')}/**/.*/**`,
-            ],
+            ignored,
         });
         // Setup abort support
         options.signal?.addEventListener('abort', () => void watcher?.close());
