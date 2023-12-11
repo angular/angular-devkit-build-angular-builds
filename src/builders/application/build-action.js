@@ -34,6 +34,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.runEsBuildBuildAction = void 0;
+const node_fs_1 = require("node:fs");
 const node_path_1 = __importDefault(require("node:path"));
 const sass_language_1 = require("../../tools/esbuild/stylesheets/sass-language");
 const utils_1 = require("../../tools/esbuild/utils");
@@ -42,7 +43,7 @@ const environment_options_1 = require("../../utils/environment-options");
 async function* runEsBuildBuildAction(action, options) {
     const { writeToFileSystemFilter, writeToFileSystem = true, watch, poll, logger, deleteOutputPath, cacheOptions, outputPath, verbose, projectRoot, workspaceRoot, progress, preserveSymlinks, } = options;
     if (deleteOutputPath && writeToFileSystem) {
-        await (0, delete_output_dir_1.deleteOutputDir)(workspaceRoot, outputPath);
+        await (0, delete_output_dir_1.deleteOutputDir)(workspaceRoot, outputPath, ['browser', 'server']);
     }
     const withProgress = progress ? utils_1.withSpinner : utils_1.withNoProgress;
     // Initial build
@@ -97,7 +98,9 @@ async function* runEsBuildBuildAction(action, options) {
             '.pnp.cjs',
             '.pnp.data.json',
         ];
-        watcher.add(packageWatchFiles.map((file) => node_path_1.default.join(workspaceRoot, file)));
+        watcher.add(packageWatchFiles
+            .map((file) => node_path_1.default.join(workspaceRoot, file))
+            .filter((file) => (0, node_fs_1.existsSync)(file)));
         // Watch locations provided by the initial build result
         watcher.add(result.watchFiles);
     }

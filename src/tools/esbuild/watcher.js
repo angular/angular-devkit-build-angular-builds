@@ -6,10 +6,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createWatcher = exports.ChangedFiles = void 0;
-const chokidar_1 = require("chokidar");
-const node_path_1 = require("node:path");
+const watchpack_1 = __importDefault(require("watchpack"));
 class ChangedFiles {
     added = new Set();
     modified = new Set();
@@ -28,87 +30,40 @@ class ChangedFiles {
 }
 exports.ChangedFiles = ChangedFiles;
 function createWatcher(options) {
-    const watcher = new chokidar_1.FSWatcher({
-        usePolling: options?.polling,
-        interval: options?.interval,
+    const watcher = new watchpack_1.default({
+        poll: options?.polling ? options?.interval ?? true : false,
         ignored: options?.ignored,
         followSymlinks: options?.followSymlinks,
-        disableGlobbing: true,
-        ignoreInitial: true,
+        aggregateTimeout: 250,
     });
+    const watchedFiles = new Set();
     const nextQueue = [];
-    let currentChanges;
-    let nextWaitTimeout;
-    /**
-     * We group the current events in a map as on Windows with certain IDE a file contents change can trigger multiple events.
-     *
-     * Example:
-     * rename | 'C:/../src/app/app.component.css'
-     * rename | 'C:/../src/app/app.component.css'
-     * change | 'C:/../src/app/app.component.css'
-     *
-     */
-    let currentEvents;
-    /**
-     * Using `watcher.on('all')` does not capture some of events fired when using Visual studio and this does not happen all the time,
-     * but only after a file has been changed 3 or more times.
-     *
-     * Also, some IDEs such as Visual Studio (not VS Code) will fire a rename event instead of unlink when a file is renamed or changed.
-     *
-     * Example:
-     * ```
-     * watcher.on('raw')
-     * Change 1
-     * rename | 'C:/../src/app/app.component.css'
-     * rename | 'C:/../src/app/app.component.css'
-     * change | 'C:/../src/app/app.component.css'
-     *
-     * Change 2
-     * rename | 'C:/../src/app/app.component.css'
-     * rename | 'C:/../src/app/app.component.css'
-     * change | 'C:/../src/app/app.component.css'
-     *
-     * Change 3
-     * rename | 'C:/../src/app/app.component.css'
-     * rename | 'C:/../src/app/app.component.css'
-     * change | 'C:/../src/app/app.component.css'
-     *
-     * watcher.on('all')
-     * Change 1
-     * change | 'C:\\..\\src\\app\\app.component.css'
-     *
-     * Change 2
-     * unlink | 'C:\\..\\src\\app\\app.component.css'
-     *
-     * Change 3
-     * ... (Nothing)
-     * ```
-     */
-    watcher
-        .on('raw', (event, path, { watchedPath }) => {
-        if (watchedPath && !(0, node_path_1.extname)(watchedPath)) {
-            // Ignore directories, file changes in directories will be fired seperatly.
-            return;
+    let currentChangedFiles;
+    watcher.on('aggregated', (changes, removals) => {
+        const changedFiles = currentChangedFiles ?? new ChangedFiles();
+        for (const file of changes) {
+            changedFiles.modified.add(file);
         }
-        switch (event) {
-            case 'rename':
-            case 'change':
-                // When polling is enabled `watchedPath` can be undefined.
-                // `path` is always normalized unlike `watchedPath`.
-                const changedPath = watchedPath ? (0, node_path_1.normalize)(watchedPath) : path;
-                handleFileChange(event, changedPath);
-                break;
+        for (const file of removals) {
+            changedFiles.removed.add(file);
         }
-    })
-        .on('all', handleFileChange);
+        const next = nextQueue.shift();
+        if (next) {
+            currentChangedFiles = undefined;
+            next(changedFiles);
+        }
+        else {
+            currentChangedFiles = changedFiles;
+        }
+    });
     return {
         [Symbol.asyncIterator]() {
             return this;
         },
         async next() {
-            if (currentChanges && nextQueue.length === 0) {
-                const result = { value: currentChanges };
-                currentChanges = undefined;
+            if (currentChangedFiles && nextQueue.length === 0) {
+                const result = { value: currentChangedFiles };
+                currentChangedFiles = undefined;
                 return result;
             }
             return new Promise((resolve) => {
@@ -116,17 +71,40 @@ function createWatcher(options) {
             });
         },
         add(paths) {
-            watcher.add(paths);
+            const previousSize = watchedFiles.size;
+            if (typeof paths === 'string') {
+                watchedFiles.add(paths);
+            }
+            else {
+                for (const file of paths) {
+                    watchedFiles.add(file);
+                }
+            }
+            if (previousSize !== watchedFiles.size) {
+                watcher.watch({
+                    files: watchedFiles,
+                });
+            }
         },
         remove(paths) {
-            watcher.unwatch(paths);
+            const previousSize = watchedFiles.size;
+            if (typeof paths === 'string') {
+                watchedFiles.delete(paths);
+            }
+            else {
+                for (const file of paths) {
+                    watchedFiles.delete(file);
+                }
+            }
+            if (previousSize !== watchedFiles.size) {
+                watcher.watch({
+                    files: watchedFiles,
+                });
+            }
         },
         async close() {
             try {
-                await watcher.close();
-                if (nextWaitTimeout) {
-                    clearTimeout(nextWaitTimeout);
-                }
+                watcher.close();
             }
             finally {
                 let next;
@@ -136,48 +114,5 @@ function createWatcher(options) {
             }
         },
     };
-    function handleFileChange(event, path) {
-        switch (event) {
-            case 'add':
-            case 'change':
-            // When using Visual Studio the rename event is fired before a change event when the contents of the file changed
-            // or instead of `unlink` when the file has been renamed.
-            case 'unlink':
-            case 'rename':
-                currentEvents ??= new Map();
-                currentEvents.set(path, event);
-                break;
-            default:
-                return;
-        }
-        // Wait 250ms from next change to better capture groups of file save operations.
-        if (!nextWaitTimeout) {
-            nextWaitTimeout = setTimeout(() => {
-                nextWaitTimeout = undefined;
-                const next = nextQueue.shift();
-                if (next && currentEvents) {
-                    const events = currentEvents;
-                    currentEvents = undefined;
-                    const currentChanges = new ChangedFiles();
-                    for (const [path, event] of events) {
-                        switch (event) {
-                            case 'add':
-                                currentChanges.added.add(path);
-                                break;
-                            case 'change':
-                                currentChanges.modified.add(path);
-                                break;
-                            case 'unlink':
-                            case 'rename':
-                                currentChanges.removed.add(path);
-                                break;
-                        }
-                    }
-                    next(currentChanges);
-                }
-            }, 250);
-            nextWaitTimeout?.unref();
-        }
-    }
 }
 exports.createWatcher = createWatcher;
