@@ -42,7 +42,7 @@ const environment_options_1 = require("../../utils/environment-options");
 async function* runEsBuildBuildAction(action, options) {
     const { writeToFileSystemFilter, writeToFileSystem = true, watch, poll, logger, deleteOutputPath, cacheOptions, outputPath, verbose, projectRoot, workspaceRoot, progress, preserveSymlinks, } = options;
     if (deleteOutputPath && writeToFileSystem) {
-        await (0, delete_output_dir_1.deleteOutputDir)(workspaceRoot, outputPath);
+        await (0, delete_output_dir_1.deleteOutputDir)(workspaceRoot, outputPath, ['browser', 'server']);
     }
     const withProgress = progress ? utils_1.withSpinner : utils_1.withNoProgress;
     // Initial build
