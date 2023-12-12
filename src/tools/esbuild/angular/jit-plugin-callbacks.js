@@ -6,13 +6,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupJitPluginCallbacks = void 0;
 const promises_1 = require("node:fs/promises");
-const node_path_1 = __importDefault(require("node:path"));
+const node_path_1 = require("node:path");
+const load_result_cache_1 = require("../load-result-cache");
 const uri_1 = require("./uri");
 /**
  * Loads/extracts the contents from a load callback Angular JIT entry.
@@ -27,7 +25,7 @@ const uri_1 = require("./uri");
  */
 async function loadEntry(entry, root, skipRead) {
     if (entry.startsWith('file:')) {
-        const specifier = node_path_1.default.join(root, entry.slice(5));
+        const specifier = (0, node_path_1.join)(root, entry.slice(5));
         return {
             path: specifier,
             contents: skipRead ? undefined : await (0, promises_1.readFile)(specifier, 'utf-8'),
@@ -36,7 +34,7 @@ async function loadEntry(entry, root, skipRead) {
     else if (entry.startsWith('inline:')) {
         const [importer, data] = entry.slice(7).split(';', 2);
         return {
-            path: node_path_1.default.join(root, importer),
+            path: (0, node_path_1.join)(root, importer),
             contents: Buffer.from(data, 'base64').toString(),
         };
     }
@@ -53,7 +51,7 @@ async function loadEntry(entry, root, skipRead) {
  * @param styleOptions The options to use when bundling stylesheets.
  * @param additionalResultFiles A Map where stylesheet resources will be added.
  */
-function setupJitPluginCallbacks(build, stylesheetBundler, additionalResultFiles, inlineStyleLanguage) {
+function setupJitPluginCallbacks(build, stylesheetBundler, additionalResultFiles, inlineStyleLanguage, loadCache) {
     const root = build.initialOptions.absWorkingDir ?? '';
     // Add a resolve callback to capture and parse any JIT URIs that were added by the
     // JIT resource TypeScript transformer.
@@ -68,13 +66,13 @@ function setupJitPluginCallbacks(build, stylesheetBundler, additionalResultFiles
             return {
                 // Use a relative path to prevent fully resolved paths in the metafile (JSON stats file).
                 // This is only necessary for custom namespaces. esbuild will handle the file namespace.
-                path: 'file:' + node_path_1.default.relative(root, node_path_1.default.join(node_path_1.default.dirname(args.importer), specifier)),
+                path: 'file:' + (0, node_path_1.relative)(root, (0, node_path_1.join)((0, node_path_1.dirname)(args.importer), specifier)),
                 namespace,
             };
         }
         else {
             // Inline data may need the importer to resolve imports/references within the content
-            const importer = node_path_1.default.relative(root, args.importer);
+            const importer = (0, node_path_1.relative)(root, args.importer);
             return {
                 path: `inline:${importer};${specifier}`,
                 namespace,
@@ -82,7 +80,7 @@ function setupJitPluginCallbacks(build, stylesheetBundler, additionalResultFiles
         }
     });
     // Add a load callback to handle Component stylesheets (both inline and external)
-    build.onLoad({ filter: /./, namespace: uri_1.JIT_STYLE_NAMESPACE }, async (args) => {
+    build.onLoad({ filter: /./, namespace: uri_1.JIT_STYLE_NAMESPACE }, (0, load_result_cache_1.createCachedLoad)(loadCache, async (args) => {
         // skipRead is used here because the stylesheet bundling will read a file stylesheet
         // directly either via a preprocessor or esbuild itself.
         const entry = await loadEntry(args.path, root, true /* skipRead */);
@@ -94,24 +92,26 @@ function setupJitPluginCallbacks(build, stylesheetBundler, additionalResultFiles
         else {
             stylesheetResult = await stylesheetBundler.bundleInline(entry.contents, entry.path, inlineStyleLanguage);
         }
-        const { contents, resourceFiles, errors, warnings, metafile } = stylesheetResult;
+        const { contents, resourceFiles, errors, warnings, metafile, referencedFiles } = stylesheetResult;
         additionalResultFiles.set(entry.path, { outputFiles: resourceFiles, metafile });
         return {
             errors,
             warnings,
             contents,
             loader: 'text',
+            watchFiles: referencedFiles && [...referencedFiles],
         };
-    });
+    }));
     // Add a load callback to handle Component templates
     // NOTE: While this callback supports both inline and external templates, the transformer
     // currently only supports generating URIs for external templates.
-    build.onLoad({ filter: /./, namespace: uri_1.JIT_TEMPLATE_NAMESPACE }, async (args) => {
-        const { contents } = await loadEntry(args.path, root);
+    build.onLoad({ filter: /./, namespace: uri_1.JIT_TEMPLATE_NAMESPACE }, (0, load_result_cache_1.createCachedLoad)(loadCache, async (args) => {
+        const { contents, path } = await loadEntry(args.path, root);
         return {
             contents,
             loader: 'text',
+            watchFiles: [path],
         };
-    });
+    }));
 }
 exports.setupJitPluginCallbacks = setupJitPluginCallbacks;
