@@ -11,19 +11,20 @@ exports.getESMLoaderArgs = exports.callInitializeIfNeeded = void 0;
 const node_path_1 = require("node:path");
 const node_url_1 = require("node:url");
 const node_worker_threads_1 = require("node:worker_threads");
-let IS_NODE_18;
-function isNode18() {
-    return (IS_NODE_18 ??= process.versions.node.startsWith('18.'));
+const semver_1 = require("semver");
+let SUPPORTS_IMPORT_FLAG;
+function supportsImportFlag() {
+    return (SUPPORTS_IMPORT_FLAG ??= (0, semver_1.satisfies)(process.versions.node, '>= 18.19'));
 }
 /** Call the initialize hook when running on Node.js 18 */
 function callInitializeIfNeeded(initialize) {
-    if (isNode18()) {
+    if (!supportsImportFlag()) {
         initialize(node_worker_threads_1.workerData);
     }
 }
 exports.callInitializeIfNeeded = callInitializeIfNeeded;
 function getESMLoaderArgs() {
-    if (isNode18()) {
+    if (!supportsImportFlag()) {
         return [
             '--no-warnings',
             '--loader',
