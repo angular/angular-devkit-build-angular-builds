@@ -308,7 +308,7 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
             }));
             // Setup bundling of component templates and stylesheets when in JIT mode
             if (pluginOptions.jit) {
-                (0, jit_plugin_callbacks_1.setupJitPluginCallbacks)(build, stylesheetBundler, additionalResults, styleOptions.inlineStyleLanguage);
+                (0, jit_plugin_callbacks_1.setupJitPluginCallbacks)(build, stylesheetBundler, additionalResults, styleOptions.inlineStyleLanguage, pluginOptions.loadResultCache);
             }
             build.onEnd((result) => {
                 // Ensure other compilations are unblocked if the main compilation throws during start
