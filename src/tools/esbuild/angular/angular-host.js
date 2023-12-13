@@ -40,7 +40,7 @@ function createAngularCompilerHost(compilerOptions, hostOptions) {
             return null;
         }
         const result = await hostOptions.transformStylesheet(data, context.containingFile, context.resourceFile ?? undefined);
-        return result ? { content: result } : null;
+        return typeof result === 'string' ? { content: result } : null;
     };
     // Allow the AOT compiler to request the set of changed templates and styles
     host.getModifiedResourceFiles = function () {
