@@ -37,8 +37,8 @@ const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
 const node_url_1 = require("node:url");
 const picomatch_1 = require("picomatch");
-const error_1 = require("../../utils/error");
-const load_esm_1 = require("../../utils/load-esm");
+const error_1 = require("./error");
+const load_esm_1 = require("./load-esm");
 async function loadProxyConfiguration(root, proxyConfig, normalize = false) {
     if (!proxyConfig) {
         return undefined;

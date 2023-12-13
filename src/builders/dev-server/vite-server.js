@@ -51,7 +51,6 @@ const supported_browsers_1 = require("../../utils/supported-browsers");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const application_1 = require("../application");
 const browser_esbuild_1 = require("../browser-esbuild");
-const load_proxy_config_1 = require("./load-proxy-config");
 // eslint-disable-next-line max-lines-per-function
 async function* serveWithVite(serverOptions, builderName, context, transformers, extensions) {
     // Get the browser configuration from the target name.
@@ -331,7 +330,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
 }
 // eslint-disable-next-line max-lines-per-function
 async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target, prebundleLoaderExtensions, extensionMiddleware, indexHtmlTransformer, thirdPartySourcemaps = false) {
-    const proxy = await (0, load_proxy_config_1.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig, true);
+    const proxy = await (0, utils_2.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig, true);
     // dynamically import Vite for ESM compatibility
     const { normalizePath } = await (0, load_esm_1.loadEsmModule)('vite');
     // Path will not exist on disk and only used to provide separate path for Vite requests

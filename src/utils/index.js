@@ -24,6 +24,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./default-progress"), exports);
 __exportStar(require("./delete-output-dir"), exports);
 __exportStar(require("./run-module-as-observable-fork"), exports);
+__exportStar(require("./load-proxy-config"), exports);
 __exportStar(require("./normalize-file-replacements"), exports);
 __exportStar(require("./normalize-asset-patterns"), exports);
 __exportStar(require("./normalize-source-maps"), exports);
