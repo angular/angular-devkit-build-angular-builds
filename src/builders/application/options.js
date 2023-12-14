@@ -59,20 +59,27 @@ async function normalizeOptions(context, projectName, options, extensions) {
     }
     const entryPoints = normalizeEntryPoints(workspaceRoot, options.browser, options.entryPoints);
     const tsconfig = node_path_1.default.join(workspaceRoot, options.tsConfig);
-    const outputPath = normalizeDirectoryPath(node_path_1.default.join(workspaceRoot, options.outputPath));
     const optimizationOptions = (0, utils_1.normalizeOptimization)(options.optimization);
     const sourcemapOptions = (0, utils_1.normalizeSourceMaps)(options.sourceMap ?? false);
     const assets = options.assets?.length
         ? (0, utils_1.normalizeAssetPatterns)(options.assets, workspaceRoot, projectRoot, projectSourceRoot)
         : undefined;
+    const outputPath = options.outputPath;
+    const outputOptions = {
+        browser: 'browser',
+        server: 'server',
+        media: 'media',
+        ...(typeof outputPath === 'string' ? undefined : outputPath),
+        base: normalizeDirectoryPath(node_path_1.default.join(workspaceRoot, typeof outputPath === 'string' ? outputPath : outputPath.base)),
+    };
     const outputNames = {
         bundles: options.outputHashing === schema_1.OutputHashing.All || options.outputHashing === schema_1.OutputHashing.Bundles
             ? '[name]-[hash]'
             : '[name]',
-        media: 'media/' +
+        media: outputOptions.media +
             (options.outputHashing === schema_1.OutputHashing.All || options.outputHashing === schema_1.OutputHashing.Media
-                ? '[name]-[hash]'
-                : '[name]'),
+                ? '/[name]-[hash]'
+                : '/[name]'),
     };
     let fileReplacements;
     if (options.fileReplacements) {
@@ -112,24 +119,6 @@ async function normalizeOptions(context, projectName, options, extensions) {
     if (options.scripts?.length) {
         for (const { bundleName, paths, inject } of (0, helpers_1.globalScriptsByBundleName)(options.scripts)) {
             globalScripts.push({ name: bundleName, files: paths, initial: inject });
-        }
-    }
-    let tailwindConfiguration;
-    const tailwindConfigurationPath = await (0, tailwind_1.findTailwindConfigurationFile)(workspaceRoot, projectRoot);
-    if (tailwindConfigurationPath) {
-        // Create a node resolver at the project root as a directory
-        const resolver = (0, node_module_1.createRequire)(projectRoot + '/');
-        try {
-            tailwindConfiguration = {
-                file: tailwindConfigurationPath,
-                package: resolver.resolve('tailwindcss'),
-            };
-        }
-        catch {
-            const relativeTailwindConfigPath = node_path_1.default.relative(workspaceRoot, tailwindConfigurationPath);
-            context.logger.warn(`Tailwind CSS configuration file found (${relativeTailwindConfigPath})` +
-                ` but the 'tailwindcss' package is not installed.` +
-                ` To enable Tailwind CSS, please install the 'tailwindcss' package.`);
         }
     }
     let indexHtmlOptions;
@@ -209,7 +198,7 @@ async function normalizeOptions(context, projectName, options, extensions) {
         workspaceRoot,
         entryPoints,
         optimizationOptions,
-        outputPath,
+        outputOptions,
         outExtension,
         sourcemapOptions,
         tsconfig,
@@ -221,7 +210,7 @@ async function normalizeOptions(context, projectName, options, extensions) {
         globalScripts,
         serviceWorker: typeof serviceWorker === 'string' ? node_path_1.default.join(workspaceRoot, serviceWorker) : undefined,
         indexHtmlOptions,
-        tailwindConfiguration,
+        tailwindConfiguration: await getTailwindConfig(workspaceRoot, projectRoot, context),
         i18nOptions,
         namedChunks,
         budgets: budgets?.length ? budgets : undefined,
@@ -231,6 +220,27 @@ async function normalizeOptions(context, projectName, options, extensions) {
     };
 }
 exports.normalizeOptions = normalizeOptions;
+async function getTailwindConfig(workspaceRoot, projectRoot, context) {
+    const tailwindConfigurationPath = await (0, tailwind_1.findTailwindConfigurationFile)(workspaceRoot, projectRoot);
+    if (!tailwindConfigurationPath) {
+        return undefined;
+    }
+    // Create a node resolver at the project root as a directory
+    const resolver = (0, node_module_1.createRequire)(projectRoot + '/');
+    try {
+        return {
+            file: tailwindConfigurationPath,
+            package: resolver.resolve('tailwindcss'),
+        };
+    }
+    catch {
+        const relativeTailwindConfigPath = node_path_1.default.relative(workspaceRoot, tailwindConfigurationPath);
+        context.logger.warn(`Tailwind CSS configuration file found (${relativeTailwindConfigPath})` +
+            ` but the 'tailwindcss' package is not installed.` +
+            ` To enable Tailwind CSS, please install the 'tailwindcss' package.`);
+    }
+    return undefined;
+}
 /**
  * Normalize entry point options. To maintain compatibility with the legacy browser builder, we need a single `browser`
  * option which defines a single entry point. However, we also want to support multiple entry points as an internal option.

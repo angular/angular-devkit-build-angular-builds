@@ -41,9 +41,12 @@ const utils_1 = require("../../tools/esbuild/utils");
 const delete_output_dir_1 = require("../../utils/delete-output-dir");
 const environment_options_1 = require("../../utils/environment-options");
 async function* runEsBuildBuildAction(action, options) {
-    const { writeToFileSystemFilter, writeToFileSystem = true, watch, poll, logger, deleteOutputPath, cacheOptions, outputPath, verbose, projectRoot, workspaceRoot, progress, preserveSymlinks, } = options;
+    const { writeToFileSystemFilter, writeToFileSystem, watch, poll, logger, deleteOutputPath, cacheOptions, outputOptions, verbose, projectRoot, workspaceRoot, progress, preserveSymlinks, } = options;
     if (deleteOutputPath && writeToFileSystem) {
-        await (0, delete_output_dir_1.deleteOutputDir)(workspaceRoot, outputPath, ['browser', 'server']);
+        await (0, delete_output_dir_1.deleteOutputDir)(workspaceRoot, outputOptions.base, [
+            outputOptions.browser,
+            outputOptions.server,
+        ]);
     }
     const withProgress = progress ? utils_1.withSpinner : utils_1.withNoProgress;
     // Initial build
@@ -65,7 +68,7 @@ async function* runEsBuildBuildAction(action, options) {
         }
         const ignored = [
             // Ignore the output and cache paths to avoid infinite rebuild cycles
-            outputPath,
+            outputOptions.base,
             cacheOptions.basePath,
             `${workspaceRoot.replace(/\\/g, '/')}/**/.*/**`,
         ];
@@ -113,7 +116,7 @@ async function* runEsBuildBuildAction(action, options) {
     // unit tests which execute the builder and modify the file system programmatically.
     if (writeToFileSystem) {
         // Write output files
-        await (0, utils_1.writeResultFiles)(result.outputFiles, result.assetFiles, outputPath);
+        await (0, utils_1.writeResultFiles)(result.outputFiles, result.assetFiles, outputOptions);
         yield result.output;
     }
     else {
@@ -158,7 +161,7 @@ async function* runEsBuildBuildAction(action, options) {
                 const filesToWrite = writeToFileSystemFilter
                     ? result.outputFiles.filter(writeToFileSystemFilter)
                     : result.outputFiles;
-                await (0, utils_1.writeResultFiles)(filesToWrite, result.assetFiles, outputPath);
+                await (0, utils_1.writeResultFiles)(filesToWrite, result.assetFiles, outputOptions);
                 yield result.output;
             }
             else {

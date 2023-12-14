@@ -10,14 +10,15 @@ import type { logging } from '@angular-devkit/core';
 import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
+import { NormalizedOutputOptions } from './options';
 export declare function runEsBuildBuildAction(action: (rebuildState?: RebuildState) => ExecutionResult | Promise<ExecutionResult>, options: {
     workspaceRoot: string;
     projectRoot: string;
-    outputPath: string;
+    outputOptions: NormalizedOutputOptions;
     logger: logging.LoggerApi;
     cacheOptions: NormalizedCachedOptions;
-    writeToFileSystem?: boolean;
-    writeToFileSystemFilter?: (file: BuildOutputFile) => boolean;
+    writeToFileSystem: boolean;
+    writeToFileSystemFilter: ((file: BuildOutputFile) => boolean) | undefined;
     watch?: boolean;
     verbose?: boolean;
     progress?: boolean;

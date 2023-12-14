@@ -31,9 +31,9 @@ async function* buildEsbuildBrowser(userOptions, context, infrastructureSettings
     (0, builder_status_warnings_1.logBuilderStatusWarnings)(userOptions, context);
     const normalizedOptions = normalizeOptions(userOptions);
     const { deleteOutputPath, outputPath } = normalizedOptions;
-    const fullOutputPath = node_path_1.default.join(context.workspaceRoot, outputPath);
+    const fullOutputPath = node_path_1.default.join(context.workspaceRoot, outputPath.base);
     if (deleteOutputPath && infrastructureSettings?.write !== false) {
-        await (0, utils_2.deleteOutputDir)(context.workspaceRoot, outputPath);
+        await (0, utils_2.deleteOutputDir)(context.workspaceRoot, outputPath.base);
     }
     for await (const result of (0, application_1.buildApplicationInternal)(normalizedOptions, context, {
         write: false,
@@ -55,11 +55,15 @@ async function* buildEsbuildBrowser(userOptions, context, infrastructureSettings
 }
 exports.buildEsbuildBrowser = buildEsbuildBrowser;
 function normalizeOptions(options) {
-    const { main: browser, ngswConfigPath, serviceWorker, polyfills, ...otherOptions } = options;
+    const { main: browser, outputPath, ngswConfigPath, serviceWorker, polyfills, ...otherOptions } = options;
     return {
         browser,
         serviceWorker: serviceWorker ? ngswConfigPath : false,
         polyfills: typeof polyfills === 'string' ? [polyfills] : polyfills,
+        outputPath: {
+            base: outputPath,
+            browser: '',
+        },
         ...otherOptions,
     };
 }

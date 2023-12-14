@@ -35,7 +35,6 @@ export declare enum BuildOutputFileType {
 }
 export interface BuildOutputFile extends OutputFile {
     type: BuildOutputFileType;
-    fullOutputPath: string;
     clone: () => BuildOutputFile;
 }
 export type BundlerOptionsFactory<T extends BuildOptions = BuildOptions> = (loadCache: LoadResultCache | undefined) => T;

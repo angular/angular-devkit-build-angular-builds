@@ -9,7 +9,8 @@ import { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import { I18nOptions } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
-import { Schema as ApplicationBuilderOptions, I18NTranslation } from './schema';
+import { Schema as ApplicationBuilderOptions, I18NTranslation, OutputPathClass } from './schema';
+export type NormalizedOutputOptions = Required<OutputPathClass>;
 export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 export interface ApplicationBuilderExtensions {
     codePlugins?: Plugin[];
@@ -93,7 +94,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     workspaceRoot: string;
     entryPoints: Record<string, string>;
     optimizationOptions: import("../../utils").NormalizedOptimizationOptions;
-    outputPath: string;
+    outputOptions: Required<OutputPathClass>;
     outExtension: "js" | "mjs" | undefined;
     sourcemapOptions: import("../..").SourceMapObject;
     tsconfig: string;

@@ -99,9 +99,9 @@ export interface Schema {
      */
     outputHashing?: OutputHashing;
     /**
-     * The full path for the new output directory, relative to the current workspace.
+     * Specify the output path relative to workspace root.
      */
-    outputPath: string;
+    outputPath: OutputPathUnion;
     /**
      * Enable and define the file watching poll time period in milliseconds.
      */
@@ -368,6 +368,31 @@ export declare enum OutputHashing {
     Bundles = "bundles",
     Media = "media",
     None = "none"
+}
+/**
+ * Specify the output path relative to workspace root.
+ */
+export type OutputPathUnion = OutputPathClass | string;
+export interface OutputPathClass {
+    /**
+     * Specify the output path relative to workspace root.
+     */
+    base: string;
+    /**
+     * The output directory name of your browser build within the output path base. Defaults to
+     * 'browser'.
+     */
+    browser?: string;
+    /**
+     * The output directory name of your media files within the output browser directory.
+     * Defaults to 'media'.
+     */
+    media?: string;
+    /**
+     * The output directory name of your server build within the output path base. Defaults to
+     * 'server'.
+     */
+    server?: string;
 }
 /**
  * Prerender (SSG) pages of your application during build time.

@@ -6,9 +6,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BundlerContext = exports.BuildOutputFileType = void 0;
 const esbuild_1 = require("esbuild");
+const node_assert_1 = __importDefault(require("node:assert"));
 const node_path_1 = require("node:path");
 const load_result_cache_1 = require("./load-result-cache");
 const utils_1 = require("./utils");
@@ -250,10 +254,13 @@ class BundlerContext {
                 externalImports.add(importData.path);
             }
         }
-        const platformIsServer = this.#esbuildOptions?.platform === 'node';
+        (0, node_assert_1.default)(this.#esbuildOptions, 'esbuild options cannot be undefined.');
+        const { platform, assetNames = '' } = this.#esbuildOptions;
+        const platformIsServer = platform === 'node';
+        const mediaDirname = (0, node_path_1.dirname)(assetNames);
         const outputFiles = result.outputFiles.map((file) => {
             let fileType;
-            if ((0, node_path_1.dirname)(file.path) === 'media') {
+            if ((0, node_path_1.dirname)(file.path) === mediaDirname) {
                 fileType = BuildOutputFileType.Media;
             }
             else {

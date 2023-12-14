@@ -6,39 +6,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSupportedNodeTargets = exports.transformSupportedBrowsersToTargets = exports.getFullOutputPath = exports.convertOutputFile = exports.createOutputFileFromData = exports.createOutputFileFromText = exports.emitFilesToDisk = exports.writeResultFiles = exports.getFeatureSupport = exports.logMessages = exports.withNoProgress = exports.withSpinner = exports.calculateEstimatedTransferSizes = exports.logBuildStats = void 0;
+exports.getSupportedNodeTargets = exports.transformSupportedBrowsersToTargets = exports.convertOutputFile = exports.createOutputFileFromData = exports.createOutputFileFromText = exports.emitFilesToDisk = exports.writeResultFiles = exports.getFeatureSupport = exports.logMessages = exports.withNoProgress = exports.withSpinner = exports.calculateEstimatedTransferSizes = exports.logBuildStats = void 0;
 const esbuild_1 = require("esbuild");
 const node_crypto_1 = require("node:crypto");
 const node_fs_1 = require("node:fs");
 const promises_1 = __importDefault(require("node:fs/promises"));
-const node_path_1 = __importStar(require("node:path"));
+const node_path_1 = __importDefault(require("node:path"));
 const node_util_1 = require("node:util");
 const node_zlib_1 = require("node:zlib");
 const semver_1 = require("semver");
@@ -182,31 +159,45 @@ function getFeatureSupport(target) {
     return supported;
 }
 exports.getFeatureSupport = getFeatureSupport;
-async function writeResultFiles(outputFiles, assetFiles, outputPath) {
+async function writeResultFiles(outputFiles, assetFiles, { base, browser, media, server }) {
     const directoryExists = new Set();
-    const ensureDirectoryExists = async (basePath) => {
-        if (basePath && !directoryExists.has(basePath)) {
-            await promises_1.default.mkdir(node_path_1.default.join(outputPath, basePath), { recursive: true });
+    const ensureDirectoryExists = async (destPath) => {
+        const basePath = node_path_1.default.dirname(destPath);
+        if (!directoryExists.has(basePath)) {
+            await promises_1.default.mkdir(node_path_1.default.join(base, basePath), { recursive: true });
             directoryExists.add(basePath);
         }
     };
     // Writes the output file to disk and ensures the containing directories are present
     await emitFilesToDisk(outputFiles, async (file) => {
-        const fullOutputPath = file.fullOutputPath;
+        let outputDir;
+        switch (file.type) {
+            case bundler_context_1.BuildOutputFileType.Browser:
+            case bundler_context_1.BuildOutputFileType.Media:
+                outputDir = browser;
+                break;
+            case bundler_context_1.BuildOutputFileType.Server:
+                outputDir = server;
+                break;
+            case bundler_context_1.BuildOutputFileType.Root:
+                outputDir = '';
+                break;
+            default:
+                throw new Error(`Unhandled write for file "${file.path}" with type "${bundler_context_1.BuildOutputFileType[file.type]}".`);
+        }
+        const destPath = node_path_1.default.join(outputDir, file.path);
         // Ensure output subdirectories exist
-        const basePath = node_path_1.default.dirname(fullOutputPath);
-        await ensureDirectoryExists(basePath);
+        await ensureDirectoryExists(destPath);
         // Write file contents
-        await promises_1.default.writeFile(node_path_1.default.join(outputPath, fullOutputPath), file.contents);
+        await promises_1.default.writeFile(node_path_1.default.join(base, destPath), file.contents);
     });
     if (assetFiles?.length) {
         await emitFilesToDisk(assetFiles, async ({ source, destination }) => {
+            const destPath = node_path_1.default.join(browser, destination);
             // Ensure output subdirectories exist
-            const destPath = (0, node_path_1.join)('browser', destination);
-            const basePath = node_path_1.default.dirname(destPath);
-            await ensureDirectoryExists(basePath);
+            await ensureDirectoryExists(destPath);
             // Copy file contents
-            await promises_1.default.copyFile(source, node_path_1.default.join(outputPath, destPath), node_fs_1.constants.COPYFILE_FICLONE);
+            await promises_1.default.copyFile(source, node_path_1.default.join(base, destPath), node_fs_1.constants.COPYFILE_FICLONE);
         });
     }
 }
@@ -235,9 +226,6 @@ function createOutputFileFromText(path, text, type) {
         get contents() {
             return Buffer.from(this.text, 'utf-8');
         },
-        get fullOutputPath() {
-            return getFullOutputPath(this);
-        },
         clone() {
             return createOutputFileFromText(this.path, this.text, this.type);
         },
@@ -257,9 +245,6 @@ function createOutputFileFromData(path, data, type) {
         get contents() {
             return data;
         },
-        get fullOutputPath() {
-            return getFullOutputPath(this);
-        },
         clone() {
             return createOutputFileFromData(this.path, this.contents, this.type);
         },
@@ -276,27 +261,12 @@ function convertOutputFile(file, type) {
         get text() {
             return Buffer.from(this.contents.buffer, this.contents.byteOffset, this.contents.byteLength).toString('utf-8');
         },
-        get fullOutputPath() {
-            return getFullOutputPath(this);
-        },
         clone() {
             return convertOutputFile(this, this.type);
         },
     };
 }
 exports.convertOutputFile = convertOutputFile;
-function getFullOutputPath(file) {
-    switch (file.type) {
-        case bundler_context_1.BuildOutputFileType.Browser:
-        case bundler_context_1.BuildOutputFileType.Media:
-            return (0, node_path_1.join)('browser', file.path);
-        case bundler_context_1.BuildOutputFileType.Server:
-            return (0, node_path_1.join)('server', file.path);
-        default:
-            return file.path;
-    }
-}
-exports.getFullOutputPath = getFullOutputPath;
 /**
  * Transform browserlists result to esbuild target.
  * @see https://esbuild.github.io/api/#target
