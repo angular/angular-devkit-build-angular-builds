@@ -8,8 +8,13 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import { I18nOptions } from '../../utils/i18n-options';
+import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { Schema as ApplicationBuilderOptions, I18NTranslation } from './schema';
 export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+export interface ApplicationBuilderExtensions {
+    codePlugins?: Plugin[];
+    indexHtmlTransformer?: IndexHtmlTransform;
+}
 /** Internal options hidden from builder schema but available when invoked programmatically. */
 interface InternalOptions {
     /**
@@ -51,7 +56,7 @@ export type ApplicationBuilderInternalOptions = Omit<ApplicationBuilderOptions &
  * @param plugins An optional array of programmatically supplied build plugins.
  * @returns An object containing normalized options required to perform the build.
  */
-export declare function normalizeOptions(context: BuilderContext, projectName: string, options: ApplicationBuilderInternalOptions, plugins?: Plugin[]): Promise<{
+export declare function normalizeOptions(context: BuilderContext, projectName: string, options: ApplicationBuilderInternalOptions, extensions?: ApplicationBuilderExtensions): Promise<{
     advancedOptimizations: boolean;
     allowedCommonJsDependencies: string[] | undefined;
     baseHref: string | undefined;
@@ -114,6 +119,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
         input: string;
         output: string;
         insertionOrder: import("../../utils/package-chunk-sort").EntryPointsType[];
+        transformer: IndexHtmlTransform | undefined;
     } | undefined;
     tailwindConfiguration: {
         file: string;

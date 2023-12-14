@@ -17,7 +17,7 @@ const execute_build_1 = require("./execute-build");
 const options_1 = require("./options");
 async function* buildApplicationInternal(options, 
 // TODO: Integrate abort signal support into builder system
-context, infrastructureSettings, plugins) {
+context, infrastructureSettings, extensions) {
     // Check Angular version.
     (0, version_1.assertCompatibleAngularVersion)(context.workspaceRoot);
     // Purge old build disk cache.
@@ -28,7 +28,7 @@ context, infrastructureSettings, plugins) {
         context.logger.error(`The 'application' builder requires a target to be specified.`);
         return;
     }
-    const normalizedOptions = await (0, options_1.normalizeOptions)(context, projectName, options, plugins);
+    const normalizedOptions = await (0, options_1.normalizeOptions)(context, projectName, options, extensions);
     // Setup an abort controller with a builder teardown if no signal is present
     let signal = context.signal;
     if (!signal) {
@@ -65,22 +65,14 @@ context, infrastructureSettings, plugins) {
     });
 }
 exports.buildApplicationInternal = buildApplicationInternal;
-/**
- * Builds an application using the `application` builder with the provided
- * options.
- *
- * Usage of the `plugins` parameter is NOT supported and may cause unexpected
- * build output or build failures.
- *
- * @experimental Direct usage of this function is considered experimental.
- *
- * @param options The options defined by the builder's schema to use.
- * @param context An Architect builder context instance.
- * @param plugins An array of plugins to apply to the main code bundling.
- * @returns The build output results of the build.
- */
-function buildApplication(options, context, plugins) {
-    return buildApplicationInternal(options, context, undefined, plugins);
+function buildApplication(options, context, pluginsOrExtensions) {
+    let extensions;
+    if (pluginsOrExtensions && Array.isArray(pluginsOrExtensions)) {
+        extensions = {
+            codePlugins: pluginsOrExtensions,
+        };
+    }
+    return buildApplicationInternal(options, context, undefined, extensions);
 }
 exports.buildApplication = buildApplication;
 exports.default = (0, architect_1.createBuilder)(buildApplication);

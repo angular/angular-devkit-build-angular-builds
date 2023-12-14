@@ -37,7 +37,7 @@ async function* buildEsbuildBrowser(userOptions, context, infrastructureSettings
     }
     for await (const result of (0, application_1.buildApplicationInternal)(normalizedOptions, context, {
         write: false,
-    }, plugins)) {
+    }, plugins && { codePlugins: plugins })) {
         if (infrastructureSettings?.write !== false && result.outputFiles) {
             // Write output files
             await writeResultFiles(result.outputFiles, result.assetFiles, fullOutputPath);

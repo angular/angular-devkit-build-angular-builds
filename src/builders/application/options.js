@@ -35,7 +35,7 @@ const schema_1 = require("./schema");
  * @returns An object containing normalized options required to perform the build.
  */
 // eslint-disable-next-line max-lines-per-function
-async function normalizeOptions(context, projectName, options, plugins) {
+async function normalizeOptions(context, projectName, options, extensions) {
     // If not explicitly set, default to the Node.js process argument
     const preserveSymlinks = options.preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks');
     // Setup base paths based on workspace root and project information
@@ -144,6 +144,7 @@ async function normalizeOptions(context, projectName, options, plugins) {
                 scripts: options.scripts ?? [],
                 styles: options.styles ?? [],
             }),
+            transformer: extensions?.indexHtmlTransformer,
         };
     }
     let serverEntryPoint;
@@ -225,7 +226,7 @@ async function normalizeOptions(context, projectName, options, plugins) {
         namedChunks,
         budgets: budgets?.length ? budgets : undefined,
         publicPath: deployUrl ? deployUrl : undefined,
-        plugins: plugins?.length ? plugins : undefined,
+        plugins: extensions?.codePlugins?.length ? extensions?.codePlugins : undefined,
         loaderExtensions,
     };
 }

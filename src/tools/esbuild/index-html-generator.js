@@ -87,6 +87,7 @@ async function generateIndexHtml(initialFiles, outputFiles, buildOptions, lang) 
         },
         crossOrigin: crossOrigin,
         deployUrl: buildOptions.publicPath,
+        postTransform: indexHtmlOptions.transformer,
     });
     indexHtmlGenerator.readAsset = readAsset;
     const transformResult = await indexHtmlGenerator.process({
@@ -110,6 +111,7 @@ async function generateIndexHtml(initialFiles, outputFiles, buildOptions, lang) 
     const { InlineCriticalCssProcessor } = await Promise.resolve().then(() => __importStar(require('../../utils/index-file/inline-critical-css')));
     const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
         minify: false, // CSS has already been minified during the build.
+        deployUrl: buildOptions.publicPath,
         readAsset,
     });
     const { content, errors, warnings } = await inlineCriticalCssProcessor.process(contentWithoutCriticalCssInlined, {
