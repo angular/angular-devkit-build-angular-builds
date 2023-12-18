@@ -45,7 +45,7 @@ async function generateIndexHtml(initialFiles, outputFiles, buildOptions, lang) 
     const hints = [];
     const { indexHtmlOptions, externalPackages, optimizationOptions, crossOrigin, subresourceIntegrity, baseHref, } = buildOptions;
     (0, node_assert_1.default)(indexHtmlOptions, 'indexHtmlOptions cannot be undefined.');
-    if (!externalPackages) {
+    if (!externalPackages && indexHtmlOptions.preloadInitial) {
         for (const [key, value] of initialFiles) {
             if (value.entrypoint) {
                 // Entry points are already referenced in the HTML

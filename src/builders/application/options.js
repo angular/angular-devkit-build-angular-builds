@@ -134,6 +134,8 @@ async function normalizeOptions(context, projectName, options, extensions) {
                 styles: options.styles ?? [],
             }),
             transformer: extensions?.indexHtmlTransformer,
+            // Preload initial defaults to true
+            preloadInitial: typeof options.index !== 'object' || (options.index.preloadInitial ?? true),
         };
     }
     let serverEntryPoint;

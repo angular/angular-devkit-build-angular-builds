@@ -290,6 +290,11 @@ export interface IndexObject {
      * will be used and will be considered relative to the application's configured output path.
      */
     output?: string;
+    /**
+     * Generates 'preload', `modulepreload', and 'preconnect' link elements for initial
+     * application files and resources.
+     */
+    preloadInitial?: boolean;
     [property: string]: any;
 }
 /**

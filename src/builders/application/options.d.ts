@@ -121,6 +121,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
         output: string;
         insertionOrder: import("../../utils/package-chunk-sort").EntryPointsType[];
         transformer: IndexHtmlTransform | undefined;
+        preloadInitial: boolean;
     } | undefined;
     tailwindConfiguration: {
         file: string;
