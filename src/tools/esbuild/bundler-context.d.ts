@@ -20,6 +20,7 @@ export type BundleContextResult = {
         server?: Set<string>;
         browser?: Set<string>;
     };
+    externalConfiguration?: string[];
 };
 export interface InitialFileRecord {
     entrypoint: boolean;

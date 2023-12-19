@@ -75,6 +75,7 @@ class BundlerContext {
         const externalImportsBrowser = new Set();
         const externalImportsServer = new Set();
         const outputFiles = [];
+        let externalConfiguration;
         for (const result of individualResults) {
             warnings.push(...result.warnings);
             if (result.errors) {
@@ -91,6 +92,12 @@ class BundlerContext {
             outputFiles.push(...result.outputFiles);
             result.externalImports.browser?.forEach((value) => externalImportsBrowser.add(value));
             result.externalImports.server?.forEach((value) => externalImportsServer.add(value));
+            if (result.externalConfiguration) {
+                externalConfiguration ??= new Set();
+                for (const value of result.externalConfiguration) {
+                    externalConfiguration.add(value);
+                }
+            }
         }
         if (errors !== undefined) {
             return { errors, warnings };
@@ -105,6 +112,7 @@ class BundlerContext {
                 browser: externalImportsBrowser,
                 server: externalImportsServer,
             },
+            externalConfiguration: externalConfiguration ? [...externalConfiguration] : undefined,
         };
     }
     /**
@@ -276,6 +284,7 @@ class BundlerContext {
             externalImports: {
                 [platformIsServer ? 'server' : 'browser']: externalImports,
             },
+            externalConfiguration: this.#esbuildOptions.external,
             errors: undefined,
         };
     }

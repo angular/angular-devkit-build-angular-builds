@@ -121,14 +121,10 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
         deferred?.();
     });
     const build = builderName === '@angular-devkit/build-angular:browser-esbuild'
-        ? browser_esbuild_1.buildEsbuildBrowser
-        : application_1.buildApplicationInternal;
+        ? browser_esbuild_1.buildEsbuildBrowser.bind(undefined, browserOptions, context, { write: false }, extensions?.buildPlugins)
+        : application_1.buildApplicationInternal.bind(undefined, browserOptions, context, { write: false }, { codePlugins: extensions?.buildPlugins });
     // TODO: Switch this to an architect schedule call when infrastructure settings are supported
-    for await (const result of build(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    browserOptions, context, {
-        write: false,
-    }, extensions?.buildPlugins)) {
+    for await (const result of build()) {
         (0, node_assert_1.default)(result.outputFiles, 'Builder did not provide result files.');
         // If build failed, nothing to serve
         if (!result.success) {

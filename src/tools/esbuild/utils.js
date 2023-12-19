@@ -16,13 +16,11 @@ const node_crypto_1 = require("node:crypto");
 const node_fs_1 = require("node:fs");
 const promises_1 = __importDefault(require("node:fs/promises"));
 const node_path_1 = __importDefault(require("node:path"));
-const node_util_1 = require("node:util");
 const node_zlib_1 = require("node:zlib");
 const semver_1 = require("semver");
 const spinner_1 = require("../../utils/spinner");
 const stats_1 = require("../webpack/utils/stats");
 const bundler_context_1 = require("./bundler-context");
-const compressAsync = (0, node_util_1.promisify)(node_zlib_1.brotliCompress);
 function logBuildStats(context, metafile, initial, budgetFailures, changedFiles, estimatedTransferSizes) {
     const stats = [];
     let unchangedCount = 0;
@@ -67,22 +65,41 @@ function logBuildStats(context, metafile, initial, budgetFailures, changedFiles,
 exports.logBuildStats = logBuildStats;
 async function calculateEstimatedTransferSizes(outputFiles) {
     const sizes = new Map();
-    const pendingCompression = [];
-    for (const outputFile of outputFiles) {
-        // Only calculate JavaScript and CSS files
-        if (!outputFile.path.endsWith('.js') && !outputFile.path.endsWith('.css')) {
-            continue;
-        }
-        // Skip compressing small files which may end being larger once compressed and will most likely not be
-        // compressed in actual transit.
-        if (outputFile.contents.byteLength < 1024) {
-            sizes.set(outputFile.path, outputFile.contents.byteLength);
-            continue;
-        }
-        pendingCompression.push(compressAsync(outputFile.contents).then((result) => sizes.set(outputFile.path, result.byteLength)));
+    if (outputFiles.length <= 0) {
+        return sizes;
     }
-    await Promise.all(pendingCompression);
-    return sizes;
+    return new Promise((resolve, reject) => {
+        let completeCount = 0;
+        for (const outputFile of outputFiles) {
+            // Only calculate JavaScript and CSS files
+            if (!outputFile.path.endsWith('.js') && !outputFile.path.endsWith('.css')) {
+                ++completeCount;
+                continue;
+            }
+            // Skip compressing small files which may end being larger once compressed and will most likely not be
+            // compressed in actual transit.
+            if (outputFile.contents.byteLength < 1024) {
+                sizes.set(outputFile.path, outputFile.contents.byteLength);
+                ++completeCount;
+                continue;
+            }
+            // Directly use the async callback function to minimize the number of Promises that need to be created.
+            (0, node_zlib_1.brotliCompress)(outputFile.contents, (error, result) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                sizes.set(outputFile.path, result.byteLength);
+                if (++completeCount >= outputFiles.length) {
+                    resolve(sizes);
+                }
+            });
+        }
+        // Covers the case where no files need to be compressed
+        if (completeCount >= outputFiles.length) {
+            resolve(sizes);
+        }
+    });
 }
 exports.calculateEstimatedTransferSizes = calculateEstimatedTransferSizes;
 async function withSpinner(text, action) {
