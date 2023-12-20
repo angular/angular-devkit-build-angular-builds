@@ -92,8 +92,8 @@ function setupJitPluginCallbacks(build, stylesheetBundler, additionalResultFiles
         else {
             stylesheetResult = await stylesheetBundler.bundleInline(entry.contents, entry.path, inlineStyleLanguage);
         }
-        const { contents, resourceFiles, errors, warnings, metafile, referencedFiles } = stylesheetResult;
-        additionalResultFiles.set(entry.path, { outputFiles: resourceFiles, metafile });
+        const { contents, outputFiles, errors, warnings, metafile, referencedFiles } = stylesheetResult;
+        additionalResultFiles.set(entry.path, { outputFiles, metafile });
         return {
             errors,
             warnings,

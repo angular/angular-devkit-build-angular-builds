@@ -26,9 +26,7 @@ export declare class ComponentStylesheetBundler {
         errors: import("esbuild").Message[] | undefined;
         warnings: import("esbuild").Message[];
         contents: string;
-        map: string | undefined;
-        path: string | undefined;
-        resourceFiles: OutputFile[];
+        outputFiles: OutputFile[];
         metafile: import("esbuild").Metafile | undefined;
         referencedFiles: Set<string> | undefined;
     }>;
@@ -36,12 +34,11 @@ export declare class ComponentStylesheetBundler {
         errors: import("esbuild").Message[] | undefined;
         warnings: import("esbuild").Message[];
         contents: string;
-        map: string | undefined;
-        path: string | undefined;
-        resourceFiles: OutputFile[];
+        outputFiles: OutputFile[];
         metafile: import("esbuild").Metafile | undefined;
         referencedFiles: Set<string> | undefined;
     }>;
     invalidate(files: Iterable<string>): void;
     dispose(): Promise<void>;
+    private extractResult;
 }

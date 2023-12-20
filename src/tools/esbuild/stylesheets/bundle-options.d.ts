@@ -13,7 +13,7 @@ export interface BundleStylesheetOptions {
     optimization: boolean;
     inlineFonts: boolean;
     preserveSymlinks?: boolean;
-    sourcemap: boolean | 'external' | 'inline';
+    sourcemap: boolean | 'external' | 'inline' | 'linked';
     outputNames: {
         bundles: string;
         media: string;

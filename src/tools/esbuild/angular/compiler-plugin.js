@@ -119,14 +119,14 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                         else {
                             stylesheetResult = await stylesheetBundler.bundleInline(data, containingFile, styleOptions.inlineStyleLanguage);
                         }
-                        const { contents, resourceFiles, referencedFiles, errors, warnings } = stylesheetResult;
+                        const { contents, outputFiles, metafile, referencedFiles, errors, warnings } = stylesheetResult;
                         if (errors) {
                             (result.errors ??= []).push(...errors);
                         }
                         (result.warnings ??= []).push(...warnings);
                         additionalResults.set(stylesheetFile ?? containingFile, {
-                            outputFiles: resourceFiles,
-                            metafile: stylesheetResult.metafile,
+                            outputFiles,
+                            metafile,
                         });
                         if (referencedFiles) {
                             referencedFileTracker.add(containingFile, referencedFiles);
