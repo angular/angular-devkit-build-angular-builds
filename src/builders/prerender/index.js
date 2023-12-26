@@ -93,6 +93,13 @@ async function _scheduleBuilds(options, context) {
         serviceWorker: false,
         // todo: handle service worker augmentation
     });
+    if (browserTargetRun.info.builderName === '@angular-devkit/build-angular:application') {
+        return {
+            success: false,
+            error: '"@angular-devkit/build-angular:application" has built-in prerendering capabilities. ' +
+                'The "prerender" option should be used instead.',
+        };
+    }
     const serverTargetRun = await context.scheduleTarget(serverTarget, {
         watch: false,
     });

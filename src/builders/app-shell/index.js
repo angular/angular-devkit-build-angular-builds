@@ -139,6 +139,13 @@ async function _appShellBuilder(options, context) {
         serviceWorker: false,
         optimization: optimization,
     });
+    if (browserTargetRun.info.builderName === '@angular-devkit/build-angular:application') {
+        return {
+            success: false,
+            error: '"@angular-devkit/build-angular:application" has built-in app-shell generation capabilities. ' +
+                'The "appShell" option should be used instead.',
+        };
+    }
     const serverTargetRun = await context.scheduleTarget(serverTarget, {
         watch: false,
     });
