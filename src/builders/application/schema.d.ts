@@ -291,7 +291,7 @@ export interface IndexObject {
      */
     output?: string;
     /**
-     * Generates 'preload', `modulepreload', and 'preconnect' link elements for initial
+     * Generates 'preload', 'modulepreload', and 'preconnect' link elements for initial
      * application files and resources.
      */
     preloadInitial?: boolean;
