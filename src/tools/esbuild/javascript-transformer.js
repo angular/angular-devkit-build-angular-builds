@@ -11,6 +11,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaScriptTransformer = void 0;
+const node_crypto_1 = require("node:crypto");
+const promises_1 = require("node:fs/promises");
 const piscina_1 = __importDefault(require("piscina"));
 /**
  * A class that performs transformation of JavaScript files and raw data.
@@ -21,11 +23,13 @@ const piscina_1 = __importDefault(require("piscina"));
  */
 class JavaScriptTransformer {
     maxThreads;
+    cache;
     #workerPool;
     #commonOptions;
-    #pendingfileResults;
-    constructor(options, maxThreads, reuseResults) {
+    #fileCacheKeyBase;
+    constructor(options, maxThreads, cache) {
         this.maxThreads = maxThreads;
+        this.cache = cache;
         // Extract options to ensure only the named options are serialized and sent to the worker
         const { sourcemap, thirdPartySourcemaps = false, advancedOptimizations = false, jit = false, } = options;
         this.#commonOptions = {
@@ -34,10 +38,7 @@ class JavaScriptTransformer {
             advancedOptimizations,
             jit,
         };
-        // Currently only tracks pending file transform results
-        if (reuseResults) {
-            this.#pendingfileResults = new Map();
-        }
+        this.#fileCacheKeyBase = Buffer.from(JSON.stringify(this.#commonOptions), 'utf-8');
     }
     #ensureWorkerPool() {
         this.#workerPool ??= new piscina_1.default({
@@ -57,21 +58,46 @@ class JavaScriptTransformer {
      * @param sideEffects If false, and `advancedOptimizations` is enabled tslib decorators are wrapped.
      * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
      */
-    transformFile(filename, skipLinker, sideEffects) {
-        const pendingKey = `${!!skipLinker}--${filename}`;
-        let pending = this.#pendingfileResults?.get(pendingKey);
-        if (pending === undefined) {
-            // Always send the request to a worker. Files are almost always from node modules which means
-            // they may need linking. The data is also not yet available to perform most transformation checks.
-            pending = this.#ensureWorkerPool().run({
+    async transformFile(filename, skipLinker, sideEffects) {
+        const data = await (0, promises_1.readFile)(filename);
+        let result;
+        let cacheKey;
+        if (this.cache) {
+            // Create a cache key from the file data and options that effect the output.
+            // NOTE: If additional options are added, this may need to be updated.
+            // TODO: Consider xxhash or similar instead of SHA256
+            const hash = (0, node_crypto_1.createHash)('sha256');
+            hash.update(`${!!skipLinker}--${!!sideEffects}`);
+            hash.update(data);
+            hash.update(this.#fileCacheKeyBase);
+            cacheKey = hash.digest('hex');
+            try {
+                result = await this.cache?.get(cacheKey);
+            }
+            catch {
+                // Failure to get the value should not fail the transform
+            }
+        }
+        if (result === undefined) {
+            // If there is no cache or no cached entry, process the file
+            result = (await this.#ensureWorkerPool().run({
                 filename,
+                data,
                 skipLinker,
                 sideEffects,
                 ...this.#commonOptions,
-            });
-            this.#pendingfileResults?.set(pendingKey, pending);
+            }, { transferList: [data.buffer] }));
+            // If there is a cache then store the result
+            if (this.cache && cacheKey) {
+                try {
+                    await this.cache.put(cacheKey, result);
+                }
+                catch {
+                    // Failure to store the value in the cache should not fail the transform
+                }
+            }
         }
-        return pending;
+        return result;
     }
     /**
      * Performs JavaScript transformations on the provided data of a file. The file does not need
@@ -103,7 +129,6 @@ class JavaScriptTransformer {
      * @returns A void promise that resolves when closing is complete.
      */
     async close() {
-        this.#pendingfileResults?.clear();
         if (this.#workerPool) {
             try {
                 await this.#workerPool.destroy();

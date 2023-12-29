@@ -29,19 +29,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@babel/core");
-const promises_1 = require("node:fs/promises");
+const piscina_1 = __importDefault(require("piscina"));
 const application_1 = __importStar(require("../../tools/babel/presets/application"));
 const load_esm_1 = require("../../utils/load-esm");
+const textDecoder = new TextDecoder();
+const textEncoder = new TextEncoder();
 async function transformJavaScript(request) {
-    request.data ??= await (0, promises_1.readFile)(request.filename, 'utf-8');
-    const transformedData = await transformWithBabel(request);
-    return Buffer.from(transformedData, 'utf-8');
+    const { filename, data, ...options } = request;
+    const textData = typeof data === 'string' ? data : textDecoder.decode(data);
+    const transformedData = await transformWithBabel(filename, textData, options);
+    // Transfer the data via `move` instead of cloning
+    return piscina_1.default.move(textEncoder.encode(transformedData));
 }
 exports.default = transformJavaScript;
 let linkerPluginCreator;
-async function transformWithBabel({ filename, data, ...options }) {
+async function transformWithBabel(filename, data, options) {
     const shouldLink = !options.skipLinker && (await (0, application_1.requiresLinking)(filename, data));
     const useInputSourcemap = options.sourcemap &&
         (!!options.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));

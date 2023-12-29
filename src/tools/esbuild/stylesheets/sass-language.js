@@ -33,6 +33,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SassStylesheetLanguage = exports.shutdownSassWorkerPool = void 0;
 const node_path_1 = require("node:path");
 const node_url_1 = require("node:url");
+const cache_1 = require("../cache");
 let sassWorkerPool;
 let sassWorkerPoolPromise;
 function isSassException(error) {
@@ -81,16 +82,6 @@ function parsePackageName(url) {
         },
     };
 }
-class Cache extends Map {
-    async getOrCreate(key, creator) {
-        let value = this.get(key);
-        if (value === undefined) {
-            value = await creator();
-            this.set(key, value);
-        }
-        return value;
-    }
-}
 async function compileString(data, filePath, syntax, options, resolveUrl) {
     // Lazily load Sass when a Sass file is found
     if (sassWorkerPool === undefined) {
@@ -105,8 +96,8 @@ async function compileString(data, filePath, syntax, options, resolveUrl) {
     // A null value indicates that the cached resolution attempt failed to find a location and
     // later stage resolution should be attempted. This avoids potentially expensive repeat
     // failing resolution attempts.
-    const resolutionCache = new Cache();
-    const packageRootCache = new Cache();
+    const resolutionCache = new cache_1.MemoryCache();
+    const packageRootCache = new cache_1.MemoryCache();
     const warnings = [];
     try {
         const { css, sourceMap, loadedUrls } = await sassWorkerPool.compileStringAsync(data, {

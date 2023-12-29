@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Cache } from './cache';
 /**
  * Transformation options that should apply to all transformed files and data.
  */
@@ -24,7 +25,8 @@ export interface JavaScriptTransformerOptions {
 export declare class JavaScriptTransformer {
     #private;
     readonly maxThreads: number;
-    constructor(options: JavaScriptTransformerOptions, maxThreads: number, reuseResults?: boolean);
+    private readonly cache?;
+    constructor(options: JavaScriptTransformerOptions, maxThreads: number, cache?: Cache<Uint8Array, import("./cache").CacheStore<Uint8Array>> | undefined);
     /**
      * Performs JavaScript transformations on a file from the filesystem.
      * If no transformations are required, the data for the original file will be returned.
