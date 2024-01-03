@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import fastGlob from 'fast-glob';
-import { JestBuilderOptions } from './options';
 /**
  * Finds all test files in the project.
  *
@@ -16,4 +15,4 @@ import { JestBuilderOptions } from './options';
  *     testing purposes.
  * @returns A set of all test files in the project.
  */
-export declare function findTestFiles(options: JestBuilderOptions, workspaceRoot: string, glob?: typeof fastGlob): Promise<Set<string>>;
+export declare function findTestFiles(include: string[], exclude: string[], workspaceRoot: string, glob?: typeof fastGlob): Promise<Set<string>>;

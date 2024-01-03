@@ -35,10 +35,10 @@ const child_process_1 = require("child_process");
 const path = __importStar(require("path"));
 const util_1 = require("util");
 const color_1 = require("../../utils/color");
+const test_files_1 = require("../../utils/test-files");
 const application_1 = require("../application");
 const schema_1 = require("../browser-esbuild/schema");
 const options_1 = require("./options");
-const test_files_1 = require("./test-files");
 const execFile = (0, util_1.promisify)(child_process_1.execFile);
 /** Main execution function for the Jest builder. */
 exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
@@ -66,7 +66,7 @@ exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
         };
     }
     // Build all the test files.
-    const testFiles = await (0, test_files_1.findTestFiles)(options, context.workspaceRoot);
+    const testFiles = await (0, test_files_1.findTestFiles)(options.include, options.exclude, context.workspaceRoot);
     const jestGlobal = path.join(__dirname, 'jest-global.mjs');
     const initTestBed = path.join(__dirname, 'init-test-bed.mjs');
     const buildResult = await build(context, {
