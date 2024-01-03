@@ -615,6 +615,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
         }
         else {
             const { default: basicSslPlugin } = await Promise.resolve().then(() => __importStar(require('@vitejs/plugin-basic-ssl')));
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
             configuration.plugins ??= [];
             configuration.plugins.push(basicSslPlugin());
         }
