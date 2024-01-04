@@ -284,9 +284,10 @@ function normalizeEntryPoints(workspaceRoot, browser, entryPoints = new Set()) {
             const entryPointName = node_path_1.default.isAbsolute(entryPoint)
                 ? parsedEntryPoint.name
                 : node_path_1.default.join(parsedEntryPoint.dir, parsedEntryPoint.name);
-            // Get the full file path to a relative entry point input. Leave bare specifiers alone so they are resolved as modules.
-            const isRelativePath = entryPoint.startsWith('.');
-            const entryPointPath = isRelativePath ? node_path_1.default.join(workspaceRoot, entryPoint) : entryPoint;
+            // Get the full file path to the entry point input.
+            const entryPointPath = node_path_1.default.isAbsolute(entryPoint)
+                ? entryPoint
+                : node_path_1.default.join(workspaceRoot, entryPoint);
             // Check for conflicts with previous entry points.
             const existingEntryPointPath = entryPointPaths[entryPointName];
             if (existingEntryPointPath) {
