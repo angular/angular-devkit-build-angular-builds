@@ -97,7 +97,6 @@ function extractZoneTesting(polyfills) {
 async function runTests(wtr, testDir, options) {
     const testPagePath = node_path_1.default.resolve(__dirname, 'test_page.html');
     const testPage = await node_fs_1.promises.readFile(testPagePath, 'utf8');
-    console.error(`CHROME_PATH: ${process.env.CHROME_PATH}`); // DEBUG
     const runner = await wtr.startTestRunner({
         config: {
             rootDir: testDir,
