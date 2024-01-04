@@ -41,7 +41,7 @@ exports.default = (0, architect_1.createBuilder)(async (schema, ctx) => {
     // Parallelize startup work.
     const [testFiles] = await Promise.all([
         // Glob for files to test.
-        (0, test_files_1.findTestFiles)(options.include, options.exclude, ctx.workspaceRoot).then((files) => Array.from(files).map((file) => node_path_1.default.relative(process.cwd(), file))),
+        (0, test_files_1.findTestFiles)(options.include, options.exclude, ctx.workspaceRoot),
         // Clean build output path.
         node_fs_1.promises.rm(testDir, { recursive: true, force: true }),
     ]);
