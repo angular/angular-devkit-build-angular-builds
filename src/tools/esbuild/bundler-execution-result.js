@@ -19,6 +19,7 @@ class ExecutionResult {
     outputFiles = [];
     assetFiles = [];
     errors = [];
+    warnings = [];
     externalMetadata;
     constructor(rebuildContexts, codeBundleCache) {
         this.rebuildContexts = rebuildContexts;
@@ -30,8 +31,31 @@ class ExecutionResult {
     addAssets(assets) {
         this.assetFiles.push(...assets);
     }
+    addError(error) {
+        if (typeof error === 'string') {
+            this.errors.push({ text: error, location: null });
+        }
+        else {
+            this.errors.push(error);
+        }
+    }
     addErrors(errors) {
-        this.errors.push(...errors);
+        for (const error of errors) {
+            this.addError(error);
+        }
+    }
+    addWarning(error) {
+        if (typeof error === 'string') {
+            this.warnings.push({ text: error, location: null });
+        }
+        else {
+            this.warnings.push(error);
+        }
+    }
+    addWarnings(errors) {
+        for (const error of errors) {
+            this.addWarning(error);
+        }
     }
     /**
      * Add external JavaScript import metadata to the result. This is currently used
