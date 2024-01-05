@@ -33,11 +33,15 @@ export declare class ExecutionResult {
     outputFiles: BuildOutputFile[];
     assetFiles: BuildOutputAsset[];
     errors: (Message | PartialMessage)[];
+    warnings: (Message | PartialMessage)[];
     externalMetadata?: ExternalResultMetadata;
     constructor(rebuildContexts: BundlerContext[], codeBundleCache?: SourceFileCache | undefined);
     addOutputFile(path: string, content: string, type: BuildOutputFileType): void;
     addAssets(assets: BuildOutputAsset[]): void;
-    addErrors(errors: (Message | PartialMessage)[]): void;
+    addError(error: PartialMessage | string): void;
+    addErrors(errors: (PartialMessage | string)[]): void;
+    addWarning(error: PartialMessage | string): void;
+    addWarnings(errors: (PartialMessage | string)[]): void;
     /**
      * Add external JavaScript import metadata to the result. This is currently used
      * by the development server to optimize the prebundling process.
