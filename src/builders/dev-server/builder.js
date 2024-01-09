@@ -57,18 +57,11 @@ function execute(options, context, transforms = {}, extensions) {
         context.logger.error(`The 'dev-server' builder requires a target to be specified.`);
         return rxjs_1.EMPTY;
     }
-    return (0, rxjs_1.defer)(() => initialize(options, projectName, context)).pipe((0, rxjs_1.switchMap)(({ builderName, normalizedOptions }) => {
+    return (0, rxjs_1.defer)(() => initialize(options, projectName, context, extensions?.builderSelector)).pipe((0, rxjs_1.switchMap)(({ builderName, normalizedOptions }) => {
         // Use vite-based development server for esbuild-based builds
-        if (builderName === '@angular-devkit/build-angular:application' ||
-            builderName === '@angular-devkit/build-angular:browser-esbuild' ||
-            normalizedOptions.forceEsbuild) {
+        if (isEsbuildBased(builderName)) {
             if (transforms?.logging || transforms?.webpackConfiguration) {
                 throw new Error('The `application` and `browser-esbuild` builders do not support Webpack transforms.');
-            }
-            if (normalizedOptions.forceEsbuild &&
-                builderName === '@angular-devkit/build-angular:browser') {
-                // The compatibility builder should be used if esbuild is force enabled with the official Webpack-based builder.
-                builderName = '@angular-devkit/build-angular:browser-esbuild';
             }
             return (0, rxjs_1.defer)(() => Promise.resolve().then(() => __importStar(require('./vite-server')))).pipe((0, rxjs_1.switchMap)(({ serveWithVite }) => serveWithVite(normalizedOptions, builderName, context, transforms, extensions)));
         }
@@ -83,7 +76,7 @@ function execute(options, context, transforms = {}, extensions) {
     }));
 }
 exports.execute = execute;
-async function initialize(initialOptions, projectName, context) {
+async function initialize(initialOptions, projectName, context, builderSelector = defaultBuilderSelector) {
     // Purge old build disk cache.
     await (0, purge_cache_1.purgeStaleBuildCache)(context);
     const normalizedOptions = await (0, options_1.normalizeOptions)(context, projectName, initialOptions);
@@ -105,10 +98,30 @@ case.
         context.logger.warn('Warning: Running a server with --disable-host-check is a security risk. ' +
             'See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a for more information.');
     }
-    if (normalizedOptions.forceEsbuild && !builderName.startsWith('@angular-devkit/build-angular:')) {
-        context.logger.warn('Warning: Forcing the use of the esbuild-based build system with third-party builders' +
-            ' may cause unexpected behavior and/or build failures.');
-    }
     normalizedOptions.port = await (0, check_port_1.checkPort)(normalizedOptions.port, normalizedOptions.host);
-    return { builderName, normalizedOptions };
+    return {
+        builderName: builderSelector({ builderName, forceEsbuild: !!normalizedOptions.forceEsbuild }, context.logger),
+        normalizedOptions,
+    };
+}
+function isEsbuildBased(builderName) {
+    if (builderName === '@angular-devkit/build-angular:application' ||
+        builderName === '@angular-devkit/build-angular:browser-esbuild') {
+        return true;
+    }
+    return false;
+}
+function defaultBuilderSelector(info, logger) {
+    if (isEsbuildBased(info.builderName)) {
+        return info.builderName;
+    }
+    if (info.forceEsbuild) {
+        if (!info.builderName.startsWith('@angular-devkit/build-angular:')) {
+            logger.warn('Warning: Forcing the use of the esbuild-based build system with third-party builders' +
+                ' may cause unexpected behavior and/or build failures.');
+        }
+        // The compatibility builder should be used if esbuild is force enabled.
+        return '@angular-devkit/build-angular:browser-esbuild';
+    }
+    return info.builderName;
 }
