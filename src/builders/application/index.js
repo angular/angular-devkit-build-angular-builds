@@ -92,6 +92,9 @@ function buildApplication(options, context, pluginsOrExtensions) {
             codePlugins: pluginsOrExtensions,
         };
     }
+    else {
+        extensions = pluginsOrExtensions;
+    }
     return buildApplicationInternal(options, context, undefined, extensions);
 }
 exports.buildApplication = buildApplication;

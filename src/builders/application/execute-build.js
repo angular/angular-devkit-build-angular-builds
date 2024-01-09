@@ -9,13 +9,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.executeBuild = void 0;
 const source_file_cache_1 = require("../../tools/esbuild/angular/source-file-cache");
-const application_code_bundle_1 = require("../../tools/esbuild/application-code-bundle");
 const budget_stats_1 = require("../../tools/esbuild/budget-stats");
 const bundler_context_1 = require("../../tools/esbuild/bundler-context");
 const bundler_execution_result_1 = require("../../tools/esbuild/bundler-execution-result");
 const commonjs_checker_1 = require("../../tools/esbuild/commonjs-checker");
-const global_scripts_1 = require("../../tools/esbuild/global-scripts");
-const global_styles_1 = require("../../tools/esbuild/global-styles");
 const license_extractor_1 = require("../../tools/esbuild/license-extractor");
 const utils_1 = require("../../tools/esbuild/utils");
 const bundle_calculator_1 = require("../../utils/bundle-calculator");
@@ -24,11 +21,11 @@ const copy_assets_1 = require("../../utils/copy-assets");
 const supported_browsers_1 = require("../../utils/supported-browsers");
 const execute_post_bundle_1 = require("./execute-post-bundle");
 const i18n_1 = require("./i18n");
-// eslint-disable-next-line max-lines-per-function
+const setup_bundling_1 = require("./setup-bundling");
 async function executeBuild(options, context, rebuildState) {
-    const { projectRoot, workspaceRoot, i18nOptions, optimizationOptions, serverEntryPoint, assets, cacheOptions, prerenderOptions, appShellOptions, ssrOptions, } = options;
+    const { projectRoot, workspaceRoot, i18nOptions, optimizationOptions, assets, cacheOptions, prerenderOptions, } = options;
+    // TODO: Consider integrating into watch mode. Would require full rebuild on target changes.
     const browsers = (0, supported_browsers_1.getSupportedBrowsers)(projectRoot, context.logger);
-    const target = (0, utils_1.transformSupportedBrowsersToTargets)(browsers);
     // Load active translations if inlining
     // TODO: Integrate into watch mode and only load changed translations
     if (i18nOptions.shouldInline) {
@@ -39,53 +36,11 @@ async function executeBuild(options, context, rebuildState) {
     const codeBundleCache = rebuildState?.codeBundleCache ??
         new source_file_cache_1.SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
     if (bundlerContexts === undefined) {
-        bundlerContexts = [];
-        // Browser application code
-        bundlerContexts.push(new bundler_context_1.BundlerContext(workspaceRoot, !!options.watch, (0, application_code_bundle_1.createBrowserCodeBundleOptions)(options, target, codeBundleCache)));
-        // Browser polyfills code
-        const browserPolyfillBundleOptions = (0, application_code_bundle_1.createBrowserPolyfillBundleOptions)(options, target, codeBundleCache);
-        if (browserPolyfillBundleOptions) {
-            bundlerContexts.push(new bundler_context_1.BundlerContext(workspaceRoot, !!options.watch, browserPolyfillBundleOptions));
-        }
-        // Global Stylesheets
-        if (options.globalStyles.length > 0) {
-            for (const initial of [true, false]) {
-                const bundleOptions = (0, global_styles_1.createGlobalStylesBundleOptions)(options, target, initial);
-                if (bundleOptions) {
-                    bundlerContexts.push(new bundler_context_1.BundlerContext(workspaceRoot, !!options.watch, bundleOptions, () => initial));
-                }
-            }
-        }
-        // Global Scripts
-        if (options.globalScripts.length > 0) {
-            for (const initial of [true, false]) {
-                const bundleOptions = (0, global_scripts_1.createGlobalScriptsBundleOptions)(options, target, initial);
-                if (bundleOptions) {
-                    bundlerContexts.push(new bundler_context_1.BundlerContext(workspaceRoot, !!options.watch, bundleOptions, () => initial));
-                }
-            }
-        }
-        // Skip server build when none of the features are enabled.
-        if (serverEntryPoint && (prerenderOptions || appShellOptions || ssrOptions)) {
-            const nodeTargets = [...target, ...(0, utils_1.getSupportedNodeTargets)()];
-            // Server application code
-            bundlerContexts.push(new bundler_context_1.BundlerContext(workspaceRoot, !!options.watch, (0, application_code_bundle_1.createServerCodeBundleOptions)({
-                ...options,
-                // Disable external deps for server bundles.
-                // This is because it breaks Vite 'optimizeDeps' for SSR.
-                externalPackages: false,
-            }, nodeTargets, codeBundleCache), () => false));
-            // Server polyfills code
-            const serverPolyfillBundleOptions = (0, application_code_bundle_1.createServerPolyfillBundleOptions)(options, nodeTargets, codeBundleCache);
-            if (serverPolyfillBundleOptions) {
-                bundlerContexts.push(new bundler_context_1.BundlerContext(workspaceRoot, !!options.watch, serverPolyfillBundleOptions, () => false));
-            }
-        }
+        bundlerContexts = (0, setup_bundling_1.setupBundlerContexts)(options, browsers, codeBundleCache);
     }
     const bundlingResult = await bundler_context_1.BundlerContext.bundleAll(bundlerContexts, rebuildState?.fileChanges.all);
-    // Log all warnings and errors generated during bundling
-    await (0, utils_1.logMessages)(context, bundlingResult);
     const executionResult = new bundler_execution_result_1.ExecutionResult(bundlerContexts, codeBundleCache);
+    executionResult.addWarnings(bundlingResult.warnings);
     // Return if the bundling has errors
     if (bundlingResult.errors) {
         executionResult.addErrors(bundlingResult.errors);
@@ -169,8 +124,7 @@ async function executeBuild(options, context, rebuildState) {
         }
         context.logger.info(color_1.colors.magenta(prerenderMsg) + '\n');
     }
-    (0, utils_1.logBuildStats)(context, metafile, initialFiles, budgetFailures, changedFiles, estimatedTransferSizes);
-    await (0, utils_1.logMessages)(context, executionResult);
+    (0, utils_1.logBuildStats)(context.logger, metafile, initialFiles, budgetFailures, changedFiles, estimatedTransferSizes);
     // Write metafile if stats option is enabled
     if (options.stats) {
         executionResult.addOutputFile('stats.json', JSON.stringify(metafile, null, 2), bundler_context_1.BuildOutputFileType.Root);

@@ -21,7 +21,7 @@ const semver_1 = require("semver");
 const spinner_1 = require("../../utils/spinner");
 const stats_1 = require("../webpack/utils/stats");
 const bundler_context_1 = require("./bundler-context");
-function logBuildStats(context, metafile, initial, budgetFailures, changedFiles, estimatedTransferSizes) {
+function logBuildStats(logger, metafile, initial, budgetFailures, changedFiles, estimatedTransferSizes) {
     const stats = [];
     let unchangedCount = 0;
     for (const [file, output] of Object.entries(metafile.outputs)) {
@@ -53,13 +53,13 @@ function logBuildStats(context, metafile, initial, budgetFailures, changedFiles,
     }
     if (stats.length > 0) {
         const tableText = (0, stats_1.generateBuildStatsTable)(stats, true, unchangedCount === 0, !!estimatedTransferSizes, budgetFailures);
-        context.logger.info('\n' + tableText + '\n');
+        logger.info('\n' + tableText + '\n');
     }
     else if (changedFiles !== undefined) {
-        context.logger.info('\nNo output file changes.\n');
+        logger.info('\nNo output file changes.\n');
     }
     if (unchangedCount > 0) {
-        context.logger.info(`Unchanged output files: ${unchangedCount}`);
+        logger.info(`Unchanged output files: ${unchangedCount}`);
     }
 }
 exports.logBuildStats = logBuildStats;
@@ -117,14 +117,14 @@ async function withNoProgress(text, action) {
     return action();
 }
 exports.withNoProgress = withNoProgress;
-async function logMessages(context, { errors, warnings }) {
+async function logMessages(logger, { errors, warnings }) {
     if (warnings?.length) {
         const warningMessages = await (0, esbuild_1.formatMessages)(warnings, { kind: 'warning', color: true });
-        context.logger.warn(warningMessages.join('\n'));
+        logger.warn(warningMessages.join('\n'));
     }
     if (errors?.length) {
         const errorMessages = await (0, esbuild_1.formatMessages)(errors, { kind: 'error', color: true });
-        context.logger.error(errorMessages.join('\n'));
+        logger.error(errorMessages.join('\n'));
     }
 }
 exports.logMessages = logMessages;

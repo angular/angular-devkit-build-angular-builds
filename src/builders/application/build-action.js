@@ -52,7 +52,10 @@ async function* runEsBuildBuildAction(action, options) {
     // Initial build
     let result;
     try {
+        // Perform the build action
         result = await withProgress('Building...', () => action());
+        // Log all diagnostic (error/warning) messages from the build
+        await (0, utils_1.logMessages)(logger, result);
     }
     finally {
         // Ensure Sass workers are shutdown if not watching
@@ -139,6 +142,8 @@ async function* runEsBuildBuildAction(action, options) {
                 logger.info(changes.toDebugString());
             }
             result = await withProgress('Changes detected. Rebuilding...', () => action(result.createRebuildState(changes)));
+            // Log all diagnostic (error/warning) messages from the rebuild
+            await (0, utils_1.logMessages)(logger, result);
             // Update watched locations provided by the new build result.
             // Keep watching all previous files if there are any errors; otherwise consider all
             // files stale until confirmed present in the new result's watch files.
