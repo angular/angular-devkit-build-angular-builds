@@ -38,4 +38,10 @@ export declare function execute(options: DevServerBuilderOptions, context: Build
 }, extensions?: {
     buildPlugins?: Plugin[];
     middleware?: ((req: http.IncomingMessage, res: http.ServerResponse, next: (err?: unknown) => void) => void)[];
+    builderSelector?: (info: BuilderSelectorInfo, logger: BuilderContext['logger']) => string;
 }): Observable<DevServerBuilderOutput>;
+interface BuilderSelectorInfo {
+    builderName: string;
+    forceEsbuild: boolean;
+}
+export {};
