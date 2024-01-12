@@ -30,8 +30,9 @@ async function normalizeOptions(context, projectName, options) {
     const workspaceRoot = context.workspaceRoot;
     const projectMetadata = await context.getProjectMetadata(projectName);
     const projectRoot = node_path_1.default.join(workspaceRoot, projectMetadata.root ?? '');
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const buildTarget = (0, architect_1.targetFromTargetString)(options.buildTarget ?? options.browserTarget);
+    // Target specifier defaults to the current project's build target with no specified configuration
+    const buildTargetSpecifier = options.buildTarget ?? options.browserTarget ?? ':';
+    const buildTarget = (0, architect_1.targetFromTargetString)(buildTargetSpecifier, projectName, 'build');
     const i18nOptions = (0, i18n_options_1.createI18nOptions)(projectMetadata);
     // Normalize xliff format extensions
     let format = options.format;
