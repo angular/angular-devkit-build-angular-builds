@@ -361,6 +361,10 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
             open: serverOptions.open,
             headers: serverOptions.headers,
             proxy,
+            cors: {
+                // Allow preflight requests to be proxied.
+                preflightContinue: true,
+            },
             // File watching is handled by the build directly. `null` disables file watching for Vite.
             watch: null,
             fs: {
