@@ -51,15 +51,21 @@ class JitCompilation extends angular_compilation_1.AngularCompilation {
             .map((sourceFile) => sourceFile.fileName);
         return { affectedFiles, compilerOptions, referencedFiles };
     }
-    *collectDiagnostics() {
+    *collectDiagnostics(modes) {
         (0, node_assert_1.default)(this.#state, 'Compilation must be initialized prior to collecting diagnostics.');
         const { typeScriptProgram } = this.#state;
         // Collect program level diagnostics
-        yield* typeScriptProgram.getConfigFileParsingDiagnostics();
-        yield* typeScriptProgram.getOptionsDiagnostics();
-        yield* typeScriptProgram.getGlobalDiagnostics();
-        yield* (0, profiling_1.profileSync)('NG_DIAGNOSTICS_SYNTACTIC', () => typeScriptProgram.getSyntacticDiagnostics());
-        yield* (0, profiling_1.profileSync)('NG_DIAGNOSTICS_SEMANTIC', () => typeScriptProgram.getSemanticDiagnostics());
+        if (modes & angular_compilation_1.DiagnosticModes.Option) {
+            yield* typeScriptProgram.getConfigFileParsingDiagnostics();
+            yield* typeScriptProgram.getOptionsDiagnostics();
+        }
+        if (modes & angular_compilation_1.DiagnosticModes.Syntactic) {
+            yield* typeScriptProgram.getGlobalDiagnostics();
+            yield* (0, profiling_1.profileSync)('NG_DIAGNOSTICS_SYNTACTIC', () => typeScriptProgram.getSyntacticDiagnostics());
+        }
+        if (modes & angular_compilation_1.DiagnosticModes.Semantic) {
+            yield* (0, profiling_1.profileSync)('NG_DIAGNOSTICS_SEMANTIC', () => typeScriptProgram.getSemanticDiagnostics());
+        }
     }
     emitAffectedFiles() {
         (0, node_assert_1.default)(this.#state, 'Compilation must be initialized prior to emitting files.');

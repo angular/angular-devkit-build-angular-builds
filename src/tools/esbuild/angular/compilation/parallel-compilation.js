@@ -106,8 +106,8 @@ class ParallelCompilation extends angular_compilation_1.AngularCompilation {
     collectDiagnostics() {
         throw new Error('Not implemented in ParallelCompilation.');
     }
-    diagnoseFiles() {
-        return this.#worker.run(undefined, { name: 'diagnose' });
+    diagnoseFiles(modes = angular_compilation_1.DiagnosticModes.All) {
+        return this.#worker.run(modes, { name: 'diagnose' });
     }
     emitAffectedFiles() {
         return this.#worker.run(undefined, { name: 'emit' });

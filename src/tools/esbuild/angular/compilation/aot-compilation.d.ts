@@ -8,7 +8,7 @@
 import type ng from '@angular/compiler-cli';
 import ts from 'typescript';
 import { AngularHostOptions } from '../angular-host';
-import { AngularCompilation, EmitFileResult } from './angular-compilation';
+import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
 export declare class AotCompilation extends AngularCompilation {
     #private;
     initialize(tsconfig: string, hostOptions: AngularHostOptions, compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions): Promise<{
@@ -16,6 +16,6 @@ export declare class AotCompilation extends AngularCompilation {
         compilerOptions: ng.CompilerOptions;
         referencedFiles: readonly string[];
     }>;
-    collectDiagnostics(): Iterable<ts.Diagnostic>;
+    collectDiagnostics(modes: DiagnosticModes): Iterable<ts.Diagnostic>;
     emitAffectedFiles(): Iterable<EmitFileResult>;
 }

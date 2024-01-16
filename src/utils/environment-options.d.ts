@@ -13,3 +13,4 @@ export declare const useParallelTs: boolean;
 export declare const useLegacySass: boolean;
 export declare const debugPerformance: boolean;
 export declare const shouldWatchRoot: boolean;
+export declare const useTypeChecking: boolean;

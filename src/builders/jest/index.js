@@ -31,15 +31,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const architect_1 = require("@angular-devkit/architect");
-const child_process_1 = require("child_process");
-const path = __importStar(require("path"));
-const util_1 = require("util");
+const node_child_process_1 = require("node:child_process");
+const fs = __importStar(require("node:fs/promises"));
+const path = __importStar(require("node:path"));
+const node_util_1 = require("node:util");
 const color_1 = require("../../utils/color");
 const test_files_1 = require("../../utils/test-files");
 const application_1 = require("../application");
 const schema_1 = require("../browser-esbuild/schema");
 const options_1 = require("./options");
-const execFile = (0, util_1.promisify)(child_process_1.execFile);
+const execFile = (0, node_util_1.promisify)(node_child_process_1.execFile);
 /** Main execution function for the Jest builder. */
 exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
     context.logger.warn('NOTE: The Jest builder is currently EXPERIMENTAL and not ready for production use.');
@@ -65,8 +66,21 @@ exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
             error: '`jest-environment-jsdom` is not installed. Install it with `npm install jest-environment-jsdom --save-dev`.',
         };
     }
+    const [testFiles, customConfig] = await Promise.all([
+        (0, test_files_1.findTestFiles)(options.include, options.exclude, context.workspaceRoot),
+        findCustomJestConfig(context.workspaceRoot),
+    ]);
+    // Warn if a custom Jest configuration is found. We won't use it, so if a developer is trying to use a custom config, this hopefully
+    // makes a better experience than silently ignoring the configuration.
+    // Ideally, this would be a hard error. However a Jest config could exist for testing other files in the workspace outside of Angular
+    // CLI, so we likely can't produce a hard error in this situation without an opt-out.
+    if (customConfig) {
+        context.logger.warn('A custom Jest config was found, but this is not supported by `@angular-devkit/build-angular:jest` and will be' +
+            ` ignored: ${customConfig}. This is an experiment to see if completely abstracting away Jest's configuration is viable. Please` +
+            ` consider if your use case can be met without directly modifying the Jest config. If this is a major obstacle for your use` +
+            ` case, please post it in this issue so we can collect feedback and evaluate: https://github.com/angular/angular-cli/issues/25434.`);
+    }
     // Build all the test files.
-    const testFiles = await (0, test_files_1.findTestFiles)(options.include, options.exclude, context.workspaceRoot);
     const jestGlobal = path.join(__dirname, 'jest-global.mjs');
     const initTestBed = path.join(__dirname, 'init-test-bed.mjs');
     const buildResult = await build(context, {
@@ -94,6 +108,7 @@ exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
         '--experimental-vm-modules',
         jest,
         `--rootDir="${path.join(testOut, 'browser')}"`,
+        `--config=${path.join(__dirname, 'jest.config.mjs')}`,
         '--testEnvironment=jsdom',
         // TODO(dgp1130): Enable cache once we have a mechanism for properly clearing / disabling it.
         '--no-cache',
@@ -157,4 +172,28 @@ function resolveModule(module) {
     catch {
         return undefined;
     }
+}
+/** Returns whether or not the provided directory includes a Jest configuration file. */
+async function findCustomJestConfig(dir) {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    // Jest supports many file extensions (`js`, `ts`, `cjs`, `cts`, `json`, etc.) Just look
+    // for anything with that prefix.
+    const config = entries.find((entry) => entry.isFile() && entry.name.startsWith('jest.config.'));
+    if (config) {
+        return path.join(dir, config.name);
+    }
+    // Jest also supports a `jest` key in `package.json`, look for a config there.
+    const packageJsonPath = path.join(dir, 'package.json');
+    let packageJson;
+    try {
+        packageJson = await fs.readFile(packageJsonPath, 'utf8');
+    }
+    catch {
+        return undefined; // No package.json, therefore no Jest configuration in it.
+    }
+    const json = JSON.parse(packageJson);
+    if ('jest' in json) {
+        return packageJsonPath;
+    }
+    return undefined;
 }

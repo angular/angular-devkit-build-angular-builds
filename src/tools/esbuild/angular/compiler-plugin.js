@@ -195,13 +195,6 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                     hasCompilationErrors = await sharedTSCompilationState.waitUntilReady;
                     return result;
                 }
-                const diagnostics = await compilation.diagnoseFiles();
-                if (diagnostics.errors?.length) {
-                    (result.errors ??= []).push(...diagnostics.errors);
-                }
-                if (diagnostics.warnings?.length) {
-                    (result.warnings ??= []).push(...diagnostics.warnings);
-                }
                 // Update TypeScript file output cache for all affected files
                 try {
                     await (0, profiling_1.profileAsync)('NG_EMIT_TS', async () => {
@@ -221,6 +214,13 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                             },
                         ],
                     });
+                }
+                const diagnostics = await compilation.diagnoseFiles(environment_options_1.useTypeChecking ? compilation_1.DiagnosticModes.All : compilation_1.DiagnosticModes.All & ~compilation_1.DiagnosticModes.Semantic);
+                if (diagnostics.errors?.length) {
+                    (result.errors ??= []).push(...diagnostics.errors);
+                }
+                if (diagnostics.warnings?.length) {
+                    (result.warnings ??= []).push(...diagnostics.warnings);
                 }
                 // Add errors from failed additional results.
                 // This must be done after emit to capture latest web worker results.

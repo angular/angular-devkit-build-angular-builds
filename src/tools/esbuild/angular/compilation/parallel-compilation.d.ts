@@ -9,7 +9,7 @@ import type { CompilerOptions } from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import type { SourceFile } from 'typescript';
 import type { AngularHostOptions } from '../angular-host';
-import { AngularCompilation, EmitFileResult } from './angular-compilation';
+import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
 /**
  * An Angular compilation which uses a Node.js Worker thread to load and execute
  * the TypeScript and Angular compilers. This allows for longer synchronous actions
@@ -32,7 +32,7 @@ export declare class ParallelCompilation extends AngularCompilation {
      * with the serializable esbuild compatible diagnostics.
      */
     protected collectDiagnostics(): never;
-    diagnoseFiles(): Promise<{
+    diagnoseFiles(modes?: DiagnosticModes): Promise<{
         errors?: PartialMessage[];
         warnings?: PartialMessage[];
     }>;

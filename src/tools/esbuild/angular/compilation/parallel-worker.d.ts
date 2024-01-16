@@ -10,6 +10,7 @@
 /// <reference types="@types/node/ts4.8/worker_threads" />
 import type { PartialMessage } from 'esbuild';
 import { type MessagePort } from 'node:worker_threads';
+import type { DiagnosticModes } from './angular-compilation';
 export interface InitRequest {
     jit: boolean;
     tsconfig: string;
@@ -26,7 +27,7 @@ export declare function initialize(request: InitRequest): Promise<{
         allowJs: boolean | undefined;
     };
 }>;
-export declare function diagnose(): Promise<{
+export declare function diagnose(modes: DiagnosticModes): Promise<{
     errors?: PartialMessage[];
     warnings?: PartialMessage[];
 }>;

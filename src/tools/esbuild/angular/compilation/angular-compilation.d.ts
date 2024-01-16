@@ -14,6 +14,13 @@ export interface EmitFileResult {
     contents: string;
     dependencies?: readonly string[];
 }
+export declare enum DiagnosticModes {
+    None = 0,
+    Option = 1,
+    Syntactic = 2,
+    Semantic = 4,
+    All = 7
+}
 export declare abstract class AngularCompilation {
     #private;
     static loadCompilerCli(): Promise<typeof ng>;
@@ -25,8 +32,8 @@ export declare abstract class AngularCompilation {
         referencedFiles: readonly string[];
     }>;
     abstract emitAffectedFiles(): Iterable<EmitFileResult> | Promise<Iterable<EmitFileResult>>;
-    protected abstract collectDiagnostics(): Iterable<ts.Diagnostic> | Promise<Iterable<ts.Diagnostic>>;
-    diagnoseFiles(): Promise<{
+    protected abstract collectDiagnostics(modes: DiagnosticModes): Iterable<ts.Diagnostic> | Promise<Iterable<ts.Diagnostic>>;
+    diagnoseFiles(modes?: DiagnosticModes): Promise<{
         errors?: PartialMessage[];
         warnings?: PartialMessage[];
     }>;

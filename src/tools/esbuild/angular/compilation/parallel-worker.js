@@ -72,9 +72,9 @@ async function initialize(request) {
     };
 }
 exports.initialize = initialize;
-async function diagnose() {
+async function diagnose(modes) {
     (0, node_assert_1.default)(compilation);
-    const diagnostics = await compilation.diagnoseFiles();
+    const diagnostics = await compilation.diagnoseFiles(modes);
     return diagnostics;
 }
 exports.diagnose = diagnose;

@@ -30,10 +30,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AngularCompilation = void 0;
+exports.AngularCompilation = exports.DiagnosticModes = void 0;
 const load_esm_1 = require("../../../../utils/load-esm");
 const profiling_1 = require("../../profiling");
 const diagnostics_1 = require("../diagnostics");
+var DiagnosticModes;
+(function (DiagnosticModes) {
+    DiagnosticModes[DiagnosticModes["None"] = 0] = "None";
+    DiagnosticModes[DiagnosticModes["Option"] = 1] = "Option";
+    DiagnosticModes[DiagnosticModes["Syntactic"] = 2] = "Syntactic";
+    DiagnosticModes[DiagnosticModes["Semantic"] = 4] = "Semantic";
+    DiagnosticModes[DiagnosticModes["All"] = 7] = "All";
+})(DiagnosticModes || (exports.DiagnosticModes = DiagnosticModes = {}));
 class AngularCompilation {
     static #angularCompilerCliModule;
     static #typescriptModule;
@@ -64,13 +72,13 @@ class AngularCompilation {
             supportJitMode: false,
         }));
     }
-    async diagnoseFiles() {
+    async diagnoseFiles(modes = DiagnosticModes.All) {
         const result = {};
         // Avoid loading typescript until actually needed.
         // This allows for avoiding the load of typescript in the main thread when using the parallel compilation.
         const typescript = await AngularCompilation.loadTypescript();
         await (0, profiling_1.profileAsync)('NG_DIAGNOSTICS_TOTAL', async () => {
-            for (const diagnostic of await this.collectDiagnostics()) {
+            for (const diagnostic of await this.collectDiagnostics(modes)) {
                 const message = (0, diagnostics_1.convertTypeScriptDiagnostic)(typescript, diagnostic);
                 if (diagnostic.category === typescript.DiagnosticCategory.Error) {
                     (result.errors ??= []).push(message);
