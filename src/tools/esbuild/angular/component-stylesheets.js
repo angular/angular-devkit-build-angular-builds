@@ -110,17 +110,19 @@ class ComponentStylesheetBundler {
         if (!result.errors) {
             for (const outputFile of result.outputFiles) {
                 const filename = node_path_1.default.basename(outputFile.path);
-                // Needed for Bazel as otherwise the files will not be written in the correct place.
-                outputFile.path = node_path_1.default.join(this.options.workspaceRoot, outputFile.path);
-                if (outputFile.type === bundler_context_1.BuildOutputFileType.Media) {
-                    // The output files could also contain resources (images/fonts/etc.) that were referenced
-                    outputFiles.push(outputFile);
+                if (outputFile.type === bundler_context_1.BuildOutputFileType.Media || filename.endsWith('.css.map')) {
+                    // The output files could also contain resources (images/fonts/etc.) that were referenced and the map files.
+                    // Clone the output file to avoid amending the original path which would causes problems during rebuild.
+                    const clonedOutputFile = outputFile.clone();
+                    // Needed for Bazel as otherwise the files will not be written in the correct place,
+                    // this is because esbuild will resolve the output file from the outdir which is currently set to `workspaceRoot` twice,
+                    // once in the stylesheet and the other in the application code bundler.
+                    // Ex: `../../../../../app.component.css.map`.
+                    clonedOutputFile.path = node_path_1.default.join(this.options.workspaceRoot, outputFile.path);
+                    outputFiles.push(clonedOutputFile);
                 }
                 else if (filename.endsWith('.css')) {
                     contents = outputFile.text;
-                }
-                else if (filename.endsWith('.css.map')) {
-                    outputFiles.push(outputFile);
                 }
                 else {
                     throw new Error(`Unexpected non CSS/Media file "${filename}" outputted during component stylesheet processing.`);

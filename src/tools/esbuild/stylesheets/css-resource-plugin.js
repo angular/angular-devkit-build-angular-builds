@@ -11,6 +11,7 @@ exports.createCssResourcePlugin = void 0;
 const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
 const load_result_cache_1 = require("../load-result-cache");
+const CSS_RESOURCE_NAMESPACE = 'angular:css-resource';
 /**
  * Symbol marker used to indicate CSS resource resolution is being attempted.
  * This is used to prevent an infinite loop within the plugin's resolve hook.
@@ -89,10 +90,10 @@ function createCssResourcePlugin(cache) {
                     // Use a relative path to prevent fully resolved paths in the metafile (JSON stats file).
                     // This is only necessary for custom namespaces. esbuild will handle the file namespace.
                     path: (0, node_path_1.relative)(build.initialOptions.absWorkingDir ?? '', result.path),
-                    namespace: 'css-resource',
+                    namespace: CSS_RESOURCE_NAMESPACE,
                 };
             });
-            build.onLoad({ filter: /./, namespace: 'css-resource' }, (0, load_result_cache_1.createCachedLoad)(cache, async (args) => {
+            build.onLoad({ filter: /./, namespace: CSS_RESOURCE_NAMESPACE }, (0, load_result_cache_1.createCachedLoad)(cache, async (args) => {
                 const resourcePath = (0, node_path_1.join)(build.initialOptions.absWorkingDir ?? '', args.path);
                 return {
                     contents: await (0, promises_1.readFile)(resourcePath),

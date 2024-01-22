@@ -177,10 +177,12 @@ class BundlerContext {
             if (this.incremental) {
                 // When incremental always add any files from the load result cache
                 if (this.#loadCache) {
-                    this.#loadCache.watchFiles
-                        .filter((file) => !isInternalAngularFile(file))
-                        // watch files are fully resolved paths
-                        .forEach((file) => this.watchFiles.add(file));
+                    for (const file of this.#loadCache.watchFiles) {
+                        if (!isInternalAngularFile(file)) {
+                            // watch files are fully resolved paths
+                            this.watchFiles.add(file);
+                        }
+                    }
                 }
             }
         }
@@ -189,10 +191,12 @@ class BundlerContext {
         // currently enabled with watch mode where watch files are needed.
         if (this.incremental) {
             // Add input files except virtual angular files which do not exist on disk
-            Object.keys(result.metafile.inputs)
-                .filter((input) => !isInternalAngularFile(input))
-                // input file paths are always relative to the workspace root
-                .forEach((input) => this.watchFiles.add((0, node_path_1.join)(this.workspaceRoot, input)));
+            for (const input of Object.keys(result.metafile.inputs)) {
+                if (!isInternalAngularFile(input)) {
+                    // input file paths are always relative to the workspace root
+                    this.watchFiles.add((0, node_path_1.join)(this.workspaceRoot, input));
+                }
+            }
         }
         // Return if the build encountered any errors
         if (result.errors.length) {
