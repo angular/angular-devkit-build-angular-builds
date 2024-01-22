@@ -126,9 +126,9 @@ function createAngularMemoryPlugin(options) {
             return () => {
                 function angularSSRMiddleware(req, res, next) {
                     const url = req.originalUrl;
-                    if (
-                    // Skip if path is not defined.
-                    !url ||
+                    if (!req.url ||
+                        // Skip if path is not defined.
+                        !url ||
                         // Skip if path is like a file.
                         // NOTE: We use a regexp to mitigate against matching requests like: /browse/pl.0ef59752c0cd457dbf1391f08cbd936f
                         /^\.[a-z]{2,4}$/i.test((0, node_path_1.extname)(url.split('?')[0]))) {
@@ -140,7 +140,7 @@ function createAngularMemoryPlugin(options) {
                         next();
                         return;
                     }
-                    transformIndexHtmlAndAddHeaders(url, rawHtml, res, next, async (html) => {
+                    transformIndexHtmlAndAddHeaders(req.url, rawHtml, res, next, async (html) => {
                         const { content } = await (0, render_page_1.renderPage)({
                             document: html,
                             route: new URL(req.originalUrl ?? '/', server.resolvedUrls?.local[0]).toString(),
