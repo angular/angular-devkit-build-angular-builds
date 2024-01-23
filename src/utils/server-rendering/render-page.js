@@ -29,8 +29,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.renderPage = void 0;
+const node_assert_1 = __importDefault(require("node:assert"));
 const node_path_1 = require("node:path");
 const load_esm_1 = require("../load-esm");
 /**
@@ -65,6 +69,7 @@ async function renderPage({ route, serverContext, document, inlineCriticalCss, o
         },
     ];
     let html;
+    (0, node_assert_1.default)(bootstrapAppFnOrModule, 'The file "./main.server.mjs" does not have a default export for an AppServerModule or a bootstrapping function.');
     if (isBootstrapFn(bootstrapAppFnOrModule)) {
         html = await renderApplication(bootstrapAppFnOrModule, {
             document,
