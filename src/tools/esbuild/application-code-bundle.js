@@ -18,6 +18,7 @@ const node_path_1 = require("node:path");
 const environment_options_1 = require("../../utils/environment-options");
 const compiler_plugin_1 = require("./angular/compiler-plugin");
 const compiler_plugin_options_1 = require("./compiler-plugin-options");
+const external_packages_plugin_1 = require("./external-packages-plugin");
 const i18n_locale_plugin_1 = require("./i18n-locale-plugin");
 const rxjs_esm_resolution_plugin_1 = require("./rxjs-esm-resolution-plugin");
 const sourcemap_ignorelist_plugin_1 = require("./sourcemap-ignorelist-plugin");
@@ -47,11 +48,19 @@ function createBrowserCodeBundleOptions(options, target, sourceFileCache) {
             styleOptions),
         ],
     };
-    if (options.externalPackages) {
-        buildOptions.packages = 'external';
-    }
     if (options.plugins) {
         buildOptions.plugins?.push(...options.plugins);
+    }
+    if (options.externalPackages) {
+        // Package files affected by a customized loader should not be implicitly marked as external
+        if (options.loaderExtensions || options.plugins) {
+            // Plugin must be added after custom plugins to ensure any added loader options are considered
+            buildOptions.plugins?.push((0, external_packages_plugin_1.createExternalPackagesPlugin)());
+        }
+        else {
+            // Safe to use the packages external option directly
+            buildOptions.packages = 'external';
+        }
     }
     return buildOptions;
 }
