@@ -341,7 +341,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
         publicDir: false,
         esbuild: false,
         mode: 'development',
-        appType: 'spa',
+        appType: 'mpa',
         css: {
             devSourcemap: true,
         },
