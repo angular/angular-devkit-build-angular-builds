@@ -20,9 +20,11 @@ async function extractMessages(options, builderName, context, extractorConstruct
     // Setup the build options for the application based on the buildTarget option
     const buildOptions = (await context.validateOptions(await context.getTargetOptions(options.buildTarget), builderName));
     buildOptions.optimization = false;
-    buildOptions.sourceMap = { scripts: true, vendor: true };
+    buildOptions.sourceMap = { scripts: true, vendor: true, styles: false };
     buildOptions.localize = false;
     buildOptions.budgets = undefined;
+    buildOptions.index = false;
+    buildOptions.serviceWorker = false;
     let build;
     if (builderName === '@angular-devkit/build-angular:application') {
         build = application_1.buildApplicationInternal;
