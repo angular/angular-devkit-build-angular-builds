@@ -260,7 +260,9 @@ class BundlerContext {
         for (const { imports } of Object.values(result.metafile.outputs)) {
             for (const importData of imports) {
                 if (!importData.external ||
-                    (importData.kind !== 'import-statement' && importData.kind !== 'dynamic-import')) {
+                    (importData.kind !== 'import-statement' &&
+                        importData.kind !== 'dynamic-import' &&
+                        importData.kind !== 'require-call')) {
                     continue;
                 }
                 externalImports.add(importData.path);
