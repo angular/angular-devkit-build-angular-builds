@@ -35,9 +35,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.webpackStatsLogger = exports.generateBuildEventStats = exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.generateBuildStatsTable = exports.formatSize = void 0;
 const core_1 = require("@angular-devkit/core");
-const assert_1 = __importDefault(require("assert"));
-const path = __importStar(require("path"));
-const text_table_1 = __importDefault(require("text-table"));
+const node_assert_1 = __importDefault(require("node:assert"));
+const path = __importStar(require("node:path"));
 const utils_1 = require("../../../utils");
 const color_1 = require("../../../utils/color");
 const async_chunks_1 = require("./async-chunks");
@@ -55,8 +54,8 @@ function formatSize(size) {
 }
 exports.formatSize = formatSize;
 function getBuildDuration(webpackStats) {
-    (0, assert_1.default)(webpackStats.builtAt, 'buildAt cannot be undefined');
-    (0, assert_1.default)(webpackStats.time, 'time cannot be undefined');
+    (0, node_assert_1.default)(webpackStats.builtAt, 'buildAt cannot be undefined');
+    (0, node_assert_1.default)(webpackStats.time, 'time cannot be undefined');
     return Date.now() - webpackStats.builtAt + webpackStats.time;
 }
 function generateBundleStats(info) {
@@ -79,7 +78,6 @@ function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTrans
     const r = (x) => (colors ? color_1.colors.redBright(x) : x);
     const y = (x) => (colors ? color_1.colors.yellowBright(x) : x);
     const bold = (x) => (colors ? color_1.colors.bold(x) : x);
-    const dim = (x) => (colors ? color_1.colors.dim(x) : x);
     const getSizeColor = (name, file, defaultColor = c) => {
         const severity = budgets.get(name) || (file && budgets.get(file));
         switch (severity) {
@@ -187,13 +185,41 @@ function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTrans
     if (changedLazyChunksStats.length) {
         bundleInfo.push(['Lazy Chunk Files', ...baseTitles].map(bold), ...changedLazyChunksStats);
     }
-    return (0, text_table_1.default)(bundleInfo, {
-        hsep: dim(' | '),
-        stringLength: (s) => (0, color_1.removeColor)(s).length,
-        align: tableAlign,
-    });
+    return generateTableText(bundleInfo, colors);
 }
 exports.generateBuildStatsTable = generateBuildStatsTable;
+function generateTableText(bundleInfo, colors) {
+    const longest = [];
+    for (const item of bundleInfo) {
+        for (let i = 0; i < item.length; i++) {
+            if (item[i] === undefined) {
+                continue;
+            }
+            const currentItem = item[i].toString();
+            const currentLongest = (longest[i] ??= 0);
+            const currentItemLength = (0, color_1.removeColor)(currentItem).length;
+            if (currentLongest < currentItemLength) {
+                longest[i] = currentItemLength;
+            }
+        }
+    }
+    const seperator = colors ? color_1.colors.dim(' | ') : ' | ';
+    const outputTable = [];
+    for (const item of bundleInfo) {
+        for (let i = 0; i < longest.length; i++) {
+            if (item[i] === undefined) {
+                continue;
+            }
+            const currentItem = item[i].toString();
+            const currentItemLength = (0, color_1.removeColor)(currentItem).length;
+            const stringPad = ' '.repeat(longest[i] - currentItemLength);
+            // Last item is right aligned, thus we add the padding at the start.
+            item[i] = longest.length === i + 1 ? stringPad + currentItem : currentItem + stringPad;
+        }
+        outputTable.push(item.join(seperator));
+    }
+    return outputTable.join('\n');
+}
 function generateBuildStats(hash, time, colors) {
     const w = (x) => (colors ? color_1.colors.bold.white(x) : x);
     return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
