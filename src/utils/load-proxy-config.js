@@ -136,8 +136,8 @@ function normalizeProxyConfiguration(proxy) {
     // TODO: Consider upstreaming glob support
     for (const key of Object.keys(normalizedProxy)) {
         if ((0, fast_glob_1.isDynamicPattern)(key)) {
-            const { output } = (0, picomatch_1.parse)(key);
-            normalizedProxy[`^${output}$`] = normalizedProxy[key];
+            const pattern = (0, picomatch_1.makeRe)(key).source;
+            normalizedProxy[pattern] = normalizedProxy[key];
             delete normalizedProxy[key];
         }
     }
