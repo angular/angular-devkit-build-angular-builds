@@ -70,7 +70,7 @@ async function normalizeOptions(context, projectName, options, extensions) {
         server: 'server',
         media: 'media',
         ...(typeof outputPath === 'string' ? undefined : outputPath),
-        base: normalizeDirectoryPath(node_path_1.default.join(workspaceRoot, typeof outputPath === 'string' ? outputPath : outputPath.base)),
+        base: normalizeDirectoryPath(node_path_1.default.resolve(workspaceRoot, typeof outputPath === 'string' ? outputPath : outputPath.base)),
     };
     const outputNames = {
         bundles: options.outputHashing === schema_1.OutputHashing.All || options.outputHashing === schema_1.OutputHashing.Bundles
