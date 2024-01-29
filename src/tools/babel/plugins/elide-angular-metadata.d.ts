@@ -7,7 +7,7 @@
  */
 /// <reference path="../../../../../../../../../../packages/angular_devkit/build_angular/src/babel-bazel.d.ts" />
 /// <reference types="@angular/compiler-cli/private/babel" />
-import { PluginObj } from '@babel/core';
+import type { PluginObj } from '@babel/core';
 /**
  * Provides one or more keywords that if found within the content of a source file indicate
  * that this plugin should be used with a source file.

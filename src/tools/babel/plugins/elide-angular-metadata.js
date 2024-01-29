@@ -8,7 +8,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getKeywords = void 0;
-const core_1 = require("@babel/core");
 /**
  * The name of the Angular class metadata function created by the Angular compiler.
  */
@@ -28,9 +27,18 @@ const SET_CLASS_DEBUG_INFO_NAME = 'ɵsetClassDebugInfo';
  * @returns An a string iterable containing one or more keywords.
  */
 function getKeywords() {
-    return [SET_CLASS_METADATA_NAME, SET_CLASS_METADATA_ASYNC_NAME, SET_CLASS_DEBUG_INFO_NAME];
+    return Object.keys(angularMetadataFunctions);
 }
 exports.getKeywords = getKeywords;
+/**
+ * An object map of function names and related value checks for discovery of Angular generated
+ * metadata calls.
+ */
+const angularMetadataFunctions = {
+    [SET_CLASS_METADATA_NAME]: isSetClassMetadataCall,
+    [SET_CLASS_METADATA_ASYNC_NAME]: isSetClassMetadataAsyncCall,
+    [SET_CLASS_DEBUG_INFO_NAME]: isSetClassDebugInfoCall,
+};
 /**
  * A babel plugin factory function for eliding the Angular class metadata function (`ɵsetClassMetadata`).
  *
@@ -40,20 +48,23 @@ function default_1() {
     return {
         visitor: {
             CallExpression(path) {
-                const callee = path.node.callee;
-                const callArguments = path.node.arguments;
+                const callee = path.get('callee');
                 // The function being called must be the metadata function name
                 let calleeName;
-                if (core_1.types.isMemberExpression(callee) && core_1.types.isIdentifier(callee.property)) {
-                    calleeName = callee.property.name;
+                if (callee.isMemberExpression()) {
+                    const calleeProperty = callee.get('property');
+                    if (calleeProperty.isIdentifier()) {
+                        calleeName = calleeProperty.node.name;
+                    }
                 }
-                else if (core_1.types.isIdentifier(callee)) {
-                    calleeName = callee.name;
+                else if (callee.isIdentifier()) {
+                    calleeName = callee.node.name;
                 }
-                if (calleeName !== undefined &&
-                    (isRemoveClassMetadataCall(calleeName, callArguments) ||
-                        isRemoveClassmetadataAsyncCall(calleeName, callArguments) ||
-                        isSetClassDebugInfoCall(calleeName, callArguments))) {
+                if (!calleeName) {
+                    return;
+                }
+                if (Object.hasOwn(angularMetadataFunctions, calleeName) &&
+                    angularMetadataFunctions[calleeName](path.get('arguments'))) {
                     // The metadata function is always emitted inside a function expression
                     const parent = path.getFunctionParent();
                     if (parent && (parent.isFunctionExpression() || parent.isArrowFunctionExpression())) {
@@ -68,35 +79,32 @@ function default_1() {
 }
 exports.default = default_1;
 /** Determines if a function call is a call to `setClassMetadata`. */
-function isRemoveClassMetadataCall(name, args) {
+function isSetClassMetadataCall(callArguments) {
     // `setClassMetadata` calls have to meet the following criteria:
     // * First must be an identifier
     // * Second must be an array literal
-    return (name === SET_CLASS_METADATA_NAME &&
-        args.length === 4 &&
-        core_1.types.isIdentifier(args[0]) &&
-        core_1.types.isArrayExpression(args[1]));
+    return (callArguments.length === 4 &&
+        callArguments[0].isIdentifier() &&
+        callArguments[1].isArrayExpression());
 }
 /** Determines if a function call is a call to `setClassMetadataAsync`. */
-function isRemoveClassmetadataAsyncCall(name, args) {
+function isSetClassMetadataAsyncCall(callArguments) {
     // `setClassMetadataAsync` calls have to meet the following criteria:
     // * First argument must be an identifier.
     // * Second argument must be an inline function.
     // * Third argument must be an inline function.
-    return (name === SET_CLASS_METADATA_ASYNC_NAME &&
-        args.length === 3 &&
-        core_1.types.isIdentifier(args[0]) &&
-        isInlineFunction(args[1]) &&
-        isInlineFunction(args[2]));
+    return (callArguments.length === 3 &&
+        callArguments[0].isIdentifier() &&
+        isInlineFunction(callArguments[1]) &&
+        isInlineFunction(callArguments[2]));
 }
 /** Determines if a function call is a call to `setClassDebugInfo`. */
-function isSetClassDebugInfoCall(name, args) {
-    return (name === SET_CLASS_DEBUG_INFO_NAME &&
-        args.length === 2 &&
-        core_1.types.isIdentifier(args[0]) &&
-        core_1.types.isObjectExpression(args[1]));
+function isSetClassDebugInfoCall(callArguments) {
+    return (callArguments.length === 2 &&
+        callArguments[0].isIdentifier() &&
+        callArguments[1].isObjectExpression());
 }
 /** Determines if a node is an inline function expression. */
-function isInlineFunction(node) {
-    return core_1.types.isFunctionExpression(node) || core_1.types.isArrowFunctionExpression(node);
+function isInlineFunction(path) {
+    return path.isFunctionExpression() || path.isArrowFunctionExpression();
 }

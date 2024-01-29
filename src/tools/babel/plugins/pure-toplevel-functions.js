@@ -33,7 +33,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@babel/core");
 const helper_annotate_as_pure_1 = __importDefault(require("@babel/helper-annotate-as-pure"));
 const tslib = __importStar(require("tslib"));
 /**
@@ -67,14 +66,14 @@ function default_1() {
                 if (path.getFunctionParent()) {
                     return;
                 }
-                const callee = path.node.callee;
-                if ((core_1.types.isFunctionExpression(callee) || core_1.types.isArrowFunctionExpression(callee)) &&
+                const callee = path.get('callee');
+                if ((callee.isFunctionExpression() || callee.isArrowFunctionExpression()) &&
                     path.node.arguments.length !== 0) {
                     return;
                 }
                 // Do not annotate TypeScript helpers emitted by the TypeScript compiler.
                 // TypeScript helpers are intended to cause side effects.
-                if (core_1.types.isIdentifier(callee) && isTslibHelperName(callee.name)) {
+                if (callee.isIdentifier() && isTslibHelperName(callee.node.name)) {
                     return;
                 }
                 (0, helper_annotate_as_pure_1.default)(path);

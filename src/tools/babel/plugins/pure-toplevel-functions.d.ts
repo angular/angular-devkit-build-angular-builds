@@ -7,7 +7,7 @@
  */
 /// <reference path="../../../../../../../../../../packages/angular_devkit/build_angular/src/babel-bazel.d.ts" />
 /// <reference types="@angular/compiler-cli/private/babel" />
-import { PluginObj } from '@babel/core';
+import type { PluginObj } from '@babel/core';
 /**
  * A babel plugin factory function for adding the PURE annotation to top-level new and call expressions.
  *
