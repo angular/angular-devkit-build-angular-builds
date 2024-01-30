@@ -11,7 +11,7 @@ import { NormalizedOutputOptions } from '../../builders/application/options';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
 import { BuildOutputAsset } from './bundler-execution-result';
-export declare function logBuildStats(logger: logging.LoggerApi, metafile: Metafile, initial: Map<string, InitialFileRecord>, budgetFailures: BudgetCalculatorResult[] | undefined, changedFiles?: Set<string>, estimatedTransferSizes?: Map<string, number>): void;
+export declare function logBuildStats(logger: logging.LoggerApi, metafile: Metafile, initial: Map<string, InitialFileRecord>, budgetFailures: BudgetCalculatorResult[] | undefined, changedFiles?: Set<string>, estimatedTransferSizes?: Map<string, number>, ssrOutputEnabled?: boolean, verbose?: boolean): void;
 export declare function calculateEstimatedTransferSizes(outputFiles: OutputFile[]): Promise<Map<string, number>>;
 export declare function withSpinner<T>(text: string, action: () => T | Promise<T>): Promise<T>;
 export declare function withNoProgress<T>(text: string, action: () => T | Promise<T>): Promise<T>;

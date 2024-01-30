@@ -23,7 +23,7 @@ const execute_post_bundle_1 = require("./execute-post-bundle");
 const i18n_1 = require("./i18n");
 const setup_bundling_1 = require("./setup-bundling");
 async function executeBuild(options, context, rebuildState) {
-    const { projectRoot, workspaceRoot, i18nOptions, optimizationOptions, assets, cacheOptions, prerenderOptions, } = options;
+    const { projectRoot, workspaceRoot, i18nOptions, optimizationOptions, assets, cacheOptions, prerenderOptions, ssrOptions, verbose, } = options;
     // TODO: Consider integrating into watch mode. Would require full rebuild on target changes.
     const browsers = (0, supported_browsers_1.getSupportedBrowsers)(projectRoot, context.logger);
     // Load active translations if inlining
@@ -124,7 +124,7 @@ async function executeBuild(options, context, rebuildState) {
         }
         context.logger.info(color_1.colors.magenta(prerenderMsg) + '\n');
     }
-    (0, utils_1.logBuildStats)(context.logger, metafile, initialFiles, budgetFailures, changedFiles, estimatedTransferSizes);
+    (0, utils_1.logBuildStats)(context.logger, metafile, initialFiles, budgetFailures, changedFiles, estimatedTransferSizes, !!ssrOptions, verbose);
     // Write metafile if stats option is enabled
     if (options.stats) {
         executionResult.addOutputFile('stats.json', JSON.stringify(metafile, null, 2), bundler_context_1.BuildOutputFileType.Root);

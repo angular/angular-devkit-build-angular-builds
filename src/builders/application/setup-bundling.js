@@ -59,11 +59,11 @@ function setupBundlerContexts(options, browsers, codeBundleCache) {
             // Disable external deps for server bundles.
             // This is because it breaks Vite 'optimizeDeps' for SSR.
             externalPackages: false,
-        }, nodeTargets, codeBundleCache), () => false));
+        }, nodeTargets, codeBundleCache)));
         // Server polyfills code
         const serverPolyfillBundleOptions = (0, application_code_bundle_1.createServerPolyfillBundleOptions)(options, nodeTargets, codeBundleCache);
         if (serverPolyfillBundleOptions) {
-            bundlerContexts.push(new bundler_context_1.BundlerContext(workspaceRoot, !!options.watch, serverPolyfillBundleOptions, () => false));
+            bundlerContexts.push(new bundler_context_1.BundlerContext(workspaceRoot, !!options.watch, serverPolyfillBundleOptions));
         }
     }
     return bundlerContexts;

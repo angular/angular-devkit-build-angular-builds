@@ -22,6 +22,7 @@ export interface BundleStats {
     initial: boolean;
     stats: BundleStatsData;
 }
+export declare function generateEsbuildBuildStatsTable([browserStats, serverStats]: [browserStats: BundleStats[], serverStats: BundleStats[]], colors: boolean, showTotalSize: boolean, showEstimatedTransferSize: boolean, budgetFailures?: BudgetCalculatorResult[], verbose?: boolean): string;
 export declare function generateBuildStatsTable(data: BundleStats[], colors: boolean, showTotalSize: boolean, showEstimatedTransferSize: boolean, budgetFailures?: BudgetCalculatorResult[]): string;
 export declare function statsWarningsToString(json: StatsCompilation, statsConfig: WebpackStatsOptions): string;
 export declare function statsErrorsToString(json: StatsCompilation, statsConfig: WebpackStatsOptions): string;

@@ -33,8 +33,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.webpackStatsLogger = exports.generateBuildEventStats = exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.generateBuildStatsTable = exports.formatSize = void 0;
-const core_1 = require("@angular-devkit/core");
+exports.webpackStatsLogger = exports.generateBuildEventStats = exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.generateBuildStatsTable = exports.generateEsbuildBuildStatsTable = exports.formatSize = void 0;
 const node_assert_1 = __importDefault(require("node:assert"));
 const path = __importStar(require("node:path"));
 const utils_1 = require("../../../utils");
@@ -72,12 +71,35 @@ function generateBundleStats(info) {
         stats: [files, names, rawSize, estimatedTransferSize],
     };
 }
+function generateEsbuildBuildStatsTable([browserStats, serverStats], colors, showTotalSize, showEstimatedTransferSize, budgetFailures, verbose) {
+    const bundleInfo = generateBuildStatsData(browserStats, colors, showTotalSize, showEstimatedTransferSize, budgetFailures, verbose);
+    if (serverStats.length) {
+        const m = (x) => (colors ? color_1.colors.magenta(x) : x);
+        if (browserStats.length) {
+            bundleInfo.unshift([m('Browser bundles')]);
+            // Add seperators between browser and server logs
+            bundleInfo.push([], []);
+        }
+        bundleInfo.push([m('Server bundles')], ...generateBuildStatsData(serverStats, colors, false, false, undefined, verbose));
+    }
+    return generateTableText(bundleInfo, colors);
+}
+exports.generateEsbuildBuildStatsTable = generateEsbuildBuildStatsTable;
 function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTransferSize, budgetFailures) {
-    const g = (x) => (colors ? color_1.colors.greenBright(x) : x);
-    const c = (x) => (colors ? color_1.colors.cyanBright(x) : x);
+    const bundleInfo = generateBuildStatsData(data, colors, showTotalSize, showEstimatedTransferSize, budgetFailures, true);
+    return generateTableText(bundleInfo, colors);
+}
+exports.generateBuildStatsTable = generateBuildStatsTable;
+function generateBuildStatsData(data, colors, showTotalSize, showEstimatedTransferSize, budgetFailures, verbose) {
+    if (data.length === 0) {
+        return [];
+    }
+    const g = (x) => (colors ? color_1.colors.green(x) : x);
+    const c = (x) => (colors ? color_1.colors.cyan(x) : x);
     const r = (x) => (colors ? color_1.colors.redBright(x) : x);
     const y = (x) => (colors ? color_1.colors.yellowBright(x) : x);
     const bold = (x) => (colors ? color_1.colors.bold(x) : x);
+    const dim = (x) => (colors ? color_1.colors.dim(x) : x);
     const getSizeColor = (name, file, defaultColor = c) => {
         const severity = budgets.get(name) || (file && budgets.get(file));
         switch (severity) {
@@ -92,7 +114,9 @@ function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTrans
     const changedEntryChunksStats = [];
     const changedLazyChunksStats = [];
     let initialTotalRawSize = 0;
+    let changedLazyChunksCount = 0;
     let initialTotalEstimatedTransferSize;
+    const maxLazyChunksWithoutBudgetFailures = 15;
     const budgets = new Map();
     if (budgetFailures) {
         for (const { label, severity } of budgetFailures) {
@@ -115,12 +139,21 @@ function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTrans
     });
     for (const { initial, stats } of data) {
         const [files, names, rawSize, estimatedTransferSize] = stats;
+        if (!initial &&
+            !verbose &&
+            changedLazyChunksStats.length >= maxLazyChunksWithoutBudgetFailures &&
+            !budgets.has(names) &&
+            !budgets.has(files)) {
+            // Limit the number of lazy chunks displayed in the stats table when there is no budget failure and not in verbose mode.
+            changedLazyChunksCount++;
+            continue;
+        }
         const getRawSizeColor = getSizeColor(names, files);
         let data;
         if (showEstimatedTransferSize) {
             data = [
                 g(files),
-                names,
+                dim(names),
                 getRawSizeColor(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
                 c(typeof estimatedTransferSize === 'number'
                     ? formatSize(estimatedTransferSize)
@@ -130,7 +163,7 @@ function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTrans
         else {
             data = [
                 g(files),
-                names,
+                dim(names),
                 getRawSizeColor(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
                 '',
             ];
@@ -149,24 +182,22 @@ function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTrans
         }
         else {
             changedLazyChunksStats.push(data);
+            changedLazyChunksCount++;
         }
     }
     const bundleInfo = [];
-    const baseTitles = ['Names', 'Raw Size'];
-    const tableAlign = ['l', 'l', 'r'];
+    const baseTitles = ['Names', 'Raw size'];
     if (showEstimatedTransferSize) {
-        baseTitles.push('Estimated Transfer Size');
-        tableAlign.push('r');
+        baseTitles.push('Estimated transfer size');
     }
     // Entry chunks
     if (changedEntryChunksStats.length) {
-        bundleInfo.push(['Initial Chunk Files', ...baseTitles].map(bold), ...changedEntryChunksStats);
+        bundleInfo.push(['Initial chunk files', ...baseTitles].map(bold), ...changedEntryChunksStats);
         if (showTotalSize) {
-            bundleInfo.push([]);
             const initialSizeTotalColor = getSizeColor('bundle initial', undefined, (x) => x);
             const totalSizeElements = [
                 ' ',
-                'Initial Total',
+                'Initial total',
                 initialSizeTotalColor(formatSize(initialTotalRawSize)),
             ];
             if (showEstimatedTransferSize) {
@@ -174,7 +205,7 @@ function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTrans
                     ? formatSize(initialTotalEstimatedTransferSize)
                     : '-');
             }
-            bundleInfo.push(totalSizeElements.map(bold));
+            bundleInfo.push([], totalSizeElements.map(bold));
         }
     }
     // Seperator
@@ -183,12 +214,18 @@ function generateBuildStatsTable(data, colors, showTotalSize, showEstimatedTrans
     }
     // Lazy chunks
     if (changedLazyChunksStats.length) {
-        bundleInfo.push(['Lazy Chunk Files', ...baseTitles].map(bold), ...changedLazyChunksStats);
+        bundleInfo.push(['Lazy chunk files', ...baseTitles].map(bold), ...changedLazyChunksStats);
+        if (changedLazyChunksCount > changedLazyChunksStats.length) {
+            bundleInfo.push([
+                dim(`...and ${changedLazyChunksCount - changedLazyChunksStats.length} more lazy chunks files. ` +
+                    'Use "--verbose" to show all the files.'),
+            ]);
+        }
     }
-    return generateTableText(bundleInfo, colors);
+    return bundleInfo;
 }
-exports.generateBuildStatsTable = generateBuildStatsTable;
 function generateTableText(bundleInfo, colors) {
+    const skipText = (value) => value.includes('...and ');
     const longest = [];
     for (const item of bundleInfo) {
         for (let i = 0; i < item.length; i++) {
@@ -196,6 +233,9 @@ function generateTableText(bundleInfo, colors) {
                 continue;
             }
             const currentItem = item[i].toString();
+            if (skipText(currentItem)) {
+                continue;
+            }
             const currentLongest = (longest[i] ??= 0);
             const currentItemLength = (0, color_1.removeColor)(currentItem).length;
             if (currentLongest < currentItemLength) {
@@ -211,18 +251,17 @@ function generateTableText(bundleInfo, colors) {
                 continue;
             }
             const currentItem = item[i].toString();
+            if (skipText(currentItem)) {
+                continue;
+            }
             const currentItemLength = (0, color_1.removeColor)(currentItem).length;
             const stringPad = ' '.repeat(longest[i] - currentItemLength);
-            // Last item is right aligned, thus we add the padding at the start.
-            item[i] = longest.length === i + 1 ? stringPad + currentItem : currentItem + stringPad;
+            // Values in columns at index 2 and 3 (Raw and Estimated sizes) are always right aligned.
+            item[i] = i >= 2 ? stringPad + currentItem : currentItem + stringPad;
         }
         outputTable.push(item.join(seperator));
     }
     return outputTable.join('\n');
-}
-function generateBuildStats(hash, time, colors) {
-    const w = (x) => (colors ? color_1.colors.bold.white(x) : x);
-    return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
 }
 // We use this cache because we can have multiple builders running in the same process,
 // where each builder has different output path.
@@ -236,6 +275,7 @@ statsConfig, budgetFailures) {
     }
     const colors = statsConfig.colors;
     const rs = (x) => (colors ? color_1.colors.reset(x) : x);
+    const w = (x) => (colors ? color_1.colors.bold.white(x) : x);
     const changedChunksStats = [];
     let unchangedChunkNumber = 0;
     let hasEstimatedTransferSizes = false;
@@ -273,24 +313,9 @@ statsConfig, budgetFailures) {
     // Such us index generation, service worker augmentation etc...
     // This will correct the time and include these.
     const time = getBuildDuration(json);
-    if (unchangedChunkNumber > 0) {
-        return ('\n' +
-            rs(core_1.tags.stripIndents `
-      ${statsTable}
-
-      ${unchangedChunkNumber} unchanged chunks
-
-      ${generateBuildStats(json.hash || '', time, colors)}
-      `));
-    }
-    else {
-        return ('\n' +
-            rs(core_1.tags.stripIndents `
-      ${statsTable}
-
-      ${generateBuildStats(json.hash || '', time, colors)}
-      `));
-    }
+    return rs(`\n${statsTable}\n\n` +
+        (unchangedChunkNumber > 0 ? `${unchangedChunkNumber} unchanged chunks\n\n` : '') +
+        `Build at: ${w(new Date().toISOString())} - Hash: ${w(json.hash || '')} - Time: ${w('' + time)}ms`);
 }
 function statsWarningsToString(json, statsConfig) {
     const colors = statsConfig.colors;

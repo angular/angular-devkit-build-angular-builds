@@ -21,12 +21,13 @@ const semver_1 = require("semver");
 const spinner_1 = require("../../utils/spinner");
 const stats_1 = require("../webpack/utils/stats");
 const bundler_context_1 = require("./bundler-context");
-function logBuildStats(logger, metafile, initial, budgetFailures, changedFiles, estimatedTransferSizes) {
-    const stats = [];
+function logBuildStats(logger, metafile, initial, budgetFailures, changedFiles, estimatedTransferSizes, ssrOutputEnabled, verbose) {
+    const browserStats = [];
+    const serverStats = [];
     let unchangedCount = 0;
     for (const [file, output] of Object.entries(metafile.outputs)) {
         // Only display JavaScript and CSS files
-        if (!file.endsWith('.js') && !file.endsWith('.css')) {
+        if (!/\.(?:css|m?js)$/.test(file)) {
             continue;
         }
         // Skip internal component resources
@@ -39,6 +40,12 @@ function logBuildStats(logger, metafile, initial, budgetFailures, changedFiles, 
             ++unchangedCount;
             continue;
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const isPlatformServer = output['ng-platform-server'];
+        if (isPlatformServer && !ssrOutputEnabled) {
+            // Only log server build stats when SSR is enabled.
+            continue;
+        }
         let name = initial.get(file)?.name;
         if (name === undefined && output.entryPoint) {
             name = node_path_1.default
@@ -46,14 +53,20 @@ function logBuildStats(logger, metafile, initial, budgetFailures, changedFiles, 
                 .replace(/\.[cm]?[jt]s$/, '')
                 .replace(/[\\/.]/g, '-');
         }
-        stats.push({
+        const stat = {
             initial: initial.has(file),
             stats: [file, name ?? '-', output.bytes, estimatedTransferSizes?.get(file) ?? '-'],
-        });
+        };
+        if (isPlatformServer) {
+            serverStats.push(stat);
+        }
+        else {
+            browserStats.push(stat);
+        }
     }
-    if (stats.length > 0) {
-        const tableText = (0, stats_1.generateBuildStatsTable)(stats, true, unchangedCount === 0, !!estimatedTransferSizes, budgetFailures);
-        logger.info('\n' + tableText + '\n');
+    if (browserStats.length > 0 || serverStats.length > 0) {
+        const tableText = (0, stats_1.generateEsbuildBuildStatsTable)([browserStats, serverStats], true, unchangedCount === 0, !!estimatedTransferSizes, budgetFailures, verbose);
+        logger.info(tableText + '\n');
     }
     else if (changedFiles !== undefined) {
         logger.info('\nNo output file changes.\n');
