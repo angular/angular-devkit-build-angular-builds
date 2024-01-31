@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import type { OnLoadResult, Plugin, PluginBuild } from 'esbuild';
+import type { PostcssConfiguration } from '../../../utils/postcss-configuration';
 import { LoadResultCache } from '../load-result-cache';
 /**
  * An object containing the plugin options to use when processing stylesheets.
@@ -35,6 +36,12 @@ export interface StylesheetPluginOptions {
         file: string;
         package: string;
     };
+    /**
+     * Optional configuration object for custom postcss usage. If present, postcss will be
+     * initialized and used for every stylesheet. This overrides the tailwind integration
+     * and any tailwind usage must be manually configured in the custom postcss usage.
+     */
+    postcssConfiguration?: PostcssConfiguration;
 }
 export interface StylesheetLanguage {
     name: string;

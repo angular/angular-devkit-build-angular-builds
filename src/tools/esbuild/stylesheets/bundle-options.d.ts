@@ -7,6 +7,7 @@
  */
 import type { BuildOptions } from 'esbuild';
 import { NormalizedCachedOptions } from '../../../utils/normalize-cache';
+import { PostcssConfiguration } from '../../../utils/postcss-configuration';
 import { LoadResultCache } from '../load-result-cache';
 export interface BundleStylesheetOptions {
     workspaceRoot: string;
@@ -25,6 +26,7 @@ export interface BundleStylesheetOptions {
         file: string;
         package: string;
     };
+    postcssConfiguration?: PostcssConfiguration;
     publicPath?: string;
     cacheOptions: NormalizedCachedOptions;
 }

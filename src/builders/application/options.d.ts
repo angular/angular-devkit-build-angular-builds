@@ -127,6 +127,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
         file: string;
         package: string;
     } | undefined;
+    postcssConfiguration: import("../../utils/postcss-configuration").PostcssConfiguration | undefined;
     i18nOptions: I18nOptions & {
         duplicateTranslationBehavior?: I18NTranslation | undefined;
         missingTranslationBehavior?: I18NTranslation | undefined;
@@ -136,5 +137,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     publicPath: string | undefined;
     plugins: Plugin[] | undefined;
     loaderExtensions: Record<string, "binary" | "file" | "text"> | undefined;
+    jsonLogs: boolean;
+    colors: boolean;
 }>;
 export {};

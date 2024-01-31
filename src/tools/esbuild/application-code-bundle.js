@@ -230,7 +230,7 @@ function createServerPolyfillBundleOptions(options, target, sourceFileCache) {
 }
 exports.createServerPolyfillBundleOptions = createServerPolyfillBundleOptions;
 function getEsBuildCommonOptions(options) {
-    const { workspaceRoot, outExtension, optimizationOptions, sourcemapOptions, tsconfig, externalDependencies, outputNames, preserveSymlinks, jit, loaderExtensions, } = options;
+    const { workspaceRoot, outExtension, optimizationOptions, sourcemapOptions, tsconfig, externalDependencies, outputNames, preserveSymlinks, jit, loaderExtensions, jsonLogs, } = options;
     // Ensure unique hashes for i18n translation changes when using post-process inlining.
     // This hash value is added as a footer to each file and ensures that the output file names (with hashes)
     // change when translation files have changed. If this is not done the post processed files may have
@@ -250,7 +250,7 @@ function getEsBuildCommonOptions(options) {
         resolveExtensions: ['.ts', '.tsx', '.mjs', '.js'],
         metafile: true,
         legalComments: options.extractLicenses ? 'none' : 'eof',
-        logLevel: options.verbose ? 'debug' : 'silent',
+        logLevel: options.verbose && !jsonLogs ? 'debug' : 'silent',
         minifyIdentifiers: optimizationOptions.scripts && environment_options_1.allowMangle,
         minifySyntax: optimizationOptions.scripts,
         minifyWhitespace: optimizationOptions.scripts,

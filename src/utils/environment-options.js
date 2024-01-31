@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useTypeChecking = exports.shouldWatchRoot = exports.debugPerformance = exports.useLegacySass = exports.useParallelTs = exports.maxWorkers = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
+exports.useJSONBuildLogs = exports.useTypeChecking = exports.shouldWatchRoot = exports.debugPerformance = exports.useLegacySass = exports.useParallelTs = exports.maxWorkers = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
 const color_1 = require("./color");
 function isDisabled(variable) {
     return variable === '0' || variable.toLowerCase() === 'false';
@@ -85,3 +85,5 @@ const watchRootVariable = process.env['NG_BUILD_WATCH_ROOT'];
 exports.shouldWatchRoot = isPresent(watchRootVariable) && isEnabled(watchRootVariable);
 const typeCheckingVariable = process.env['NG_BUILD_TYPE_CHECK'];
 exports.useTypeChecking = !isPresent(typeCheckingVariable) || !isDisabled(typeCheckingVariable);
+const buildLogsJsonVariable = process.env['NG_BUILD_LOGS_JSON'];
+exports.useJSONBuildLogs = isPresent(buildLogsJsonVariable) && isEnabled(buildLogsJsonVariable);

@@ -19,6 +19,7 @@ class ExecutionResult {
     outputFiles = [];
     assetFiles = [];
     errors = [];
+    prerenderedRoutes = [];
     warnings = [];
     externalMetadata;
     constructor(rebuildContexts, codeBundleCache) {
@@ -43,6 +44,11 @@ class ExecutionResult {
         for (const error of errors) {
             this.addError(error);
         }
+    }
+    addPrerenderedRoutes(routes) {
+        this.prerenderedRoutes.push(...routes);
+        // Sort the prerendered routes.
+        this.prerenderedRoutes.sort((a, b) => a.localeCompare(b));
     }
     addWarning(error) {
         if (typeof error === 'string') {

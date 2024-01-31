@@ -72,7 +72,9 @@ class StylesheetPluginFactory {
     }
     create(language) {
         // Return a noop plugin if no load actions are required
-        if (!language.process && !this.options.tailwindConfiguration) {
+        if (!language.process &&
+            !this.options.postcssConfiguration &&
+            !this.options.tailwindConfiguration) {
             return {
                 name: 'angular-' + language.name,
                 setup() { },
@@ -84,7 +86,23 @@ class StylesheetPluginFactory {
             if (this.postcssProcessor) {
                 return this.postcssProcessor;
             }
-            if (options.tailwindConfiguration) {
+            if (options.postcssConfiguration) {
+                const postCssInstanceKey = JSON.stringify(options.postcssConfiguration);
+                this.postcssProcessor = postcssProcessor.get(postCssInstanceKey)?.deref();
+                if (!this.postcssProcessor) {
+                    postcss ??= (await Promise.resolve().then(() => __importStar(require('postcss')))).default;
+                    this.postcssProcessor = postcss();
+                    for (const [pluginName, pluginOptions] of options.postcssConfiguration.plugins) {
+                        const { default: plugin } = await Promise.resolve(`${pluginName}`).then(s => __importStar(require(s)));
+                        if (typeof plugin !== 'function' || plugin.postcss !== true) {
+                            throw new Error(`Attempted to load invalid Postcss plugin: "${pluginName}"`);
+                        }
+                        this.postcssProcessor.use(plugin(pluginOptions));
+                    }
+                    postcssProcessor.set(postCssInstanceKey, new WeakRef(this.postcssProcessor));
+                }
+            }
+            else if (options.tailwindConfiguration) {
                 const { package: tailwindPackage, file: config } = options.tailwindConfiguration;
                 const postCssInstanceKey = tailwindPackage + ':' + config;
                 this.postcssProcessor = postcssProcessor.get(postCssInstanceKey)?.deref();
@@ -132,14 +150,12 @@ async function processStylesheet(language, data, filename, format, options, buil
             watchFiles: [filename],
         };
     }
-    // Return early if there are no contents to further process
-    if (!result.contents) {
+    // Return early if there are no contents to further process or there are errors
+    if (!result.contents || result.errors?.length) {
         return result;
     }
-    // Only use postcss if Tailwind processing is required.
-    // NOTE: If postcss is used for more than just Tailwind in the future this check MUST
-    // be updated to account for the additional use.
-    if (postcssProcessor && !result.errors?.length && hasTailwindKeywords(result.contents)) {
+    // Only use postcss if Tailwind processing is required or custom postcss is present.
+    if (postcssProcessor && (options.postcssConfiguration || hasTailwindKeywords(result.contents))) {
         const postcssResult = await compileString(typeof result.contents === 'string'
             ? result.contents
             : Buffer.from(result.contents).toString('utf-8'), filename, postcssProcessor, options);

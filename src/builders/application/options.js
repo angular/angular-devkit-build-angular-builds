@@ -17,9 +17,12 @@ const node_module_1 = require("node:module");
 const node_path_1 = __importDefault(require("node:path"));
 const helpers_1 = require("../../tools/webpack/utils/helpers");
 const utils_1 = require("../../utils");
+const color_1 = require("../../utils/color");
+const environment_options_1 = require("../../utils/environment-options");
 const i18n_options_1 = require("../../utils/i18n-options");
 const normalize_cache_1 = require("../../utils/normalize-cache");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
+const postcss_configuration_1 = require("../../utils/postcss-configuration");
 const tailwind_1 = require("../../utils/tailwind");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const schema_1 = require("./schema");
@@ -108,6 +111,11 @@ async function normalizeOptions(context, projectName, options, extensions) {
             loaderExtensions[extension] = value;
         }
     }
+    const postcssConfiguration = await (0, postcss_configuration_1.loadPostcssConfiguration)(workspaceRoot, projectRoot);
+    // Skip tailwind configuration if postcss is customized
+    const tailwindConfiguration = postcssConfiguration
+        ? undefined
+        : await getTailwindConfig(workspaceRoot, projectRoot, context);
     const globalStyles = [];
     if (options.styles?.length) {
         const { entryPoints: stylesheetEntrypoints, noInjectNames } = (0, helpers_1.normalizeGlobalStyles)(options.styles || []);
@@ -212,13 +220,16 @@ async function normalizeOptions(context, projectName, options, extensions) {
         globalScripts,
         serviceWorker: typeof serviceWorker === 'string' ? node_path_1.default.join(workspaceRoot, serviceWorker) : undefined,
         indexHtmlOptions,
-        tailwindConfiguration: await getTailwindConfig(workspaceRoot, projectRoot, context),
+        tailwindConfiguration,
+        postcssConfiguration,
         i18nOptions,
         namedChunks,
         budgets: budgets?.length ? budgets : undefined,
         publicPath: deployUrl ? deployUrl : undefined,
         plugins: extensions?.codePlugins?.length ? extensions?.codePlugins : undefined,
         loaderExtensions,
+        jsonLogs: environment_options_1.useJSONBuildLogs,
+        colors: color_1.colors.enabled,
     };
 }
 exports.normalizeOptions = normalizeOptions;
