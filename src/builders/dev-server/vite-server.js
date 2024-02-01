@@ -66,7 +66,6 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
         // Avoid bundling and processing the ssr entry-point as this is not used by the dev-server.
         browserOptions.ssr = true;
         // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         process.setSourceMapsEnabled(true);
     }
     // Set all packages as external to support Vite's prebundle caching
@@ -75,7 +74,7 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
     if (serverOptions.servePath === undefined && baseHref !== undefined) {
         // Remove trailing slash
         serverOptions.servePath =
-            baseHref[baseHref.length - 1] === '/' ? baseHref.slice(0, -1) : baseHref;
+            baseHref !== './' && baseHref[baseHref.length - 1] === '/' ? baseHref.slice(0, -1) : baseHref;
     }
     // The development server currently only supports a single locale when localizing.
     // This matches the behavior of the Webpack-based development server but could be expanded in the future.
