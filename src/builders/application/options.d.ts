@@ -31,7 +31,9 @@ interface InternalOptions {
      * Indicates whether all node packages should be marked as external.
      * Currently used by the dev-server to support prebundling.
      */
-    externalPackages?: boolean;
+    externalPackages?: boolean | {
+        exclude: string[];
+    };
     /**
      * Forces the output from the localize post-processing to not create nested directories per locale output.
      * This is only used by the development server which currently only supports a single locale per build.
@@ -72,7 +74,9 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     polyfills: string[] | undefined;
     poll: number | undefined;
     progress: boolean;
-    externalPackages: boolean | undefined;
+    externalPackages: boolean | {
+        exclude: string[];
+    } | undefined;
     preserveSymlinks: boolean;
     stylePreprocessorOptions: import("./schema").StylePreprocessorOptions | undefined;
     subresourceIntegrity: boolean | undefined;

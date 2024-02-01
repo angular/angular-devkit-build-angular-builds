@@ -53,9 +53,11 @@ function createBrowserCodeBundleOptions(options, target, sourceFileCache) {
     }
     if (options.externalPackages) {
         // Package files affected by a customized loader should not be implicitly marked as external
-        if (options.loaderExtensions || options.plugins) {
+        if (options.loaderExtensions ||
+            options.plugins ||
+            typeof options.externalPackages === 'object') {
             // Plugin must be added after custom plugins to ensure any added loader options are considered
-            buildOptions.plugins?.push((0, external_packages_plugin_1.createExternalPackagesPlugin)());
+            buildOptions.plugins?.push((0, external_packages_plugin_1.createExternalPackagesPlugin)(options.externalPackages !== true ? options.externalPackages : undefined));
         }
         else {
             // Safe to use the packages external option directly
