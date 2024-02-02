@@ -143,5 +143,6 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     loaderExtensions: Record<string, "binary" | "file" | "text"> | undefined;
     jsonLogs: boolean;
     colors: boolean;
+    clearScreen: boolean | undefined;
 }>;
 export {};

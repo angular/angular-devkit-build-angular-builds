@@ -34,6 +34,10 @@ export interface Schema {
      */
     budgets?: Budget[];
     /**
+     * Automatically clear the terminal screen during rebuilds.
+     */
+    clearScreen?: boolean;
+    /**
      * Define the crossorigin attribute setting of elements that provide CORS support.
      */
     crossOrigin?: CrossOrigin;

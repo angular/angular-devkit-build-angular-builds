@@ -26,4 +26,5 @@ export declare function runEsBuildBuildAction(action: (rebuildState?: RebuildSta
     poll?: number;
     signal?: AbortSignal;
     preserveSymlinks?: boolean;
+    clearScreen?: boolean;
 }): AsyncIterable<(ExecutionResult['outputWithFiles'] | ExecutionResult['output']) & BuilderOutput>;

@@ -40,8 +40,21 @@ const sass_language_1 = require("../../tools/esbuild/stylesheets/sass-language")
 const utils_1 = require("../../tools/esbuild/utils");
 const delete_output_dir_1 = require("../../utils/delete-output-dir");
 const environment_options_1 = require("../../utils/environment-options");
+// Watch workspace for package manager changes
+const packageWatchFiles = [
+    // manifest can affect module resolution
+    'package.json',
+    // npm lock file
+    'package-lock.json',
+    // pnpm lock file
+    'pnpm-lock.yaml',
+    // yarn lock file including Yarn PnP manifest files (https://yarnpkg.com/advanced/pnp-spec/)
+    'yarn.lock',
+    '.pnp.cjs',
+    '.pnp.data.json',
+];
 async function* runEsBuildBuildAction(action, options) {
-    const { writeToFileSystemFilter, writeToFileSystem, watch, poll, logger, deleteOutputPath, cacheOptions, outputOptions, verbose, projectRoot, workspaceRoot, progress, preserveSymlinks, } = options;
+    const { writeToFileSystemFilter, writeToFileSystem, watch, poll, clearScreen, logger, deleteOutputPath, cacheOptions, outputOptions, verbose, projectRoot, workspaceRoot, progress, preserveSymlinks, } = options;
     if (deleteOutputPath && writeToFileSystem) {
         await (0, delete_output_dir_1.deleteOutputDir)(workspaceRoot, outputOptions.base, [
             outputOptions.browser,
@@ -93,19 +106,6 @@ async function* runEsBuildBuildAction(action, options) {
         if (environment_options_1.shouldWatchRoot) {
             watcher.add(projectRoot);
         }
-        // Watch workspace for package manager changes
-        const packageWatchFiles = [
-            // manifest can affect module resolution
-            'package.json',
-            // npm lock file
-            'package-lock.json',
-            // pnpm lock file
-            'pnpm-lock.yaml',
-            // yarn lock file including Yarn PnP manifest files (https://yarnpkg.com/advanced/pnp-spec/)
-            'yarn.lock',
-            '.pnp.cjs',
-            '.pnp.data.json',
-        ];
         watcher.add(packageWatchFiles
             .map((file) => node_path_1.default.join(workspaceRoot, file))
             .filter((file) => (0, node_fs_1.existsSync)(file)));
@@ -135,6 +135,10 @@ async function* runEsBuildBuildAction(action, options) {
         for await (const changes of watcher) {
             if (options.signal?.aborted) {
                 break;
+            }
+            if (clearScreen) {
+                // eslint-disable-next-line no-console
+                console.clear();
             }
             if (verbose) {
                 logger.info(changes.toDebugString());
