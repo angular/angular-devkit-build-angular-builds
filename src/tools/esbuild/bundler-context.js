@@ -162,7 +162,7 @@ class BundlerContext {
                 // For non-incremental builds, perform a single build
                 result = await (0, esbuild_1.build)(this.#esbuildOptions);
             }
-            if (this.#esbuildOptions?.platform === 'node') {
+            if (this.#platformIsServer) {
                 for (const entry of Object.values(result.metafile.outputs)) {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     entry['ng-platform-server'] = true;
@@ -232,6 +232,7 @@ class BundlerContext {
                         name,
                         type,
                         entrypoint: true,
+                        serverFile: this.#platformIsServer,
                     };
                     if (!this.initialFilter || this.initialFilter(record)) {
                         initialFiles.set(relativeFilePath, record);
@@ -251,6 +252,7 @@ class BundlerContext {
                         type: initialImport.kind === 'import-rule' ? 'style' : 'script',
                         entrypoint: false,
                         external: initialImport.external,
+                        serverFile: this.#platformIsServer,
                     };
                     if (!this.initialFilter || this.initialFilter(record)) {
                         initialFiles.set(initialImport.path, record);
@@ -275,8 +277,7 @@ class BundlerContext {
             }
         }
         (0, node_assert_1.default)(this.#esbuildOptions, 'esbuild options cannot be undefined.');
-        const { platform, assetNames = '' } = this.#esbuildOptions;
-        const platformIsServer = platform === 'node';
+        const { assetNames = '' } = this.#esbuildOptions;
         const mediaDirname = (0, node_path_1.dirname)(assetNames);
         const outputFiles = result.outputFiles.map((file) => {
             let fileType;
@@ -284,7 +285,9 @@ class BundlerContext {
                 fileType = BuildOutputFileType.Media;
             }
             else {
-                fileType = platformIsServer ? BuildOutputFileType.Server : BuildOutputFileType.Browser;
+                fileType = this.#platformIsServer
+                    ? BuildOutputFileType.Server
+                    : BuildOutputFileType.Browser;
             }
             return (0, utils_1.convertOutputFile)(file, fileType);
         });
@@ -294,7 +297,7 @@ class BundlerContext {
             outputFiles,
             initialFiles,
             externalImports: {
-                [platformIsServer ? 'server' : 'browser']: externalImports,
+                [this.#platformIsServer ? 'server' : 'browser']: externalImports,
             },
             externalConfiguration: this.#esbuildOptions.external,
             errors: undefined,
@@ -313,6 +316,9 @@ class BundlerContext {
                 }
             }
         }
+    }
+    get #platformIsServer() {
+        return this.#esbuildOptions?.platform === 'node';
     }
     /**
      * Invalidate a stored bundler result based on the previous watch files
