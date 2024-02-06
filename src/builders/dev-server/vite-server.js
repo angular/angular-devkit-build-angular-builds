@@ -69,7 +69,7 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
         process.setSourceMapsEnabled(true);
     }
     // Set all packages as external to support Vite's prebundle caching
-    browserOptions.externalPackages = serverOptions.cacheOptions.enabled;
+    browserOptions.externalPackages = serverOptions.prebundle;
     const baseHref = browserOptions.baseHref;
     if (serverOptions.servePath === undefined && baseHref !== undefined) {
         // Remove trailing slash
@@ -391,7 +391,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                  * - Breaks RxJs (Unless it is added as external). See: https://github.com/angular/angular-cli/issues/26235
                  */
                 // Only enable with caching since it causes prebundle dependencies to be cached
-                disabled: true, // !serverOptions.cacheOptions.enabled,
+                disabled: true, // serverOptions.prebundle === false,
                 // Exclude any explicitly defined dependencies (currently build defined externals and node.js built-ins)
                 exclude: serverExplicitExternal,
                 // Include all implict dependencies from the external packages internal option
@@ -421,7 +421,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
         // Browser only optimizeDeps. (This does not run for SSR dependencies).
         optimizeDeps: getDepOptimizationConfig({
             // Only enable with caching since it causes prebundle dependencies to be cached
-            disabled: !serverOptions.cacheOptions.enabled,
+            disabled: serverOptions.prebundle === false,
             // Exclude any explicitly defined dependencies (currently build defined externals)
             exclude: externalMetadata.explicit,
             // Include all implict dependencies from the external packages internal option
