@@ -42,6 +42,15 @@ export interface Schema {
      */
     crossOrigin?: CrossOrigin;
     /**
+     * Defines global identifiers that will be replaced with a specified constant value when
+     * found in any JavaScript or TypeScript code including libraries. The value will be used
+     * directly. String values must be put in quotes. Identifiers within Angular metadata such
+     * as Component Decorators will not be replaced.
+     */
+    define?: {
+        [key: string]: string;
+    };
+    /**
      * Delete the output path before building.
      */
     deleteOutputPath?: boolean;

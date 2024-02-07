@@ -144,5 +144,8 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     jsonLogs: boolean;
     colors: boolean;
     clearScreen: boolean | undefined;
+    define: {
+        [key: string]: string;
+    } | undefined;
 }>;
 export {};

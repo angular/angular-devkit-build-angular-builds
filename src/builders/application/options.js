@@ -178,7 +178,7 @@ async function normalizeOptions(context, projectName, options, extensions) {
         };
     }
     // Initial options to keep
-    const { allowedCommonJsDependencies, aot, baseHref, crossOrigin, externalDependencies, extractLicenses, inlineStyleLanguage = 'css', outExtension, serviceWorker, poll, polyfills, statsJson, stylePreprocessorOptions, subresourceIntegrity, verbose, watch, progress = true, externalPackages, deleteOutputPath, namedChunks, budgets, deployUrl, clearScreen, } = options;
+    const { allowedCommonJsDependencies, aot, baseHref, crossOrigin, externalDependencies, extractLicenses, inlineStyleLanguage = 'css', outExtension, serviceWorker, poll, polyfills, statsJson, stylePreprocessorOptions, subresourceIntegrity, verbose, watch, progress = true, externalPackages, deleteOutputPath, namedChunks, budgets, deployUrl, clearScreen, define, } = options;
     // Return all the normalized options
     return {
         advancedOptimizations: !!aot && optimizationOptions.scripts,
@@ -231,6 +231,7 @@ async function normalizeOptions(context, projectName, options, extensions) {
         jsonLogs: environment_options_1.useJSONBuildLogs,
         colors: color_1.colors.enabled,
         clearScreen,
+        define,
     };
 }
 exports.normalizeOptions = normalizeOptions;
