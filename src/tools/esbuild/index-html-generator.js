@@ -47,7 +47,7 @@ async function generateIndexHtml(initialFiles, outputFiles, buildOptions, lang) 
     (0, node_assert_1.default)(indexHtmlOptions, 'indexHtmlOptions cannot be undefined.');
     if (!externalPackages && indexHtmlOptions.preloadInitial) {
         for (const [key, value] of initialFiles) {
-            if (value.entrypoint) {
+            if (value.entrypoint || value.serverFile) {
                 // Entry points are already referenced in the HTML
                 continue;
             }
@@ -94,7 +94,9 @@ async function generateIndexHtml(initialFiles, outputFiles, buildOptions, lang) 
         baseHref,
         lang,
         outputPath: virtualOutputPath,
-        files: [...initialFiles].map(([file, record]) => ({
+        files: [...initialFiles]
+            .filter(([, file]) => !file.serverFile)
+            .map(([file, record]) => ({
             name: record.name ?? '',
             file,
             extension: node_path_1.default.extname(file),

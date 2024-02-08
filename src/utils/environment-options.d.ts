@@ -14,3 +14,4 @@ export declare const useLegacySass: boolean;
 export declare const debugPerformance: boolean;
 export declare const shouldWatchRoot: boolean;
 export declare const useTypeChecking: boolean;
+export declare const useJSONBuildLogs: boolean;

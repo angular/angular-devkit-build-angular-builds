@@ -62,8 +62,9 @@ function execute(options, context, transforms = {}) {
         return (0, build_webpack_1.runWebpack)(config, context, {
             webpackFactory: require('webpack'),
             logging: (stats, config) => {
-                if (options.verbose) {
-                    context.logger.info(stats.toString(config.stats));
+                if (options.verbose && config.stats !== false) {
+                    const statsOptions = config.stats === true ? undefined : config.stats;
+                    context.logger.info(stats.toString(statsOptions));
                 }
             },
         }).pipe((0, rxjs_1.concatMap)(async (output) => {

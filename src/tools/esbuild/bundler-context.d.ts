@@ -27,6 +27,7 @@ export interface InitialFileRecord {
     name?: string;
     type: 'script' | 'style';
     external?: boolean;
+    serverFile: boolean;
 }
 export declare enum BuildOutputFileType {
     Browser = 1,

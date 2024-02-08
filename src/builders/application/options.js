@@ -17,6 +17,8 @@ const node_module_1 = require("node:module");
 const node_path_1 = __importDefault(require("node:path"));
 const helpers_1 = require("../../tools/webpack/utils/helpers");
 const utils_1 = require("../../utils");
+const color_1 = require("../../utils/color");
+const environment_options_1 = require("../../utils/environment-options");
 const i18n_options_1 = require("../../utils/i18n-options");
 const normalize_cache_1 = require("../../utils/normalize-cache");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
@@ -176,7 +178,7 @@ async function normalizeOptions(context, projectName, options, extensions) {
         };
     }
     // Initial options to keep
-    const { allowedCommonJsDependencies, aot, baseHref, crossOrigin, externalDependencies, extractLicenses, inlineStyleLanguage = 'css', outExtension, serviceWorker, poll, polyfills, statsJson, stylePreprocessorOptions, subresourceIntegrity, verbose, watch, progress = true, externalPackages, deleteOutputPath, namedChunks, budgets, deployUrl, } = options;
+    const { allowedCommonJsDependencies, aot, baseHref, crossOrigin, externalDependencies, extractLicenses, inlineStyleLanguage = 'css', outExtension, serviceWorker, poll, polyfills, statsJson, stylePreprocessorOptions, subresourceIntegrity, verbose, watch, progress = true, externalPackages, deleteOutputPath, namedChunks, budgets, deployUrl, clearScreen, define, } = options;
     // Return all the normalized options
     return {
         advancedOptimizations: !!aot && optimizationOptions.scripts,
@@ -226,6 +228,10 @@ async function normalizeOptions(context, projectName, options, extensions) {
         publicPath: deployUrl ? deployUrl : undefined,
         plugins: extensions?.codePlugins?.length ? extensions?.codePlugins : undefined,
         loaderExtensions,
+        jsonLogs: environment_options_1.useJSONBuildLogs,
+        colors: color_1.colors.enabled,
+        clearScreen,
+        define,
     };
 }
 exports.normalizeOptions = normalizeOptions;

@@ -33,6 +33,7 @@ export declare class ExecutionResult {
     outputFiles: BuildOutputFile[];
     assetFiles: BuildOutputAsset[];
     errors: (Message | PartialMessage)[];
+    prerenderedRoutes: string[];
     warnings: (Message | PartialMessage)[];
     externalMetadata?: ExternalResultMetadata;
     constructor(rebuildContexts: BundlerContext[], codeBundleCache?: SourceFileCache | undefined);
@@ -40,6 +41,7 @@ export declare class ExecutionResult {
     addAssets(assets: BuildOutputAsset[]): void;
     addError(error: PartialMessage | string): void;
     addErrors(errors: (PartialMessage | string)[]): void;
+    addPrerenderedRoutes(routes: string[]): void;
     addWarning(error: PartialMessage | string): void;
     addWarnings(errors: (PartialMessage | string)[]): void;
     /**

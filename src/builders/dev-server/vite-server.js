@@ -66,16 +66,15 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
         // Avoid bundling and processing the ssr entry-point as this is not used by the dev-server.
         browserOptions.ssr = true;
         // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         process.setSourceMapsEnabled(true);
     }
     // Set all packages as external to support Vite's prebundle caching
-    browserOptions.externalPackages = serverOptions.cacheOptions.enabled;
+    browserOptions.externalPackages = serverOptions.prebundle;
     const baseHref = browserOptions.baseHref;
     if (serverOptions.servePath === undefined && baseHref !== undefined) {
         // Remove trailing slash
         serverOptions.servePath =
-            baseHref[baseHref.length - 1] === '/' ? baseHref.slice(0, -1) : baseHref;
+            baseHref !== './' && baseHref[baseHref.length - 1] === '/' ? baseHref.slice(0, -1) : baseHref;
     }
     // The development server currently only supports a single locale when localizing.
     // This matches the behavior of the Webpack-based development server but could be expanded in the future.
@@ -341,7 +340,8 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
         publicDir: false,
         esbuild: false,
         mode: 'development',
-        appType: 'mpa',
+        // We use custom as we do not rely on Vite's htmlFallbackMiddleware and indexHtmlMiddleware.
+        appType: 'custom',
         css: {
             devSourcemap: true,
         },
@@ -392,7 +392,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                  * - Breaks RxJs (Unless it is added as external). See: https://github.com/angular/angular-cli/issues/26235
                  */
                 // Only enable with caching since it causes prebundle dependencies to be cached
-                disabled: true, // !serverOptions.cacheOptions.enabled,
+                disabled: true, // serverOptions.prebundle === false,
                 // Exclude any explicitly defined dependencies (currently build defined externals and node.js built-ins)
                 exclude: serverExplicitExternal,
                 // Include all implict dependencies from the external packages internal option
@@ -422,7 +422,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
         // Browser only optimizeDeps. (This does not run for SSR dependencies).
         optimizeDeps: getDepOptimizationConfig({
             // Only enable with caching since it causes prebundle dependencies to be cached
-            disabled: !serverOptions.cacheOptions.enabled,
+            disabled: serverOptions.prebundle === false,
             // Exclude any explicitly defined dependencies (currently build defined externals)
             exclude: externalMetadata.explicit,
             // Include all implict dependencies from the external packages internal option
