@@ -63,15 +63,7 @@ function execute(options, context, transforms = {}, extensions) {
             if (transforms?.logging || transforms?.webpackConfiguration) {
                 throw new Error('The `application` and `browser-esbuild` builders do not support Webpack transforms.');
             }
-            // Warn if the initial options provided by the user enable prebundling but caching is disabled
-            if (options.prebundle && !normalizedOptions.cacheOptions.enabled) {
-                context.logger.warn(`Prebundling has been configured but will not be used because caching has been disabled.`);
-            }
             return (0, rxjs_1.defer)(() => Promise.resolve().then(() => __importStar(require('./vite-server')))).pipe((0, rxjs_1.switchMap)(({ serveWithVite }) => serveWithVite(normalizedOptions, builderName, context, transforms, extensions)));
-        }
-        // Warn if the initial options provided by the user enable prebundling with Webpack-based builders
-        if (options.prebundle) {
-            context.logger.warn(`Prebundling has been configured but will not be used because it is not supported by the "${builderName}" builder.`);
         }
         if (extensions?.buildPlugins?.length) {
             throw new Error('Only the `application` and `browser-esbuild` builders support plugins.');
@@ -88,10 +80,7 @@ async function initialize(initialOptions, projectName, context, builderSelector 
     // Purge old build disk cache.
     await (0, purge_cache_1.purgeStaleBuildCache)(context);
     const normalizedOptions = await (0, options_1.normalizeOptions)(context, projectName, initialOptions);
-    const builderName = builderSelector({
-        builderName: await context.getBuilderNameForTarget(normalizedOptions.buildTarget),
-        forceEsbuild: !!normalizedOptions.forceEsbuild,
-    }, context.logger);
+    const builderName = await context.getBuilderNameForTarget(normalizedOptions.buildTarget);
     if (!normalizedOptions.disableHostCheck &&
         !/^127\.\d+\.\d+\.\d+/g.test(normalizedOptions.host) &&
         normalizedOptions.host !== 'localhost') {
@@ -111,7 +100,7 @@ case.
     }
     normalizedOptions.port = await (0, check_port_1.checkPort)(normalizedOptions.port, normalizedOptions.host);
     return {
-        builderName,
+        builderName: builderSelector({ builderName, forceEsbuild: !!normalizedOptions.forceEsbuild }, context.logger),
         normalizedOptions,
     };
 }

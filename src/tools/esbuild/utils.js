@@ -10,19 +10,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logMessages = exports.getSupportedNodeTargets = exports.transformSupportedBrowsersToTargets = exports.convertOutputFile = exports.createOutputFileFromData = exports.createOutputFileFromText = exports.emitFilesToDisk = exports.writeResultFiles = exports.getFeatureSupport = exports.withNoProgress = exports.withSpinner = exports.calculateEstimatedTransferSizes = exports.logBuildStats = void 0;
+exports.getSupportedNodeTargets = exports.transformSupportedBrowsersToTargets = exports.convertOutputFile = exports.createOutputFileFromData = exports.createOutputFileFromText = exports.emitFilesToDisk = exports.writeResultFiles = exports.getFeatureSupport = exports.logMessages = exports.withNoProgress = exports.withSpinner = exports.calculateEstimatedTransferSizes = exports.logBuildStats = void 0;
 const esbuild_1 = require("esbuild");
 const node_crypto_1 = require("node:crypto");
 const node_fs_1 = require("node:fs");
 const promises_1 = __importDefault(require("node:fs/promises"));
-const node_path_1 = require("node:path");
-const node_url_1 = require("node:url");
+const node_path_1 = __importDefault(require("node:path"));
 const node_zlib_1 = require("node:zlib");
 const semver_1 = require("semver");
 const spinner_1 = require("../../utils/spinner");
 const stats_1 = require("../webpack/utils/stats");
 const bundler_context_1 = require("./bundler-context");
-function logBuildStats(metafile, initial, budgetFailures, colors, changedFiles, estimatedTransferSizes, ssrOutputEnabled, verbose) {
+function logBuildStats(logger, metafile, initial, budgetFailures, changedFiles, estimatedTransferSizes, ssrOutputEnabled, verbose) {
     const browserStats = [];
     const serverStats = [];
     let unchangedCount = 0;
@@ -49,7 +48,8 @@ function logBuildStats(metafile, initial, budgetFailures, colors, changedFiles, 
         }
         let name = initial.get(file)?.name;
         if (name === undefined && output.entryPoint) {
-            name = (0, node_path_1.basename)(output.entryPoint)
+            name = node_path_1.default
+                .basename(output.entryPoint)
                 .replace(/\.[cm]?[jt]s$/, '')
                 .replace(/[\\/.]/g, '-');
         }
@@ -65,16 +65,15 @@ function logBuildStats(metafile, initial, budgetFailures, colors, changedFiles, 
         }
     }
     if (browserStats.length > 0 || serverStats.length > 0) {
-        const tableText = (0, stats_1.generateEsbuildBuildStatsTable)([browserStats, serverStats], colors, unchangedCount === 0, !!estimatedTransferSizes, budgetFailures, verbose);
-        return tableText + '\n';
+        const tableText = (0, stats_1.generateEsbuildBuildStatsTable)([browserStats, serverStats], true, unchangedCount === 0, !!estimatedTransferSizes, budgetFailures, verbose);
+        logger.info(tableText + '\n');
     }
     else if (changedFiles !== undefined) {
-        return '\nNo output file changes.\n';
+        logger.info('\nNo output file changes.\n');
     }
     if (unchangedCount > 0) {
-        return `Unchanged output files: ${unchangedCount}`;
+        logger.info(`Unchanged output files: ${unchangedCount}`);
     }
-    return '';
 }
 exports.logBuildStats = logBuildStats;
 async function calculateEstimatedTransferSizes(outputFiles) {
@@ -131,6 +130,17 @@ async function withNoProgress(text, action) {
     return action();
 }
 exports.withNoProgress = withNoProgress;
+async function logMessages(logger, { errors, warnings }) {
+    if (warnings?.length) {
+        const warningMessages = await (0, esbuild_1.formatMessages)(warnings, { kind: 'warning', color: true });
+        logger.warn(warningMessages.join('\n'));
+    }
+    if (errors?.length) {
+        const errorMessages = await (0, esbuild_1.formatMessages)(errors, { kind: 'error', color: true });
+        logger.error(errorMessages.join('\n'));
+    }
+}
+exports.logMessages = logMessages;
 /**
  * Generates a syntax feature object map for Angular applications based on a list of targets.
  * A full set of feature names can be found here: https://esbuild.github.io/api/#supported
@@ -182,9 +192,9 @@ exports.getFeatureSupport = getFeatureSupport;
 async function writeResultFiles(outputFiles, assetFiles, { base, browser, media, server }) {
     const directoryExists = new Set();
     const ensureDirectoryExists = async (destPath) => {
-        const basePath = (0, node_path_1.dirname)(destPath);
+        const basePath = node_path_1.default.dirname(destPath);
         if (!directoryExists.has(basePath)) {
-            await promises_1.default.mkdir((0, node_path_1.join)(base, basePath), { recursive: true });
+            await promises_1.default.mkdir(node_path_1.default.join(base, basePath), { recursive: true });
             directoryExists.add(basePath);
         }
     };
@@ -205,19 +215,19 @@ async function writeResultFiles(outputFiles, assetFiles, { base, browser, media,
             default:
                 throw new Error(`Unhandled write for file "${file.path}" with type "${bundler_context_1.BuildOutputFileType[file.type]}".`);
         }
-        const destPath = (0, node_path_1.join)(outputDir, file.path);
+        const destPath = node_path_1.default.join(outputDir, file.path);
         // Ensure output subdirectories exist
         await ensureDirectoryExists(destPath);
         // Write file contents
-        await promises_1.default.writeFile((0, node_path_1.join)(base, destPath), file.contents);
+        await promises_1.default.writeFile(node_path_1.default.join(base, destPath), file.contents);
     });
     if (assetFiles?.length) {
         await emitFilesToDisk(assetFiles, async ({ source, destination }) => {
-            const destPath = (0, node_path_1.join)(browser, destination);
+            const destPath = node_path_1.default.join(browser, destination);
             // Ensure output subdirectories exist
             await ensureDirectoryExists(destPath);
             // Copy file contents
-            await promises_1.default.copyFile(source, (0, node_path_1.join)(base, destPath), node_fs_1.constants.COPYFILE_FICLONE);
+            await promises_1.default.copyFile(source, node_path_1.default.join(base, destPath), node_fs_1.constants.COPYFILE_FICLONE);
         });
     }
 }
@@ -344,33 +354,3 @@ function getSupportedNodeTargets() {
     return SUPPORTED_NODE_VERSIONS.split('||').map((v) => 'node' + (0, semver_1.coerce)(v)?.version);
 }
 exports.getSupportedNodeTargets = getSupportedNodeTargets;
-async function logMessages(logger, executionResult, options) {
-    const { outputOptions: { base, server, browser }, ssrOptions, jsonLogs, colors: color, } = options;
-    const { warnings, errors, prerenderedRoutes } = executionResult;
-    const warningMessages = warnings.length
-        ? await (0, esbuild_1.formatMessages)(warnings, { kind: 'warning', color })
-        : [];
-    const errorMessages = errors.length ? await (0, esbuild_1.formatMessages)(errors, { kind: 'error', color }) : [];
-    if (jsonLogs) {
-        // JSON format output
-        const manifest = {
-            errors: errorMessages,
-            warnings: warningMessages,
-            outputPaths: {
-                root: (0, node_url_1.pathToFileURL)(base),
-                browser: (0, node_url_1.pathToFileURL)((0, node_path_1.join)(base, browser)),
-                server: ssrOptions ? (0, node_url_1.pathToFileURL)((0, node_path_1.join)(base, server)) : undefined,
-            },
-            prerenderedRoutes,
-        };
-        logger.info(JSON.stringify(manifest, undefined, 2));
-        return;
-    }
-    if (warningMessages.length) {
-        logger.warn(warningMessages.join('\n'));
-    }
-    if (errorMessages.length) {
-        logger.error(errorMessages.join('\n'));
-    }
-}
-exports.logMessages = logMessages;

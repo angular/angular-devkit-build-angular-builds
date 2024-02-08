@@ -53,11 +53,9 @@ function createBrowserCodeBundleOptions(options, target, sourceFileCache) {
     }
     if (options.externalPackages) {
         // Package files affected by a customized loader should not be implicitly marked as external
-        if (options.loaderExtensions ||
-            options.plugins ||
-            typeof options.externalPackages === 'object') {
+        if (options.loaderExtensions || options.plugins) {
             // Plugin must be added after custom plugins to ensure any added loader options are considered
-            buildOptions.plugins?.push((0, external_packages_plugin_1.createExternalPackagesPlugin)(options.externalPackages !== true ? options.externalPackages : undefined));
+            buildOptions.plugins?.push((0, external_packages_plugin_1.createExternalPackagesPlugin)());
         }
         else {
             // Safe to use the packages external option directly
@@ -232,7 +230,7 @@ function createServerPolyfillBundleOptions(options, target, sourceFileCache) {
 }
 exports.createServerPolyfillBundleOptions = createServerPolyfillBundleOptions;
 function getEsBuildCommonOptions(options) {
-    const { workspaceRoot, outExtension, optimizationOptions, sourcemapOptions, tsconfig, externalDependencies, outputNames, preserveSymlinks, jit, loaderExtensions, jsonLogs, } = options;
+    const { workspaceRoot, outExtension, optimizationOptions, sourcemapOptions, tsconfig, externalDependencies, outputNames, preserveSymlinks, jit, loaderExtensions, } = options;
     // Ensure unique hashes for i18n translation changes when using post-process inlining.
     // This hash value is added as a footer to each file and ensures that the output file names (with hashes)
     // change when translation files have changed. If this is not done the post processed files may have
@@ -252,7 +250,7 @@ function getEsBuildCommonOptions(options) {
         resolveExtensions: ['.ts', '.tsx', '.mjs', '.js'],
         metafile: true,
         legalComments: options.extractLicenses ? 'none' : 'eof',
-        logLevel: options.verbose && !jsonLogs ? 'debug' : 'silent',
+        logLevel: options.verbose ? 'debug' : 'silent',
         minifyIdentifiers: optimizationOptions.scripts && environment_options_1.allowMangle,
         minifySyntax: optimizationOptions.scripts,
         minifyWhitespace: optimizationOptions.scripts,
@@ -267,7 +265,6 @@ function getEsBuildCommonOptions(options) {
         write: false,
         preserveSymlinks,
         define: {
-            ...options.define,
             // Only set to false when script optimizations are enabled. It should not be set to true because
             // Angular turns `ngDevMode` into an object for development debugging purposes when not defined
             // which a constant true value would break.

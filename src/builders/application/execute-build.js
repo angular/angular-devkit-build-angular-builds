@@ -16,13 +16,14 @@ const commonjs_checker_1 = require("../../tools/esbuild/commonjs-checker");
 const license_extractor_1 = require("../../tools/esbuild/license-extractor");
 const utils_1 = require("../../tools/esbuild/utils");
 const bundle_calculator_1 = require("../../utils/bundle-calculator");
+const color_1 = require("../../utils/color");
 const copy_assets_1 = require("../../utils/copy-assets");
 const supported_browsers_1 = require("../../utils/supported-browsers");
 const execute_post_bundle_1 = require("./execute-post-bundle");
 const i18n_1 = require("./i18n");
 const setup_bundling_1 = require("./setup-bundling");
 async function executeBuild(options, context, rebuildState) {
-    const { projectRoot, workspaceRoot, i18nOptions, optimizationOptions, assets, cacheOptions, prerenderOptions, ssrOptions, verbose, colors, jsonLogs, } = options;
+    const { projectRoot, workspaceRoot, i18nOptions, optimizationOptions, assets, cacheOptions, prerenderOptions, ssrOptions, verbose, } = options;
     // TODO: Consider integrating into watch mode. Would require full rebuild on target changes.
     const browsers = (0, supported_browsers_1.getSupportedBrowsers)(projectRoot, context.logger);
     // Load active translations if inlining
@@ -95,11 +96,12 @@ async function executeBuild(options, context, rebuildState) {
         executionResult.addOutputFile('3rdpartylicenses.txt', await (0, license_extractor_1.extractLicenses)(metafile, workspaceRoot), bundler_context_1.BuildOutputFileType.Root);
     }
     // Perform i18n translation inlining if enabled
+    let prerenderedRoutes;
     if (i18nOptions.shouldInline) {
         const result = await (0, i18n_1.inlineI18n)(options, executionResult, initialFiles);
         executionResult.addErrors(result.errors);
         executionResult.addWarnings(result.warnings);
-        executionResult.addPrerenderedRoutes(result.prerenderedRoutes);
+        prerenderedRoutes = result.prerenderedRoutes;
     }
     else {
         const result = await (0, execute_post_bundle_1.executePostBundleSteps)(options, executionResult.outputFiles, executionResult.assetFiles, initialFiles, 
@@ -107,20 +109,25 @@ async function executeBuild(options, context, rebuildState) {
         i18nOptions.hasDefinedSourceLocale ? i18nOptions.sourceLocale : undefined);
         executionResult.addErrors(result.errors);
         executionResult.addWarnings(result.warnings);
-        executionResult.addPrerenderedRoutes(result.prerenderedRoutes);
+        prerenderedRoutes = result.prerenderedRoutes;
         executionResult.outputFiles.push(...result.additionalOutputFiles);
         executionResult.assetFiles.push(...result.additionalAssets);
     }
     if (prerenderOptions) {
-        const prerenderedRoutes = executionResult.prerenderedRoutes;
-        executionResult.addOutputFile('prerendered-routes.json', JSON.stringify({ routes: prerenderedRoutes }, null, 2), bundler_context_1.BuildOutputFileType.Root);
+        executionResult.addOutputFile('prerendered-routes.json', JSON.stringify({ routes: prerenderedRoutes.sort((a, b) => a.localeCompare(b)) }, null, 2), bundler_context_1.BuildOutputFileType.Root);
+        let prerenderMsg = `Prerendered ${prerenderedRoutes.length} static route`;
+        if (prerenderedRoutes.length > 1) {
+            prerenderMsg += 's.';
+        }
+        else {
+            prerenderMsg += '.';
+        }
+        context.logger.info(color_1.colors.magenta(prerenderMsg) + '\n');
     }
+    (0, utils_1.logBuildStats)(context.logger, metafile, initialFiles, budgetFailures, changedFiles, estimatedTransferSizes, !!ssrOptions, verbose);
     // Write metafile if stats option is enabled
     if (options.stats) {
         executionResult.addOutputFile('stats.json', JSON.stringify(metafile, null, 2), bundler_context_1.BuildOutputFileType.Root);
-    }
-    if (!jsonLogs) {
-        context.logger.info((0, utils_1.logBuildStats)(metafile, initialFiles, budgetFailures, colors, changedFiles, estimatedTransferSizes, !!ssrOptions, verbose));
     }
     return executionResult;
 }

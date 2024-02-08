@@ -6,15 +6,19 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { logging } from '@angular-devkit/core';
-import { BuildOptions, Metafile, OutputFile } from 'esbuild';
-import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from '../../builders/application/options';
+import { BuildOptions, Metafile, OutputFile, PartialMessage } from 'esbuild';
+import { NormalizedOutputOptions } from '../../builders/application/options';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
-import { BuildOutputAsset, ExecutionResult } from './bundler-execution-result';
-export declare function logBuildStats(metafile: Metafile, initial: Map<string, InitialFileRecord>, budgetFailures: BudgetCalculatorResult[] | undefined, colors: boolean, changedFiles?: Set<string>, estimatedTransferSizes?: Map<string, number>, ssrOutputEnabled?: boolean, verbose?: boolean): string;
+import { BuildOutputAsset } from './bundler-execution-result';
+export declare function logBuildStats(logger: logging.LoggerApi, metafile: Metafile, initial: Map<string, InitialFileRecord>, budgetFailures: BudgetCalculatorResult[] | undefined, changedFiles?: Set<string>, estimatedTransferSizes?: Map<string, number>, ssrOutputEnabled?: boolean, verbose?: boolean): void;
 export declare function calculateEstimatedTransferSizes(outputFiles: OutputFile[]): Promise<Map<string, number>>;
 export declare function withSpinner<T>(text: string, action: () => T | Promise<T>): Promise<T>;
 export declare function withNoProgress<T>(text: string, action: () => T | Promise<T>): Promise<T>;
+export declare function logMessages(logger: logging.LoggerApi, { errors, warnings }: {
+    errors?: PartialMessage[];
+    warnings?: PartialMessage[];
+}): Promise<void>;
 /**
  * Generates a syntax feature object map for Angular applications based on a list of targets.
  * A full set of feature names can be found here: https://esbuild.github.io/api/#supported
@@ -37,4 +41,3 @@ export declare function transformSupportedBrowsersToTargets(supportedBrowsers: s
  * @see https://esbuild.github.io/api/#target
  */
 export declare function getSupportedNodeTargets(): string[];
-export declare function logMessages(logger: logging.LoggerApi, executionResult: ExecutionResult, options: NormalizedApplicationBuildOptions): Promise<void>;

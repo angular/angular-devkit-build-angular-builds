@@ -59,12 +59,6 @@ export interface Schema {
      */
     port?: number;
     /**
-     * Enable and control the Vite-based development server's prebundling capabilities. To
-     * enable prebundling, the Angular CLI cache must also be enabled. This option has no effect
-     * when using the 'browser' or other Webpack-based builders.
-     */
-    prebundle?: PrebundleUnion;
-    /**
      * Proxy configuration file. For more information, see
      * https://angular.io/guide/build#proxying-to-a-backend-server.
      */
@@ -99,17 +93,4 @@ export interface Schema {
      * Rebuild on change.
      */
     watch?: boolean;
-}
-/**
- * Enable and control the Vite-based development server's prebundling capabilities. To
- * enable prebundling, the Angular CLI cache must also be enabled. This option has no effect
- * when using the 'browser' or other Webpack-based builders.
- */
-export type PrebundleUnion = boolean | PrebundleClass;
-export interface PrebundleClass {
-    /**
-     * List of package imports that should not be prebundled by the development server. The
-     * packages will be bundled into the application code itself.
-     */
-    exclude: string[];
 }

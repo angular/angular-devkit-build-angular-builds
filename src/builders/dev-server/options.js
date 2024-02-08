@@ -33,7 +33,7 @@ async function normalizeOptions(context, projectName, options) {
     const buildTargetSpecifier = options.buildTarget ?? options.browserTarget ?? `::development`;
     const buildTarget = (0, architect_1.targetFromTargetString)(buildTargetSpecifier, projectName, 'build');
     // Initial options to keep
-    const { host, port, poll, open, verbose, watch, allowedHosts, disableHostCheck, liveReload, hmr, headers, proxyConfig, servePath, publicHost, ssl, sslCert, sslKey, forceEsbuild, prebundle, } = options;
+    const { host, port, poll, open, verbose, watch, allowedHosts, disableHostCheck, liveReload, hmr, headers, proxyConfig, servePath, publicHost, ssl, sslCert, sslKey, forceEsbuild, } = options;
     // Return all the normalized options
     return {
         buildTarget,
@@ -58,8 +58,6 @@ async function normalizeOptions(context, projectName, options) {
         sslCert,
         sslKey,
         forceEsbuild,
-        // Prebundling defaults to true but requires caching to function
-        prebundle: cacheOptions.enabled && (prebundle ?? true),
     };
 }
 exports.normalizeOptions = normalizeOptions;

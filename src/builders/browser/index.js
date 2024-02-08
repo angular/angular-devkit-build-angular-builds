@@ -120,9 +120,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             webpackFactory: require('webpack'),
             logging: transforms.logging ||
                 ((stats, config) => {
-                    if (options.verbose && config.stats !== false) {
-                        const statsOptions = config.stats === true ? undefined : config.stats;
-                        context.logger.info(stats.toString(statsOptions));
+                    if (options.verbose) {
+                        context.logger.info(stats.toString(config.stats));
                     }
                 }),
         }).pipe((0, rxjs_1.concatMap)(

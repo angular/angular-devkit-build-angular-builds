@@ -49,7 +49,7 @@ const virtual_module_plugin_1 = require("./virtual-module-plugin");
  * @returns An esbuild BuildOptions object.
  */
 function createGlobalScriptsBundleOptions(options, target, initial) {
-    const { globalScripts, optimizationOptions, outputNames, preserveSymlinks, sourcemapOptions, jsonLogs, workspaceRoot, } = options;
+    const { globalScripts, optimizationOptions, outputNames, preserveSymlinks, sourcemapOptions, workspaceRoot, } = options;
     const namespace = 'angular:script/global';
     const entryPoints = {};
     let found = false;
@@ -74,7 +74,7 @@ function createGlobalScriptsBundleOptions(options, target, initial) {
             mainFields: ['script', 'browser', 'main'],
             conditions: ['script'],
             resolveExtensions: ['.mjs', '.js'],
-            logLevel: options.verbose && !jsonLogs ? 'debug' : 'silent',
+            logLevel: options.verbose ? 'debug' : 'silent',
             metafile: true,
             minify: optimizationOptions.scripts,
             outdir: workspaceRoot,
@@ -91,7 +91,8 @@ function createGlobalScriptsBundleOptions(options, target, initial) {
                     // Add the `js` extension here so that esbuild generates an output file with the extension
                     transformPath: (path) => path.slice(namespace.length + 1) + '.js',
                     loadContent: (args, build) => (0, load_result_cache_1.createCachedLoad)(loadCache, async (args) => {
-                        const files = globalScripts.find(({ name }) => name === args.path.slice(0, -3))?.files;
+                        const files = globalScripts.find(({ name }) => name === args.path.slice(0, -3))
+                            ?.files;
                         (0, node_assert_1.default)(files, `Invalid operation: global scripts name not found [${args.path}]`);
                         // Global scripts are concatenated using magic-string instead of bundled via esbuild.
                         const bundleContent = new magic_string_1.Bundle();

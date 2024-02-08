@@ -13,6 +13,4 @@ import type { Plugin } from 'esbuild';
  *
  * @returns An esbuild plugin.
  */
-export declare function createExternalPackagesPlugin(options?: {
-    exclude?: string[];
-}): Plugin;
+export declare function createExternalPackagesPlugin(): Plugin;

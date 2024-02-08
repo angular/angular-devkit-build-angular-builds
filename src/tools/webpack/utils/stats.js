@@ -419,9 +419,8 @@ function createWebpackLoggingCallback(options, logger) {
         ...(0, helpers_1.normalizeExtraEntryPoints)(scripts, 'scripts'),
     ];
     return (stats, config) => {
-        if (verbose && config.stats !== false) {
-            const statsOptions = config.stats === true ? undefined : config.stats;
-            logger.info(stats.toString(statsOptions));
+        if (verbose) {
+            logger.info(stats.toString(config.stats));
         }
         const rawStats = stats.toJson((0, helpers_1.getStatsOptions)(false));
         const webpackStats = {
