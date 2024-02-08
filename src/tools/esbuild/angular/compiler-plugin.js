@@ -162,7 +162,7 @@ function createCompilerPlugin(pluginOptions, styleOptions) {
                         });
                         referencedFileTracker.add(containingFile, Object.keys(workerResult.metafile.inputs).map((input) => path.join(build.initialOptions.absWorkingDir ?? '', input)));
                         // Return bundled worker file entry name to be used in the built output
-                        const workerCodeFile = workerResult.outputFiles.find((file) => file.path.endsWith('.js'));
+                        const workerCodeFile = workerResult.outputFiles.find((file) => /^worker-[A-Z0-9]{8}.[cm]?js$/.test(path.basename(file.path)));
                         (0, node_assert_1.default)(workerCodeFile, 'Web Worker bundled code file should always be present.');
                         const workerCodePath = path.relative(build.initialOptions.outdir ?? '', workerCodeFile.path);
                         return workerCodePath.replaceAll('\\', '/');
