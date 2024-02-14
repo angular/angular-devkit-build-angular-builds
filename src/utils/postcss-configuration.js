@@ -67,7 +67,7 @@ async function loadPostcssConfiguration(workspaceRoot, projectRoot) {
     }
     const config = { plugins: [] };
     for (const [name, options] of entries) {
-        if (!options || typeof options !== 'object') {
+        if (!options || (typeof options !== 'object' && typeof options !== 'string')) {
             continue;
         }
         config.plugins.push([name, options]);

@@ -6,6 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export interface PostcssConfiguration {
-    plugins: [name: string, options?: object][];
+    plugins: [name: string, options?: object | string][];
 }
 export declare function loadPostcssConfiguration(workspaceRoot: string, projectRoot: string): Promise<PostcssConfiguration | undefined>;
