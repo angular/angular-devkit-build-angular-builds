@@ -185,7 +185,7 @@ class SassWorkerImplementation {
     }
     async processImporters(importers, url, options) {
         for (const importer of importers) {
-            if (this.isImporter(importer)) {
+            if (!this.isFileImporter(importer)) {
                 // Importer
                 throw new Error('Only File Importers are supported.');
             }
@@ -206,8 +206,8 @@ class SassWorkerImplementation {
             importers,
         };
     }
-    isImporter(value) {
-        return 'canonicalize' in value && 'load' in value;
+    isFileImporter(value) {
+        return 'findFileUrl' in value;
     }
 }
 exports.SassWorkerImplementation = SassWorkerImplementation;

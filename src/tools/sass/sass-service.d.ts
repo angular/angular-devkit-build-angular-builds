@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { CompileResult, StringOptionsWithImporter, StringOptionsWithoutImporter } from 'sass';
+import { CompileResult, StringOptions } from 'sass';
 /**
  * A Sass renderer implementation that provides an interface that can be used by Webpack's
  * `sass-loader`. The implementation uses a Worker thread to perform the Sass rendering
@@ -36,7 +36,7 @@ export declare class SassWorkerImplementation {
      * @param source The contents to compile.
      * @param options The `dart-sass` options to use when rendering the stylesheet.
      */
-    compileStringAsync(source: string, options: StringOptionsWithImporter<'async'> | StringOptionsWithoutImporter<'async'>): Promise<CompileResult>;
+    compileStringAsync(source: string, options: StringOptions<'async'>): Promise<CompileResult>;
     /**
      * Shutdown the Sass render worker.
      * Executing this method will stop any pending render requests.
@@ -45,5 +45,5 @@ export declare class SassWorkerImplementation {
     private createWorker;
     private processImporters;
     private createRequest;
-    private isImporter;
+    private isFileImporter;
 }
