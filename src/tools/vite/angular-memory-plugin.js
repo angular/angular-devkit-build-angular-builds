@@ -42,13 +42,16 @@ function createAngularMemoryPlugin(options) {
                 return (0, node_path_1.join)(virtualProjectRoot, source);
             }
         },
-        load(id) {
+        async load(id) {
             const [file] = id.split('?', 1);
             const relativeFile = '/' + normalizePath((0, node_path_1.relative)(virtualProjectRoot, file));
             const codeContents = outputFiles.get(relativeFile)?.contents;
             if (codeContents === undefined) {
                 if (relativeFile.endsWith('/node_modules/vite/dist/client/client.mjs')) {
-                    return loadViteClientCode(file);
+                    return {
+                        code: await loadViteClientCode(file),
+                        map: await (0, promises_1.readFile)(file + '.map', 'utf-8'),
+                    };
                 }
                 return;
             }
