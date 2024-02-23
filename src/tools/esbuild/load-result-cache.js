@@ -54,13 +54,16 @@ class MemoryLoadResultCache {
         }
     }
     invalidate(path) {
-        const affected = this.#fileDependencies.get(path);
+        const affectedPaths = this.#fileDependencies.get(path);
         let found = false;
-        if (affected) {
-            affected.forEach((a) => (found ||= this.#loadResults.delete(a)));
+        if (affectedPaths) {
+            for (const affected of affectedPaths) {
+                if (this.#loadResults.delete(affected)) {
+                    found = true;
+                }
+            }
             this.#fileDependencies.delete(path);
         }
-        found ||= this.#loadResults.delete(path);
         return found;
     }
     get watchFiles() {
