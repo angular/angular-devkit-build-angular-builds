@@ -60,7 +60,7 @@ const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
  * Maximum time in milliseconds for single build/rebuild
  * This accounts for CI variability.
  */
-exports.BUILD_TIMEOUT = 30000;
+exports.BUILD_TIMEOUT = 30_000;
 async function initialize(options, context, webpackConfigurationTransform) {
     const originalOutputPath = options.outputPath;
     // Assets are processed directly by the builder except when watching

@@ -76,7 +76,7 @@ async function render({ serverBundlePath, document, url }) {
     }
     // The below should really handled by the framework!!!.
     let timer;
-    const renderingTimeout = new Promise((_, reject) => (timer = setTimeout(() => reject(new Error(`Page ${new URL(url, 'resolve://').pathname} did not render in 30 seconds.`)), 30000)));
+    const renderingTimeout = new Promise((_, reject) => (timer = setTimeout(() => reject(new Error(`Page ${new URL(url, 'resolve://').pathname} did not render in 30 seconds.`)), 30_000)));
     return Promise.race([renderAppPromise, renderingTimeout]).finally(() => clearTimeout(timer));
 }
 function isBootstrapFn(value) {

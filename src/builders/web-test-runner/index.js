@@ -110,7 +110,7 @@ async function runTests(wtr, testDir, options) {
             ],
             testFramework: {
                 config: {
-                    defaultTimeoutInterval: 5000,
+                    defaultTimeoutInterval: 5_000,
                 },
             },
             nodeResolve: true,
