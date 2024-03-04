@@ -83,6 +83,7 @@ class I18nInliner {
                 shouldOptimize: options.shouldOptimize,
                 files,
             },
+            recordTiming: false,
         });
     }
     /**

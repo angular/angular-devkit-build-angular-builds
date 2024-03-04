@@ -69,6 +69,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
         filename: require.resolve('./render-worker'),
         maxThreads: 1,
         workerData: { zonePackage },
+        recordTiming: false,
     });
     try {
         for (const { path: outputPath, baseHref } of browserResult.outputs) {
