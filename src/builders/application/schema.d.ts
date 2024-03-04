@@ -55,6 +55,12 @@ export interface Schema {
      */
     deleteOutputPath?: boolean;
     /**
+     * Customize the base path for the URLs of resources in 'index.html' and component
+     * stylesheets. This option is only necessary for specific deployment scenarios, such as
+     * with Angular Elements or when utilizing different CDN locations.
+     */
+    deployUrl?: string;
+    /**
      * Exclude the listed external dependencies from being bundled into the bundle. Instead, the
      * created bundle relies on these dependencies to be available during runtime.
      */

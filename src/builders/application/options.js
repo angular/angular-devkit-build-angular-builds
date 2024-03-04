@@ -225,7 +225,7 @@ async function normalizeOptions(context, projectName, options, extensions) {
         i18nOptions,
         namedChunks,
         budgets: budgets?.length ? budgets : undefined,
-        publicPath: deployUrl ? deployUrl : undefined,
+        publicPath: deployUrl,
         plugins: extensions?.codePlugins?.length ? extensions?.codePlugins : undefined,
         loaderExtensions,
         jsonLogs: environment_options_1.useJSONBuildLogs,

@@ -39,6 +39,7 @@ class ParallelCompilation extends angular_compilation_1.AngularCompilation {
             // is used when the Atomics based wait loop is enable.
             useAtomics: !process.versions.webcontainer,
             filename: localRequire.resolve('./parallel-worker'),
+            recordTiming: false,
         });
     }
     initialize(tsconfig, hostOptions, compilerOptionsTransformer) {

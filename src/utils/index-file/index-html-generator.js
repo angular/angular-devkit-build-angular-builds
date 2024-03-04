@@ -10,7 +10,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.IndexHtmlGenerator = void 0;
 const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
-const strip_bom_1 = require("../strip-bom");
 const augment_index_html_1 = require("./augment-index-html");
 const inline_critical_css_1 = require("./inline-critical-css");
 const inline_fonts_1 = require("./inline-fonts");
@@ -37,7 +36,7 @@ class IndexHtmlGenerator {
         ];
     }
     async process(options) {
-        let content = (0, strip_bom_1.stripBom)(await this.readIndex(this.options.indexPath));
+        let content = await this.readIndex(this.options.indexPath);
         const warnings = [];
         const errors = [];
         for (const plugin of this.plugins) {
@@ -71,10 +70,10 @@ class IndexHtmlGenerator {
     }
     async readIndex(path) {
         try {
-            return await (0, promises_1.readFile)(path, 'utf-8');
+            return new TextDecoder('utf-8').decode(await (0, promises_1.readFile)(path));
         }
-        catch {
-            throw new Error(`Failed to read index HTML file "${path}".`);
+        catch (cause) {
+            throw new Error(`Failed to read index HTML file "${path}".`, { cause });
         }
     }
 }

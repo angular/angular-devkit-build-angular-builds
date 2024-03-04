@@ -41,9 +41,9 @@ export interface Schema {
      */
     deleteOutputPath?: boolean;
     /**
-     * URL where files will be deployed.
-     * @deprecated Use "baseHref" option, "APP_BASE_HREF" DI token or a combination of both
-     * instead. For more information, see https://angular.io/guide/deployment#the-deploy-url.
+     * Customize the base path for the URLs of resources in 'index.html' and component
+     * stylesheets. This option is only necessary for specific deployment scenarios, such as
+     * with Angular Elements or when utilizing different CDN locations.
      */
     deployUrl?: string;
     /**
