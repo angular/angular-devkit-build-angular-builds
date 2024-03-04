@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.webpackStatsLogger = exports.generateBuildEventStats = exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = exports.generateBuildStatsTable = exports.generateEsbuildBuildStatsTable = exports.formatSize = void 0;
 const node_assert_1 = __importDefault(require("node:assert"));
 const path = __importStar(require("node:path"));
+const node_util_1 = require("node:util");
 const utils_1 = require("../../../utils");
 const color_1 = require("../../../utils/color");
 const async_chunks_1 = require("./async-chunks");
@@ -237,7 +238,7 @@ function generateTableText(bundleInfo, colors) {
                 continue;
             }
             const currentLongest = (longest[i] ??= 0);
-            const currentItemLength = (0, color_1.removeColor)(currentItem).length;
+            const currentItemLength = (0, node_util_1.stripVTControlCharacters)(currentItem).length;
             if (currentLongest < currentItemLength) {
                 longest[i] = currentItemLength;
             }
@@ -254,7 +255,7 @@ function generateTableText(bundleInfo, colors) {
             if (skipText(currentItem)) {
                 continue;
             }
-            const currentItemLength = (0, color_1.removeColor)(currentItem).length;
+            const currentItemLength = (0, node_util_1.stripVTControlCharacters)(currentItem).length;
             const stringPad = ' '.repeat(longest[i] - currentItemLength);
             // Values in columns at index 2 and 3 (Raw and Estimated sizes) are always right aligned.
             item[i] = i >= 2 ? stringPad + currentItem : currentItem + stringPad;

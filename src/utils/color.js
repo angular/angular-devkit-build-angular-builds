@@ -30,9 +30,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.colors = exports.removeColor = void 0;
+exports.colors = void 0;
 const ansiColors = __importStar(require("ansi-colors"));
-const tty_1 = require("tty");
+const node_tty_1 = require("node:tty");
 function supportColor() {
     if (process.env.FORCE_COLOR !== undefined) {
         // 2 colors: FORCE_COLOR = 0 (Disables colors), depth 1
@@ -52,17 +52,11 @@ function supportColor() {
                 return false;
         }
     }
-    if (process.stdout instanceof tty_1.WriteStream) {
-        return process.stdout.getColorDepth() > 1;
+    if (process.stdout instanceof node_tty_1.WriteStream) {
+        return process.stdout.hasColors();
     }
     return false;
 }
-function removeColor(text) {
-    // This has been created because when colors.enabled is false unstyle doesn't work
-    // see: https://github.com/doowb/ansi-colors/blob/a4794363369d7b4d1872d248fc43a12761640d8e/index.js#L38
-    return text.replace(ansiColors.ansiRegex, '');
-}
-exports.removeColor = removeColor;
 // Create a separate instance to prevent unintended global changes to the color configuration
 const colors = ansiColors.create();
 exports.colors = colors;
