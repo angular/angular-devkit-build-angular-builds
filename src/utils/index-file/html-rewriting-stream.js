@@ -8,38 +8,21 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.htmlRewritingStream = void 0;
-const stream_1 = require("stream");
+const node_stream_1 = require("node:stream");
+const promises_1 = require("node:stream/promises");
 const load_esm_1 = require("../load-esm");
 async function htmlRewritingStream(content) {
     const { RewritingStream } = await (0, load_esm_1.loadEsmModule)('parse5-html-rewriting-stream');
-    const chunks = [];
     const rewriter = new RewritingStream();
     return {
         rewriter,
-        transformedContent: () => {
-            return new Promise((resolve) => {
-                new stream_1.Readable({
-                    encoding: 'utf8',
-                    read() {
-                        this.push(Buffer.from(content));
-                        this.push(null);
-                    },
-                })
-                    .pipe(rewriter)
-                    .pipe(new stream_1.Writable({
-                    write(chunk, encoding, callback) {
-                        chunks.push(typeof chunk === 'string'
-                            ? Buffer.from(chunk, encoding)
-                            : chunk);
-                        callback();
-                    },
-                    final(callback) {
-                        callback();
-                        resolve(Buffer.concat(chunks).toString());
-                    },
-                }));
-            });
-        },
+        transformedContent: () => (0, promises_1.pipeline)(node_stream_1.Readable.from(content), rewriter, async function (source) {
+            const chunks = [];
+            for await (const chunk of source) {
+                chunks.push(Buffer.from(chunk));
+            }
+            return Buffer.concat(chunks).toString('utf-8');
+        }),
     };
 }
 exports.htmlRewritingStream = htmlRewritingStream;
