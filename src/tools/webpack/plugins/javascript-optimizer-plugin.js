@@ -116,7 +116,6 @@ class JavaScriptOptimizerPlugin {
                 const workerPool = new piscina_1.default({
                     filename: workerPath,
                     maxThreads: MAX_OPTIMIZE_WORKERS,
-                    recordTiming: false,
                 });
                 // Enqueue script optimization tasks and update compilation assets as the tasks complete
                 try {

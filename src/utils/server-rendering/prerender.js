@@ -97,7 +97,6 @@ async function renderPages(sourcemap, allRoutes, maxThreads, workspaceRoot, outp
             document,
         },
         execArgv: workerExecArgv,
-        recordTiming: false,
     });
     try {
         const renderingPromises = [];
@@ -164,7 +163,6 @@ async function getAllRoutes(workspaceRoot, outputFilesForWorker, assetFilesForWo
             verbose,
         },
         execArgv: workerExecArgv,
-        recordTiming: false,
     });
     const { routes: extractedRoutes, warnings } = await renderWorker
         .run({})
