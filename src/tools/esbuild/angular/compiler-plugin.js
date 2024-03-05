@@ -351,7 +351,7 @@ function createCompilerOptionsTransformer(setupWarnings, pluginOptions, preserve
                 location: { file: pluginOptions.tsconfig },
                 notes: [
                     {
-                        text: 'To control ECMA version and features use the Browerslist configuration. ' +
+                        text: 'To control ECMA version and features use the Browserslist configuration. ' +
                             'For more information, see https://angular.io/guide/build#configuring-browser-compatibility',
                     },
                 ],
