@@ -53,6 +53,8 @@ const browser_esbuild_1 = require("../browser-esbuild");
 async function* serveWithVite(serverOptions, builderName, context, transformers, extensions) {
     // Get the browser configuration from the target name.
     const rawBrowserOptions = (await context.getTargetOptions(serverOptions.buildTarget));
+    // Deploy url is not used in the dev-server.
+    delete rawBrowserOptions.deployUrl;
     const browserOptions = (await context.validateOptions({
         ...rawBrowserOptions,
         watch: serverOptions.watch,
