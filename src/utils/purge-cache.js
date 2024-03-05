@@ -8,8 +8,8 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.purgeStaleBuildCache = void 0;
-const fs_1 = require("fs");
-const path_1 = require("path");
+const promises_1 = require("node:fs/promises");
+const node_path_1 = require("node:path");
 const normalize_cache_1 = require("./normalize-cache");
 /** Delete stale cache directories used by previous versions of build-angular. */
 async function purgeStaleBuildCache(context) {
@@ -19,17 +19,22 @@ async function purgeStaleBuildCache(context) {
     }
     const metadata = await context.getProjectMetadata(projectName);
     const { basePath, path, enabled } = (0, normalize_cache_1.normalizeCacheOptions)(metadata, context.workspaceRoot);
-    if (!enabled || !(0, fs_1.existsSync)(basePath)) {
+    if (!enabled) {
         return;
     }
-    const entriesToDelete = (await fs_1.promises.readdir(basePath, { withFileTypes: true }))
-        .filter((d) => (0, path_1.join)(basePath, d.name) !== path && d.isDirectory())
-        .map((d) => {
-        const subPath = (0, path_1.join)(basePath, d.name);
-        return fs_1.promises
-            .rm(subPath, { force: true, recursive: true, maxRetries: 3 })
-            .catch(() => void 0);
-    });
-    await Promise.all(entriesToDelete);
+    let baseEntries;
+    try {
+        baseEntries = await (0, promises_1.readdir)(basePath, { withFileTypes: true });
+    }
+    catch {
+        // No purging possible if base path does not exist or cannot otherwise be accessed
+        return;
+    }
+    const entriesToDelete = baseEntries
+        .filter((d) => d.isDirectory())
+        .map((d) => (0, node_path_1.join)(basePath, d.name))
+        .filter((cachePath) => cachePath !== path)
+        .map((stalePath) => (0, promises_1.rm)(stalePath, { force: true, recursive: true, maxRetries: 3 }));
+    await Promise.allSettled(entriesToDelete);
 }
 exports.purgeStaleBuildCache = purgeStaleBuildCache;
