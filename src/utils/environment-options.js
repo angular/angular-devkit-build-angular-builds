@@ -7,8 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useJSONBuildLogs = exports.useTypeChecking = exports.shouldWatchRoot = exports.debugPerformance = exports.useLegacySass = exports.useParallelTs = exports.maxWorkers = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
-const color_1 = require("./color");
+exports.useJSONBuildLogs = exports.useTypeChecking = exports.shouldWatchRoot = exports.debugPerformance = exports.useParallelTs = exports.maxWorkers = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
 function isDisabled(variable) {
     return variable === '0' || variable.toLowerCase() === 'false';
 }
@@ -70,15 +69,6 @@ const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
 exports.maxWorkers = isPresent(maxWorkersVariable) ? +maxWorkersVariable : 4;
 const parallelTsVariable = process.env['NG_BUILD_PARALLEL_TS'];
 exports.useParallelTs = !isPresent(parallelTsVariable) || !isDisabled(parallelTsVariable);
-const legacySassVariable = process.env['NG_BUILD_LEGACY_SASS'];
-exports.useLegacySass = (() => {
-    if (!isPresent(legacySassVariable)) {
-        return false;
-    }
-    // eslint-disable-next-line no-console
-    console.warn(color_1.colors.yellow(`Warning: 'NG_BUILD_LEGACY_SASS' environment variable support will be removed in version 16.`));
-    return isEnabled(legacySassVariable);
-})();
 const debugPerfVariable = process.env['NG_BUILD_DEBUG_PERF'];
 exports.debugPerformance = isPresent(debugPerfVariable) && isEnabled(debugPerfVariable);
 const watchRootVariable = process.env['NG_BUILD_WATCH_ROOT'];
