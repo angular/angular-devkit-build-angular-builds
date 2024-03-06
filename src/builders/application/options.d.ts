@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuilderContext } from '@angular-devkit/architect';
+import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import { I18nOptions } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
@@ -119,7 +119,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     indexHtmlOptions: {
         input: string;
         output: string;
-        insertionOrder: import("../../utils/package-chunk-sort").EntryPointsType[];
+        insertionOrder: [string, boolean][];
         transformer: IndexHtmlTransform | undefined;
         preloadInitial: boolean;
     } | undefined;

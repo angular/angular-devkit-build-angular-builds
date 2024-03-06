@@ -15,7 +15,7 @@ const node_assert_1 = __importDefault(require("node:assert"));
 const bundle_options_1 = require("./stylesheets/bundle-options");
 const virtual_module_plugin_1 = require("./virtual-module-plugin");
 function createGlobalStylesBundleOptions(options, target, initial) {
-    const { workspaceRoot, optimizationOptions, sourcemapOptions, outputNames, globalStyles, preserveSymlinks, externalDependencies, stylePreprocessorOptions, tailwindConfiguration, postcssConfiguration, cacheOptions, publicPath, } = options;
+    const { workspaceRoot, optimizationOptions, sourcemapOptions, outputNames, globalStyles, preserveSymlinks, externalDependencies, stylePreprocessorOptions, tailwindConfiguration, postcssConfiguration, cacheOptions, } = options;
     const namespace = 'angular:styles/global';
     const entryPoints = {};
     let found = false;
@@ -48,7 +48,6 @@ function createGlobalStylesBundleOptions(options, target, initial) {
             tailwindConfiguration,
             postcssConfiguration,
             cacheOptions,
-            publicPath,
         }, loadCache);
         // Keep special CSS comments `/*! comment */` in place when `removeSpecialComments` is disabled.
         // These comments are special for a number of CSS tools such as Critters and PurgeCSS.

@@ -276,7 +276,6 @@ function getEsBuildCommonOptions(options) {
         },
         loader: loaderExtensions,
         footer,
-        publicPath: options.publicPath,
     };
 }
 function getEsBuildCommonPolyfillsOptions(options, namespace, tryToResolvePolyfillsAsRelative, sourceFileCache) {

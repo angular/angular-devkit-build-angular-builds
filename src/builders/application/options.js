@@ -15,16 +15,13 @@ const node_fs_1 = require("node:fs");
 const promises_1 = require("node:fs/promises");
 const node_module_1 = require("node:module");
 const node_path_1 = __importDefault(require("node:path"));
-const helpers_1 = require("../../tools/webpack/utils/helpers");
 const utils_1 = require("../../utils");
 const color_1 = require("../../utils/color");
 const environment_options_1 = require("../../utils/environment-options");
 const i18n_options_1 = require("../../utils/i18n-options");
 const normalize_cache_1 = require("../../utils/normalize-cache");
-const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
 const postcss_configuration_1 = require("../../utils/postcss-configuration");
 const tailwind_1 = require("../../utils/tailwind");
-const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const schema_1 = require("./schema");
 /**
  * Normalize the user provided options by creating full paths for all path based options
@@ -116,31 +113,24 @@ async function normalizeOptions(context, projectName, options, extensions) {
     const tailwindConfiguration = postcssConfiguration
         ? undefined
         : await getTailwindConfig(workspaceRoot, projectRoot, context);
-    const globalStyles = [];
-    if (options.styles?.length) {
-        const { entryPoints: stylesheetEntrypoints, noInjectNames } = (0, helpers_1.normalizeGlobalStyles)(options.styles || []);
-        for (const [name, files] of Object.entries(stylesheetEntrypoints)) {
-            globalStyles.push({ name, files, initial: !noInjectNames.includes(name) });
-        }
-    }
-    const globalScripts = [];
-    if (options.scripts?.length) {
-        for (const { bundleName, paths, inject } of (0, helpers_1.globalScriptsByBundleName)(options.scripts)) {
-            globalScripts.push({ name: bundleName, files: paths, initial: inject });
-        }
-    }
+    const globalStyles = normalizeGlobalEntries(options.styles, 'styles');
+    const globalScripts = normalizeGlobalEntries(options.scripts, 'scripts');
     let indexHtmlOptions;
     // index can never have a value of `true` but in the schema it's of type `boolean`.
     if (typeof options.index !== 'boolean') {
         indexHtmlOptions = {
-            input: node_path_1.default.join(workspaceRoot, (0, webpack_browser_config_1.getIndexInputFile)(options.index)),
+            input: node_path_1.default.join(workspaceRoot, typeof options.index === 'string' ? options.index : options.index.input),
             // The output file will be created within the configured output path
-            output: (0, webpack_browser_config_1.getIndexOutputFile)(options.index),
-            // TODO: Use existing information from above to create the insertion order
-            insertionOrder: (0, package_chunk_sort_1.generateEntryPoints)({
-                scripts: options.scripts ?? [],
-                styles: options.styles ?? [],
-            }),
+            output: typeof options.index === 'string'
+                ? node_path_1.default.basename(options.index)
+                : options.index.output || 'index.html',
+            insertionOrder: [
+                ['polyfills', true],
+                ...globalStyles.filter((s) => s.initial).map((s) => [s.name, false]),
+                ...globalScripts.filter((s) => s.initial).map((s) => [s.name, false]),
+                ['main', true],
+                // [name, esm]
+            ],
             transformer: extensions?.indexHtmlTransformer,
             // Preload initial defaults to true
             preloadInitial: typeof options.index !== 'object' || (options.index.preloadInitial ?? true),
@@ -323,4 +313,34 @@ function normalizeDirectoryPath(path) {
         return path.slice(0, -1);
     }
     return path;
+}
+function normalizeGlobalEntries(rawEntries, defaultName) {
+    if (!rawEntries?.length) {
+        return [];
+    }
+    const bundles = new Map();
+    for (const rawEntry of rawEntries) {
+        let entry;
+        if (typeof rawEntry === 'string') {
+            // string entries use default bundle name and inject values
+            entry = { input: rawEntry };
+        }
+        else {
+            entry = rawEntry;
+        }
+        const { bundleName, input, inject = true } = entry;
+        // Non-injected entries default to the file name
+        const name = bundleName || (inject ? defaultName : node_path_1.default.basename(input, node_path_1.default.extname(input)));
+        const existing = bundles.get(name);
+        if (!existing) {
+            bundles.set(name, { name, files: [input], initial: inject });
+            continue;
+        }
+        if (existing.initial !== inject) {
+            throw new Error(`The "${name}" bundle is mixing injected and non-injected entries. ` +
+                'Verify that the project options are correct.');
+        }
+        existing.files.push(input);
+    }
+    return [...bundles.values()];
 }
