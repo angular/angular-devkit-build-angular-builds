@@ -84,7 +84,7 @@ export default function ({ asset, options }: OptimizeRequest): Promise<{
 } | {
     name: string;
     code: string;
-    map: import("@ampproject/remapping/dist/types/source-map").default | undefined;
+    map: import("@ampproject/remapping").SourceMap | undefined;
     errors?: undefined;
 }>;
 export {};
