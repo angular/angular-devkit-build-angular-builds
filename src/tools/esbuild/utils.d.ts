@@ -37,4 +37,5 @@ export declare function transformSupportedBrowsersToTargets(supportedBrowsers: s
  * @see https://esbuild.github.io/api/#target
  */
 export declare function getSupportedNodeTargets(): string[];
-export declare function logMessages(logger: logging.LoggerApi, executionResult: ExecutionResult, options: NormalizedApplicationBuildOptions): Promise<void>;
+export declare function createJsonBuildManifest(result: ExecutionResult, normalizedOptions: NormalizedApplicationBuildOptions): Promise<string>;
+export declare function logMessages(logger: logging.LoggerApi, executionResult: ExecutionResult, color?: boolean, jsonLogs?: boolean): Promise<void>;
