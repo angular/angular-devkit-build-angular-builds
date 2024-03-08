@@ -35,10 +35,12 @@ export declare class ExecutionResult {
     errors: (Message | PartialMessage)[];
     prerenderedRoutes: string[];
     warnings: (Message | PartialMessage)[];
+    logs: string[];
     externalMetadata?: ExternalResultMetadata;
     constructor(rebuildContexts: BundlerContext[], codeBundleCache?: SourceFileCache | undefined);
     addOutputFile(path: string, content: string, type: BuildOutputFileType): void;
     addAssets(assets: BuildOutputAsset[]): void;
+    addLog(value: string): void;
     addError(error: PartialMessage | string): void;
     addErrors(errors: (PartialMessage | string)[]): void;
     addPrerenderedRoutes(routes: string[]): void;

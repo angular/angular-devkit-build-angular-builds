@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logMessages = exports.getSupportedNodeTargets = exports.transformSupportedBrowsersToTargets = exports.convertOutputFile = exports.createOutputFileFromData = exports.createOutputFileFromText = exports.emitFilesToDisk = exports.writeResultFiles = exports.getFeatureSupport = exports.withNoProgress = exports.withSpinner = exports.calculateEstimatedTransferSizes = exports.logBuildStats = void 0;
+exports.logMessages = exports.createJsonBuildManifest = exports.getSupportedNodeTargets = exports.transformSupportedBrowsersToTargets = exports.convertOutputFile = exports.createOutputFileFromData = exports.createOutputFileFromText = exports.emitFilesToDisk = exports.writeResultFiles = exports.getFeatureSupport = exports.withNoProgress = exports.withSpinner = exports.calculateEstimatedTransferSizes = exports.logBuildStats = void 0;
 const esbuild_1 = require("esbuild");
 const node_crypto_1 = require("node:crypto");
 const node_fs_1 = require("node:fs");
@@ -344,33 +344,35 @@ function getSupportedNodeTargets() {
     return SUPPORTED_NODE_VERSIONS.split('||').map((v) => 'node' + (0, semver_1.coerce)(v)?.version);
 }
 exports.getSupportedNodeTargets = getSupportedNodeTargets;
-async function logMessages(logger, executionResult, options) {
-    const { outputOptions: { base, server, browser }, ssrOptions, jsonLogs, colors: color, } = options;
-    const { warnings, errors, prerenderedRoutes } = executionResult;
-    const warningMessages = warnings.length
-        ? await (0, esbuild_1.formatMessages)(warnings, { kind: 'warning', color })
-        : [];
-    const errorMessages = errors.length ? await (0, esbuild_1.formatMessages)(errors, { kind: 'error', color }) : [];
+async function createJsonBuildManifest(result, normalizedOptions) {
+    const { colors: color, outputOptions: { base, server, browser }, ssrOptions, } = normalizedOptions;
+    const { warnings, errors, prerenderedRoutes } = result;
+    const manifest = {
+        errors: errors.length ? await (0, esbuild_1.formatMessages)(errors, { kind: 'error', color }) : [],
+        warnings: warnings.length ? await (0, esbuild_1.formatMessages)(warnings, { kind: 'warning', color }) : [],
+        outputPaths: {
+            root: (0, node_url_1.pathToFileURL)(base),
+            browser: (0, node_url_1.pathToFileURL)((0, node_path_1.join)(base, browser)),
+            server: ssrOptions ? (0, node_url_1.pathToFileURL)((0, node_path_1.join)(base, server)) : undefined,
+        },
+        prerenderedRoutes,
+    };
+    return JSON.stringify(manifest, undefined, 2);
+}
+exports.createJsonBuildManifest = createJsonBuildManifest;
+async function logMessages(logger, executionResult, color, jsonLogs) {
+    const { warnings, errors, logs } = executionResult;
+    if (logs.length) {
+        logger.info(logs.join('\n'));
+    }
     if (jsonLogs) {
-        // JSON format output
-        const manifest = {
-            errors: errorMessages,
-            warnings: warningMessages,
-            outputPaths: {
-                root: (0, node_url_1.pathToFileURL)(base),
-                browser: (0, node_url_1.pathToFileURL)((0, node_path_1.join)(base, browser)),
-                server: ssrOptions ? (0, node_url_1.pathToFileURL)((0, node_path_1.join)(base, server)) : undefined,
-            },
-            prerenderedRoutes,
-        };
-        logger.info(JSON.stringify(manifest, undefined, 2));
         return;
     }
-    if (warningMessages.length) {
-        logger.warn(warningMessages.join('\n'));
+    if (warnings.length) {
+        logger.warn((await (0, esbuild_1.formatMessages)(warnings, { kind: 'warning', color })).join('\n'));
     }
-    if (errorMessages.length) {
-        logger.error(errorMessages.join('\n'));
+    if (errors.length) {
+        logger.error((await (0, esbuild_1.formatMessages)(errors, { kind: 'error', color })).join('\n'));
     }
 }
 exports.logMessages = logMessages;

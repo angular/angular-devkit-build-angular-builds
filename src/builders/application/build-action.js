@@ -54,7 +54,7 @@ const packageWatchFiles = [
     '.pnp.data.json',
 ];
 async function* runEsBuildBuildAction(action, options) {
-    const { writeToFileSystemFilter, writeToFileSystem, watch, poll, clearScreen, logger, deleteOutputPath, cacheOptions, outputOptions, verbose, projectRoot, workspaceRoot, progress, preserveSymlinks, } = options;
+    const { writeToFileSystemFilter, writeToFileSystem, watch, poll, clearScreen, logger, deleteOutputPath, cacheOptions, outputOptions, verbose, projectRoot, workspaceRoot, progress, preserveSymlinks, colors, jsonLogs, } = options;
     if (deleteOutputPath && writeToFileSystem) {
         await (0, delete_output_dir_1.deleteOutputDir)(workspaceRoot, outputOptions.base, [
             outputOptions.browser,
@@ -67,6 +67,8 @@ async function* runEsBuildBuildAction(action, options) {
     try {
         // Perform the build action
         result = await withProgress('Building...', () => action());
+        // Log all diagnostic (error/warning/logs) messages
+        await (0, utils_1.logMessages)(logger, result, colors, jsonLogs);
     }
     finally {
         // Ensure Sass workers are shutdown if not watching
@@ -144,6 +146,8 @@ async function* runEsBuildBuildAction(action, options) {
                 logger.info(changes.toDebugString());
             }
             result = await withProgress('Changes detected. Rebuilding...', () => action(result.createRebuildState(changes)));
+            // Log all diagnostic (error/warning/logs) messages
+            await (0, utils_1.logMessages)(logger, result, colors, jsonLogs);
             // Update watched locations provided by the new build result.
             // Keep watching all previous files if there are any errors; otherwise consider all
             // files stale until confirmed present in the new result's watch files.
