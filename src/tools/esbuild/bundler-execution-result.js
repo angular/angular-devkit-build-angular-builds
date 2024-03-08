@@ -21,6 +21,7 @@ class ExecutionResult {
     errors = [];
     prerenderedRoutes = [];
     warnings = [];
+    logs = [];
     externalMetadata;
     constructor(rebuildContexts, codeBundleCache) {
         this.rebuildContexts = rebuildContexts;
@@ -31,6 +32,9 @@ class ExecutionResult {
     }
     addAssets(assets) {
         this.assetFiles.push(...assets);
+    }
+    addLog(value) {
+        this.logs.push(value);
     }
     addError(error) {
         if (typeof error === 'string') {

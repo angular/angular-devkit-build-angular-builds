@@ -11,7 +11,7 @@ import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { NormalizedOutputOptions } from './options';
-export declare function runEsBuildBuildAction(action: (rebuildState?: RebuildState) => ExecutionResult | Promise<ExecutionResult>, options: {
+export declare function runEsBuildBuildAction(action: (rebuildState?: RebuildState) => Promise<ExecutionResult>, options: {
     workspaceRoot: string;
     projectRoot: string;
     outputOptions: NormalizedOutputOptions;
@@ -27,4 +27,6 @@ export declare function runEsBuildBuildAction(action: (rebuildState?: RebuildSta
     signal?: AbortSignal;
     preserveSymlinks?: boolean;
     clearScreen?: boolean;
+    colors?: boolean;
+    jsonLogs?: boolean;
 }): AsyncIterable<(ExecutionResult['outputWithFiles'] | ExecutionResult['output']) & BuilderOutput>;
