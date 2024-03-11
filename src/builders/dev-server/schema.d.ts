@@ -3,7 +3,8 @@
  */
 export interface Schema {
     /**
-     * List of hosts that are allowed to access the dev server.
+     * List of hosts that are allowed to access the dev server. This option has no effect when
+     * using the 'application' or other esbuild-based builders.
      */
     allowedHosts?: string[];
     /**
@@ -20,7 +21,8 @@ export interface Schema {
      */
     buildTarget?: string;
     /**
-     * Don't verify connected clients are part of allowed hosts.
+     * Don't verify connected clients are part of allowed hosts. This option has no effect when
+     * using the 'application' or other esbuild-based builders.
      */
     disableHostCheck?: boolean;
     /**
@@ -72,7 +74,8 @@ export interface Schema {
     /**
      * The URL that the browser client (or live-reload client, if enabled) should use to connect
      * to the development server. Use for a complex dev server setup, such as one with reverse
-     * proxies.
+     * proxies. This option has no effect when using the 'application' or other esbuild-based
+     * builders.
      */
     publicHost?: string;
     /**
