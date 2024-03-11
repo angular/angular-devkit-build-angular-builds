@@ -54,18 +54,27 @@ function execute(options, context, transforms = {}, extensions) {
     // Determine project name from builder context target
     const projectName = context.target?.project;
     if (!projectName) {
-        context.logger.error(`The 'dev-server' builder requires a target to be specified.`);
+        context.logger.error(`The "dev-server" builder requires a target to be specified.`);
         return rxjs_1.EMPTY;
     }
     return (0, rxjs_1.defer)(() => initialize(options, projectName, context, extensions?.builderSelector)).pipe((0, rxjs_1.switchMap)(({ builderName, normalizedOptions }) => {
         // Use vite-based development server for esbuild-based builds
         if (isEsbuildBased(builderName)) {
             if (transforms?.logging || transforms?.webpackConfiguration) {
-                throw new Error('The `application` and `browser-esbuild` builders do not support Webpack transforms.');
+                throw new Error(`The "application" and "browser-esbuild" builders do not support Webpack transforms.`);
             }
             // Warn if the initial options provided by the user enable prebundling but caching is disabled
             if (options.prebundle && !normalizedOptions.cacheOptions.enabled) {
                 context.logger.warn(`Prebundling has been configured but will not be used because caching has been disabled.`);
+            }
+            if (options.allowedHosts?.length) {
+                context.logger.warn(`The "allowedHost" option will not be used because it is not supported by the "${builderName}" builder.`);
+            }
+            if (options.publicHost) {
+                context.logger.warn(`The "publicHost" option will not be used because it is not supported by the "${builderName}" builder.`);
+            }
+            if (options.disableHostCheck) {
+                context.logger.warn(`The "disableHostCheck" option will not be used because it is not supported by the "${builderName}" builder.`);
             }
             return (0, rxjs_1.defer)(() => Promise.resolve().then(() => __importStar(require('./vite-server')))).pipe((0, rxjs_1.switchMap)(({ serveWithVite }) => serveWithVite(normalizedOptions, builderName, context, transforms, extensions)));
         }
@@ -74,10 +83,10 @@ function execute(options, context, transforms = {}, extensions) {
             context.logger.warn(`Prebundling has been configured but will not be used because it is not supported by the "${builderName}" builder.`);
         }
         if (extensions?.buildPlugins?.length) {
-            throw new Error('Only the `application` and `browser-esbuild` builders support plugins.');
+            throw new Error('Only the "application" and "browser-esbuild" builders support plugins.');
         }
         if (extensions?.middleware?.length) {
-            throw new Error('Only the `application` and `browser-esbuild` builders support middleware.');
+            throw new Error('Only the "application" and "browser-esbuild" builders support middleware.');
         }
         // Use Webpack for all other browser targets
         return (0, rxjs_1.defer)(() => Promise.resolve().then(() => __importStar(require('./webpack-server')))).pipe((0, rxjs_1.switchMap)(({ serveWebpackBrowser }) => serveWebpackBrowser(normalizedOptions, builderName, context, transforms)));
