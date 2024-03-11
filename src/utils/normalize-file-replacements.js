@@ -31,10 +31,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeFileReplacements = exports.MissingFileReplacementException = void 0;
-const core_1 = require("@angular-devkit/core");
 const fs_1 = require("fs");
 const path = __importStar(require("path"));
-class MissingFileReplacementException extends core_1.BaseException {
+class MissingFileReplacementException extends Error {
     constructor(path) {
         super(`The ${path} path in file replacements does not exist.`);
     }

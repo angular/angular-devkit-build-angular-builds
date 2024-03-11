@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { logging } from '@angular-devkit/core';
+import { BuilderContext } from '@angular-devkit/architect';
 import { BuildOptions, Metafile, OutputFile } from 'esbuild';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from '../../builders/application/options';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
@@ -38,4 +38,4 @@ export declare function transformSupportedBrowsersToTargets(supportedBrowsers: s
  */
 export declare function getSupportedNodeTargets(): string[];
 export declare function createJsonBuildManifest(result: ExecutionResult, normalizedOptions: NormalizedApplicationBuildOptions): Promise<string>;
-export declare function logMessages(logger: logging.LoggerApi, executionResult: ExecutionResult, color?: boolean, jsonLogs?: boolean): Promise<void>;
+export declare function logMessages(logger: BuilderContext['logger'], executionResult: ExecutionResult, color?: boolean, jsonLogs?: boolean): Promise<void>;

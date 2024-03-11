@@ -11,11 +11,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadTranslations = exports.configureI18nBuild = exports.createI18nOptions = void 0;
-const core_1 = require("@angular-devkit/core");
-const fs_1 = __importDefault(require("fs"));
-const module_1 = __importDefault(require("module"));
-const os_1 = __importDefault(require("os"));
-const path_1 = __importDefault(require("path"));
+const node_fs_1 = __importDefault(require("node:fs"));
+const node_module_1 = require("node:module");
+const node_os_1 = __importDefault(require("node:os"));
+const node_path_1 = __importDefault(require("node:path"));
 const schema_1 = require("../builders/browser/schema");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
 const load_translations_1 = require("./load-translations");
@@ -39,11 +38,19 @@ function normalizeTranslationFileOption(option, locale, expectObjectInError) {
     }
     throw new Error(errorMessage);
 }
-function createI18nOptions(metadata, inline) {
-    if (metadata.i18n !== undefined && !core_1.json.isJsonObject(metadata.i18n)) {
-        throw new Error('Project i18n field is malformed. Expected an object.');
+function ensureObject(value, name) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        throw new Error(`Project ${name} field is malformed. Expected an object.`);
     }
-    metadata = metadata.i18n || {};
+}
+function ensureString(value, name) {
+    if (typeof value !== 'string') {
+        throw new Error(`Project ${name} field is malformed. Expected a string.`);
+    }
+}
+function createI18nOptions(projectMetadata, inline) {
+    const { i18n: metadata = {} } = projectMetadata;
+    ensureObject(metadata, 'i18n');
     const i18n = {
         inlineLocales: new Set(),
         // en-US is the default locale added to Angular applications (https://angular.io/guide/i18n#i18n-pipes)
@@ -55,21 +62,21 @@ function createI18nOptions(metadata, inline) {
     };
     let rawSourceLocale;
     let rawSourceLocaleBaseHref;
-    if (core_1.json.isJsonObject(metadata.sourceLocale)) {
-        rawSourceLocale = metadata.sourceLocale.code;
-        if (metadata.sourceLocale.baseHref !== undefined &&
-            typeof metadata.sourceLocale.baseHref !== 'string') {
-            throw new Error('Project i18n sourceLocale baseHref field is malformed. Expected a string.');
-        }
-        rawSourceLocaleBaseHref = metadata.sourceLocale.baseHref;
-    }
-    else {
+    if (typeof metadata.sourceLocale === 'string') {
         rawSourceLocale = metadata.sourceLocale;
     }
-    if (rawSourceLocale !== undefined) {
-        if (typeof rawSourceLocale !== 'string') {
-            throw new Error('Project i18n sourceLocale field is malformed. Expected a string.');
+    else if (metadata.sourceLocale !== undefined) {
+        ensureObject(metadata.sourceLocale, 'i18n sourceLocale');
+        if (metadata.sourceLocale.code !== undefined) {
+            ensureString(metadata.sourceLocale.code, 'i18n sourceLocale code');
+            rawSourceLocale = metadata.sourceLocale.code;
         }
+        if (metadata.sourceLocale.baseHref !== undefined) {
+            ensureString(metadata.sourceLocale.baseHref, 'i18n sourceLocale baseHref');
+            rawSourceLocaleBaseHref = metadata.sourceLocale.baseHref;
+        }
+    }
+    if (rawSourceLocale !== undefined) {
         i18n.sourceLocale = rawSourceLocale;
         i18n.hasDefinedSourceLocale = true;
     }
@@ -77,16 +84,15 @@ function createI18nOptions(metadata, inline) {
         files: [],
         baseHref: rawSourceLocaleBaseHref,
     };
-    if (metadata.locales !== undefined && !core_1.json.isJsonObject(metadata.locales)) {
-        throw new Error('Project i18n locales field is malformed. Expected an object.');
-    }
-    else if (metadata.locales) {
+    if (metadata.locales !== undefined) {
+        ensureObject(metadata.locales, 'i18n locales');
         for (const [locale, options] of Object.entries(metadata.locales)) {
             let translationFiles;
             let baseHref;
-            if (core_1.json.isJsonObject(options)) {
+            if (options && typeof options === 'object' && 'translation' in options) {
                 translationFiles = normalizeTranslationFileOption(options.translation, locale, false);
-                if (typeof options.baseHref === 'string') {
+                if ('baseHref' in options) {
+                    ensureString(options.baseHref, `i18n locales ${locale} baseHref`);
                     baseHref = options.baseHref;
                 }
             }
@@ -129,10 +135,10 @@ async function configureI18nBuild(context, options) {
     if (!i18n.shouldInline && !i18n.hasDefinedSourceLocale) {
         return { buildOptions, i18n };
     }
-    const projectRoot = path_1.default.join(context.workspaceRoot, metadata.root || '');
+    const projectRoot = node_path_1.default.join(context.workspaceRoot, metadata.root || '');
     // The trailing slash is required to signal that the path is a directory and not a file.
-    const projectRequire = module_1.default.createRequire(projectRoot + '/');
-    const localeResolver = (locale) => projectRequire.resolve(path_1.default.join(LOCALE_DATA_BASE_MODULE, locale));
+    const projectRequire = (0, node_module_1.createRequire)(projectRoot + '/');
+    const localeResolver = (locale) => projectRequire.resolve(node_path_1.default.join(LOCALE_DATA_BASE_MODULE, locale));
     // Load locale data and translations (if present)
     let loader;
     const usedFormats = new Set();
@@ -177,11 +183,11 @@ async function configureI18nBuild(context, options) {
     if (i18n.shouldInline) {
         // TODO: we should likely save these in the .angular directory in the next major version.
         // We'd need to do a migration to add the temp directory to gitignore.
-        const tempPath = fs_1.default.mkdtempSync(path_1.default.join(fs_1.default.realpathSync(os_1.default.tmpdir()), 'angular-cli-i18n-'));
+        const tempPath = node_fs_1.default.mkdtempSync(node_path_1.default.join(node_fs_1.default.realpathSync(node_os_1.default.tmpdir()), 'angular-cli-i18n-'));
         buildOptions.outputPath = tempPath;
         process.on('exit', () => {
             try {
-                fs_1.default.rmSync(tempPath, { force: true, recursive: true, maxRetries: 3 });
+                node_fs_1.default.rmSync(tempPath, { force: true, recursive: true, maxRetries: 3 });
             }
             catch { }
         });
@@ -203,7 +209,7 @@ function findLocaleDataPath(locale, resolver) {
 function loadTranslations(locale, desc, workspaceRoot, loader, logger, usedFormats, duplicateTranslation) {
     let translations = undefined;
     for (const file of desc.files) {
-        const loadResult = loader(path_1.default.join(workspaceRoot, file.path));
+        const loadResult = loader(node_path_1.default.join(workspaceRoot, file.path));
         for (const diagnostics of loadResult.diagnostics.messages) {
             if (diagnostics.type === 'error') {
                 logger.error(`Error parsing translation file '${file.path}': ${diagnostics.message}`);

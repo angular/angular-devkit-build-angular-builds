@@ -5,9 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BaseException } from '@angular-devkit/core';
 import { FileReplacement } from '../builders/browser/schema';
-export declare class MissingFileReplacementException extends BaseException {
+export declare class MissingFileReplacementException extends Error {
     constructor(path: string);
 }
 export interface NormalizedFileReplacement {

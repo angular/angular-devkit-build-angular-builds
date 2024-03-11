@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
 import { Schema as BrowserBuilderSchema, I18NTranslation } from '../builders/browser/schema';
 import { Schema as ServerBuilderSchema } from '../builders/server/schema';
 import { TranslationLoader } from './load-translations';
@@ -28,7 +27,9 @@ export interface I18nOptions {
     readonly shouldInline: boolean;
     hasDefinedSourceLocale?: boolean;
 }
-export declare function createI18nOptions(metadata: json.JsonObject, inline?: boolean | string[]): I18nOptions;
+export declare function createI18nOptions(projectMetadata: {
+    i18n?: unknown;
+}, inline?: boolean | string[]): I18nOptions;
 export declare function configureI18nBuild<T extends BrowserBuilderSchema | ServerBuilderSchema>(context: BuilderContext, options: T): Promise<{
     buildOptions: T;
     i18n: I18nOptions;

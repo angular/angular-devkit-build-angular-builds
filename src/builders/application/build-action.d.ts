@@ -5,8 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuilderOutput } from '@angular-devkit/architect';
-import type { logging } from '@angular-devkit/core';
+import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
@@ -15,7 +14,7 @@ export declare function runEsBuildBuildAction(action: (rebuildState?: RebuildSta
     workspaceRoot: string;
     projectRoot: string;
     outputOptions: NormalizedOutputOptions;
-    logger: logging.LoggerApi;
+    logger: BuilderContext['logger'];
     cacheOptions: NormalizedCachedOptions;
     writeToFileSystem: boolean;
     writeToFileSystemFilter: ((file: BuildOutputFile) => boolean) | undefined;

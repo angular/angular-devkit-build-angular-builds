@@ -31,10 +31,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeAssetPatterns = exports.MissingAssetSourceRootException = void 0;
-const core_1 = require("@angular-devkit/core");
 const fs_1 = require("fs");
 const path = __importStar(require("path"));
-class MissingAssetSourceRootException extends core_1.BaseException {
+class MissingAssetSourceRootException extends Error {
     constructor(path) {
         super(`The ${path} asset path must start with the project source root.`);
     }
