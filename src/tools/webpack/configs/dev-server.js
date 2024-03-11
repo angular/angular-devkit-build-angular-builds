@@ -162,12 +162,13 @@ async function addProxyConfig(root, proxyConfig) {
     if (!(0, fs_1.existsSync)(proxyPath)) {
         throw new Error(`Proxy configuration file ${proxyPath} does not exist.`);
     }
+    let proxyConfiguration;
     switch ((0, path_1.extname)(proxyPath)) {
         case '.json': {
             const content = await fs_1.promises.readFile(proxyPath, 'utf-8');
             const { parse, printParseErrorCode } = await Promise.resolve().then(() => __importStar(require('jsonc-parser')));
             const parseErrors = [];
-            const proxyConfiguration = parse(content, parseErrors, { allowTrailingComma: true });
+            proxyConfiguration = parse(content, parseErrors, { allowTrailingComma: true });
             if (parseErrors.length > 0) {
                 let errorMessage = `Proxy configuration file ${proxyPath} contains parse errors:`;
                 for (const parseError of parseErrors) {
@@ -176,32 +177,35 @@ async function addProxyConfig(root, proxyConfig) {
                 }
                 throw new Error(errorMessage);
             }
-            return proxyConfiguration;
+            break;
         }
         case '.mjs':
             // Load the ESM configuration file using the TypeScript dynamic import workaround.
             // Once TypeScript provides support for keeping the dynamic import this workaround can be
             // changed to a direct dynamic import.
-            return (await (0, load_esm_1.loadEsmModule)((0, url_1.pathToFileURL)(proxyPath))).default;
+            proxyConfiguration = (await (0, load_esm_1.loadEsmModule)((0, url_1.pathToFileURL)(proxyPath))).default;
+            break;
         case '.cjs':
-            return require(proxyPath);
+            proxyConfiguration = require(proxyPath);
+            break;
         default:
             // The file could be either CommonJS or ESM.
             // CommonJS is tried first then ESM if loading fails.
             try {
-                return require(proxyPath);
+                proxyConfiguration = require(proxyPath);
             }
             catch (e) {
                 (0, error_1.assertIsError)(e);
-                if (e.code === 'ERR_REQUIRE_ESM') {
-                    // Load the ESM configuration file using the TypeScript dynamic import workaround.
-                    // Once TypeScript provides support for keeping the dynamic import this workaround can be
-                    // changed to a direct dynamic import.
-                    return (await (0, load_esm_1.loadEsmModule)((0, url_1.pathToFileURL)(proxyPath))).default;
+                if (e.code !== 'ERR_REQUIRE_ESM') {
+                    throw e;
                 }
-                throw e;
+                // Load the ESM configuration file using the TypeScript dynamic import workaround.
+                // Once TypeScript provides support for keeping the dynamic import this workaround can be
+                // changed to a direct dynamic import.
+                proxyConfiguration = (await (0, load_esm_1.loadEsmModule)((0, url_1.pathToFileURL)(proxyPath))).default;
             }
     }
+    return normalizeProxyConfiguration(proxyConfiguration);
 }
 /**
  * Calculates the line and column for an error offset in the content of a JSON file.
@@ -300,4 +304,9 @@ function getPublicHostOptions(options, webSocketPath) {
         publicHost = new url_1.URL(hostWithProtocol).host;
     }
     return `auto://${publicHost || '0.0.0.0:0'}${webSocketPath}`;
+}
+function normalizeProxyConfiguration(proxy) {
+    return Array.isArray(proxy)
+        ? proxy
+        : Object.entries(proxy).map(([context, value]) => ({ context: [context], ...value }));
 }
