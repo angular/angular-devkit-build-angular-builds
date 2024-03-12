@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { json } from '@angular-devkit/core';
 export interface NormalizedCachedOptions {
     /** Whether disk cache is enabled. */
     enabled: boolean;
@@ -14,4 +13,4 @@ export interface NormalizedCachedOptions {
     /** Disk cache base path. Example: `/.angular/cache`. */
     basePath: string;
 }
-export declare function normalizeCacheOptions(metadata: json.JsonObject, worspaceRoot: string): NormalizedCachedOptions;
+export declare function normalizeCacheOptions(projectMetadata: unknown, worspaceRoot: string): NormalizedCachedOptions;

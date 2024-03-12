@@ -44,7 +44,7 @@ const spinner_1 = require("../../utils/spinner");
 async function _renderUniversal(options, context, browserResult, serverResult, spinner) {
     // Get browser target options.
     const browserTarget = (0, architect_1.targetFromTargetString)(options.browserTarget);
-    const rawBrowserOptions = (await context.getTargetOptions(browserTarget));
+    const rawBrowserOptions = await context.getTargetOptions(browserTarget);
     const browserBuilderName = await context.getBuilderNameForTarget(browserTarget);
     const browserOptions = await context.validateOptions(rawBrowserOptions, browserBuilderName);
     // Locate zone.js to load in the render worker

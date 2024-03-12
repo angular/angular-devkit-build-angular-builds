@@ -68,7 +68,7 @@ function serveWebpackBrowser(options, builderName, context, transforms = {}) {
       See https://webpack.js.org/guides/hot-module-replacement for information on working with HMR for Webpack.`);
         }
         // Get the browser configuration from the target name.
-        const rawBrowserOptions = (await context.getTargetOptions(options.buildTarget));
+        const rawBrowserOptions = await context.getTargetOptions(options.buildTarget);
         if (rawBrowserOptions.outputHashing && rawBrowserOptions.outputHashing !== schema_1.OutputHashing.None) {
             // Disable output hashing for dev build as this can cause memory leaks
             // See: https://github.com/webpack/webpack-dev-server/issues/377#issuecomment-241258405

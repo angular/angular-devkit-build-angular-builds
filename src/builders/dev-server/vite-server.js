@@ -49,18 +49,25 @@ const supported_browsers_1 = require("../../utils/supported-browsers");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const application_1 = require("../application");
 const browser_esbuild_1 = require("../browser-esbuild");
+/**
+ * Build options that are also present on the dev server but are only passed
+ * to the build.
+ */
+const CONVENIENCE_BUILD_OPTIONS = ['watch', 'poll', 'verbose'];
 // eslint-disable-next-line max-lines-per-function
 async function* serveWithVite(serverOptions, builderName, context, transformers, extensions) {
     // Get the browser configuration from the target name.
-    const rawBrowserOptions = (await context.getTargetOptions(serverOptions.buildTarget));
+    const rawBrowserOptions = await context.getTargetOptions(serverOptions.buildTarget);
     // Deploy url is not used in the dev-server.
     delete rawBrowserOptions.deployUrl;
-    const browserOptions = (await context.validateOptions({
-        ...rawBrowserOptions,
-        watch: serverOptions.watch,
-        poll: serverOptions.poll,
-        verbose: serverOptions.verbose,
-    }, builderName));
+    // Copy convenience options to build
+    for (const optionName of CONVENIENCE_BUILD_OPTIONS) {
+        const optionValue = serverOptions[optionName];
+        if (optionValue !== undefined) {
+            rawBrowserOptions[optionName] = optionValue;
+        }
+    }
+    const browserOptions = await context.validateOptions(rawBrowserOptions, builderName);
     if (browserOptions.prerender || browserOptions.ssr) {
         // Disable prerendering if enabled and force SSR.
         // This is so instead of prerendering all the routes for every change, the page is "prerendered" when it is requested.

@@ -6,9 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
 import { Schema } from './schema';
-type PrerenderBuilderOptions = Schema & json.JsonObject;
+type PrerenderBuilderOptions = Schema;
 type PrerenderBuilderOutput = BuilderOutput;
 /**
  * Builds the browser and server, then renders each route in options.routes
@@ -16,5 +15,5 @@ type PrerenderBuilderOutput = BuilderOutput;
  * the browser result.
  */
 export declare function execute(options: PrerenderBuilderOptions, context: BuilderContext): Promise<PrerenderBuilderOutput>;
-declare const _default: import("../../../../architect/src/internal").Builder<Schema & json.JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<Schema & import("../../../../core/src").JsonObject>;
 export default _default;
