@@ -111,7 +111,7 @@ exports.createBrowserPolyfillBundleOptions = createBrowserPolyfillBundleOptions;
  * @returns An esbuild BuildOptions object.
  */
 function createServerCodeBundleOptions(options, target, sourceFileCache) {
-    const { jit, serverEntryPoint, workspaceRoot, ssrOptions, watch, externalPackages, prerenderOptions, } = options;
+    const { serverEntryPoint, workspaceRoot, ssrOptions, watch, externalPackages, prerenderOptions } = options;
     (0, node_assert_1.default)(serverEntryPoint, 'createServerCodeBundleOptions should not be called without a defined serverEntryPoint.');
     const { pluginOptions, styleOptions } = (0, compiler_plugin_options_1.createCompilerPluginOptions)(options, target, sourceFileCache);
     const mainServerNamespace = 'angular:server-render-utils';
