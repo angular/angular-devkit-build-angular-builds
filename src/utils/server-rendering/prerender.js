@@ -13,9 +13,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.prerenderPages = void 0;
 const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
+const node_url_1 = require("node:url");
 const piscina_1 = __importDefault(require("piscina"));
 const bundler_context_1 = require("../../tools/esbuild/bundler-context");
-const node_18_utils_1 = require("./esm-in-memory-loader/node-18-utils");
 async function prerenderPages(workspaceRoot, appShellOptions = {}, prerenderOptions = {}, outputFiles, assets, document, sourcemap = false, inlineCriticalCss = false, maxThreads = 1, verbose = false) {
     const outputFilesForWorker = {};
     const serverBundlesSourceMaps = new Map();
@@ -82,7 +82,11 @@ async function renderPages(sourcemap, allRoutes, maxThreads, workspaceRoot, outp
     const output = {};
     const warnings = [];
     const errors = [];
-    const workerExecArgv = (0, node_18_utils_1.getESMLoaderArgs)();
+    const workerExecArgv = [
+        '--import',
+        // Loader cannot be an absolute path on Windows.
+        (0, node_url_1.pathToFileURL)((0, node_path_1.join)(__dirname, 'esm-in-memory-loader/register-hooks.js')).href,
+    ];
     if (sourcemap) {
         workerExecArgv.push('--enable-source-maps');
     }
@@ -149,7 +153,11 @@ async function getAllRoutes(workspaceRoot, outputFilesForWorker, assetFilesForWo
     if (!discoverRoutes) {
         return { routes };
     }
-    const workerExecArgv = (0, node_18_utils_1.getESMLoaderArgs)();
+    const workerExecArgv = [
+        '--import',
+        // Loader cannot be an absolute path on Windows.
+        (0, node_url_1.pathToFileURL)((0, node_path_1.join)(__dirname, 'esm-in-memory-loader/register-hooks.js')).href,
+    ];
     if (sourcemap) {
         workerExecArgv.push('--enable-source-maps');
     }

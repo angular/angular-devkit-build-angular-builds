@@ -17,7 +17,6 @@ const node_path_1 = require("node:path");
 const node_url_1 = require("node:url");
 const url_1 = require("url");
 const javascript_transformer_1 = require("../../../tools/esbuild/javascript-transformer");
-const node_18_utils_1 = require("./node-18-utils");
 /**
  * Node.js ESM loader to redirect imports to in memory files.
  * @see: https://nodejs.org/api/esm.html#loaders for more information about loaders.
@@ -30,7 +29,6 @@ const javascriptTransformer = new javascript_transformer_1.JavaScriptTransformer
 // In a development environment the additional scope information does not
 // have a negative effect unlike production where final output size is relevant.
 { sourcemap: true, jit: true }, 1);
-(0, node_18_utils_1.callInitializeIfNeeded)(initialize);
 function initialize(data) {
     // This path does not actually exist but is used to overlay the in memory files with the
     // actual filesystem for resolution purposes.
