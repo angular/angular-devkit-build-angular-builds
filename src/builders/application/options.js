@@ -141,7 +141,7 @@ async function normalizeOptions(context, projectName, options, extensions) {
         serverEntryPoint = node_path_1.default.join(workspaceRoot, options.server);
     }
     else if (options.server === '') {
-        throw new Error('`server` option cannot be an empty string.');
+        throw new Error('The "server" option cannot be an empty string.');
     }
     let prerenderOptions;
     if (options.prerender) {
@@ -166,6 +166,9 @@ async function normalizeOptions(context, projectName, options, extensions) {
         appShellOptions = {
             route: 'shell',
         };
+    }
+    if ((appShellOptions || ssrOptions || prerenderOptions) && !serverEntryPoint) {
+        throw new Error('The "server" option is required when enabling "ssr", "prerender" or "app-shell".');
     }
     // Initial options to keep
     const { allowedCommonJsDependencies, aot, baseHref, crossOrigin, externalDependencies, extractLicenses, inlineStyleLanguage = 'css', outExtension, serviceWorker, poll, polyfills, statsJson, stylePreprocessorOptions, subresourceIntegrity, verbose, watch, progress = true, externalPackages, deleteOutputPath, namedChunks, budgets, deployUrl, clearScreen, define, } = options;
