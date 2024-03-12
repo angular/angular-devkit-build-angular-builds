@@ -8,7 +8,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_worker_threads_1 = require("node:worker_threads");
-const load_esm_1 = require("../load-esm");
 const fetch_patch_1 = require("./fetch-patch");
 const render_page_1 = require("./render-page");
 /**
@@ -22,7 +21,6 @@ function render(options) {
         outputFiles,
         document,
         inlineCriticalCss,
-        loadBundle: async (path) => await (0, load_esm_1.loadEsmModule)(new URL(path, 'memory://')),
     });
 }
 function initialize() {
