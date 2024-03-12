@@ -36,11 +36,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.renderPage = void 0;
 const node_assert_1 = __importDefault(require("node:assert"));
 const node_path_1 = require("node:path");
-const load_esm_1 = require("../load-esm");
+const load_esm_from_memory_1 = require("./load-esm-from-memory");
 /**
  * Renders each route in routes and writes them to <outputPath>/<route>/index.html.
  */
-async function renderPage({ route, serverContext, document, inlineCriticalCss, outputFiles, loadBundle = load_esm_1.loadEsmModule, }) {
+async function renderPage({ route, serverContext, document, inlineCriticalCss, outputFiles, loadBundle = load_esm_from_memory_1.loadEsmModuleFromMemory, }) {
     const { default: bootstrapAppFnOrModule } = await loadBundle('./main.server.mjs');
     const { ɵSERVER_CONTEXT, renderModule, renderApplication, ɵresetCompiledComponents, ɵConsole } = await loadBundle('./render-utils.server.mjs');
     // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
