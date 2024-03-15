@@ -6,8 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <reference types="node" />
-/// <reference types="@types/node/http" />
-/// <reference types="@types/node/ts4.8/http" />
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import type http from 'node:http';

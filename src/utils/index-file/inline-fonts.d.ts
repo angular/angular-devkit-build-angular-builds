@@ -6,8 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <reference types="node" />
-/// <reference types="@types/node/url" />
-/// <reference types="@types/node/ts4.8/url" />
 import { URL } from 'node:url';
 import { NormalizedCachedOptions } from '../normalize-cache';
 export interface InlineFontsOptions {
