@@ -45,6 +45,10 @@ function createAngularCompilerHost(compilerOptions, hostOptions) {
         if (context.type !== 'style') {
             return null;
         }
+        // No transformation required if the resource is empty
+        if (data.trim().length === 0) {
+            return { content: '' };
+        }
         const result = await hostOptions.transformStylesheet(data, context.containingFile, context.resourceFile ?? undefined);
         return typeof result === 'string' ? { content: result } : null;
     };
