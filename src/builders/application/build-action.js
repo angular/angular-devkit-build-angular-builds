@@ -117,16 +117,7 @@ async function* runEsBuildBuildAction(action, options) {
     // Output the first build results after setting up the watcher to ensure that any code executed
     // higher in the iterator call stack will trigger the watcher. This is particularly relevant for
     // unit tests which execute the builder and modify the file system programmatically.
-    if (writeToFileSystem) {
-        // Write output files
-        await (0, utils_1.writeResultFiles)(result.outputFiles, result.assetFiles, outputOptions);
-        yield result.output;
-    }
-    else {
-        // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        yield result.outputWithFiles;
-    }
+    yield await writeAndEmitOutput(writeToFileSystem, result, outputOptions, writeToFileSystemFilter);
     // Finish if watch mode is not enabled
     if (!watcher) {
         return;
@@ -165,19 +156,7 @@ async function* runEsBuildBuildAction(action, options) {
             if (staleWatchFiles?.size) {
                 watcher.remove([...staleWatchFiles]);
             }
-            if (writeToFileSystem) {
-                // Write output files
-                const filesToWrite = writeToFileSystemFilter
-                    ? result.outputFiles.filter(writeToFileSystemFilter)
-                    : result.outputFiles;
-                await (0, utils_1.writeResultFiles)(filesToWrite, result.assetFiles, outputOptions);
-                yield result.output;
-            }
-            else {
-                // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                yield result.outputWithFiles;
-            }
+            yield await writeAndEmitOutput(writeToFileSystem, result, outputOptions, writeToFileSystemFilter);
         }
     }
     finally {
@@ -187,3 +166,18 @@ async function* runEsBuildBuildAction(action, options) {
     }
 }
 exports.runEsBuildBuildAction = runEsBuildBuildAction;
+async function writeAndEmitOutput(writeToFileSystem, { outputFiles, output, outputWithFiles, assetFiles }, outputOptions, writeToFileSystemFilter) {
+    if (writeToFileSystem) {
+        // Write output files
+        const outputFilesToWrite = writeToFileSystemFilter
+            ? outputFiles.filter(writeToFileSystemFilter)
+            : outputFiles;
+        await (0, utils_1.writeResultFiles)(outputFilesToWrite, assetFiles, outputOptions);
+        return output;
+    }
+    else {
+        // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return outputWithFiles;
+    }
+}

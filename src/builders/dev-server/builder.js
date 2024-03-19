@@ -68,7 +68,7 @@ function execute(options, context, transforms = {}, extensions) {
                 context.logger.warn(`Prebundling has been configured but will not be used because caching has been disabled.`);
             }
             if (options.allowedHosts?.length) {
-                context.logger.warn(`The "allowedHost" option will not be used because it is not supported by the "${builderName}" builder.`);
+                context.logger.warn(`The "allowedHosts" option will not be used because it is not supported by the "${builderName}" builder.`);
             }
             if (options.publicHost) {
                 context.logger.warn(`The "publicHost" option will not be used because it is not supported by the "${builderName}" builder.`);
