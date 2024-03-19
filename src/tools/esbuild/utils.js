@@ -179,7 +179,7 @@ function getFeatureSupport(target) {
     return supported;
 }
 exports.getFeatureSupport = getFeatureSupport;
-async function writeResultFiles(outputFiles, assetFiles, { base, browser, media, server }) {
+async function writeResultFiles(outputFiles, assetFiles, { base, browser, server }) {
     const directoryExists = new Set();
     const ensureDirectoryExists = async (destPath) => {
         const basePath = (0, node_path_1.dirname)(destPath);

@@ -22,7 +22,7 @@ export declare function withNoProgress<T>(text: string, action: () => T | Promis
  * @returns An object that can be used with the esbuild build `supported` option.
  */
 export declare function getFeatureSupport(target: string[]): BuildOptions['supported'];
-export declare function writeResultFiles(outputFiles: BuildOutputFile[], assetFiles: BuildOutputAsset[] | undefined, { base, browser, media, server }: NormalizedOutputOptions): Promise<void>;
+export declare function writeResultFiles(outputFiles: BuildOutputFile[], assetFiles: BuildOutputAsset[] | undefined, { base, browser, server }: NormalizedOutputOptions): Promise<void>;
 export declare function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(files: T[], writeFileCallback: (file: T) => Promise<void>): Promise<void>;
 export declare function createOutputFileFromText(path: string, text: string, type: BuildOutputFileType): BuildOutputFile;
 export declare function createOutputFileFromData(path: string, data: Uint8Array, type: BuildOutputFileType): BuildOutputFile;
