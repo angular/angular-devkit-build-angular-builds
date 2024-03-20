@@ -315,10 +315,7 @@ function default_1() {
                 if (!wrapDecorators || visitedClasses.has(classNode)) {
                     return;
                 }
-                if (!classNode.id ||
-                    !parentPath.isVariableDeclarator() ||
-                    !core_1.types.isIdentifier(parentPath.node.id) ||
-                    parentPath.node.id.name !== classNode.id.name) {
+                if (!parentPath.isVariableDeclarator() || !core_1.types.isIdentifier(parentPath.node.id)) {
                     return;
                 }
                 const origin = parentPath.parentPath;
@@ -338,10 +335,10 @@ function default_1() {
                 // Wrap class and safe static assignments in a pure annotated IIFE
                 const container = core_1.types.arrowFunctionExpression([], core_1.types.blockStatement([
                     core_1.types.variableDeclaration('let', [
-                        core_1.types.variableDeclarator(core_1.types.cloneNode(classNode.id), classNode),
+                        core_1.types.variableDeclarator(core_1.types.cloneNode(parentPath.node.id), classNode),
                     ]),
                     ...wrapStatementNodes,
-                    core_1.types.returnStatement(core_1.types.cloneNode(classNode.id)),
+                    core_1.types.returnStatement(core_1.types.cloneNode(parentPath.node.id)),
                 ]));
                 const replacementInitializer = core_1.types.callExpression(core_1.types.parenthesizedExpression(container), []);
                 (0, helper_annotate_as_pure_1.default)(replacementInitializer);
