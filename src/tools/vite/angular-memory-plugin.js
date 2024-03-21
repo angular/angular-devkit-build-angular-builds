@@ -159,9 +159,11 @@ function createAngularMemoryPlugin(options) {
                         return;
                     }
                     transformIndexHtmlAndAddHeaders(req.url, rawHtml, res, next, async (html) => {
+                        const resolvedUrls = server.resolvedUrls;
+                        const baseUrl = resolvedUrls?.local[0] ?? resolvedUrls?.network[0];
                         const { content } = await (0, render_page_1.renderPage)({
                             document: html,
-                            route: new URL(req.originalUrl ?? '/', server.resolvedUrls?.local[0]).toString(),
+                            route: new URL(req.originalUrl ?? '/', baseUrl).toString(),
                             serverContext: 'ssr',
                             loadBundle: (uri) => 
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
