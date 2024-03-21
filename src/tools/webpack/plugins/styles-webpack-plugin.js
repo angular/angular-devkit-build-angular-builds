@@ -34,7 +34,7 @@ class StylesWebpackPlugin {
             preferRelative: true,
             useSyncFileSystemCalls: true,
             symlinks: !preserveSymlinks,
-            fileSystem: compiler.inputFileSystem,
+            fileSystem: compiler.inputFileSystem ?? undefined,
         });
         const webpackOptions = compiler.options;
         compiler.hooks.environment.tap(PLUGIN_NAME, () => {
