@@ -34,8 +34,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@babel/core");
+const node_fs_1 = __importDefault(require("node:fs"));
+const node_path_1 = __importDefault(require("node:path"));
 const piscina_1 = __importDefault(require("piscina"));
-const application_1 = __importStar(require("../../tools/babel/presets/application"));
 const load_esm_1 = require("../../utils/load-esm");
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
@@ -47,21 +48,40 @@ async function transformJavaScript(request) {
     return piscina_1.default.move(textEncoder.encode(transformedData));
 }
 exports.default = transformJavaScript;
+/**
+ * Cached instance of the compiler-cli linker's createEs2015LinkerPlugin function.
+ */
 let linkerPluginCreator;
+/**
+ * Cached instance of the compiler-cli linker's needsLinking function.
+ */
+let needsLinking;
 async function transformWithBabel(filename, data, options) {
-    const shouldLink = !options.skipLinker && (await (0, application_1.requiresLinking)(filename, data));
+    const shouldLink = !options.skipLinker && (await requiresLinking(filename, data));
     const useInputSourcemap = options.sourcemap &&
         (!!options.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
-    // If no additional transformations are needed, return the data directly
-    if (!options.advancedOptimizations && !shouldLink) {
-        // Strip sourcemaps if they should not be used
-        return useInputSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
-    }
-    const sideEffectFree = options.sideEffects === false;
-    const safeAngularPackage = sideEffectFree && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
+    const plugins = [];
     // Lazy load the linker plugin only when linking is required
     if (shouldLink) {
-        linkerPluginCreator ??= (await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli/linker/babel')).createEs2015LinkerPlugin;
+        const linkerPlugin = await createLinkerPlugin(options);
+        plugins.push(linkerPlugin);
+    }
+    if (options.advancedOptimizations) {
+        const sideEffectFree = options.sideEffects === false;
+        const safeAngularPackage = sideEffectFree && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
+        const { adjustStaticMembers, adjustTypeScriptEnums, elideAngularMetadata, markTopLevelPure } = await Promise.resolve().then(() => __importStar(require('../babel/plugins')));
+        if (safeAngularPackage) {
+            plugins.push(markTopLevelPure);
+        }
+        plugins.push(elideAngularMetadata, adjustTypeScriptEnums, [
+            adjustStaticMembers,
+            { wrapDecorators: sideEffectFree },
+        ]);
+    }
+    // If no additional transformations are needed, return the data directly
+    if (plugins.length === 0) {
+        // Strip sourcemaps if they should not be used
+        return useInputSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
     }
     const result = await (0, core_1.transformAsync)(data, {
         filename,
@@ -71,23 +91,7 @@ async function transformWithBabel(filename, data, options) {
         configFile: false,
         babelrc: false,
         browserslistConfigFile: false,
-        plugins: [],
-        presets: [
-            [
-                application_1.default,
-                {
-                    angularLinker: linkerPluginCreator && {
-                        shouldLink,
-                        jitMode: options.jit,
-                        linkerPluginCreator,
-                    },
-                    optimize: options.advancedOptimizations && {
-                        pureTopLevel: safeAngularPackage,
-                        wrapDecorators: sideEffectFree,
-                    },
-                },
-            ],
-        ],
+        plugins,
     });
     const outputCode = result?.code ?? data;
     // Strip sourcemaps if they should not be used.
@@ -95,4 +99,56 @@ async function transformWithBabel(filename, data, options) {
     return useInputSourcemap
         ? outputCode
         : outputCode.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+}
+async function requiresLinking(path, source) {
+    // @angular/core and @angular/compiler will cause false positives
+    // Also, TypeScript files do not require linking
+    if (/[\\/]@angular[\\/](?:compiler|core)|\.tsx?$/.test(path)) {
+        return false;
+    }
+    if (!needsLinking) {
+        // Load ESM `@angular/compiler-cli/linker` using the TypeScript dynamic import workaround.
+        // Once TypeScript provides support for keeping the dynamic import this workaround can be
+        // changed to a direct dynamic import.
+        const linkerModule = await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli/linker');
+        needsLinking = linkerModule.needsLinking;
+    }
+    return needsLinking(path, source);
+}
+async function createLinkerPlugin(options) {
+    linkerPluginCreator ??= (await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli/linker/babel')).createEs2015LinkerPlugin;
+    const linkerPlugin = linkerPluginCreator({
+        linkerJitMode: options.jit,
+        // This is a workaround until https://github.com/angular/angular/issues/42769 is fixed.
+        sourceMapping: false,
+        logger: {
+            level: 1, // Info level
+            debug(...args) {
+                // eslint-disable-next-line no-console
+                console.debug(args);
+            },
+            info(...args) {
+                // eslint-disable-next-line no-console
+                console.info(args);
+            },
+            warn(...args) {
+                // eslint-disable-next-line no-console
+                console.warn(args);
+            },
+            error(...args) {
+                // eslint-disable-next-line no-console
+                console.error(args);
+            },
+        },
+        fileSystem: {
+            resolve: node_path_1.default.resolve,
+            exists: node_fs_1.default.existsSync,
+            dirname: node_path_1.default.dirname,
+            relative: node_path_1.default.relative,
+            readFile: node_fs_1.default.readFileSync,
+            // Node.JS types don't overlap the Compiler types.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        },
+    });
+    return linkerPlugin;
 }
