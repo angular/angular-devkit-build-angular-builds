@@ -115,7 +115,7 @@ export interface AssetPatternClass {
     /**
      * Absolute path within the output.
      */
-    output: string;
+    output?: string;
 }
 /**
  * Override which browsers tests are run against. Set to `false` to not use any browser.

@@ -221,7 +221,7 @@ export interface AssetPatternClass {
     /**
      * Absolute path within the output.
      */
-    output: string;
+    output?: string;
 }
 export interface Budget {
     /**

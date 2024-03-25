@@ -29,9 +29,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeAssetPatterns = exports.MissingAssetSourceRootException = void 0;
 const fs_1 = require("fs");
+const node_assert_1 = __importDefault(require("node:assert"));
 const path = __importStar(require("path"));
 class MissingAssetSourceRootException extends Error {
     constructor(path) {
@@ -80,8 +84,9 @@ function normalizeAssetPatterns(assetPatterns, workspaceRoot, projectRoot, proje
             assetPattern = { glob, input, output };
         }
         else {
-            assetPattern.output = path.join('.', assetPattern.output);
+            assetPattern.output = path.join('.', assetPattern.output ?? '');
         }
+        (0, node_assert_1.default)(assetPattern.output !== undefined);
         if (assetPattern.output.startsWith('..')) {
             throw new Error('An asset cannot be written to a location outside of the output path.');
         }
