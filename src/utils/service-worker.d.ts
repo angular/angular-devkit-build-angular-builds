@@ -12,7 +12,7 @@ import { promises as fsPromises } from 'node:fs';
 import { BuildOutputFile } from '../tools/esbuild/bundler-context';
 import { BuildOutputAsset } from '../tools/esbuild/bundler-execution-result';
 export declare function augmentAppWithServiceWorker(appRoot: string, workspaceRoot: string, outputPath: string, baseHref: string, ngswConfigPath?: string, inputputFileSystem?: typeof fsPromises, outputFileSystem?: typeof fsPromises): Promise<void>;
-export declare function augmentAppWithServiceWorkerEsbuild(workspaceRoot: string, configPath: string, baseHref: string, outputFiles: BuildOutputFile[], assetFiles: BuildOutputAsset[]): Promise<{
+export declare function augmentAppWithServiceWorkerEsbuild(workspaceRoot: string, configPath: string, baseHref: string, indexHtml: string | undefined, outputFiles: BuildOutputFile[], assetFiles: BuildOutputAsset[]): Promise<{
     manifest: string;
     assetFiles: BuildOutputAsset[];
 }>;

@@ -75,7 +75,7 @@ async function executePostBundleSteps(options, outputFiles, assetFiles, initialF
     // If localization is enabled, service worker is handled in the inlining process.
     if (serviceWorker) {
         try {
-            const serviceWorkerResult = await (0, service_worker_1.augmentAppWithServiceWorkerEsbuild)(workspaceRoot, serviceWorker, options.baseHref || '/', 
+            const serviceWorkerResult = await (0, service_worker_1.augmentAppWithServiceWorkerEsbuild)(workspaceRoot, serviceWorker, options.baseHref || '/', options.indexHtmlOptions?.output, 
             // Ensure additional files recently added are used
             [...outputFiles, ...additionalOutputFiles], assetFiles);
             additionalOutputFiles.push((0, utils_1.createOutputFileFromText)('ngsw.json', serviceWorkerResult.manifest, bundler_context_1.BuildOutputFileType.Browser));
