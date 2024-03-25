@@ -205,15 +205,25 @@ class RelativeUrlRebasingImporter extends UrlRebasingImporter {
             foundImports = [];
             cachedEntries = { files: new Set(), directories: new Set() };
             for (const entry of entries) {
-                const isDirectory = entry.isDirectory();
+                let isDirectory;
+                let isFile;
+                if (entry.isSymbolicLink()) {
+                    const stats = (0, node_fs_1.statSync)((0, node_path_1.join)(entry.path, entry.name));
+                    isDirectory = stats.isDirectory();
+                    isFile = stats.isFile();
+                }
+                else {
+                    isDirectory = entry.isDirectory();
+                    isFile = entry.isFile();
+                }
                 if (isDirectory) {
                     cachedEntries.directories.add(entry.name);
+                    // Record if the name should be checked as a directory with an index file
+                    if (checkDirectory && !hasStyleExtension && entry.name === filename) {
+                        hasPotentialIndex = true;
+                    }
                 }
-                // Record if the name should be checked as a directory with an index file
-                if (checkDirectory && !hasStyleExtension && entry.name === filename && isDirectory) {
-                    hasPotentialIndex = true;
-                }
-                if (!entry.isFile()) {
+                if (!isFile) {
                     continue;
                 }
                 cachedEntries.files.add(entry.name);

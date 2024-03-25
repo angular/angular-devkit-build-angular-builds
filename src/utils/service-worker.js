@@ -159,12 +159,15 @@ async function augmentAppWithServiceWorker(appRoot, workspaceRoot, outputPath, b
 }
 exports.augmentAppWithServiceWorker = augmentAppWithServiceWorker;
 // This is currently used by the esbuild-based builder
-async function augmentAppWithServiceWorkerEsbuild(workspaceRoot, configPath, baseHref, outputFiles, assetFiles) {
+async function augmentAppWithServiceWorkerEsbuild(workspaceRoot, configPath, baseHref, indexHtml, outputFiles, assetFiles) {
     // Read the configuration file
     let config;
     try {
         const configurationData = await node_fs_1.promises.readFile(configPath, 'utf-8');
         config = JSON.parse(configurationData);
+        if (indexHtml) {
+            config.index = indexHtml;
+        }
     }
     catch (error) {
         (0, error_1.assertIsError)(error);

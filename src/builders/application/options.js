@@ -211,7 +211,9 @@ async function normalizeOptions(context, projectName, options, extensions) {
         fileReplacements,
         globalStyles,
         globalScripts,
-        serviceWorker: typeof serviceWorker === 'string' ? node_path_1.default.join(workspaceRoot, serviceWorker) : undefined,
+        serviceWorker: serviceWorker
+            ? node_path_1.default.join(workspaceRoot, typeof serviceWorker === 'string' ? serviceWorker : 'src/ngsw-config.json')
+            : undefined,
         indexHtmlOptions,
         tailwindConfiguration,
         postcssConfiguration,
