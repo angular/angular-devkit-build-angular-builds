@@ -31,7 +31,7 @@ class ExecutionResult {
         this.outputFiles.push((0, utils_1.createOutputFileFromText)(path, content, type));
     }
     addAssets(assets) {
-        this.assetFiles.push(...assets);
+        this.assetFiles = this.assetFiles.concat(assets);
     }
     addLog(value) {
         this.logs.push(value);
