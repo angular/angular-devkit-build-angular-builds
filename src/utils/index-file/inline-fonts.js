@@ -36,8 +36,6 @@ const node_crypto_1 = require("node:crypto");
 const promises_1 = require("node:fs/promises");
 const https = __importStar(require("node:https"));
 const node_path_1 = require("node:path");
-const node_url_1 = require("node:url");
-const package_version_1 = require("../package-version");
 const html_rewriting_stream_1 = require("./html-rewriting-stream");
 const SUPPORTED_PROVIDERS = {
     'fonts.googleapis.com': {
@@ -161,7 +159,7 @@ class InlineFontsProcessor {
     async getResponse(url) {
         let cacheFile;
         if (this.cachePath) {
-            const key = (0, node_crypto_1.createHash)(CONTENT_HASH_ALGORITHM).update(`${package_version_1.VERSION}|${url}`).digest('hex');
+            const key = (0, node_crypto_1.createHash)(CONTENT_HASH_ALGORITHM).update(`${url}`).digest('hex');
             cacheFile = (0, node_path_1.join)(this.cachePath, key);
         }
         if (cacheFile) {
@@ -226,7 +224,7 @@ class InlineFontsProcessor {
         return data;
     }
     async processURL(url) {
-        const normalizedURL = url instanceof node_url_1.URL ? url : this.createNormalizedUrl(url);
+        const normalizedURL = url instanceof URL ? url : this.createNormalizedUrl(url);
         if (!normalizedURL) {
             return;
         }
@@ -255,7 +253,7 @@ class InlineFontsProcessor {
     }
     createNormalizedUrl(value) {
         // Need to convert '//' to 'https://' because the URL parser will fail with '//'.
-        const url = new node_url_1.URL(value.startsWith('//') ? `https:${value}` : value, 'resolve://');
+        const url = new URL(value.startsWith('//') ? `https:${value}` : value, 'resolve://');
         switch (url.protocol) {
             case 'http:':
             case 'https:':
