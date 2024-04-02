@@ -8,4 +8,10 @@
 export interface PostcssConfiguration {
     plugins: [name: string, options?: object | string][];
 }
-export declare function loadPostcssConfiguration(workspaceRoot: string, projectRoot: string): Promise<PostcssConfiguration | undefined>;
+export interface SearchDirectory {
+    root: string;
+    files: Set<string>;
+}
+export declare function generateSearchDirectories(roots: string[]): Promise<SearchDirectory[]>;
+export declare function findTailwindConfiguration(searchDirectories: SearchDirectory[]): string | undefined;
+export declare function loadPostcssConfiguration(searchDirectories: SearchDirectory[]): Promise<PostcssConfiguration | undefined>;
