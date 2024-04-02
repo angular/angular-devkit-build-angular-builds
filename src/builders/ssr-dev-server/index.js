@@ -156,7 +156,7 @@ exports.log = log;
 function startNodeServer(serverOutput, port, logger, inspectMode = false) {
     const outputPath = serverOutput.outputPath;
     const path = (0, path_1.join)(outputPath, 'main.js');
-    const env = { ...process.env, SSR_PORT: '' + port, PORT: '' + port };
+    const env = { ...process.env, PORT: '' + port };
     const args = ['--enable-source-maps', `"${path}"`];
     if (inspectMode) {
         args.unshift('--inspect-brk');
