@@ -5,7 +5,30 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { CompileResult, StringOptions } from 'sass';
+import { CompileResult, Deprecation, SourceSpan, StringOptions } from 'sass';
+export interface SerializableVersion {
+    major: number;
+    minor: number;
+    patch: number;
+}
+export interface SerializableDeprecation extends Omit<Deprecation, 'obsoleteIn' | 'deprecatedIn'> {
+    /** The version this deprecation first became active in. */
+    deprecatedIn: SerializableVersion | null;
+    /** The version this deprecation became obsolete in. */
+    obsoleteIn: SerializableVersion | null;
+}
+export type SerializableWarningMessage = ({
+    deprecation: true;
+    deprecationType: SerializableDeprecation;
+} | {
+    deprecation: false;
+}) & {
+    message: string;
+    span?: Omit<SourceSpan, 'url'> & {
+        url?: string;
+    };
+    stack?: string;
+};
 /**
  * A Sass renderer implementation that provides an interface that can be used by Webpack's
  * `sass-loader`. The implementation uses a Worker thread to perform the Sass rendering

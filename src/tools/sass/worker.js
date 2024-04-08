@@ -77,13 +77,15 @@ node_worker_threads_1.parentPort.on('message', (message) => {
             importer: relativeImporter,
             logger: hasLogger
                 ? {
-                    warn(message, { deprecation, span, stack }) {
+                    warn(message, warnOptions) {
                         warnings ??= [];
                         warnings.push({
+                            ...warnOptions,
                             message,
-                            deprecation,
-                            stack,
-                            span: span && convertSourceSpan(span),
+                            span: warnOptions.span && convertSourceSpan(warnOptions.span),
+                            ...convertDeprecation(warnOptions.deprecation, 
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            warnOptions.deprecationType),
                         });
                     },
                 }
@@ -160,5 +162,31 @@ function convertSourceSpan(span) {
             line: span.start.line,
         },
         url: span.url ? (0, node_url_1.fileURLToPath)(span.url) : undefined,
+    };
+}
+function convertDeprecation(deprecation, deprecationType) {
+    if (!deprecation || !deprecationType) {
+        return { deprecation: false };
+    }
+    const { obsoleteIn, deprecatedIn, ...rest } = deprecationType;
+    return {
+        deprecation: true,
+        deprecationType: {
+            ...rest,
+            obsoleteIn: obsoleteIn
+                ? {
+                    major: obsoleteIn.major,
+                    minor: obsoleteIn.minor,
+                    patch: obsoleteIn.patch,
+                }
+                : null,
+            deprecatedIn: deprecatedIn
+                ? {
+                    major: deprecatedIn.major,
+                    minor: deprecatedIn.minor,
+                    patch: deprecatedIn.patch,
+                }
+                : null,
+        },
     };
 }
