@@ -223,21 +223,24 @@ async function initBrowserSync(browserSyncInstance, nodeServerPort, options, con
         if (hasPathname) {
             const { createProxyMiddleware } = await Promise.resolve().then(() => __importStar(require('http-proxy-middleware')));
             // Remove leading slash
-            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            (bsOptions.scriptPath = (p) => p.substring(1)),
-                (bsOptions.middleware = [
-                    createProxyMiddleware(defaultSocketIoPath, {
-                        target: url.format({
-                            protocol: 'http',
-                            hostname: host,
-                            port: bsPort,
-                            pathname: path,
-                        }),
-                        ws: true,
-                        logLevel: 'silent',
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            bsOptions.scriptPath = (p) => p.substring(1);
+            bsOptions.middleware = [
+                createProxyMiddleware({
+                    pathFilter: defaultSocketIoPath,
+                    target: url.format({
+                        protocol: 'http',
+                        hostname: host,
+                        port: bsPort,
+                        pathname: path,
                     }),
-                ]);
+                    ws: true,
+                    logger: {
+                        info: () => { },
+                        warn: () => { },
+                        error: () => { },
+                    },
+                }),
+            ];
         }
     }
     if (proxyConfig) {
@@ -283,21 +286,18 @@ function getSslConfig(root, options) {
     return ssl;
 }
 async function getProxyConfig(root, proxyConfig) {
-    const proxy = await (0, utils_1.loadProxyConfiguration)(root, proxyConfig, false);
-    const createdProxies = [];
-    const { createProxyMiddleware } = await Promise.resolve().then(() => __importStar(require('http-proxy-middleware')));
-    for (const [key, context] of Object.entries(proxy)) {
-        if (typeof key === 'string') {
-            createdProxies.push(createProxyMiddleware(key.replace(/^\*$/, '**').replace(/\/\*$/, ''), 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            context));
-        }
-        else {
-            createdProxies.push(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            createProxyMiddleware(key, context));
-        }
+    const proxy = await (0, utils_1.loadProxyConfiguration)(root, proxyConfig);
+    if (!proxy) {
+        return [];
     }
-    return createdProxies;
+    const { createProxyMiddleware } = await Promise.resolve().then(() => __importStar(require('http-proxy-middleware')));
+    return Object.entries(proxy).map(([key, context]) => {
+        const filterRegExp = new RegExp(key);
+        return createProxyMiddleware({
+            pathFilter: (pathname) => filterRegExp.test(pathname),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ...context,
+        });
+    });
 }
 exports.default = (0, architect_1.createBuilder)(execute);

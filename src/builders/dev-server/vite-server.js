@@ -332,7 +332,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
     }
 }
 async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target, prebundleLoaderExtensions, extensionMiddleware, indexHtmlTransformer, thirdPartySourcemaps = false) {
-    const proxy = await (0, utils_2.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig, true);
+    const proxy = await (0, utils_2.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig);
     // dynamically import Vite for ESM compatibility
     const { normalizePath } = await (0, load_esm_1.loadEsmModule)('vite');
     // Path will not exist on disk and only used to provide separate path for Vite requests

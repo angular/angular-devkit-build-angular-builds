@@ -39,7 +39,7 @@ const node_url_1 = require("node:url");
 const picomatch_1 = require("picomatch");
 const error_1 = require("./error");
 const load_esm_1 = require("./load-esm");
-async function loadProxyConfiguration(root, proxyConfig, normalize = false) {
+async function loadProxyConfiguration(root, proxyConfig) {
     if (!proxyConfig) {
         return undefined;
     }
@@ -94,10 +94,7 @@ async function loadProxyConfiguration(root, proxyConfig, normalize = false) {
                 throw e;
             }
     }
-    if (normalize) {
-        proxyConfiguration = normalizeProxyConfiguration(proxyConfiguration);
-    }
-    return proxyConfiguration;
+    return normalizeProxyConfiguration(proxyConfiguration);
 }
 exports.loadProxyConfiguration = loadProxyConfiguration;
 /**
