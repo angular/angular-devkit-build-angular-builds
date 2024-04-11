@@ -37,7 +37,7 @@ const webpack_merge_1 = require("webpack-merge");
 const builder_watch_plugin_1 = require("../tools/webpack/plugins/builder-watch-plugin");
 const utils_1 = require("../utils");
 const read_tsconfig_1 = require("../utils/read-tsconfig");
-const i18n_options_1 = require("./i18n-options");
+const i18n_webpack_1 = require("./i18n-webpack");
 async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, projectName, options, webpackPartialGenerator, logger, extraBuildOptions) {
     // Ensure Build Optimizer is only used with AOT.
     if (options.buildOptimizer && !options.aot) {
@@ -63,7 +63,7 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, pro
 }
 exports.generateWebpackConfig = generateWebpackConfig;
 async function generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, extraBuildOptions = {}) {
-    const { buildOptions, i18n } = await (0, i18n_options_1.configureI18nBuild)(context, options);
+    const { buildOptions, i18n } = await (0, i18n_webpack_1.configureI18nBuild)(context, options);
     const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, (wco) => {
         return webpackPartialGenerator(wco);
     }, extraBuildOptions);

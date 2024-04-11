@@ -5,10 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BuilderContext } from '@angular-devkit/architect';
-import { Schema as BrowserBuilderSchema, I18NTranslation } from '../builders/browser/schema';
-import { Schema as ServerBuilderSchema } from '../builders/server/schema';
-import { TranslationLoader } from './load-translations';
+import type { TranslationLoader } from './load-translations';
 export interface LocaleDescription {
     files: {
         path: string;
@@ -30,11 +27,7 @@ export interface I18nOptions {
 export declare function createI18nOptions(projectMetadata: {
     i18n?: unknown;
 }, inline?: boolean | string[]): I18nOptions;
-export declare function configureI18nBuild<T extends BrowserBuilderSchema | ServerBuilderSchema>(context: BuilderContext, options: T): Promise<{
-    buildOptions: T;
-    i18n: I18nOptions;
-}>;
 export declare function loadTranslations(locale: string, desc: LocaleDescription, workspaceRoot: string, loader: TranslationLoader, logger: {
     warn: (message: string) => void;
     error: (message: string) => void;
-}, usedFormats?: Set<string>, duplicateTranslation?: I18NTranslation): void;
+}, usedFormats?: Set<string>, duplicateTranslation?: 'ignore' | 'error' | 'warning'): void;

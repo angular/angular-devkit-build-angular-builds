@@ -10,7 +10,7 @@ import { Configuration } from 'webpack';
 import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
 import { NormalizedBrowserBuilderSchema } from '../utils';
 import { WebpackConfigOptions } from '../utils/build-options';
-import { I18nOptions } from './i18n-options';
+import { I18nOptions } from './i18n-webpack';
 export type BrowserWebpackConfigOptions = WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
 export type WebpackPartialGenerator = (configurationOptions: BrowserWebpackConfigOptions) => (Promise<Configuration> | Configuration)[];
 export declare function generateWebpackConfig(workspaceRoot: string, projectRoot: string, sourceRoot: string | undefined, projectName: string, options: NormalizedBrowserBuilderSchema, webpackPartialGenerator: WebpackPartialGenerator, logger: BuilderContext['logger'], extraBuildOptions: Partial<NormalizedBrowserBuilderSchema>): Promise<Configuration>;

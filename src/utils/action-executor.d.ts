@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { InlineOptions } from './bundle-inline-options';
-import { I18nOptions } from './i18n-options';
+import { I18nOptions } from './i18n-webpack';
 export declare class BundleActionExecutor {
     private workerOptions;
     private workerPool?;

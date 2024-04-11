@@ -7,5 +7,5 @@
  */
 import { BuilderContext } from '@angular-devkit/architect';
 import { EmittedFiles } from '@angular-devkit/build-webpack';
-import { I18nOptions } from './i18n-options';
+import { I18nOptions } from './i18n-webpack';
 export declare function i18nInlineEmittedFiles(context: BuilderContext, emittedFiles: EmittedFiles[], i18n: I18nOptions, baseOutputPath: string, outputPaths: string[], scriptsEntryPointName: string[], emittedPath: string, missingTranslation: 'error' | 'warning' | 'ignore' | undefined): Promise<boolean>;

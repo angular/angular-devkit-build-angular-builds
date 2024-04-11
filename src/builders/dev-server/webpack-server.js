@@ -42,7 +42,7 @@ const service_worker_plugin_1 = require("../../tools/webpack/plugins/service-wor
 const stats_1 = require("../../tools/webpack/utils/stats");
 const utils_1 = require("../../utils");
 const color_1 = require("../../utils/color");
-const i18n_options_1 = require("../../utils/i18n-options");
+const i18n_webpack_1 = require("../../utils/i18n-webpack");
 const load_translations_1 = require("../../utils/load-translations");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
 const version_1 = require("../../utils/version");
@@ -266,7 +266,7 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheO
             compiler.hooks.thisCompilation.tap('build-angular', (compilation) => {
                 if (i18n.shouldInline && i18nLoaderOptions.translation === undefined) {
                     // Reload translations
-                    (0, i18n_options_1.loadTranslations)(locale, localeDescription, context.workspaceRoot, loader, {
+                    (0, i18n_webpack_1.loadTranslations)(locale, localeDescription, context.workspaceRoot, loader, {
                         warn(message) {
                             (0, webpack_diagnostics_1.addWarning)(compilation, message);
                         },
