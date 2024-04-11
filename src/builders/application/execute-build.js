@@ -16,7 +16,7 @@ const commonjs_checker_1 = require("../../tools/esbuild/commonjs-checker");
 const license_extractor_1 = require("../../tools/esbuild/license-extractor");
 const utils_1 = require("../../tools/esbuild/utils");
 const bundle_calculator_1 = require("../../utils/bundle-calculator");
-const copy_assets_1 = require("../../utils/copy-assets");
+const resolve_assets_1 = require("../../utils/resolve-assets");
 const supported_browsers_1 = require("../../utils/supported-browsers");
 const execute_post_bundle_1 = require("./execute-post-bundle");
 const i18n_1 = require("./i18n");
@@ -86,9 +86,7 @@ async function executeBuild(options, context, rebuildState) {
     }
     // Copy assets
     if (assets) {
-        // The webpack copy assets helper is used with no base paths defined. This prevents the helper
-        // from directly writing to disk. This should eventually be replaced with a more optimized helper.
-        executionResult.addAssets(await (0, copy_assets_1.copyAssets)(assets, [], workspaceRoot));
+        executionResult.addAssets(await (0, resolve_assets_1.resolveAssets)(assets, workspaceRoot));
     }
     // Extract and write licenses for used packages
     if (options.extractLicenses) {
