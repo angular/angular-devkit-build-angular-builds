@@ -69,16 +69,13 @@ class UrlRebasingImporter {
             if (value.length === 0 || value[0] === '~' || value[0] === '^') {
                 continue;
             }
-            // Skip if value is a Sass variable.
-            // Sass variable usage either starts with a `$` or contains a namespace and a `.$`
-            if (value[0] === '$' || /^\w+\.\$/.test(value)) {
-                continue;
-            }
             // Skip if root-relative, absolute or protocol relative url
             if (/^((?:\w+:)?\/\/|data:|chrome:|#|\/)/.test(value)) {
                 continue;
             }
-            const rebasedPath = (0, node_path_1.relative)(this.entryDirectory, (0, node_path_1.join)(stylesheetDirectory, value));
+            // Sass variable usage either starts with a `$` or contains a namespace and a `.$`
+            const valueNormalized = value[0] === '$' || /^\w+\.\$/.test(value) ? `#{${value}}` : value;
+            const rebasedPath = (0, node_path_1.relative)(this.entryDirectory, stylesheetDirectory) + '||file:' + valueNormalized;
             // Normalize path separators and escape characters
             // https://developer.mozilla.org/en-US/docs/Web/CSS/url#syntax
             const rebasedUrl = ensureRelative(rebasedPath.replace(/\\/g, '/').replace(/[()\s'"]/g, '\\$&'));

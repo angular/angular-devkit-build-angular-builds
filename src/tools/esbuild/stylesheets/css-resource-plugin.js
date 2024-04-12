@@ -30,31 +30,38 @@ function createCssResourcePlugin(cache) {
         name: 'angular-css-resource',
         setup(build) {
             build.onResolve({ filter: /.*/ }, async (args) => {
+                const { importer, path, kind, resolveDir, namespace, pluginData = {} } = args;
                 // Only attempt to resolve url tokens which only exist inside CSS.
                 // Also, skip this plugin if already attempting to resolve the url-token.
-                if (args.kind !== 'url-token' || args.pluginData?.[CSS_RESOURCE_RESOLUTION]) {
+                if (kind !== 'url-token' || pluginData[CSS_RESOURCE_RESOLUTION]) {
                     return null;
+                }
+                let [containingDir, resourceUrl] = path.split('||file:', 2);
+                if (resourceUrl === undefined) {
+                    // This can happen due to early exit checks in rebasing-importer
+                    // logic such as when the url is an external URL.
+                    resourceUrl = containingDir;
+                    containingDir = '';
                 }
                 // If root-relative, absolute or protocol relative url, mark as external to leave the
                 // path/URL in place.
-                if (/^((?:\w+:)?\/\/|data:|chrome:|#|\/)/.test(args.path)) {
+                if (/^((?:\w+:)?\/\/|data:|chrome:|#|\/)/.test(resourceUrl)) {
                     return {
-                        path: args.path,
+                        path: resourceUrl,
                         external: true,
                     };
                 }
-                const { importer, kind, resolveDir, namespace, pluginData = {} } = args;
                 pluginData[CSS_RESOURCE_RESOLUTION] = true;
-                const result = await build.resolve(args.path, {
+                const result = await build.resolve(resourceUrl, {
                     importer,
                     kind,
                     namespace,
                     pluginData,
-                    resolveDir,
+                    resolveDir: (0, node_path_1.join)(resolveDir, containingDir),
                 });
                 if (result.errors.length) {
                     const error = result.errors[0];
-                    if (args.path[0] === '~') {
+                    if (resourceUrl[0] === '~') {
                         error.notes = [
                             {
                                 location: null,
@@ -62,7 +69,7 @@ function createCssResourcePlugin(cache) {
                             },
                         ];
                     }
-                    else if (args.path[0] === '^') {
+                    else if (resourceUrl[0] === '^') {
                         error.notes = [
                             {
                                 location: null,
