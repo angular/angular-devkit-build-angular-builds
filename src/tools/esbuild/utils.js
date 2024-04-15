@@ -20,7 +20,7 @@ const node_url_1 = require("node:url");
 const node_zlib_1 = require("node:zlib");
 const semver_1 = require("semver");
 const spinner_1 = require("../../utils/spinner");
-const stats_1 = require("../webpack/utils/stats");
+const stats_table_1 = require("../../utils/stats-table");
 const bundler_context_1 = require("./bundler-context");
 function logBuildStats(metafile, initial, budgetFailures, colors, changedFiles, estimatedTransferSizes, ssrOutputEnabled, verbose) {
     const browserStats = [];
@@ -65,7 +65,7 @@ function logBuildStats(metafile, initial, budgetFailures, colors, changedFiles, 
         }
     }
     if (browserStats.length > 0 || serverStats.length > 0) {
-        const tableText = (0, stats_1.generateEsbuildBuildStatsTable)([browserStats, serverStats], colors, unchangedCount === 0, !!estimatedTransferSizes, budgetFailures, verbose);
+        const tableText = (0, stats_table_1.generateEsbuildBuildStatsTable)([browserStats, serverStats], colors, unchangedCount === 0, !!estimatedTransferSizes, budgetFailures, verbose);
         return tableText + '\n';
     }
     else if (changedFiles !== undefined) {

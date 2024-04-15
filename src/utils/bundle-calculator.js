@@ -9,7 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkThresholds = exports.checkBudgets = exports.calculateThresholds = exports.ThresholdSeverity = void 0;
 const schema_1 = require("../builders/browser/schema");
-const stats_1 = require("../tools/webpack/utils/stats");
+const format_bytes_1 = require("./format-bytes");
 var ThresholdType;
 (function (ThresholdType) {
     ThresholdType["Max"] = "maximum";
@@ -273,11 +273,11 @@ function* checkThresholds(thresholds, size, label) {
                 if (size <= threshold.limit) {
                     continue;
                 }
-                const sizeDifference = (0, stats_1.formatSize)(size - threshold.limit);
+                const sizeDifference = (0, format_bytes_1.formatSize)(size - threshold.limit);
                 yield {
                     severity: threshold.severity,
                     label,
-                    message: `${label} exceeded maximum budget. Budget ${(0, stats_1.formatSize)(threshold.limit)} was not met by ${sizeDifference} with a total of ${(0, stats_1.formatSize)(size)}.`,
+                    message: `${label} exceeded maximum budget. Budget ${(0, format_bytes_1.formatSize)(threshold.limit)} was not met by ${sizeDifference} with a total of ${(0, format_bytes_1.formatSize)(size)}.`,
                 };
                 break;
             }
@@ -285,11 +285,11 @@ function* checkThresholds(thresholds, size, label) {
                 if (size >= threshold.limit) {
                     continue;
                 }
-                const sizeDifference = (0, stats_1.formatSize)(threshold.limit - size);
+                const sizeDifference = (0, format_bytes_1.formatSize)(threshold.limit - size);
                 yield {
                     severity: threshold.severity,
                     label,
-                    message: `${label} failed to meet minimum budget. Budget ${(0, stats_1.formatSize)(threshold.limit)} was not met by ${sizeDifference} with a total of ${(0, stats_1.formatSize)(size)}.`,
+                    message: `${label} failed to meet minimum budget. Budget ${(0, format_bytes_1.formatSize)(threshold.limit)} was not met by ${sizeDifference} with a total of ${(0, format_bytes_1.formatSize)(size)}.`,
                 };
                 break;
             }

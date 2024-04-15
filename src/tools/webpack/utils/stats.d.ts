@@ -11,19 +11,6 @@ import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../../builders/browser/schema';
 import { BudgetCalculatorResult } from '../../../utils/bundle-calculator';
 import { WebpackStatsOptions } from './helpers';
-export declare function formatSize(size: number): string;
-export type BundleStatsData = [
-    files: string,
-    names: string,
-    rawSize: number | string,
-    estimatedTransferSize: number | string
-];
-export interface BundleStats {
-    initial: boolean;
-    stats: BundleStatsData;
-}
-export declare function generateEsbuildBuildStatsTable([browserStats, serverStats]: [browserStats: BundleStats[], serverStats: BundleStats[]], colors: boolean, showTotalSize: boolean, showEstimatedTransferSize: boolean, budgetFailures?: BudgetCalculatorResult[], verbose?: boolean): string;
-export declare function generateBuildStatsTable(data: BundleStats[], colors: boolean, showTotalSize: boolean, showEstimatedTransferSize: boolean, budgetFailures?: BudgetCalculatorResult[]): string;
 export declare function statsWarningsToString(json: StatsCompilation, statsConfig: WebpackStatsOptions): string;
 export declare function statsErrorsToString(json: StatsCompilation, statsConfig: WebpackStatsOptions): string;
 export declare function statsHasErrors(json: StatsCompilation): boolean;
