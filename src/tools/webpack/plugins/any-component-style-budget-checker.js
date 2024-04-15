@@ -33,7 +33,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AnyComponentStyleBudgetChecker = void 0;
 const path = __importStar(require("path"));
 const webpack_1 = require("webpack");
-const schema_1 = require("../../../builders/browser/schema");
 const bundle_calculator_1 = require("../../../utils/bundle-calculator");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
 const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
@@ -44,7 +43,7 @@ const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
 class AnyComponentStyleBudgetChecker {
     budgets;
     constructor(budgets) {
-        this.budgets = budgets.filter((budget) => budget.type === schema_1.Type.AnyComponentStyle);
+        this.budgets = budgets.filter((budget) => budget.type === bundle_calculator_1.BudgetType.AnyComponentStyle);
     }
     apply(compiler) {
         compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
@@ -64,22 +63,20 @@ class AnyComponentStyleBudgetChecker {
                 const componentStyles = Object.keys(compilation.assets)
                     .filter((name) => cssExtensions.includes(path.extname(name)))
                     .map((name) => ({
+                    name,
                     size: compilation.assets[name].size(),
-                    label: name,
+                    componentStyle: true,
                 }));
-                const thresholds = this.budgets.flatMap((budget) => [...(0, bundle_calculator_1.calculateThresholds)(budget)]);
-                for (const { size, label } of componentStyles) {
-                    for (const { severity, message } of (0, bundle_calculator_1.checkThresholds)(thresholds[Symbol.iterator](), size, label)) {
-                        switch (severity) {
-                            case bundle_calculator_1.ThresholdSeverity.Warning:
-                                (0, webpack_diagnostics_1.addWarning)(compilation, message);
-                                break;
-                            case bundle_calculator_1.ThresholdSeverity.Error:
-                                (0, webpack_diagnostics_1.addError)(compilation, message);
-                                break;
-                            default:
-                                assertNever(severity);
-                        }
+                for (const { severity, message } of (0, bundle_calculator_1.checkBudgets)(this.budgets, { chunks: [], assets: componentStyles }, true)) {
+                    switch (severity) {
+                        case bundle_calculator_1.ThresholdSeverity.Warning:
+                            (0, webpack_diagnostics_1.addWarning)(compilation, message);
+                            break;
+                        case bundle_calculator_1.ThresholdSeverity.Error:
+                            (0, webpack_diagnostics_1.addError)(compilation, message);
+                            break;
+                        default:
+                            assertNever(severity);
                     }
                 }
             });

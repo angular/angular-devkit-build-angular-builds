@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Compiler } from 'webpack';
-import { Budget } from '../../../builders/browser/schema';
+import { BudgetEntry } from '../../../utils/bundle-calculator';
 /**
  * Check budget sizes for component styles by emitting a warning or error if a
  * budget is exceeded by a particular component's styles.
  */
 export declare class AnyComponentStyleBudgetChecker {
     private readonly budgets;
-    constructor(budgets: Budget[]);
+    constructor(budgets: BudgetEntry[]);
     apply(compiler: Compiler): void;
 }

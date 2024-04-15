@@ -7,8 +7,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkThresholds = exports.checkBudgets = exports.calculateThresholds = exports.ThresholdSeverity = void 0;
-const schema_1 = require("../builders/browser/schema");
+exports.checkThresholds = exports.checkBudgets = exports.calculateThresholds = exports.ThresholdSeverity = exports.BudgetType = void 0;
+const schema_1 = require("../builders/application/schema");
+Object.defineProperty(exports, "BudgetType", { enumerable: true, get: function () { return schema_1.Type; } });
 const format_bytes_1 = require("./format-bytes");
 var ThresholdType;
 (function (ThresholdType) {

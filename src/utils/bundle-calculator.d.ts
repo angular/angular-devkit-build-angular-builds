@@ -5,7 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Budget } from '../builders/browser/schema';
+import { Budget as BudgetEntry, Type as BudgetType } from '../builders/application/schema';
+export { BudgetEntry, BudgetType };
 export interface Threshold {
     limit: number;
     type: ThresholdType;
@@ -38,7 +39,6 @@ export interface BudgetStats {
     chunks?: BudgetChunk[];
     assets?: BudgetAsset[];
 }
-export declare function calculateThresholds(budget: Budget): IterableIterator<Threshold>;
-export declare function checkBudgets(budgets: Budget[], stats: BudgetStats, checkComponentStyles?: boolean): IterableIterator<BudgetCalculatorResult>;
-export declare function checkThresholds(thresholds: IterableIterator<Threshold>, size: number, label?: string): IterableIterator<BudgetCalculatorResult>;
-export {};
+export declare function calculateThresholds(budget: BudgetEntry): IterableIterator<Threshold>;
+export declare function checkBudgets(budgets: BudgetEntry[], stats: BudgetStats, checkComponentStyles?: boolean): IterableIterator<BudgetCalculatorResult>;
+export declare function checkThresholds(thresholds: Iterable<Threshold>, size: number, label?: string): IterableIterator<BudgetCalculatorResult>;
