@@ -145,7 +145,7 @@ class InlineFontsProcessor {
                     if (hrefAttr) {
                         const href = hrefAttr.value;
                         const cssContent = hrefsContent.get(href);
-                        rewriter.emitRaw(`<style type="text/css">${cssContent}</style>`);
+                        rewriter.emitRaw(`<style>${cssContent}</style>`);
                     }
                     else {
                         rewriter.emitStartTag(tag);
