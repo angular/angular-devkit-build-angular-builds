@@ -10,36 +10,53 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.IndexHtmlGenerator = void 0;
 const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
+const add_event_dispatch_contract_1 = require("./add-event-dispatch-contract");
 const augment_index_html_1 = require("./augment-index-html");
 const inline_critical_css_1 = require("./inline-critical-css");
 const inline_fonts_1 = require("./inline-fonts");
-const style_nonce_1 = require("./style-nonce");
+const nonce_1 = require("./nonce");
 class IndexHtmlGenerator {
     options;
     plugins;
+    csrPlugins = [];
+    ssrPlugins = [];
     constructor(options) {
         this.options = options;
-        const extraPlugins = [];
-        if (this.options.optimization?.fonts.inline) {
-            extraPlugins.push(inlineFontsPlugin(this));
+        const extraCommonPlugins = [];
+        if (options?.optimization?.fonts.inline) {
+            extraCommonPlugins.push(inlineFontsPlugin(this), nonce_1.addNonce);
         }
-        if (this.options.optimization?.styles.inlineCritical) {
-            extraPlugins.push(inlineCriticalCssPlugin(this));
+        // Common plugins
+        this.plugins = [augmentIndexHtmlPlugin(this), ...extraCommonPlugins, postTransformPlugin(this)];
+        // CSR plugins
+        if (options?.optimization?.styles?.inlineCritical) {
+            this.csrPlugins.push(inlineCriticalCssPlugin(this));
         }
-        this.plugins = [
-            augmentIndexHtmlPlugin(this),
-            ...extraPlugins,
-            // Runs after the `extraPlugins` to capture any nonce or
-            // `style` tags that might've been added by them.
-            addStyleNoncePlugin(),
-            postTransformPlugin(this),
-        ];
+        // SSR plugins
+        if (options.generateDedicatedSSRContent) {
+            this.ssrPlugins.push(addEventDispatchContractPlugin(), addNoncePlugin());
+        }
     }
     async process(options) {
         let content = await this.readIndex(this.options.indexPath);
         const warnings = [];
         const errors = [];
-        for (const plugin of this.plugins) {
+        content = await this.runPlugins(content, this.plugins, options, warnings, errors);
+        const [csrContent, ssrContent] = await Promise.all([
+            this.runPlugins(content, this.csrPlugins, options, warnings, errors),
+            this.ssrPlugins.length
+                ? this.runPlugins(content, this.ssrPlugins, options, warnings, errors)
+                : undefined,
+        ]);
+        return {
+            ssrContent,
+            csrContent,
+            warnings,
+            errors,
+        };
+    }
+    async runPlugins(content, plugins, options, warnings, errors) {
+        for (const plugin of plugins) {
             const result = await plugin(content, options);
             if (typeof result === 'string') {
                 content = result;
@@ -54,11 +71,7 @@ class IndexHtmlGenerator {
                 }
             }
         }
-        return {
-            content,
-            warnings,
-            errors,
-        };
+        return content;
     }
     async readAsset(path) {
         try {
@@ -111,9 +124,12 @@ function inlineCriticalCssPlugin(generator) {
     });
     return async (html, options) => inlineCriticalCssProcessor.process(html, { outputPath: options.outputPath });
 }
-function addStyleNoncePlugin() {
-    return (html) => (0, style_nonce_1.addStyleNonce)(html);
+function addNoncePlugin() {
+    return (html) => (0, nonce_1.addNonce)(html);
 }
 function postTransformPlugin({ options }) {
     return async (html) => (options.postTransform ? options.postTransform(html) : html);
+}
+function addEventDispatchContractPlugin() {
+    return (html) => (0, add_event_dispatch_contract_1.addEventDispatchContract)(html);
 }

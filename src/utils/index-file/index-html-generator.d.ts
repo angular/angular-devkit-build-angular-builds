@@ -30,18 +30,28 @@ export interface IndexHtmlGeneratorOptions {
     optimization?: NormalizedOptimizationOptions;
     cache?: NormalizedCachedOptions;
     imageDomains?: string[];
+    generateDedicatedSSRContent?: boolean;
 }
 export type IndexHtmlTransform = (content: string) => Promise<string>;
-export interface IndexHtmlTransformResult {
+export interface IndexHtmlPluginTransformResult {
     content: string;
+    warnings: string[];
+    errors: string[];
+}
+export interface IndexHtmlProcessResult {
+    csrContent: string;
+    ssrContent?: string;
     warnings: string[];
     errors: string[];
 }
 export declare class IndexHtmlGenerator {
     readonly options: IndexHtmlGeneratorOptions;
     private readonly plugins;
+    private readonly csrPlugins;
+    private readonly ssrPlugins;
     constructor(options: IndexHtmlGeneratorOptions);
-    process(options: IndexHtmlGeneratorProcessOptions): Promise<IndexHtmlTransformResult>;
+    process(options: IndexHtmlGeneratorProcessOptions): Promise<IndexHtmlProcessResult>;
+    private runPlugins;
     readAsset(path: string): Promise<string>;
     protected readIndex(path: string): Promise<string>;
 }

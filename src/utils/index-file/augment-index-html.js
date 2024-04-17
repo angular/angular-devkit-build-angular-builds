@@ -152,6 +152,7 @@ async function augmentIndexHtml(params) {
                         foundPreconnects.add(href);
                     }
                 }
+                break;
         }
         rewriter.emitStartTag(tag);
     })

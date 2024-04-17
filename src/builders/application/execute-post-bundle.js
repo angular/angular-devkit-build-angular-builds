@@ -32,37 +32,34 @@ async function executePostBundleSteps(options, outputFiles, assetFiles, initialF
     const allErrors = [];
     const allWarnings = [];
     const prerenderedRoutes = [];
-    const { serviceWorker, indexHtmlOptions, optimizationOptions, sourcemapOptions, ssrOptions, prerenderOptions, appShellOptions, workspaceRoot, verbose, } = options;
+    const { serviceWorker, indexHtmlOptions, optimizationOptions, sourcemapOptions, prerenderOptions, appShellOptions, workspaceRoot, verbose, } = options;
     /**
      * Index HTML content without CSS inlining to be used for server rendering (AppShell, SSG and SSR).
      *
      * NOTE: we don't perform critical CSS inlining as this will be done during server rendering.
      */
-    let indexContentOutputNoCssInlining;
+    let ssrIndexContent;
     // When using prerender/app-shell the index HTML file can be regenerated.
     // Thus, we use a Map so that we do not generate 2 files with the same filename.
     const additionalHtmlOutputFiles = new Map();
     // Generate index HTML file
     // If localization is enabled, index generation is handled in the inlining process.
     if (indexHtmlOptions) {
-        const { content, contentWithoutCriticalCssInlined, errors, warnings } = await (0, index_html_generator_1.generateIndexHtml)(initialFiles, outputFiles, {
-            ...options,
-            optimizationOptions,
-        }, locale);
-        indexContentOutputNoCssInlining = contentWithoutCriticalCssInlined;
+        const { csrContent, ssrContent, errors, warnings } = await (0, index_html_generator_1.generateIndexHtml)(initialFiles, outputFiles, options, locale);
         allErrors.push(...errors);
         allWarnings.push(...warnings);
-        additionalHtmlOutputFiles.set(indexHtmlOptions.output, (0, utils_1.createOutputFileFromText)(indexHtmlOptions.output, content, bundler_context_1.BuildOutputFileType.Browser));
-        if (ssrOptions) {
+        additionalHtmlOutputFiles.set(indexHtmlOptions.output, (0, utils_1.createOutputFileFromText)(indexHtmlOptions.output, csrContent, bundler_context_1.BuildOutputFileType.Browser));
+        if (ssrContent) {
             const serverIndexHtmlFilename = 'index.server.html';
-            additionalHtmlOutputFiles.set(serverIndexHtmlFilename, (0, utils_1.createOutputFileFromText)(serverIndexHtmlFilename, contentWithoutCriticalCssInlined, bundler_context_1.BuildOutputFileType.Server));
+            additionalHtmlOutputFiles.set(serverIndexHtmlFilename, (0, utils_1.createOutputFileFromText)(serverIndexHtmlFilename, ssrContent, bundler_context_1.BuildOutputFileType.Server));
+            ssrIndexContent = ssrContent;
         }
     }
     // Pre-render (SSG) and App-shell
     // If localization is enabled, prerendering is handled in the inlining process.
     if (prerenderOptions || appShellOptions) {
-        (0, node_assert_1.default)(indexContentOutputNoCssInlining, 'The "index" option is required when using the "ssg" or "appShell" options.');
-        const { output, warnings, errors, prerenderedRoutes: generatedRoutes, } = await (0, prerender_1.prerenderPages)(workspaceRoot, appShellOptions, prerenderOptions, outputFiles, assetFiles, indexContentOutputNoCssInlining, sourcemapOptions.scripts, optimizationOptions.styles.inlineCritical, environment_options_1.maxWorkers, verbose);
+        (0, node_assert_1.default)(ssrIndexContent, 'The "index" option is required when using the "ssg" or "appShell" options.');
+        const { output, warnings, errors, prerenderedRoutes: generatedRoutes, } = await (0, prerender_1.prerenderPages)(workspaceRoot, appShellOptions, prerenderOptions, outputFiles, assetFiles, ssrIndexContent, sourcemapOptions.scripts, optimizationOptions.styles.inlineCritical, environment_options_1.maxWorkers, verbose);
         allErrors.push(...errors);
         allWarnings.push(...warnings);
         prerenderedRoutes.push(...Array.from(generatedRoutes));

@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addStyleNonce = void 0;
+exports.addNonce = void 0;
 const html_rewriting_stream_1 = require("./html-rewriting-stream");
 /**
  * Pattern matching the name of the Angular nonce attribute. Note that this is
@@ -15,24 +15,26 @@ const html_rewriting_stream_1 = require("./html-rewriting-stream");
  */
 const NONCE_ATTR_PATTERN = /ngCspNonce/i;
 /**
- * Finds the `ngCspNonce` value and copies it to all inline `<style>` tags.
+ * Finds the `ngCspNonce` value and copies it to all inline `<style>` and `<script> `tags.
  * @param html Markup that should be processed.
  */
-async function addStyleNonce(html) {
+async function addNonce(html) {
     const nonce = await findNonce(html);
     if (!nonce) {
         return html;
     }
     const { rewriter, transformedContent } = await (0, html_rewriting_stream_1.htmlRewritingStream)(html);
     rewriter.on('startTag', (tag) => {
-        if (tag.tagName === 'style' && !tag.attrs.some((attr) => attr.name === 'nonce')) {
+        if ((tag.tagName === 'style' ||
+            (tag.tagName === 'script' && !tag.attrs.some((attr) => attr.name === 'src'))) &&
+            !tag.attrs.some((attr) => attr.name === 'nonce')) {
             tag.attrs.push({ name: 'nonce', value: nonce });
         }
         rewriter.emitStartTag(tag);
     });
     return transformedContent();
 }
-exports.addStyleNonce = addStyleNonce;
+exports.addNonce = addNonce;
 /** Finds the Angular nonce in an HTML string. */
 async function findNonce(html) {
     // Inexpensive check to avoid parsing the HTML when we're sure there's no nonce.

@@ -8,8 +8,8 @@
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { BuildOutputFile, InitialFileRecord } from './bundler-context';
 export declare function generateIndexHtml(initialFiles: Map<string, InitialFileRecord>, outputFiles: BuildOutputFile[], buildOptions: NormalizedApplicationBuildOptions, lang?: string): Promise<{
-    content: string;
-    contentWithoutCriticalCssInlined: string;
+    csrContent: string;
+    ssrContent?: string;
     warnings: string[];
     errors: string[];
 }>;
