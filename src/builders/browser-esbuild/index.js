@@ -11,13 +11,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildEsbuildBrowser = void 0;
+const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
-const node_fs_1 = require("node:fs");
 const promises_1 = __importDefault(require("node:fs/promises"));
 const node_path_1 = __importDefault(require("node:path"));
-const utils_1 = require("../../tools/esbuild/utils");
-const utils_2 = require("../../utils");
-const application_1 = require("../application");
 const builder_status_warnings_1 = require("./builder-status-warnings");
 /**
  * Main execution function for the esbuild-based application builder.
@@ -33,9 +30,9 @@ async function* buildEsbuildBrowser(userOptions, context, infrastructureSettings
     const { deleteOutputPath, outputPath } = normalizedOptions;
     const fullOutputPath = node_path_1.default.join(context.workspaceRoot, outputPath.base);
     if (deleteOutputPath && infrastructureSettings?.write !== false) {
-        await (0, utils_2.deleteOutputDir)(context.workspaceRoot, outputPath.base);
+        await (0, private_1.deleteOutputDir)(context.workspaceRoot, outputPath.base);
     }
-    for await (const result of (0, application_1.buildApplicationInternal)(normalizedOptions, context, {
+    for await (const result of (0, private_1.buildApplicationInternal)(normalizedOptions, context, {
         write: false,
     }, plugins && { codePlugins: plugins })) {
         if (infrastructureSettings?.write !== false && result.outputFiles) {
@@ -78,7 +75,7 @@ async function writeResultFiles(outputFiles, assetFiles, outputPath) {
         }
     };
     // Writes the output file to disk and ensures the containing directories are present
-    await (0, utils_1.emitFilesToDisk)(outputFiles, async (file) => {
+    await (0, private_1.emitFilesToDisk)(outputFiles, async (file) => {
         // Ensure output subdirectories exist
         const basePath = node_path_1.default.dirname(file.path);
         await ensureDirectoryExists(basePath);
@@ -86,12 +83,12 @@ async function writeResultFiles(outputFiles, assetFiles, outputPath) {
         await promises_1.default.writeFile(node_path_1.default.join(outputPath, file.path), file.contents);
     });
     if (assetFiles?.length) {
-        await (0, utils_1.emitFilesToDisk)(assetFiles, async ({ source, destination }) => {
+        await (0, private_1.emitFilesToDisk)(assetFiles, async ({ source, destination }) => {
             const basePath = node_path_1.default.dirname(destination);
             // Ensure output subdirectories exist
             await ensureDirectoryExists(basePath);
             // Copy file contents
-            await promises_1.default.copyFile(source, node_path_1.default.join(outputPath, destination), node_fs_1.constants.COPYFILE_FICLONE);
+            await promises_1.default.copyFile(source, node_path_1.default.join(outputPath, destination), promises_1.default.constants.COPYFILE_FICLONE);
         });
     }
 }

@@ -31,6 +31,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serveWebpackBrowser = void 0;
+const private_1 = require("@angular/build/private");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
 const path = __importStar(require("path"));
@@ -43,9 +44,7 @@ const stats_1 = require("../../tools/webpack/utils/stats");
 const utils_1 = require("../../utils");
 const color_1 = require("../../utils/color");
 const i18n_webpack_1 = require("../../utils/i18n-webpack");
-const load_translations_1 = require("../../utils/load-translations");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
-const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
 const schema_1 = require("../browser/schema");
@@ -61,7 +60,7 @@ const schema_1 = require("../browser/schema");
 function serveWebpackBrowser(options, builderName, context, transforms = {}) {
     // Check Angular version.
     const { logger, workspaceRoot } = context;
-    (0, version_1.assertCompatibleAngularVersion)(workspaceRoot);
+    (0, private_1.assertCompatibleAngularVersion)(workspaceRoot);
     async function setup() {
         if (options.hmr) {
             logger.warn(core_1.tags.stripIndents `NOTICE: Hot Module Replacement (HMR) is enabled for the dev server.
@@ -259,7 +258,7 @@ async function setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheO
     }
     rules.push(i18nRule);
     // Add a plugin to reload translation files on rebuilds
-    const loader = await (0, load_translations_1.createTranslationLoader)();
+    const loader = await (0, private_1.createTranslationLoader)();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     webpackConfig.plugins.push({
         apply: (compiler) => {

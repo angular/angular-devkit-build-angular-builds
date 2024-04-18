@@ -8,8 +8,8 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CssOptimizerPlugin = void 0;
+const private_1 = require("@angular/build/private");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
-const utils_1 = require("../../esbuild/utils");
 const esbuild_executor_1 = require("./esbuild-executor");
 /**
  * The name of the plugin provided to Webpack when tapping Webpack compiler hooks.
@@ -26,7 +26,7 @@ class CssOptimizerPlugin {
     esbuild = new esbuild_executor_1.EsbuildExecutor();
     constructor(options) {
         if (options?.supportedBrowsers) {
-            this.targets = (0, utils_1.transformSupportedBrowsersToTargets)(options.supportedBrowsers);
+            this.targets = (0, private_1.transformSupportedBrowsersToTargets)(options.supportedBrowsers);
         }
     }
     apply(compiler) {

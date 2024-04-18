@@ -11,9 +11,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.extractMessages = void 0;
+const private_1 = require("@angular/build/private");
 const node_assert_1 = __importDefault(require("node:assert"));
 const node_path_1 = __importDefault(require("node:path"));
-const application_1 = require("../application");
 const browser_esbuild_1 = require("../browser-esbuild");
 async function extractMessages(options, builderName, context, extractorConstructor) {
     const messages = [];
@@ -27,7 +27,7 @@ async function extractMessages(options, builderName, context, extractorConstruct
     buildOptions.serviceWorker = false;
     let build;
     if (builderName === '@angular-devkit/build-angular:application') {
-        build = application_1.buildApplicationInternal;
+        build = private_1.buildApplicationInternal;
         buildOptions.ssr = false;
         buildOptions.appShell = false;
         buildOptions.prerender = false;

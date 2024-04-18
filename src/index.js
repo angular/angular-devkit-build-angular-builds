@@ -29,8 +29,8 @@ Object.defineProperty(exports, "OutputHashing", { enumerable: true, get: functio
 Object.defineProperty(exports, "Type", { enumerable: true, get: function () { return schema_1.Type; } });
 var browser_1 = require("./builders/browser");
 Object.defineProperty(exports, "executeBrowserBuilder", { enumerable: true, get: function () { return browser_1.buildWebpackBrowser; } });
-var application_1 = require("./builders/application");
-Object.defineProperty(exports, "buildApplication", { enumerable: true, get: function () { return application_1.buildApplication; } });
+var build_1 = require("@angular/build");
+Object.defineProperty(exports, "buildApplication", { enumerable: true, get: function () { return build_1.buildApplication; } });
 var dev_server_1 = require("./builders/dev-server");
 Object.defineProperty(exports, "executeDevServerBuilder", { enumerable: true, get: function () { return dev_server_1.executeDevServerBuilder; } });
 var extract_i18n_1 = require("./builders/extract-i18n");

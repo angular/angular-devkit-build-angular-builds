@@ -31,9 +31,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = void 0;
+const private_1 = require("@angular/build/private");
 const rxjs_1 = require("rxjs");
 const check_port_1 = require("../../utils/check-port");
-const purge_cache_1 = require("../../utils/purge-cache");
 const options_1 = require("./options");
 /**
  * A Builder that executes a development server based on the provided browser target option.
@@ -95,7 +95,7 @@ function execute(options, context, transforms = {}, extensions) {
 exports.execute = execute;
 async function initialize(initialOptions, projectName, context, builderSelector = defaultBuilderSelector) {
     // Purge old build disk cache.
-    await (0, purge_cache_1.purgeStaleBuildCache)(context);
+    await (0, private_1.purgeStaleBuildCache)(context);
     const normalizedOptions = await (0, options_1.normalizeOptions)(context, projectName, initialOptions);
     const builderName = builderSelector({
         builderName: await context.getBuilderNameForTarget(normalizedOptions.buildTarget),

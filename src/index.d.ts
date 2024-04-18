@@ -8,7 +8,7 @@
 export * from './transforms';
 export { AssetPattern, AssetPatternClass as AssetPatternObject, Budget, CrossOrigin, FileReplacement, OptimizationClass as OptimizationObject, OptimizationUnion, OutputHashing, Schema as BrowserBuilderOptions, SourceMapClass as SourceMapObject, SourceMapUnion, StylePreprocessorOptions, Type, } from './builders/browser/schema';
 export { buildWebpackBrowser as executeBrowserBuilder, BrowserBuilderOutput, } from './builders/browser';
-export { buildApplication, ApplicationBuilderOptions } from './builders/application';
+export { buildApplication, ApplicationBuilderOptions } from '@angular/build';
 export { executeDevServerBuilder, DevServerBuilderOptions, DevServerBuilderOutput, } from './builders/dev-server';
 export { execute as executeExtractI18nBuilder, ExtractI18nBuilderOptions, } from './builders/extract-i18n';
 export { execute as executeKarmaBuilder, KarmaBuilderOptions, KarmaConfigOptions, } from './builders/karma';

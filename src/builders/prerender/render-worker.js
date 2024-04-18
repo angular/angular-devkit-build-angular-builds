@@ -84,7 +84,7 @@ async function render({ indexFile, deployUrl, minifyCss, outputPath, serverBundl
         });
     }
     if (inlineCriticalCss) {
-        const { InlineCriticalCssProcessor } = await Promise.resolve().then(() => __importStar(require('../../utils/index-file/inline-critical-css')));
+        const { InlineCriticalCssProcessor } = await Promise.resolve().then(() => __importStar(require('@angular/build/private')));
         const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
             deployUrl: deployUrl,
             minify: minifyCss,

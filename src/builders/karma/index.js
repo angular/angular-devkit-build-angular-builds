@@ -31,20 +31,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = void 0;
+const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
 const module_1 = require("module");
 const path = __importStar(require("path"));
 const rxjs_1 = require("rxjs");
 const configs_1 = require("../../tools/webpack/configs");
-const purge_cache_1 = require("../../utils/purge-cache");
-const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const schema_1 = require("../browser/schema");
 const find_tests_plugin_1 = require("./find-tests-plugin");
 async function initialize(options, context, webpackConfigurationTransformer) {
     // Purge old build disk cache.
-    await (0, purge_cache_1.purgeStaleBuildCache)(context);
+    await (0, private_1.purgeStaleBuildCache)(context);
     const { config } = await (0, webpack_browser_config_1.generateBrowserWebpackConfigFromContext)(
     // only two properties are missing:
     // * `outputPath` which is fixed for tests
@@ -74,7 +73,7 @@ async function initialize(options, context, webpackConfigurationTransformer) {
  */
 function execute(options, context, transforms = {}) {
     // Check Angular version.
-    (0, version_1.assertCompatibleAngularVersion)(context.workspaceRoot);
+    (0, private_1.assertCompatibleAngularVersion)(context.workspaceRoot);
     let singleRun;
     if (options.watch !== undefined) {
         singleRun = !options.watch;

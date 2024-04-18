@@ -11,10 +11,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaScriptOptimizerPlugin = void 0;
+const private_1 = require("@angular/build/private");
 const piscina_1 = __importDefault(require("piscina"));
 const environment_options_1 = require("../../../utils/environment-options");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
-const utils_1 = require("../../esbuild/utils");
 const esbuild_executor_1 = require("./esbuild-executor");
 /**
  * The maximum number of Workers that will be created to execute optimize tasks.
@@ -38,7 +38,7 @@ class JavaScriptOptimizerPlugin {
     constructor(options) {
         this.options = options;
         if (options.supportedBrowsers) {
-            this.targets = (0, utils_1.transformSupportedBrowsersToTargets)(options.supportedBrowsers);
+            this.targets = (0, private_1.transformSupportedBrowsersToTargets)(options.supportedBrowsers);
         }
     }
     apply(compiler) {

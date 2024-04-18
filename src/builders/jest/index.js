@@ -30,6 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const node_child_process_1 = require("node:child_process");
 const fs = __importStar(require("node:fs/promises"));
@@ -37,7 +38,6 @@ const path = __importStar(require("node:path"));
 const node_util_1 = require("node:util");
 const color_1 = require("../../utils/color");
 const test_files_1 = require("../../utils/test-files");
-const application_1 = require("../application");
 const schema_1 = require("../browser-esbuild/schema");
 const options_1 = require("./options");
 const execFile = (0, node_util_1.promisify)(node_child_process_1.execFile);
@@ -152,7 +152,7 @@ exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
 });
 async function build(context, options) {
     try {
-        for await (const _ of (0, application_1.buildApplicationInternal)(options, context)) {
+        for await (const _ of (0, private_1.buildApplicationInternal)(options, context)) {
             // Nothing to do for each event, just wait for the whole build.
         }
         return { success: true };

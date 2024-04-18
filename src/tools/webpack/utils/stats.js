@@ -34,11 +34,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.webpackStatsLogger = exports.generateBuildEventStats = exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = void 0;
+const private_1 = require("@angular/build/private");
 const node_assert_1 = __importDefault(require("node:assert"));
 const path = __importStar(require("node:path"));
 const utils_1 = require("../../../utils");
 const color_1 = require("../../../utils/color");
-const stats_table_1 = require("../../../utils/stats-table");
 const async_chunks_1 = require("./async-chunks");
 const helpers_1 = require("./helpers");
 function getBuildDuration(webpackStats) {
@@ -105,7 +105,7 @@ statsConfig, budgetFailures) {
     }
     unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
     runsCache.add(json.outputPath || '');
-    const statsTable = (0, stats_table_1.generateBuildStatsTable)(changedChunksStats, colors, unchangedChunkNumber === 0, hasEstimatedTransferSizes, budgetFailures);
+    const statsTable = (0, private_1.generateBuildStatsTable)(changedChunksStats, colors, unchangedChunkNumber === 0, hasEstimatedTransferSizes, budgetFailures);
     // In some cases we do things outside of webpack context
     // Such us index generation, service worker augmentation etc...
     // This will correct the time and include these.

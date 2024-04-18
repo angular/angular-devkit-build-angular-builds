@@ -31,18 +31,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = void 0;
+const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const node_path_1 = require("node:path");
 const rxjs_1 = require("rxjs");
 const normalize_cache_1 = require("../../utils/normalize-cache");
-const purge_cache_1 = require("../../utils/purge-cache");
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
 function execute(options, context) {
     return (0, rxjs_1.from)((async () => {
         // Purge old build disk cache.
-        await (0, purge_cache_1.purgeStaleBuildCache)(context);
+        await (0, private_1.purgeStaleBuildCache)(context);
         const root = context.workspaceRoot;
         const packager = (await Promise.resolve().then(() => __importStar(require('ng-packagr')))).ngPackagr();
         packager.forProject((0, node_path_1.resolve)(root, options.project));

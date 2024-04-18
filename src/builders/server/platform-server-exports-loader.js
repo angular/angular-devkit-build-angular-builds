@@ -15,6 +15,7 @@ const node_path_1 = require("node:path");
  * @see https://github.com/webpack/webpack/issues/15936.
  */
 function default_1(content, map) {
+    const extractorPath = (0, node_path_1.join)((0, node_path_1.dirname)(require.resolve('@angular/build/package.json')), 'src/utils/routes-extractor/extractor.js');
     const source = `${content}
 
   // EXPORTS added by @angular-devkit/build-angular
@@ -22,7 +23,7 @@ function default_1(content, map) {
   ` +
         // We do not import it directly so that node.js modules are resolved using the correct context.
         // Remove source map URL comments from the code if a sourcemap is present as this will not match the file.
-        (0, node_fs_1.readFileSync)((0, node_path_1.join)(__dirname, '../../utils/routes-extractor/extractor.js'), 'utf-8').replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+        (0, node_fs_1.readFileSync)(extractorPath, 'utf-8').replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
     this.callback(null, source, map);
     return;
 }

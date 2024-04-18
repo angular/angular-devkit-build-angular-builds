@@ -8,13 +8,13 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeBrowserSchema = void 0;
+const private_1 = require("@angular/build/private");
 const normalize_asset_patterns_1 = require("./normalize-asset-patterns");
 const normalize_cache_1 = require("./normalize-cache");
 const normalize_file_replacements_1 = require("./normalize-file-replacements");
 const normalize_optimization_1 = require("./normalize-optimization");
 const normalize_polyfills_1 = require("./normalize-polyfills");
 const normalize_source_maps_1 = require("./normalize-source-maps");
-const supported_browsers_1 = require("./supported-browsers");
 function normalizeBrowserSchema(workspaceRoot, projectRoot, projectSourceRoot, options, metadata, logger) {
     return {
         ...options,
@@ -38,7 +38,7 @@ function normalizeBrowserSchema(workspaceRoot, projectRoot, projectSourceRoot, o
         // A value of 0 is falsy and will disable polling rather then enable
         // 500 ms is a sensible default in this case
         poll: options.poll === 0 ? 500 : options.poll,
-        supportedBrowsers: (0, supported_browsers_1.getSupportedBrowsers)(projectRoot, logger),
+        supportedBrowsers: (0, private_1.getSupportedBrowsers)(projectRoot, logger),
     };
 }
 exports.normalizeBrowserSchema = normalizeBrowserSchema;

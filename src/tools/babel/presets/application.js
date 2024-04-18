@@ -147,7 +147,7 @@ function default_1(api, options) {
         needRuntimeTransform = true;
     }
     if (options.optimize) {
-        const { adjustStaticMembers, adjustTypeScriptEnums, elideAngularMetadata, markTopLevelPure, } = require('../plugins');
+        const { adjustStaticMembers, adjustTypeScriptEnums, elideAngularMetadata, markTopLevelPure, } = require('@angular/build/private');
         if (options.optimize.pureTopLevel) {
             plugins.push(markTopLevelPure);
         }

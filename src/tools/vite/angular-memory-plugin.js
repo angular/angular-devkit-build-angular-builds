@@ -12,11 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAngularMemoryPlugin = void 0;
 const remapping_1 = __importDefault(require("@ampproject/remapping"));
+const private_1 = require("@angular/build/private");
 const mrmime_1 = require("mrmime");
 const node_assert_1 = __importDefault(require("node:assert"));
 const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
-const render_page_1 = require("../../utils/server-rendering/render-page");
 // eslint-disable-next-line max-lines-per-function
 function createAngularMemoryPlugin(options) {
     const { workspaceRoot, virtualProjectRoot, outputFiles, assets, external, ssr, extensionMiddleware, extraHeaders, indexHtmlTransformer, normalizePath, } = options;
@@ -161,7 +161,7 @@ function createAngularMemoryPlugin(options) {
                     transformIndexHtmlAndAddHeaders(req.url, rawHtml, res, next, async (html) => {
                         const resolvedUrls = server.resolvedUrls;
                         const baseUrl = resolvedUrls?.local[0] ?? resolvedUrls?.network[0];
-                        const { content } = await (0, render_page_1.renderPage)({
+                        const { content } = await (0, private_1.renderPage)({
                             document: html,
                             route: new URL(req.originalUrl ?? '/', baseUrl).toString(),
                             serverContext: 'ssr',

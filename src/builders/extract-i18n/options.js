@@ -11,10 +11,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeOptions = void 0;
+const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const node_assert_1 = require("node:assert");
 const node_path_1 = __importDefault(require("node:path"));
-const i18n_options_1 = require("../../utils/i18n-options");
 const schema_1 = require("./schema");
 /**
  * Normalize the user provided options by creating full paths for all path based options
@@ -33,7 +33,7 @@ async function normalizeOptions(context, projectName, options) {
     // Target specifier defaults to the current project's build target with no specified configuration
     const buildTargetSpecifier = options.buildTarget ?? options.browserTarget ?? ':';
     const buildTarget = (0, architect_1.targetFromTargetString)(buildTargetSpecifier, projectName, 'build');
-    const i18nOptions = (0, i18n_options_1.createI18nOptions)(projectMetadata);
+    const i18nOptions = (0, private_1.createI18nOptions)(projectMetadata);
     // Normalize xliff format extensions
     let format = options.format;
     switch (format) {

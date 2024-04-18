@@ -31,6 +31,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildWebpackBrowser = exports.BUILD_TIMEOUT = void 0;
+const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const webpack_1 = require("@ngtools/webpack");
@@ -42,19 +43,14 @@ const async_chunks_1 = require("../../tools/webpack/utils/async-chunks");
 const helpers_1 = require("../../tools/webpack/utils/helpers");
 const stats_1 = require("../../tools/webpack/utils/stats");
 const utils_1 = require("../../utils");
-const bundle_calculator_1 = require("../../utils/bundle-calculator");
 const color_1 = require("../../utils/color");
 const copy_assets_1 = require("../../utils/copy-assets");
 const error_1 = require("../../utils/error");
 const i18n_inlining_1 = require("../../utils/i18n-inlining");
-const index_html_generator_1 = require("../../utils/index-file/index-html-generator");
 const normalize_cache_1 = require("../../utils/normalize-cache");
 const output_paths_1 = require("../../utils/output-paths");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
-const purge_cache_1 = require("../../utils/purge-cache");
-const service_worker_1 = require("../../utils/service-worker");
 const spinner_1 = require("../../utils/spinner");
-const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 /**
  * Maximum time in milliseconds for single build/rebuild
@@ -90,10 +86,10 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
     let outputPaths;
     // Check Angular version.
-    (0, version_1.assertCompatibleAngularVersion)(context.workspaceRoot);
+    (0, private_1.assertCompatibleAngularVersion)(context.workspaceRoot);
     return (0, rxjs_1.from)(context.getProjectMetadata(projectName)).pipe((0, rxjs_1.switchMap)(async (projectMetadata) => {
         // Purge old build disk cache.
-        await (0, purge_cache_1.purgeStaleBuildCache)(context);
+        await (0, private_1.purgeStaleBuildCache)(context);
         // Initialize builder
         const initialization = await initialize(options, context, transforms.webpackConfiguration);
         // Add index file to watched files.
@@ -174,13 +170,13 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                 const budgets = options.budgets;
                 let budgetFailures;
                 if (budgets?.length) {
-                    budgetFailures = [...(0, bundle_calculator_1.checkBudgets)(budgets, webpackStats)];
+                    budgetFailures = [...(0, private_1.checkBudgets)(budgets, webpackStats)];
                     for (const { severity, message } of budgetFailures) {
                         switch (severity) {
-                            case bundle_calculator_1.ThresholdSeverity.Warning:
+                            case private_1.ThresholdSeverity.Warning:
                                 webpackStats.warnings?.push({ message });
                                 break;
-                            case bundle_calculator_1.ThresholdSeverity.Error:
+                            case private_1.ThresholdSeverity.Error:
                                 webpackStats.errors?.push({ message });
                                 break;
                             default:
@@ -215,7 +211,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             scripts: options.scripts ?? [],
                             styles: options.styles ?? [],
                         });
-                        const indexHtmlGenerator = new index_html_generator_1.IndexHtmlGenerator({
+                        const indexHtmlGenerator = new private_1.IndexHtmlGenerator({
                             cache: cacheOptions,
                             indexPath: path.join(context.workspaceRoot, (0, webpack_browser_config_1.getIndexInputFile)(options.index)),
                             entrypoints,
@@ -273,7 +269,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         spinner.start('Generating service worker...');
                         for (const [locale, outputPath] of outputPaths.entries()) {
                             try {
-                                await (0, service_worker_1.augmentAppWithServiceWorker)(projectRoot, context.workspaceRoot, outputPath, getLocaleBaseHref(i18n, locale) ?? options.baseHref ?? '/', options.ngswConfigPath);
+                                await (0, private_1.augmentAppWithServiceWorker)(projectRoot, context.workspaceRoot, outputPath, getLocaleBaseHref(i18n, locale) ?? options.baseHref ?? '/', options.ngswConfigPath);
                             }
                             catch (error) {
                                 spinner.fail('Service worker generation failed.');

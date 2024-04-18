@@ -33,13 +33,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const piscina_1 = __importDefault(require("piscina"));
 const utils_1 = require("../../utils");
 const error_1 = require("../../utils/error");
-const service_worker_1 = require("../../utils/service-worker");
 const spinner_1 = require("../../utils/spinner");
 async function _renderUniversal(options, context, browserResult, serverResult, spinner) {
     // Get browser target options.
@@ -59,7 +59,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
     const { styles } = (0, utils_1.normalizeOptimization)(browserOptions.optimization);
     let inlineCriticalCssProcessor;
     if (styles.inlineCritical) {
-        const { InlineCriticalCssProcessor } = await Promise.resolve().then(() => __importStar(require('../../utils/index-file/inline-critical-css')));
+        const { InlineCriticalCssProcessor } = await Promise.resolve().then(() => __importStar(require('@angular/build/private')));
         inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
             minify: styles.minify,
             deployUrl: browserOptions.deployUrl,
@@ -100,7 +100,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
             }
             await fs.promises.writeFile(outputIndexPath, html);
             if (browserOptions.serviceWorker) {
-                await (0, service_worker_1.augmentAppWithServiceWorker)(projectRoot, root, outputPath, baseHref ?? '/', browserOptions.ngswConfigPath);
+                await (0, private_1.augmentAppWithServiceWorker)(projectRoot, root, outputPath, baseHref ?? '/', browserOptions.ngswConfigPath);
             }
         }
     }
@@ -133,8 +133,6 @@ async function _appShellBuilder(options, context) {
     const browserOptions = (await context.getTargetOptions(browserTarget));
     const optimization = (0, utils_1.normalizeOptimization)(browserOptions.optimization);
     optimization.styles.inlineCritical = false;
-    // Webpack based builders do not have the `removeSpecialComments` option.
-    delete optimization.styles.removeSpecialComments;
     const browserTargetRun = await context.scheduleTarget(browserTarget, {
         watch: false,
         serviceWorker: false,

@@ -34,11 +34,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = void 0;
+const private_1 = require("@angular/build/private");
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
 const load_esm_1 = require("../../utils/load-esm");
-const purge_cache_1 = require("../../utils/purge-cache");
-const version_1 = require("../../utils/version");
 const options_1 = require("./options");
 const schema_1 = require("./schema");
 /**
@@ -52,7 +51,7 @@ async function execute(options, context, transforms) {
         return { success: false };
     }
     // Check Angular version.
-    (0, version_1.assertCompatibleAngularVersion)(context.workspaceRoot);
+    (0, private_1.assertCompatibleAngularVersion)(context.workspaceRoot);
     // Load the Angular localize package.
     // The package is a peer dependency and might not be present
     let localizeToolsModule;
@@ -80,7 +79,7 @@ async function execute(options, context, transforms) {
     else {
         // Purge old build disk cache.
         // Other build systems handle stale cache purging directly.
-        await (0, purge_cache_1.purgeStaleBuildCache)(context);
+        await (0, private_1.purgeStaleBuildCache)(context);
         const { extractMessages } = await Promise.resolve().then(() => __importStar(require('./webpack-extraction')));
         extractionResult = await extractMessages(normalizedOptions, builderName, context, transforms);
     }

@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <reference types="node" />
+import { type IndexHtmlTransform } from '@angular/build/private';
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import type http from 'node:http';
 import { Observable } from 'rxjs';
 import type { ExecutionTransformer } from '../../transforms';
-import type { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import type { Schema as DevServerBuilderOptions } from './schema';
 import type { DevServerBuilderOutput } from './webpack-server';
 /**

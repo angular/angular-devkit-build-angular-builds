@@ -31,6 +31,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = void 0;
+const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const promises_1 = require("node:fs/promises");
@@ -45,9 +46,7 @@ const copy_assets_1 = require("../../utils/copy-assets");
 const error_1 = require("../../utils/error");
 const i18n_inlining_1 = require("../../utils/i18n-inlining");
 const output_paths_1 = require("../../utils/output-paths");
-const purge_cache_1 = require("../../utils/purge-cache");
 const spinner_1 = require("../../utils/spinner");
-const version_1 = require("../../utils/version");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 /**
  * @experimental Direct usage of this function is considered experimental.
@@ -55,7 +54,7 @@ const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 function execute(options, context, transforms = {}) {
     const root = context.workspaceRoot;
     // Check Angular version.
-    (0, version_1.assertCompatibleAngularVersion)(root);
+    (0, private_1.assertCompatibleAngularVersion)(root);
     const baseOutputPath = path.resolve(root, options.outputPath);
     let outputPaths;
     return (0, rxjs_1.from)(initialize(options, context, transforms.webpackConfiguration)).pipe((0, rxjs_1.concatMap)(({ config, i18n, projectRoot, projectSourceRoot }) => {
@@ -134,7 +133,7 @@ exports.execute = execute;
 exports.default = (0, architect_1.createBuilder)(execute);
 async function initialize(options, context, webpackConfigurationTransform) {
     // Purge old build disk cache.
-    await (0, purge_cache_1.purgeStaleBuildCache)(context);
+    await (0, private_1.purgeStaleBuildCache)(context);
     await checkTsConfigForPreserveWhitespacesSetting(context, options.tsConfig);
     const browserslist = (await Promise.resolve().then(() => __importStar(require('browserslist')))).default;
     const originalOutputPath = options.outputPath;

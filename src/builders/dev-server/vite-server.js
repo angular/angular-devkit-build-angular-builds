@@ -34,20 +34,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupServer = exports.serveWithVite = void 0;
+const build_1 = require("@angular/build");
+const private_1 = require("@angular/build/private");
 const node_assert_1 = __importDefault(require("node:assert"));
 const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
-const bundler_context_1 = require("../../tools/esbuild/bundler-context");
-const javascript_transformer_1 = require("../../tools/esbuild/javascript-transformer");
-const rxjs_esm_resolution_plugin_1 = require("../../tools/esbuild/rxjs-esm-resolution-plugin");
-const utils_1 = require("../../tools/esbuild/utils");
 const angular_memory_plugin_1 = require("../../tools/vite/angular-memory-plugin");
 const i18n_locale_plugin_1 = require("../../tools/vite/i18n-locale-plugin");
-const utils_2 = require("../../utils");
+const utils_1 = require("../../utils");
 const load_esm_1 = require("../../utils/load-esm");
-const supported_browsers_1 = require("../../utils/supported-browsers");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
-const application_1 = require("../application");
 const browser_esbuild_1 = require("../browser-esbuild");
 /**
  * Build options that are also present on the dev server but are only passed
@@ -96,9 +92,9 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
         // When localization is enabled with a single locale, force a flat path to maintain behavior with the existing Webpack-based dev server.
         browserOptions.forceI18nFlatOutput = true;
     }
-    const { vendor: thirdPartySourcemaps } = (0, utils_2.normalizeSourceMaps)(browserOptions.sourceMap ?? false);
+    const { vendor: thirdPartySourcemaps } = (0, utils_1.normalizeSourceMaps)(browserOptions.sourceMap ?? false);
     // Setup the prebundling transformer that will be shared across Vite prebundling requests
-    const prebundleTransformer = new javascript_transformer_1.JavaScriptTransformer(
+    const prebundleTransformer = new private_1.JavaScriptTransformer(
     // Always enable JIT linking to support applications built with and without AOT.
     // In a development environment the additional scope information does not
     // have a negative effect unlike production where final output size is relevant.
@@ -128,7 +124,7 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
     });
     const build = builderName === '@angular-devkit/build-angular:browser-esbuild'
         ? browser_esbuild_1.buildEsbuildBrowser.bind(undefined, browserOptions, context, { write: false }, extensions?.buildPlugins)
-        : application_1.buildApplicationInternal.bind(undefined, browserOptions, context, { write: false }, { codePlugins: extensions?.buildPlugins });
+        : private_1.buildApplicationInternal.bind(undefined, browserOptions, context, { write: false }, { codePlugins: extensions?.buildPlugins });
     // TODO: Switch this to an architect schedule call when infrastructure settings are supported
     for await (const result of build()) {
         (0, node_assert_1.default)(result.outputFiles, 'Builder did not provide result files.');
@@ -195,13 +191,13 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
             }
             const { root = '' } = await context.getProjectMetadata(projectName);
             const projectRoot = (0, node_path_1.join)(context.workspaceRoot, root);
-            const browsers = (0, supported_browsers_1.getSupportedBrowsers)(projectRoot, context.logger);
-            const target = (0, utils_1.transformSupportedBrowsersToTargets)(browsers);
+            const browsers = (0, private_1.getSupportedBrowsers)(projectRoot, context.logger);
+            const target = (0, private_1.transformSupportedBrowsersToTargets)(browsers);
             const polyfills = Array.isArray((browserOptions.polyfills ??= []))
                 ? browserOptions.polyfills
                 : [browserOptions.polyfills];
             // Setup server and start listening
-            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target, (0, utils_1.isZonelessApp)(polyfills), browserOptions.loader, extensions?.middleware, transformers?.indexHtml, thirdPartySourcemaps);
+            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target, (0, private_1.isZonelessApp)(polyfills), browserOptions.loader, extensions?.middleware, transformers?.indexHtml, thirdPartySourcemaps);
             server = await createServer(serverConfiguration);
             await server.listen();
             if (serverConfiguration.ssr?.optimizeDeps?.disabled === false) {
@@ -304,7 +300,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
         if (filePath.endsWith('.map')) {
             generatedFiles.set(filePath, {
                 contents: file.contents,
-                servable: file.type === bundler_context_1.BuildOutputFileType.Browser || file.type === bundler_context_1.BuildOutputFileType.Media,
+                servable: file.type === build_1.BuildOutputFileType.Browser || file.type === build_1.BuildOutputFileType.Media,
                 size: file.contents.byteLength,
                 updated: false,
             });
@@ -324,7 +320,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
             size: file.contents.byteLength,
             hash: file.hash,
             updated: true,
-            servable: file.type === bundler_context_1.BuildOutputFileType.Browser || file.type === bundler_context_1.BuildOutputFileType.Media,
+            servable: file.type === build_1.BuildOutputFileType.Browser || file.type === build_1.BuildOutputFileType.Media,
         });
     }
     // Clear stale output files
@@ -335,7 +331,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
     }
 }
 async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target, zoneless, prebundleLoaderExtensions, extensionMiddleware, indexHtmlTransformer, thirdPartySourcemaps = false) {
-    const proxy = await (0, utils_2.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig);
+    const proxy = await (0, utils_1.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig);
     // dynamically import Vite for ESM compatibility
     const { normalizePath } = await (0, load_esm_1.loadEsmModule)('vite');
     // Path will not exist on disk and only used to provide separate path for Vite requests
@@ -486,7 +482,7 @@ function getDepOptimizationConfig({ disabled, exclude, include, target, zoneless
         },
     ];
     if (ssr) {
-        plugins.unshift((0, rxjs_esm_resolution_plugin_1.createRxjsEsmResolutionPlugin)());
+        plugins.unshift((0, private_1.createRxjsEsmResolutionPlugin)());
     }
     return {
         // Exclude any explicitly defined dependencies (currently build defined externals)
@@ -499,7 +495,7 @@ function getDepOptimizationConfig({ disabled, exclude, include, target, zoneless
         esbuildOptions: {
             // Set esbuild supported targets.
             target,
-            supported: (0, utils_1.getFeatureSupport)(target, zoneless),
+            supported: (0, private_1.getFeatureSupport)(target, zoneless),
             plugins,
             loader,
         },

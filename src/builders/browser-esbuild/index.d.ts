@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import type { BuildOutputFile } from '@angular/build';
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
-import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
-import { Schema as BrowserBuilderOptions } from './schema';
+import type { Schema as BrowserBuilderOptions } from './schema';
 /**
  * Main execution function for the esbuild-based application builder.
  * The options are compatible with the Webpack-based builder.

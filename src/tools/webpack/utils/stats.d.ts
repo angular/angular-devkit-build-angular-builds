@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { BudgetCalculatorResult } from '@angular/build/private';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { logging } from '@angular-devkit/core';
 import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../../builders/browser/schema';
-import { BudgetCalculatorResult } from '../../../utils/bundle-calculator';
 import { WebpackStatsOptions } from './helpers';
 export declare function statsWarningsToString(json: StatsCompilation, statsConfig: WebpackStatsOptions): string;
 export declare function statsErrorsToString(json: StatsCompilation, statsConfig: WebpackStatsOptions): string;

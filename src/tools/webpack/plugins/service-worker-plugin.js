@@ -8,7 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServiceWorkerPlugin = void 0;
-const service_worker_1 = require("../../../utils/service-worker");
+const private_1 = require("@angular/build/private");
 class ServiceWorkerPlugin {
     options;
     constructor(options) {
@@ -31,7 +31,7 @@ class ServiceWorkerPlugin {
                 throw new Error('Compilation output path cannot be empty.');
             }
             try {
-                await (0, service_worker_1.augmentAppWithServiceWorker)(projectRoot, root, outputPath, baseHref, ngswConfigPath, 
+                await (0, private_1.augmentAppWithServiceWorker)(projectRoot, root, outputPath, baseHref, ngswConfigPath, 
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 compiler.inputFileSystem.promises, 
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -10,12 +10,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const node_fs_1 = require("node:fs");
 const node_module_1 = require("node:module");
 const node_path_1 = __importDefault(require("node:path"));
 const test_files_1 = require("../../utils/test-files");
-const application_1 = require("../application");
 const schema_1 = require("../browser-esbuild/schema");
 const builder_status_warnings_1 = require("./builder-status-warnings");
 const options_1 = require("./options");
@@ -67,7 +67,7 @@ async function buildTests(testFiles, outputPath, options, ctx) {
     }
     // Build tests with `application` builder, using test files as entry points.
     // Also bundle in Jasmine and the Jasmine runner script, which need to share chunked dependencies.
-    const buildOutput = await first((0, application_1.buildApplicationInternal)({
+    const buildOutput = await first((0, private_1.buildApplicationInternal)({
         entryPoints,
         tsConfig: options.tsConfig,
         outputPath,

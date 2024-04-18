@@ -34,11 +34,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStylesConfig = void 0;
+const private_1 = require("@angular/build/private");
 const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
 const path = __importStar(require("node:path"));
 const node_url_1 = require("node:url");
 const tailwind_1 = require("../../../utils/tailwind");
-const sass_service_1 = require("../../sass/sass-service");
 const plugins_1 = require("../plugins");
 const css_optimizer_plugin_1 = require("../plugins/css-optimizer-plugin");
 const styles_webpack_plugin_1 = require("../plugins/styles-webpack-plugin");
@@ -66,7 +66,7 @@ async function getStylesConfig(wco) {
             extraPlugins.push(new plugins_1.RemoveHashPlugin({ chunkNames: noInjectNames, hashFormat }));
         }
     }
-    const sassImplementation = new sass_service_1.SassWorkerImplementation();
+    const sassImplementation = new private_1.SassWorkerImplementation();
     extraPlugins.push({
         apply(compiler) {
             compiler.hooks.shutdown.tap('sass-worker', () => {

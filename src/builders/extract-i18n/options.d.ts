@@ -22,7 +22,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     workspaceRoot: string;
     projectRoot: string;
     buildTarget: import("@angular-devkit/architect").Target;
-    i18nOptions: import("../../utils/i18n-options").I18nOptions;
+    i18nOptions: import("@angular/build/private").I18nOptions;
     format: Format.Arb | Format.Json | Format.LegacyMigrate | Format.Xliff | Format.Xliff2 | Format.Xmb;
     outFile: string;
     progress: boolean;

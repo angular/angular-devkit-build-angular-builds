@@ -34,6 +34,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = void 0;
+const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const fs = __importStar(require("fs"));
 const promises_1 = require("node:fs/promises");
@@ -43,7 +44,6 @@ const piscina_1 = __importDefault(require("piscina"));
 const utils_1 = require("../../utils");
 const environment_options_1 = require("../../utils/environment-options");
 const error_1 = require("../../utils/error");
-const service_worker_1 = require("../../utils/service-worker");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 class RoutesSet extends Set {
     add(value) {
@@ -188,7 +188,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, b
             if (browserOptions.serviceWorker) {
                 spinner.start('Generating service worker...');
                 try {
-                    await (0, service_worker_1.augmentAppWithServiceWorker)(projectRoot, context.workspaceRoot, outputPath, browserOptions.baseHref || '/', browserOptions.ngswConfigPath);
+                    await (0, private_1.augmentAppWithServiceWorker)(projectRoot, context.workspaceRoot, outputPath, browserOptions.baseHref || '/', browserOptions.ngswConfigPath);
                 }
                 catch (error) {
                     spinner.fail('Service worker generation failed.');

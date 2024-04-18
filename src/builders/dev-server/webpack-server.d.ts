@@ -5,13 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { IndexHtmlTransform } from '@angular/build/private';
 import { BuilderContext } from '@angular-devkit/architect';
 import { DevServerBuildOutput, WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { Observable } from 'rxjs';
 import webpack from 'webpack';
 import { BuildEventStats } from '../../tools/webpack/utils/stats';
 import { ExecutionTransformer } from '../../transforms';
-import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { NormalizedDevServerOptions } from './options';
 /**
  * @experimental Direct usage of this type is considered experimental.

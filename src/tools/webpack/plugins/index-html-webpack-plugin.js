@@ -8,13 +8,13 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IndexHtmlWebpackPlugin = void 0;
+const private_1 = require("@angular/build/private");
 const path_1 = require("path");
 const webpack_1 = require("webpack");
 const error_1 = require("../../../utils/error");
-const index_html_generator_1 = require("../../../utils/index-file/index-html-generator");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
 const PLUGIN_NAME = 'index-html-webpack-plugin';
-class IndexHtmlWebpackPlugin extends index_html_generator_1.IndexHtmlGenerator {
+class IndexHtmlWebpackPlugin extends private_1.IndexHtmlGenerator {
     options;
     _compilation;
     get compilation() {

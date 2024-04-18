@@ -31,9 +31,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AnyComponentStyleBudgetChecker = void 0;
+const private_1 = require("@angular/build/private");
 const path = __importStar(require("path"));
 const webpack_1 = require("webpack");
-const bundle_calculator_1 = require("../../../utils/bundle-calculator");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
 const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
 /**
@@ -43,7 +43,7 @@ const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
 class AnyComponentStyleBudgetChecker {
     budgets;
     constructor(budgets) {
-        this.budgets = budgets.filter((budget) => budget.type === bundle_calculator_1.BudgetType.AnyComponentStyle);
+        this.budgets = budgets.filter((budget) => budget.type === private_1.BudgetType.AnyComponentStyle);
     }
     apply(compiler) {
         compiler.hooks.compilation.tap(PLUGIN_NAME, (compilation) => {
@@ -67,12 +67,12 @@ class AnyComponentStyleBudgetChecker {
                     size: compilation.assets[name].size(),
                     componentStyle: true,
                 }));
-                for (const { severity, message } of (0, bundle_calculator_1.checkBudgets)(this.budgets, { chunks: [], assets: componentStyles }, true)) {
+                for (const { severity, message } of (0, private_1.checkBudgets)(this.budgets, { chunks: [], assets: componentStyles }, true)) {
                     switch (severity) {
-                        case bundle_calculator_1.ThresholdSeverity.Warning:
+                        case private_1.ThresholdSeverity.Warning:
                             (0, webpack_diagnostics_1.addWarning)(compilation, message);
                             break;
-                        case bundle_calculator_1.ThresholdSeverity.Error:
+                        case private_1.ThresholdSeverity.Error:
                             (0, webpack_diagnostics_1.addError)(compilation, message);
                             break;
                         default:

@@ -11,14 +11,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.configureI18nBuild = exports.loadTranslations = void 0;
+const private_1 = require("@angular/build/private");
+Object.defineProperty(exports, "loadTranslations", { enumerable: true, get: function () { return private_1.loadTranslations; } });
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_module_1 = require("node:module");
 const node_os_1 = __importDefault(require("node:os"));
 const node_path_1 = __importDefault(require("node:path"));
 const read_tsconfig_1 = require("../utils/read-tsconfig");
-const i18n_options_1 = require("./i18n-options");
-Object.defineProperty(exports, "loadTranslations", { enumerable: true, get: function () { return i18n_options_1.loadTranslations; } });
-const load_translations_1 = require("./load-translations");
 /**
  * The base module location used to search for locale specific data.
  */
@@ -30,7 +29,7 @@ async function configureI18nBuild(context, options) {
     const buildOptions = { ...options };
     const tsConfig = await (0, read_tsconfig_1.readTsconfig)(buildOptions.tsConfig, context.workspaceRoot);
     const metadata = await context.getProjectMetadata(context.target);
-    const i18n = (0, i18n_options_1.createI18nOptions)(metadata, buildOptions.localize);
+    const i18n = (0, private_1.createI18nOptions)(metadata, buildOptions.localize);
     // No additional processing needed if no inlining requested and no source locale defined.
     if (!i18n.shouldInline && !i18n.hasDefinedSourceLocale) {
         return { buildOptions, i18n };
@@ -65,8 +64,8 @@ async function configureI18nBuild(context, options) {
         if (!desc.files.length) {
             continue;
         }
-        loader ??= await (0, load_translations_1.createTranslationLoader)();
-        (0, i18n_options_1.loadTranslations)(locale, desc, context.workspaceRoot, loader, {
+        loader ??= await (0, private_1.createTranslationLoader)();
+        (0, private_1.loadTranslations)(locale, desc, context.workspaceRoot, loader, {
             warn(message) {
                 context.logger.warn(message);
             },
