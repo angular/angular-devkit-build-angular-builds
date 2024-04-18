@@ -25,7 +25,7 @@ const sourcemap_ignorelist_plugin_1 = require("./sourcemap-ignorelist-plugin");
 const utils_1 = require("./utils");
 const virtual_module_plugin_1 = require("./virtual-module-plugin");
 function createBrowserCodeBundleOptions(options, target, sourceFileCache) {
-    const { entryPoints, outputNames } = options;
+    const { entryPoints, outputNames, polyfills } = options;
     const { pluginOptions, styleOptions } = (0, compiler_plugin_options_1.createCompilerPluginOptions)(options, target, sourceFileCache);
     const buildOptions = {
         ...getEsBuildCommonOptions(options),
@@ -38,7 +38,7 @@ function createBrowserCodeBundleOptions(options, target, sourceFileCache) {
         entryNames: outputNames.bundles,
         entryPoints,
         target,
-        supported: (0, utils_1.getFeatureSupport)(target),
+        supported: (0, utils_1.getFeatureSupport)(target, (0, utils_1.isZonelessApp)(polyfills)),
         plugins: [
             (0, sourcemap_ignorelist_plugin_1.createSourcemapIgnorelistPlugin)(),
             (0, compiler_plugin_1.createCompilerPlugin)(
@@ -111,7 +111,7 @@ exports.createBrowserPolyfillBundleOptions = createBrowserPolyfillBundleOptions;
  * @returns An esbuild BuildOptions object.
  */
 function createServerCodeBundleOptions(options, target, sourceFileCache) {
-    const { serverEntryPoint, workspaceRoot, ssrOptions, watch, externalPackages, prerenderOptions } = options;
+    const { serverEntryPoint, workspaceRoot, ssrOptions, watch, externalPackages, prerenderOptions, polyfills, } = options;
     (0, node_assert_1.default)(serverEntryPoint, 'createServerCodeBundleOptions should not be called without a defined serverEntryPoint.');
     const { pluginOptions, styleOptions } = (0, compiler_plugin_options_1.createCompilerPluginOptions)(options, target, sourceFileCache);
     const mainServerNamespace = 'angular:server-render-utils';
@@ -139,7 +139,7 @@ function createServerCodeBundleOptions(options, target, sourceFileCache) {
             js: `import './polyfills.server.mjs';`,
         },
         entryPoints,
-        supported: (0, utils_1.getFeatureSupport)(target),
+        supported: (0, utils_1.getFeatureSupport)(target, (0, utils_1.isZonelessApp)(polyfills)),
         plugins: [
             (0, sourcemap_ignorelist_plugin_1.createSourcemapIgnorelistPlugin)(),
             (0, compiler_plugin_1.createCompilerPlugin)(
@@ -187,20 +187,20 @@ function createServerCodeBundleOptions(options, target, sourceFileCache) {
 }
 exports.createServerCodeBundleOptions = createServerCodeBundleOptions;
 function createServerPolyfillBundleOptions(options, target, sourceFileCache) {
-    const polyfills = [];
+    const serverPolyfills = [];
     const polyfillsFromConfig = new Set(options.polyfills);
-    if (polyfillsFromConfig.has('zone.js')) {
-        polyfills.push('zone.js/node');
+    if (!(0, utils_1.isZonelessApp)(options.polyfills)) {
+        serverPolyfills.push('zone.js/node');
     }
     if (polyfillsFromConfig.has('@angular/localize') ||
         polyfillsFromConfig.has('@angular/localize/init')) {
-        polyfills.push('@angular/localize/init');
+        serverPolyfills.push('@angular/localize/init');
     }
-    polyfills.push('@angular/platform-server/init');
+    serverPolyfills.push('@angular/platform-server/init');
     const namespace = 'angular:polyfills-server';
     const polyfillBundleOptions = getEsBuildCommonPolyfillsOptions({
         ...options,
-        polyfills,
+        polyfills: serverPolyfills,
     }, namespace, false, sourceFileCache);
     if (!polyfillBundleOptions) {
         return;

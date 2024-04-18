@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logMessages = exports.createJsonBuildManifest = exports.getSupportedNodeTargets = exports.transformSupportedBrowsersToTargets = exports.convertOutputFile = exports.createOutputFileFromData = exports.createOutputFileFromText = exports.emitFilesToDisk = exports.writeResultFiles = exports.getFeatureSupport = exports.withNoProgress = exports.withSpinner = exports.calculateEstimatedTransferSizes = exports.logBuildStats = void 0;
+exports.isZonelessApp = exports.logMessages = exports.createJsonBuildManifest = exports.getSupportedNodeTargets = exports.transformSupportedBrowsersToTargets = exports.convertOutputFile = exports.createOutputFileFromData = exports.createOutputFileFromText = exports.emitFilesToDisk = exports.writeResultFiles = exports.getFeatureSupport = exports.withNoProgress = exports.withSpinner = exports.calculateEstimatedTransferSizes = exports.logBuildStats = void 0;
 const esbuild_1 = require("esbuild");
 const node_crypto_1 = require("node:crypto");
 const node_fs_1 = require("node:fs");
@@ -135,18 +135,21 @@ exports.withNoProgress = withNoProgress;
  * Generates a syntax feature object map for Angular applications based on a list of targets.
  * A full set of feature names can be found here: https://esbuild.github.io/api/#supported
  * @param target An array of browser/engine targets in the format accepted by the esbuild `target` option.
+ * @param nativeAsyncAwait Indicate whether to support native async/await.
  * @returns An object that can be used with the esbuild build `supported` option.
  */
-function getFeatureSupport(target) {
+function getFeatureSupport(target, nativeAsyncAwait) {
     const supported = {
         // Native async/await is not supported with Zone.js. Disabling support here will cause
         // esbuild to downlevel async/await, async generators, and for await...of to a Zone.js supported form.
-        'async-await': false,
+        'async-await': nativeAsyncAwait,
         // V8 currently has a performance defect involving object spread operations that can cause signficant
         // degradation in runtime performance. By not supporting the language feature here, a downlevel form
         // will be used instead which provides a workaround for the performance issue.
         // For more details: https://bugs.chromium.org/p/v8/issues/detail?id=11536
         'object-rest-spread': false,
+        // Using top-level-await is not guaranteed to be safe with some code optimizations.
+        'top-level-await': false,
     };
     // Detect Safari browser versions that have a class field behavior bug
     // See: https://github.com/angular/angular-cli/issues/24355#issuecomment-1333477033
@@ -376,3 +379,14 @@ async function logMessages(logger, executionResult, color, jsonLogs) {
     }
 }
 exports.logMessages = logMessages;
+/**
+ * Ascertain whether the application operates without `zone.js`, we currently rely on the polyfills setting to determine its status.
+ * If a file with an extension is provided or if `zone.js` is included in the polyfills, the application is deemed as not zoneless.
+ * @param polyfills An array of polyfills
+ * @returns true, when the application is considered as zoneless.
+ */
+function isZonelessApp(polyfills) {
+    // TODO: Instead, we should rely on the presence of zone.js in the polyfills build metadata.
+    return !polyfills?.some((p) => p === 'zone.js' || /\.[mc]?[jt]s$/.test(p));
+}
+exports.isZonelessApp = isZonelessApp;

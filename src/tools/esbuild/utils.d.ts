@@ -19,9 +19,10 @@ export declare function withNoProgress<T>(text: string, action: () => T | Promis
  * Generates a syntax feature object map for Angular applications based on a list of targets.
  * A full set of feature names can be found here: https://esbuild.github.io/api/#supported
  * @param target An array of browser/engine targets in the format accepted by the esbuild `target` option.
+ * @param nativeAsyncAwait Indicate whether to support native async/await.
  * @returns An object that can be used with the esbuild build `supported` option.
  */
-export declare function getFeatureSupport(target: string[]): BuildOptions['supported'];
+export declare function getFeatureSupport(target: string[], nativeAsyncAwait: boolean): BuildOptions['supported'];
 export declare function writeResultFiles(outputFiles: BuildOutputFile[], assetFiles: BuildOutputAsset[] | undefined, { base, browser, server }: NormalizedOutputOptions): Promise<void>;
 export declare function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(files: T[], writeFileCallback: (file: T) => Promise<void>): Promise<void>;
 export declare function createOutputFileFromText(path: string, text: string, type: BuildOutputFileType): BuildOutputFile;
@@ -39,3 +40,10 @@ export declare function transformSupportedBrowsersToTargets(supportedBrowsers: s
 export declare function getSupportedNodeTargets(): string[];
 export declare function createJsonBuildManifest(result: ExecutionResult, normalizedOptions: NormalizedApplicationBuildOptions): Promise<string>;
 export declare function logMessages(logger: BuilderContext['logger'], executionResult: ExecutionResult, color?: boolean, jsonLogs?: boolean): Promise<void>;
+/**
+ * Ascertain whether the application operates without `zone.js`, we currently rely on the polyfills setting to determine its status.
+ * If a file with an extension is provided or if `zone.js` is included in the polyfills, the application is deemed as not zoneless.
+ * @param polyfills An array of polyfills
+ * @returns true, when the application is considered as zoneless.
+ */
+export declare function isZonelessApp(polyfills: string[] | undefined): boolean;

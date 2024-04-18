@@ -197,8 +197,11 @@ async function* serveWithVite(serverOptions, builderName, context, transformers,
             const projectRoot = (0, node_path_1.join)(context.workspaceRoot, root);
             const browsers = (0, supported_browsers_1.getSupportedBrowsers)(projectRoot, context.logger);
             const target = (0, utils_1.transformSupportedBrowsersToTargets)(browsers);
+            const polyfills = Array.isArray((browserOptions.polyfills ??= []))
+                ? browserOptions.polyfills
+                : [browserOptions.polyfills];
             // Setup server and start listening
-            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target, browserOptions.loader, extensions?.middleware, transformers?.indexHtml, thirdPartySourcemaps);
+            const serverConfiguration = await setupServer(serverOptions, generatedFiles, assetFiles, browserOptions.preserveSymlinks, externalMetadata, !!browserOptions.ssr, prebundleTransformer, target, (0, utils_1.isZonelessApp)(polyfills), browserOptions.loader, extensions?.middleware, transformers?.indexHtml, thirdPartySourcemaps);
             server = await createServer(serverConfiguration);
             await server.listen();
             if (serverConfiguration.ssr?.optimizeDeps?.disabled === false) {
@@ -331,7 +334,7 @@ function analyzeResultFiles(normalizePath, htmlIndexPath, resultFiles, generated
         }
     }
 }
-async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target, prebundleLoaderExtensions, extensionMiddleware, indexHtmlTransformer, thirdPartySourcemaps = false) {
+async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks, externalMetadata, ssr, prebundleTransformer, target, zoneless, prebundleLoaderExtensions, extensionMiddleware, indexHtmlTransformer, thirdPartySourcemaps = false) {
     const proxy = await (0, utils_2.loadProxyConfiguration)(serverOptions.workspaceRoot, serverOptions.proxyConfig);
     // dynamically import Vite for ESM compatibility
     const { normalizePath } = await (0, load_esm_1.loadEsmModule)('vite');
@@ -413,6 +416,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
                 include: externalMetadata.implicitServer,
                 ssr: true,
                 prebundleTransformer,
+                zoneless,
                 target,
                 loader: prebundleLoaderExtensions,
                 thirdPartySourcemaps,
@@ -443,6 +447,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
             ssr: false,
             prebundleTransformer,
             target,
+            zoneless,
             loader: prebundleLoaderExtensions,
             thirdPartySourcemaps,
         }),
@@ -466,7 +471,7 @@ async function setupServer(serverOptions, outputFiles, assets, preserveSymlinks,
     return configuration;
 }
 exports.setupServer = setupServer;
-function getDepOptimizationConfig({ disabled, exclude, include, target, prebundleTransformer, ssr, loader, thirdPartySourcemaps, }) {
+function getDepOptimizationConfig({ disabled, exclude, include, target, zoneless, prebundleTransformer, ssr, loader, thirdPartySourcemaps, }) {
     const plugins = [
         {
             name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}${thirdPartySourcemaps ? '-vendor-sourcemap' : ''}`,
@@ -494,7 +499,7 @@ function getDepOptimizationConfig({ disabled, exclude, include, target, prebundl
         esbuildOptions: {
             // Set esbuild supported targets.
             target,
-            supported: (0, utils_1.getFeatureSupport)(target),
+            supported: (0, utils_1.getFeatureSupport)(target, zoneless),
             plugins,
             loader,
         },
