@@ -3,6 +3,10 @@
  */
 export interface Schema {
     /**
+     * Enable and define the file watching poll time period in milliseconds.
+     */
+    poll?: number;
+    /**
      * The file path for the ng-packagr configuration file, relative to the current workspace.
      */
     project: string;
