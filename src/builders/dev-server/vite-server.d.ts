@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { type ExternalResultMetadata, JavaScriptTransformer } from '@angular/build/private';
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import type { Connect, DepOptimizationConfig, InlineConfig } from 'vite';
+import { type ExternalResultMetadata, JavaScriptTransformer } from './internal';
 import type { NormalizedDevServerOptions } from './options';
-import type { DevServerBuilderOutput } from './webpack-server';
+import type { DevServerBuilderOutput } from './output';
 interface OutputFileRecord {
     contents: Uint8Array;
     size: number;
