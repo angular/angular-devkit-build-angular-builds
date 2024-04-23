@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <reference types="node" />
+import type { DevServerBuilderOutput } from '@angular/build';
+import { type IndexHtmlTransform } from '@angular/build/private';
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import type http from 'node:http';
 import { Observable } from 'rxjs';
 import type { ExecutionTransformer } from '../../transforms';
-import { type IndexHtmlTransform } from './internal';
-import type { DevServerBuilderOutput } from './output';
 import type { Schema as DevServerBuilderOptions } from './schema';
 /**
  * A Builder that executes a development server based on the provided browser target option.

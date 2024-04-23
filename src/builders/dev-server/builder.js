@@ -31,9 +31,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = void 0;
+const private_1 = require("@angular/build/private");
 const rxjs_1 = require("rxjs");
-const check_port_1 = require("../../utils/check-port");
-const internal_1 = require("./internal");
 const options_1 = require("./options");
 /**
  * A Builder that executes a development server based on the provided browser target option.
@@ -76,7 +75,12 @@ function execute(options, context, transforms = {}, extensions) {
             if (options.disableHostCheck) {
                 context.logger.warn(`The "disableHostCheck" option will not be used because it is not supported by the "${builderName}" builder.`);
             }
-            return (0, rxjs_1.defer)(() => Promise.resolve().then(() => __importStar(require('./vite-server')))).pipe((0, rxjs_1.switchMap)(({ serveWithVite }) => serveWithVite(normalizedOptions, builderName, context, transforms, extensions)));
+            return (0, rxjs_1.defer)(() => Promise.all([Promise.resolve().then(() => __importStar(require('@angular/build/private'))), Promise.resolve().then(() => __importStar(require('../browser-esbuild')))])).pipe((0, rxjs_1.switchMap)(([{ serveWithVite, buildApplicationInternal }, { buildEsbuildBrowser }]) => serveWithVite(normalizedOptions, builderName, (options, context, codePlugins) => {
+                return builderName === '@angular-devkit/build-angular:browser-esbuild'
+                    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        buildEsbuildBrowser(options, context, { write: false }, codePlugins)
+                    : buildApplicationInternal(options, context, { write: false }, { codePlugins });
+            }, context, transforms, extensions)));
         }
         // Warn if the initial options provided by the user enable prebundling with Webpack-based builders
         if (options.prebundle) {
@@ -95,7 +99,7 @@ function execute(options, context, transforms = {}, extensions) {
 exports.execute = execute;
 async function initialize(initialOptions, projectName, context, builderSelector = defaultBuilderSelector) {
     // Purge old build disk cache.
-    await (0, internal_1.purgeStaleBuildCache)(context);
+    await (0, private_1.purgeStaleBuildCache)(context);
     const normalizedOptions = await (0, options_1.normalizeOptions)(context, projectName, initialOptions);
     const builderName = builderSelector({
         builderName: await context.getBuilderNameForTarget(normalizedOptions.buildTarget),
@@ -118,14 +122,15 @@ case.
         context.logger.warn('Warning: Running a server with --disable-host-check is a security risk. ' +
             'See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a for more information.');
     }
-    normalizedOptions.port = await (0, check_port_1.checkPort)(normalizedOptions.port, normalizedOptions.host);
+    normalizedOptions.port = await (0, private_1.checkPort)(normalizedOptions.port, normalizedOptions.host);
     return {
         builderName,
         normalizedOptions,
     };
 }
 function isEsbuildBased(builderName) {
-    if (builderName === '@angular-devkit/build-angular:application' ||
+    if (builderName === '@angular/build:application' ||
+        builderName === '@angular-devkit/build-angular:application' ||
         builderName === '@angular-devkit/build-angular:browser-esbuild') {
         return true;
     }

@@ -31,13 +31,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.log = exports.execute = void 0;
+const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
 const rxjs_1 = require("rxjs");
 const url = __importStar(require("url"));
-const utils_1 = require("../../utils");
-const utils_2 = require("./utils");
+const utils_1 = require("./utils");
 /** Log messages to ignore and not rely to the logger */
 const IGNORED_STDOUT_MESSAGES = [
     'server listening on',
@@ -78,7 +78,7 @@ function execute(options, context) {
   DON'T USE IT FOR PRODUCTION!
   ****************************************************************************************
  `);
-    return (0, rxjs_1.zip)(browserTargetRun, serverTargetRun, (0, utils_2.getAvailablePort)()).pipe((0, rxjs_1.switchMap)(([br, sr, nodeServerPort]) => {
+    return (0, rxjs_1.zip)(browserTargetRun, serverTargetRun, (0, utils_1.getAvailablePort)()).pipe((0, rxjs_1.switchMap)(([br, sr, nodeServerPort]) => {
         return (0, rxjs_1.combineLatest)([br.output, sr.output]).pipe(
         // This is needed so that if both server and browser emit close to each other
         // we only emit once. This typically happens on the first build.
@@ -101,7 +101,7 @@ function execute(options, context) {
                 context.logger.info('\nCompiled successfully.');
             }
         }), (0, rxjs_1.debounce)(([builderOutput]) => builderOutput.success && !options.inspect
-            ? (0, utils_2.waitUntilServerIsListening)(nodeServerPort)
+            ? (0, utils_1.waitUntilServerIsListening)(nodeServerPort)
             : rxjs_1.EMPTY), (0, rxjs_1.finalize)(() => {
             void br.stop();
             void sr.stop();
@@ -162,7 +162,7 @@ function startNodeServer(serverOutput, port, logger, inspectMode = false) {
         args.unshift('--inspect-brk');
     }
     return (0, rxjs_1.of)(null).pipe((0, rxjs_1.delay)(0), // Avoid EADDRINUSE error since it will cause the kill event to be finish.
-    (0, rxjs_1.switchMap)(() => (0, utils_2.spawnAsObservable)('node', args, { env, shell: true })), (0, rxjs_1.tap)((res) => log({ stderr: res.stderr, stdout: res.stdout }, logger)), (0, rxjs_1.ignoreElements)(), 
+    (0, rxjs_1.switchMap)(() => (0, utils_1.spawnAsObservable)('node', args, { env, shell: true })), (0, rxjs_1.tap)((res) => log({ stderr: res.stderr, stdout: res.stdout }, logger)), (0, rxjs_1.ignoreElements)(), 
     // Emit a signal after the process has been started
     (0, rxjs_1.startWith)(undefined));
 }
@@ -171,7 +171,7 @@ async function initBrowserSync(browserSyncInstance, nodeServerPort, options, con
         return browserSyncInstance;
     }
     const { port: browserSyncPort, open, host, publicHost, proxyConfig } = options;
-    const bsPort = browserSyncPort || (await (0, utils_2.getAvailablePort)());
+    const bsPort = browserSyncPort || (await (0, utils_1.getAvailablePort)());
     const bsOptions = {
         proxy: {
             target: `localhost:${nodeServerPort}`,
@@ -286,7 +286,7 @@ function getSslConfig(root, options) {
     return ssl;
 }
 async function getProxyConfig(root, proxyConfig) {
-    const proxy = await (0, utils_1.loadProxyConfiguration)(root, proxyConfig);
+    const proxy = await (0, private_1.loadProxyConfiguration)(root, proxyConfig);
     if (!proxy) {
         return [];
     }
