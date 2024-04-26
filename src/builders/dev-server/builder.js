@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.execute = void 0;
+exports.isEsbuildBased = exports.execute = void 0;
 const private_1 = require("@angular/build/private");
 const rxjs_1 = require("rxjs");
 const options_1 = require("./options");
@@ -61,10 +61,6 @@ function execute(options, context, transforms = {}, extensions) {
         if (isEsbuildBased(builderName)) {
             if (transforms?.logging || transforms?.webpackConfiguration) {
                 throw new Error(`The "application" and "browser-esbuild" builders do not support Webpack transforms.`);
-            }
-            // Warn if the initial options provided by the user enable prebundling but caching is disabled
-            if (options.prebundle && !normalizedOptions.cacheOptions.enabled) {
-                context.logger.warn(`Prebundling has been configured but will not be used because caching has been disabled.`);
             }
             if (options.allowedHosts?.length) {
                 context.logger.warn(`The "allowedHosts" option will not be used because it is not supported by the "${builderName}" builder.`);
@@ -136,6 +132,7 @@ function isEsbuildBased(builderName) {
     }
     return false;
 }
+exports.isEsbuildBased = isEsbuildBased;
 function defaultBuilderSelector(info, logger) {
     if (isEsbuildBased(info.builderName)) {
         return info.builderName;
