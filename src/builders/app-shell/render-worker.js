@@ -75,6 +75,7 @@ async function render({ serverBundlePath, document, url }) {
         });
     }
     // The below should really handled by the framework!!!.
+    // See: https://github.com/angular/angular/issues/51549
     let timer;
     const renderingTimeout = new Promise((_, reject) => (timer = setTimeout(() => reject(new Error(`Page ${new URL(url, 'resolve://').pathname} did not render in 30 seconds.`)), 30_000)));
     return Promise.race([renderAppPromise, renderingTimeout]).finally(() => clearTimeout(timer));
