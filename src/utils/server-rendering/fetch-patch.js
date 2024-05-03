@@ -36,7 +36,8 @@ function patchFetchToLoadInMemoryAssets() {
         else {
             return originalFetch(input, init);
         }
-        const { pathname, protocol } = url;
+        const { protocol } = url;
+        const pathname = decodeURIComponent(url.pathname);
         if (protocol !== RESOLVE_PROTOCOL || !assetFiles[pathname]) {
             // Only handle relative requests or files that are in assets.
             return originalFetch(input, init);
