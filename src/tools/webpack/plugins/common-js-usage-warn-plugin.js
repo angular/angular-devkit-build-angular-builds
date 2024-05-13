@@ -73,7 +73,7 @@ class CommonJsUsageWarnPlugin {
                         if (mainIssuer && mainModules.has(mainIssuer)) {
                             const warning = `${issuer?.userRequest} depends on '${rawRequest}'. ` +
                                 'CommonJS or AMD dependencies can cause optimization bailouts.\n' +
-                                'For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies';
+                                'For more info see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies';
                             // Avoid showing the same warning multiple times when in 'watch' mode.
                             if (!this.shownWarnings.has(warning)) {
                                 (0, webpack_diagnostics_1.addWarning)(compilation, warning);
