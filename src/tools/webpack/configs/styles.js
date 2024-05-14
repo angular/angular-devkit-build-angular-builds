@@ -70,7 +70,7 @@ async function getStylesConfig(wco) {
     extraPlugins.push({
         apply(compiler) {
             compiler.hooks.shutdown.tap('sass-worker', () => {
-                sassImplementation.close();
+                void sassImplementation.close();
             });
         },
     });
