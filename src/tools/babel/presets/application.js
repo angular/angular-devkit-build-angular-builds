@@ -112,7 +112,7 @@ function default_1(api, options) {
         if (safariClassFieldScopeBugBrowsers === undefined) {
             const browserslist = require('browserslist');
             safariClassFieldScopeBugBrowsers = new Set(browserslist([
-                // Safari <15 is technically not supported via https://angular.io/guide/browser-support,
+                // Safari <15 is technically not supported via https://angular.dev/reference/versions#browser-support
                 // but we apply the workaround if forcibly selected.
                 'Safari <=15',
                 'iOS <=15',

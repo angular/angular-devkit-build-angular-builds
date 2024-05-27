@@ -89,7 +89,7 @@ async function updateWebdriver() {
  * @experimental Direct usage of this function is considered experimental.
  */
 async function execute(options, context) {
-    context.logger.warn('Protractor has reached end-of-life and is no longer supported by the Angular team. The `protractor` builder will be removed in a future Angular major version. For additional information and alternatives, please see https://blog.angular.io/protractor-deprecation-update-august-2023-2beac7402ce0.');
+    context.logger.warn('Protractor has reached end-of-life and is no longer supported by the Angular team. The `protractor` builder will be removed in a future Angular major version. For additional information and alternatives, please see https://blog.angular.dev/protractor-deprecation-update-august-2023-2beac7402ce0.');
     // ensure that only one of these options is used
     if (options.devServerTarget && options.baseUrl) {
         throw new Error(core_1.tags.stripIndents `

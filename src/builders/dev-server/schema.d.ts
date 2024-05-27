@@ -68,7 +68,7 @@ export interface Schema {
     prebundle?: PrebundleUnion;
     /**
      * Proxy configuration file. For more information, see
-     * https://angular.io/guide/build#proxying-to-a-backend-server.
+     * https://angular.dev/tools/cli/serve#proxying-to-a-backend-server.
      */
     proxyConfig?: string;
     /**
