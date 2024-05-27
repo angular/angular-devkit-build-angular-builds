@@ -74,7 +74,7 @@ export interface Schema {
     scripts?: ScriptElement[];
     /**
      * Output source maps for scripts and styles. For more information, see
-     * https://angular.io/guide/workspace-config#source-map-configuration.
+     * https://angular.dev/reference/configs/workspace-config#source-map-configuration.
      */
     sourceMap?: SourceMapUnion;
     /**
@@ -157,7 +157,7 @@ export interface ScriptClass {
 }
 /**
  * Output source maps for scripts and styles. For more information, see
- * https://angular.io/guide/workspace-config#source-map-configuration.
+ * https://angular.dev/reference/configs/workspace-config#source-map-configuration.
  */
 export type SourceMapUnion = boolean | SourceMapClass;
 export interface SourceMapClass {
