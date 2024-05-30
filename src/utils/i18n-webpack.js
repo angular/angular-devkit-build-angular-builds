@@ -10,7 +10,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.configureI18nBuild = exports.loadTranslations = void 0;
+exports.loadTranslations = void 0;
+exports.configureI18nBuild = configureI18nBuild;
 const private_1 = require("@angular/build/private");
 Object.defineProperty(exports, "loadTranslations", { enumerable: true, get: function () { return private_1.loadTranslations; } });
 const node_fs_1 = __importDefault(require("node:fs"));
@@ -93,7 +94,6 @@ async function configureI18nBuild(context, options) {
     }
     return { buildOptions, i18n };
 }
-exports.configureI18nBuild = configureI18nBuild;
 function findLocaleDataPath(locale, resolver) {
     // Remove private use subtags
     const scrubbedLocale = locale.replace(/-x(-[a-zA-Z0-9]{1,8})+$/, '');

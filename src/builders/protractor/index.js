@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.execute = void 0;
+exports.execute = execute;
 const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
@@ -163,5 +163,4 @@ async function execute(options, context) {
         await server?.stop();
     }
 }
-exports.execute = execute;
 exports.default = (0, architect_1.createBuilder)(execute);

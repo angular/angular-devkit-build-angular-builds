@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const node_fs_1 = require("node:fs");
 const node_path_1 = require("node:path");
 /**
@@ -27,4 +28,3 @@ function default_1(content, map) {
     this.callback(null, source, map);
     return;
 }
-exports.default = default_1;

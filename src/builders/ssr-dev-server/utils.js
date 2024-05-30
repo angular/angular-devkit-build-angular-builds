@@ -10,7 +10,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.waitUntilServerIsListening = exports.spawnAsObservable = exports.getAvailablePort = void 0;
+exports.getAvailablePort = getAvailablePort;
+exports.spawnAsObservable = spawnAsObservable;
+exports.waitUntilServerIsListening = waitUntilServerIsListening;
 const child_process_1 = require("child_process");
 const net_1 = require("net");
 const rxjs_1 = require("rxjs");
@@ -27,7 +29,6 @@ function getAvailablePort() {
         });
     });
 }
-exports.getAvailablePort = getAvailablePort;
 function spawnAsObservable(command, args = [], options = {}) {
     return new rxjs_1.Observable((obs) => {
         const proc = (0, child_process_1.spawn)(command, args, options);
@@ -52,7 +53,6 @@ function spawnAsObservable(command, args = [], options = {}) {
         };
     });
 }
-exports.spawnAsObservable = spawnAsObservable;
 function waitUntilServerIsListening(port, host) {
     const allowedErrorCodes = ['ECONNREFUSED', 'ECONNRESET'];
     return new rxjs_1.Observable((obs) => {
@@ -71,4 +71,3 @@ function waitUntilServerIsListening(port, host) {
             : (0, rxjs_1.timer)(100 * (attempts * 1));
     }))));
 }
-exports.waitUntilServerIsListening = waitUntilServerIsListening;

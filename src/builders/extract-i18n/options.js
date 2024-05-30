@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizeOptions = void 0;
+exports.normalizeOptions = normalizeOptions;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const node_assert_1 = require("node:assert");
@@ -64,7 +64,6 @@ async function normalizeOptions(context, projectName, options) {
         progress: options.progress ?? true,
     };
 }
-exports.normalizeOptions = normalizeOptions;
 function getDefaultOutFile(format) {
     switch (format) {
         case schema_1.Format.Xmb:

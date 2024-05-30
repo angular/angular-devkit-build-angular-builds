@@ -33,7 +33,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCommonConfig = void 0;
+exports.getCommonConfig = getCommonConfig;
 const webpack_1 = require("@ngtools/webpack");
 const copy_webpack_plugin_1 = __importDefault(require("copy-webpack-plugin"));
 const path = __importStar(require("path"));
@@ -416,4 +416,3 @@ async function getCommonConfig(wco) {
         node: false,
     };
 }
-exports.getCommonConfig = getCommonConfig;

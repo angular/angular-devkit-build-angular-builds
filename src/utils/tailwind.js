@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findTailwindConfigurationFile = void 0;
+exports.findTailwindConfigurationFile = findTailwindConfigurationFile;
 const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
 const tailwindConfigFiles = [
@@ -31,4 +31,3 @@ async function findTailwindConfigurationFile(workspaceRoot, projectRoot) {
     }
     return undefined;
 }
-exports.findTailwindConfigurationFile = findTailwindConfigurationFile;

@@ -30,7 +30,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.log = exports.execute = void 0;
+exports.execute = execute;
+exports.log = log;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
@@ -140,7 +141,6 @@ function execute(options, context) {
         error: mapErrorToMessage(error),
     })));
 }
-exports.execute = execute;
 // Logs output to the terminal.
 // Removes any trailing new lines from the output.
 function log({ stderr, stdout }, logger) {
@@ -152,7 +152,6 @@ function log({ stderr, stdout }, logger) {
         logger.info(stdout.replace(/\n?$/, ''));
     }
 }
-exports.log = log;
 function startNodeServer(serverOutput, port, logger, inspectMode = false) {
     const outputPath = serverOutput.outputPath;
     const path = (0, path_1.join)(outputPath, 'main.js');

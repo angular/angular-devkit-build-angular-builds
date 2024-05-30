@@ -7,10 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizeCacheOptions = void 0;
+exports.normalizeCacheOptions = normalizeCacheOptions;
 const node_path_1 = require("node:path");
 /** Version placeholder is replaced during the build process with actual package version */
-const VERSION = '18.1.0-next.0+sha-43f3650';
+const VERSION = '18.1.0-next.0+sha-144f2bf';
 function hasCacheMetadata(value) {
     return (!!value &&
         typeof value === 'object' &&
@@ -41,4 +41,3 @@ function normalizeCacheOptions(projectMetadata, worspaceRoot) {
         path: (0, node_path_1.join)(cacheBasePath, VERSION),
     };
 }
-exports.normalizeCacheOptions = normalizeCacheOptions;

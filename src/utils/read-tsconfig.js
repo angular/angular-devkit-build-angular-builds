@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readTsconfig = void 0;
+exports.readTsconfig = readTsconfig;
 const path = __importStar(require("path"));
 const load_esm_1 = require("./load-esm");
 /**
@@ -52,4 +52,3 @@ async function readTsconfig(tsconfigPath, workspaceRoot) {
     }
     return configResult;
 }
-exports.readTsconfig = readTsconfig;

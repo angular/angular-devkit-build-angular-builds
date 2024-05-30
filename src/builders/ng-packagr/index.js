@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.execute = void 0;
+exports.execute = execute;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const node_path_1 = require("node:path");
@@ -63,5 +63,4 @@ function execute(options, context) {
         return { packager, ngPackagrOptions };
     })()).pipe((0, rxjs_1.switchMap)(({ packager, ngPackagrOptions }) => options.watch ? packager.watch(ngPackagrOptions) : packager.build(ngPackagrOptions)), (0, rxjs_1.map)(() => ({ success: true })), (0, rxjs_1.catchError)((err) => (0, rxjs_1.of)({ success: false, error: err.message })));
 }
-exports.execute = execute;
 exports.default = (0, architect_1.createBuilder)(execute);

@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.execute = void 0;
+exports.execute = execute;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
@@ -129,7 +129,6 @@ function execute(options, context, transforms = {}) {
         };
     }));
 }
-exports.execute = execute;
 exports.default = (0, architect_1.createBuilder)(execute);
 async function initialize(options, context, webpackConfigurationTransform) {
     // Purge old build disk cache.

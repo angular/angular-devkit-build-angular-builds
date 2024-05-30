@@ -33,7 +33,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.webpackStatsLogger = exports.generateBuildEventStats = exports.createWebpackLoggingCallback = exports.statsHasWarnings = exports.statsHasErrors = exports.statsErrorsToString = exports.statsWarningsToString = void 0;
+exports.statsWarningsToString = statsWarningsToString;
+exports.statsErrorsToString = statsErrorsToString;
+exports.statsHasErrors = statsHasErrors;
+exports.statsHasWarnings = statsHasWarnings;
+exports.createWebpackLoggingCallback = createWebpackLoggingCallback;
+exports.generateBuildEventStats = generateBuildEventStats;
+exports.webpackStatsLogger = webpackStatsLogger;
 const private_1 = require("@angular/build/private");
 const node_assert_1 = __importDefault(require("node:assert"));
 const path = __importStar(require("node:path"));
@@ -154,7 +160,6 @@ function statsWarningsToString(json, statsConfig) {
     }
     return output ? '\n' + output : output;
 }
-exports.statsWarningsToString = statsWarningsToString;
 function statsErrorsToString(json, statsConfig) {
     const colors = statsConfig.colors;
     const c = (x) => (colors ? color_1.colors.reset.cyan(x) : x);
@@ -200,15 +205,12 @@ function statsErrorsToString(json, statsConfig) {
     }
     return output ? '\n' + output : output;
 }
-exports.statsErrorsToString = statsErrorsToString;
 function statsHasErrors(json) {
     return !!(json.errors?.length || json.children?.some((c) => c.errors?.length));
 }
-exports.statsHasErrors = statsHasErrors;
 function statsHasWarnings(json) {
     return !!(json.warnings?.length || json.children?.some((c) => c.warnings?.length));
 }
-exports.statsHasWarnings = statsHasWarnings;
 function createWebpackLoggingCallback(options, logger) {
     const { verbose = false, scripts = [], styles = [] } = options;
     const extraEntryPoints = [
@@ -228,7 +230,6 @@ function createWebpackLoggingCallback(options, logger) {
         webpackStatsLogger(logger, webpackStats, config);
     };
 }
-exports.createWebpackLoggingCallback = createWebpackLoggingCallback;
 function generateBuildEventStats(webpackStats, browserBuilderOptions) {
     const { chunks = [], assets = [] } = webpackStats;
     let jsSizeInBytes = 0;
@@ -275,7 +276,6 @@ function generateBuildEventStats(webpackStats, browserBuilderOptions) {
         ngComponentCount,
     };
 }
-exports.generateBuildEventStats = generateBuildEventStats;
 function webpackStatsLogger(logger, json, config, budgetFailures) {
     logger.info(statsToString(json, config.stats, budgetFailures));
     if (typeof config.stats !== 'object') {
@@ -288,4 +288,3 @@ function webpackStatsLogger(logger, json, config, budgetFailures) {
         logger.error(statsErrorsToString(json, config.stats));
     }
 }
-exports.webpackStatsLogger = webpackStatsLogger;

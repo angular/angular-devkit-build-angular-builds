@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.execute = void 0;
+exports.execute = execute;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
@@ -152,7 +152,6 @@ function execute(options, context, transforms = {}) {
         };
     })), (0, rxjs_1.defaultIfEmpty)({ success: false }));
 }
-exports.execute = execute;
 function getBuiltInKarmaConfig(workspaceRoot, projectName) {
     let coverageFolderName = projectName.charAt(0) === '@' ? projectName.slice(1) : projectName;
     if (/[A-Z]/.test(coverageFolderName)) {

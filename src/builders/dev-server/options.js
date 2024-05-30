@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizeOptions = void 0;
+exports.normalizeOptions = normalizeOptions;
 const architect_1 = require("@angular-devkit/architect");
 const node_path_1 = __importDefault(require("node:path"));
 const normalize_cache_1 = require("../../utils/normalize-cache");
@@ -80,4 +80,3 @@ async function normalizeOptions(context, projectName, options) {
         prebundle: cacheOptions.enabled && !optimization.scripts && (prebundle ?? true),
     };
 }
-exports.normalizeOptions = normalizeOptions;

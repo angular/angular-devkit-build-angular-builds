@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HmrLoader = void 0;
+exports.default = localizeExtractLoader;
 const path_1 = require("path");
 exports.HmrLoader = __filename;
 const hmrAcceptPath = (0, path_1.join)(__dirname, './hmr-accept.js').replace(/\\/g, '/');
@@ -21,4 +22,3 @@ function localizeExtractLoader(content, map) {
     this.callback(null, source, map);
     return;
 }
-exports.default = localizeExtractLoader;

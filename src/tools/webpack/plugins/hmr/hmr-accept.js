@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 // eslint-disable-next-line import/no-extraneous-dependencies
 const core_1 = require("@angular/core");
 const rxjs_1 = require("rxjs");
@@ -81,7 +82,6 @@ function default_1(mod) {
         });
     });
 }
-exports.default = default_1;
 function getAppRoot() {
     const appRoot = document.querySelector('[ng-version]');
     if (!appRoot) {

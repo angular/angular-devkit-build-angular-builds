@@ -30,7 +30,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isEsbuildBased = exports.execute = void 0;
+exports.execute = execute;
+exports.isEsbuildBased = isEsbuildBased;
 const private_1 = require("@angular/build/private");
 const rxjs_1 = require("rxjs");
 const options_1 = require("./options");
@@ -92,7 +93,6 @@ function execute(options, context, transforms = {}, extensions) {
         return (0, rxjs_1.defer)(() => Promise.resolve().then(() => __importStar(require('./webpack-server')))).pipe((0, rxjs_1.switchMap)(({ serveWebpackBrowser }) => serveWebpackBrowser(normalizedOptions, builderName, context, transforms)));
     }));
 }
-exports.execute = execute;
 async function initialize(initialOptions, projectName, context, builderSelector = defaultBuilderSelector) {
     // Purge old build disk cache.
     await (0, private_1.purgeStaleBuildCache)(context);
@@ -132,7 +132,6 @@ function isEsbuildBased(builderName) {
     }
     return false;
 }
-exports.isEsbuildBased = isEsbuildBased;
 function defaultBuilderSelector(info, logger) {
     if (isEsbuildBased(info.builderName)) {
         return info.builderName;

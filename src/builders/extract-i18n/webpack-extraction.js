@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.extractMessages = void 0;
+exports.extractMessages = extractMessages;
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const rxjs_1 = require("rxjs");
 const webpack_1 = __importDefault(require("webpack"));
@@ -96,4 +96,3 @@ async function extractMessages(options, builderName, context, transforms = {}) {
         useLegacyIds,
     };
 }
-exports.extractMessages = extractMessages;

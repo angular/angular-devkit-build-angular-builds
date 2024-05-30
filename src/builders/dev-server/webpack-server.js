@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.serveWebpackBrowser = void 0;
+exports.serveWebpackBrowser = serveWebpackBrowser;
 const private_1 = require("@angular/build/private");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
 const core_1 = require("@angular-devkit/core");
@@ -200,7 +200,6 @@ function serveWebpackBrowser(options, builderName, context, transforms = {}) {
         }));
     }));
 }
-exports.serveWebpackBrowser = serveWebpackBrowser;
 async function setupLocalize(locale, i18n, browserOptions, webpackConfig, cacheOptions, context) {
     const localeDescription = i18n.locales[locale];
     // Modify main entrypoint to include locale data

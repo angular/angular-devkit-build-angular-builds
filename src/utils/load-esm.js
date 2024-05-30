@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadEsmModule = void 0;
+exports.loadEsmModule = loadEsmModule;
 /**
  * Lazily compiled dynamic import loader function.
  */
@@ -28,4 +28,3 @@ function loadEsmModule(modulePath) {
     load ??= new Function('modulePath', `return import(modulePath);`);
     return load(modulePath);
 }
-exports.loadEsmModule = loadEsmModule;

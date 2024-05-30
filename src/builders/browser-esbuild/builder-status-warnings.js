@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logBuilderStatusWarnings = void 0;
+exports.logBuilderStatusWarnings = logBuilderStatusWarnings;
 const UNSUPPORTED_OPTIONS = [
     // * Always enabled with esbuild
     // 'commonChunk',
@@ -37,4 +37,3 @@ function logBuilderStatusWarnings(options, { logger }) {
         logger.warn(`The '${unsupportedOption}' option is not yet supported by this builder.`);
     }
 }
-exports.logBuilderStatusWarnings = logBuilderStatusWarnings;

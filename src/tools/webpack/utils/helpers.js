@@ -33,7 +33,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isPlatformServerInstalled = exports.getStatsOptions = exports.assetPatterns = exports.globalScriptsByBundleName = exports.getCacheSettings = exports.normalizeGlobalStyles = exports.getInstrumentationExcludedPaths = exports.assetNameTemplateFactory = exports.normalizeExtraEntryPoints = exports.getOutputHashFormat = void 0;
+exports.getOutputHashFormat = getOutputHashFormat;
+exports.normalizeExtraEntryPoints = normalizeExtraEntryPoints;
+exports.assetNameTemplateFactory = assetNameTemplateFactory;
+exports.getInstrumentationExcludedPaths = getInstrumentationExcludedPaths;
+exports.normalizeGlobalStyles = normalizeGlobalStyles;
+exports.getCacheSettings = getCacheSettings;
+exports.globalScriptsByBundleName = globalScriptsByBundleName;
+exports.assetPatterns = assetPatterns;
+exports.getStatsOptions = getStatsOptions;
+exports.isPlatformServerInstalled = isPlatformServerInstalled;
 const crypto_1 = require("crypto");
 const fast_glob_1 = __importDefault(require("fast-glob"));
 const path = __importStar(require("path"));
@@ -73,7 +82,6 @@ function getOutputHashFormat(outputHashing = schema_1.OutputHashing.None, length
             };
     }
 }
-exports.getOutputHashFormat = getOutputHashFormat;
 function normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName) {
     return extraEntryPoints.map((entry) => {
         if (typeof entry === 'string') {
@@ -94,7 +102,6 @@ function normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName) {
         return { ...newEntry, inject, bundleName };
     });
 }
-exports.normalizeExtraEntryPoints = normalizeExtraEntryPoints;
 function assetNameTemplateFactory(hashFormat) {
     const visitedFiles = new Map();
     return (resourcePath) => {
@@ -118,7 +125,6 @@ function assetNameTemplateFactory(hashFormat) {
         return '[path][name].[ext]';
     };
 }
-exports.assetNameTemplateFactory = assetNameTemplateFactory;
 function getInstrumentationExcludedPaths(root, excludedPaths) {
     const excluded = new Set();
     for (const excludeGlob of excludedPaths) {
@@ -127,7 +133,6 @@ function getInstrumentationExcludedPaths(root, excludedPaths) {
     }
     return excluded;
 }
-exports.getInstrumentationExcludedPaths = getInstrumentationExcludedPaths;
 function normalizeGlobalStyles(styleEntrypoints) {
     const entryPoints = {};
     const noInjectNames = [];
@@ -145,7 +150,6 @@ function normalizeGlobalStyles(styleEntrypoints) {
     }
     return { entryPoints, noInjectNames };
 }
-exports.normalizeGlobalStyles = normalizeGlobalStyles;
 function getCacheSettings(wco, angularVersion) {
     const { enabled, path: cacheDirectory } = wco.buildOptions.cache;
     if (enabled) {
@@ -179,7 +183,6 @@ function getCacheSettings(wco, angularVersion) {
     }
     return false;
 }
-exports.getCacheSettings = getCacheSettings;
 function globalScriptsByBundleName(scripts) {
     return normalizeExtraEntryPoints(scripts, 'scripts').reduce((prev, curr) => {
         const { bundleName, inject, input } = curr;
@@ -201,7 +204,6 @@ function globalScriptsByBundleName(scripts) {
         return prev;
     }, []);
 }
-exports.globalScriptsByBundleName = globalScriptsByBundleName;
 function assetPatterns(root, assets) {
     return assets.map((asset, index) => {
         // Resolve input paths relative to workspace root and add slash at the end.
@@ -237,7 +239,6 @@ function assetPatterns(root, assets) {
         };
     });
 }
-exports.assetPatterns = assetPatterns;
 function getStatsOptions(verbose = false) {
     const webpackOutputOptions = {
         all: false, // Fallback value for stats options when an option is not defined. It has precedence over local webpack defaults.
@@ -274,7 +275,6 @@ function getStatsOptions(verbose = false) {
         ? { ...webpackOutputOptions, ...verboseWebpackOutputOptions }
         : webpackOutputOptions;
 }
-exports.getStatsOptions = getStatsOptions;
 /**
  * @param root the workspace root
  * @returns `true` when `@angular/platform-server` is installed.
@@ -288,4 +288,3 @@ function isPlatformServerInstalled(root) {
         return false;
     }
 }
-exports.isPlatformServerInstalled = isPlatformServerInstalled;

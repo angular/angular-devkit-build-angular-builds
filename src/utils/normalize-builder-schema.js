@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizeBrowserSchema = void 0;
+exports.normalizeBrowserSchema = normalizeBrowserSchema;
 const private_1 = require("@angular/build/private");
 const normalize_asset_patterns_1 = require("./normalize-asset-patterns");
 const normalize_cache_1 = require("./normalize-cache");
@@ -41,4 +41,3 @@ function normalizeBrowserSchema(workspaceRoot, projectRoot, projectSourceRoot, o
         supportedBrowsers: (0, private_1.getSupportedBrowsers)(projectRoot, logger),
     };
 }
-exports.normalizeBrowserSchema = normalizeBrowserSchema;

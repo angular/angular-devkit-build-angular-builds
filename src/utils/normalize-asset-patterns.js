@@ -33,7 +33,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizeAssetPatterns = exports.MissingAssetSourceRootException = void 0;
+exports.MissingAssetSourceRootException = void 0;
+exports.normalizeAssetPatterns = normalizeAssetPatterns;
 const fs_1 = require("fs");
 const node_assert_1 = __importDefault(require("node:assert"));
 const path = __importStar(require("path"));
@@ -93,4 +94,3 @@ function normalizeAssetPatterns(assetPatterns, workspaceRoot, projectRoot, proje
         return assetPattern;
     });
 }
-exports.normalizeAssetPatterns = normalizeAssetPatterns;

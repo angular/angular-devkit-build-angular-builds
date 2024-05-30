@@ -30,6 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = localizeExtractLoader;
 const nodePath = __importStar(require("path"));
 const load_esm_1 = require("../../utils/load-esm");
 function localizeExtractLoader(content, map) {
@@ -46,7 +47,6 @@ function localizeExtractLoader(content, map) {
         callback(error);
     });
 }
-exports.default = localizeExtractLoader;
 async function extract(loaderContext, content, map, options) {
     // Try to load the `@angular/localize` message extractor.
     // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.

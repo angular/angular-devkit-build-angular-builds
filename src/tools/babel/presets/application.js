@@ -10,7 +10,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.requiresLinking = void 0;
+exports.default = default_1;
+exports.requiresLinking = requiresLinking;
 const node_assert_1 = __importDefault(require("node:assert"));
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
@@ -178,7 +179,6 @@ function default_1(api, options) {
     }
     return { presets, plugins };
 }
-exports.default = default_1;
 async function requiresLinking(path, source) {
     // @angular/core and @angular/compiler will cause false positives
     // Also, TypeScript files do not require linking
@@ -194,4 +194,3 @@ async function requiresLinking(path, source) {
     }
     return needsLinking(path, source);
 }
-exports.requiresLinking = requiresLinking;

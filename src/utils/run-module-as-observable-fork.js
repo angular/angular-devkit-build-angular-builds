@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runModuleAsObservableFork = void 0;
+exports.runModuleAsObservableFork = runModuleAsObservableFork;
 const child_process_1 = require("child_process");
 const path_1 = require("path");
 const rxjs_1 = require("rxjs");
@@ -72,4 +72,3 @@ args) {
         return killForkedProcess;
     });
 }
-exports.runModuleAsObservableFork = runModuleAsObservableFork;

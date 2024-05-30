@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizeOptions = void 0;
+exports.normalizeOptions = normalizeOptions;
 /**
  * Normalizes input options validated by the schema to a more precise and useful
  * options type in {@link WtrBuilderOptions}.
@@ -23,4 +23,3 @@ function normalizeOptions(schema) {
         polyfills: typeof schema.polyfills === 'string' ? [schema.polyfills] : schema.polyfills ?? [],
     };
 }
-exports.normalizeOptions = normalizeOptions;

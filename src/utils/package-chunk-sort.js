@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateEntryPoints = void 0;
+exports.generateEntryPoints = generateEntryPoints;
 const helpers_1 = require("../tools/webpack/utils/helpers");
 function generateEntryPoints(options) {
     // Add all styles/scripts, except lazy-loaded ones.
@@ -32,4 +32,3 @@ function generateEntryPoints(options) {
     }
     return entryPoints;
 }
-exports.generateEntryPoints = generateEntryPoints;

@@ -33,7 +33,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.execute = void 0;
+exports.execute = execute;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const fs = __importStar(require("fs"));
@@ -219,5 +219,4 @@ async function execute(options, context) {
     }
     return _renderUniversal(options, context, browserResult, serverResult, browserOptions);
 }
-exports.execute = execute;
 exports.default = (0, architect_1.createBuilder)(execute);

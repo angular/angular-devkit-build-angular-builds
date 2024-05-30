@@ -30,7 +30,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizeFileReplacements = exports.MissingFileReplacementException = void 0;
+exports.MissingFileReplacementException = void 0;
+exports.normalizeFileReplacements = normalizeFileReplacements;
 const fs_1 = require("fs");
 const path = __importStar(require("path"));
 class MissingFileReplacementException extends Error {
@@ -54,7 +55,6 @@ function normalizeFileReplacements(fileReplacements, workspaceRoot) {
     }
     return normalizedReplacement;
 }
-exports.normalizeFileReplacements = normalizeFileReplacements;
 function normalizeFileReplacement(fileReplacement, root) {
     let replacePath;
     let withPath;

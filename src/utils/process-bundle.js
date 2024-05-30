@@ -33,7 +33,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.inlineLocales = void 0;
+exports.inlineLocales = inlineLocales;
 const remapping_1 = __importDefault(require("@ampproject/remapping"));
 const core_1 = require("@babel/core");
 const fs = __importStar(require("fs/promises"));
@@ -170,7 +170,6 @@ async function inlineLocales(options) {
     }
     return { file: options.filename, diagnostics };
 }
-exports.inlineLocales = inlineLocales;
 async function inlineLocalesDirect(ast, options) {
     if (!i18n || i18n.inlineLocales.size === 0) {
         return { file: options.filename, diagnostics: [], count: 0 };

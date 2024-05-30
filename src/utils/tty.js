@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isTTY = void 0;
+exports.isTTY = isTTY;
 function _isTruthy(value) {
     // Returns true if value is a string that is anything but 0 or false.
     return value !== undefined && value !== '0' && value.toUpperCase() !== 'FALSE';
@@ -20,4 +20,3 @@ function isTTY() {
     }
     return !!process.stdout.isTTY && !_isTruthy(process.env['CI']);
 }
-exports.isTTY = isTTY;

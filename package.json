@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "18.1.0-next.0+sha-43f3650",
+  "version": "18.1.0-next.0+sha-144f2bf",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
-    "@angular/build": "github:angular/angular-build-builds#43f3650",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#43f3650",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#43f3650",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#43f3650",
+    "@angular/build": "github:angular/angular-build-builds#144f2bf",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#144f2bf",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#144f2bf",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#144f2bf",
     "@babel/core": "7.24.6",
     "@babel/generator": "7.24.6",
     "@babel/helper-annotate-as-pure": "7.24.6",
@@ -21,7 +21,7 @@
     "@babel/preset-env": "7.24.6",
     "@babel/runtime": "7.24.6",
     "@discoveryjs/json-ext": "0.5.7",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#43f3650",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#144f2bf",
     "@vitejs/plugin-basic-ssl": "1.1.0",
     "ansi-colors": "4.1.3",
     "autoprefixer": "10.4.19",
@@ -87,7 +87,7 @@
     "ng-packagr": "^18.0.0 || ^18.1.0-next.0",
     "protractor": "^7.0.0",
     "tailwindcss": "^2.0.0 || ^3.0.0",
-    "typescript": ">=5.4 <5.5"
+    "typescript": ">=5.4 <5.6"
   },
   "peerDependenciesMeta": {
     "@angular/localize": {

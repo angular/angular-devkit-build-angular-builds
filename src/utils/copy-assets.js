@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.copyAssets = void 0;
+exports.copyAssets = copyAssets;
 const fast_glob_1 = __importDefault(require("fast-glob"));
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
@@ -48,4 +48,3 @@ async function copyAssets(entries, basePaths, root, changed) {
     }
     return outputFiles;
 }
-exports.copyAssets = copyAssets;

@@ -10,6 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const remapping_1 = __importDefault(require("@ampproject/remapping"));
 const terser_1 = require("terser");
 const esbuild_executor_1 = require("./esbuild-executor");
@@ -51,7 +52,6 @@ async function default_1({ asset, options }) {
     }
     return { name: asset.name, code: terserResult.code, map: fullSourcemap };
 }
-exports.default = default_1;
 /**
  * Optimizes a JavaScript asset using esbuild.
  *

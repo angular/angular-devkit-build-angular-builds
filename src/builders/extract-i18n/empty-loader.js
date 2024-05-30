@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 function default_1() {
     return `export default '';`;
 }
-exports.default = default_1;

@@ -31,6 +31,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postcss = void 0;
+exports.default = default_1;
 const loader_utils_1 = require("loader-utils");
 const path = __importStar(require("path"));
 const url = __importStar(require("url"));
@@ -172,4 +173,3 @@ function default_1(options) {
         },
     };
 }
-exports.default = default_1;

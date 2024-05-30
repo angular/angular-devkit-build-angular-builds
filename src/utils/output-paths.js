@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ensureOutputPaths = void 0;
+exports.ensureOutputPaths = ensureOutputPaths;
 const fs_1 = require("fs");
 const path_1 = require("path");
 function ensureOutputPaths(baseOutputPath, i18n) {
@@ -24,4 +24,3 @@ function ensureOutputPaths(baseOutputPath, i18n) {
     }
     return new Map(outputPaths);
 }
-exports.ensureOutputPaths = ensureOutputPaths;

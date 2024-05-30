@@ -30,7 +30,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getIndexInputFile = exports.getIndexOutputFile = exports.generateBrowserWebpackConfigFromContext = exports.generateI18nBrowserWebpackConfigFromContext = exports.generateWebpackConfig = void 0;
+exports.generateWebpackConfig = generateWebpackConfig;
+exports.generateI18nBrowserWebpackConfigFromContext = generateI18nBrowserWebpackConfigFromContext;
+exports.generateBrowserWebpackConfigFromContext = generateBrowserWebpackConfigFromContext;
+exports.getIndexOutputFile = getIndexOutputFile;
+exports.getIndexInputFile = getIndexInputFile;
 const path = __importStar(require("path"));
 const webpack_1 = require("webpack");
 const webpack_merge_1 = require("webpack-merge");
@@ -61,7 +65,6 @@ async function generateWebpackConfig(workspaceRoot, projectRoot, sourceRoot, pro
     const webpackConfig = (0, webpack_merge_1.merge)(partials);
     return webpackConfig;
 }
-exports.generateWebpackConfig = generateWebpackConfig;
 async function generateI18nBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, extraBuildOptions = {}) {
     const { buildOptions, i18n } = await (0, i18n_webpack_1.configureI18nBuild)(context, options);
     const result = await generateBrowserWebpackConfigFromContext(buildOptions, context, (wco) => {
@@ -102,7 +105,6 @@ async function generateI18nBrowserWebpackConfigFromContext(options, context, web
     }
     return { ...result, i18n };
 }
-exports.generateI18nBrowserWebpackConfigFromContext = generateI18nBrowserWebpackConfigFromContext;
 async function generateBrowserWebpackConfigFromContext(options, context, webpackPartialGenerator, extraBuildOptions = {}) {
     const projectName = context.target && context.target.project;
     if (!projectName) {
@@ -130,7 +132,6 @@ async function generateBrowserWebpackConfigFromContext(options, context, webpack
         projectSourceRoot,
     };
 }
-exports.generateBrowserWebpackConfigFromContext = generateBrowserWebpackConfigFromContext;
 function getIndexOutputFile(index) {
     if (typeof index === 'string') {
         return path.basename(index);
@@ -139,7 +140,6 @@ function getIndexOutputFile(index) {
         return index.output || 'index.html';
     }
 }
-exports.getIndexOutputFile = getIndexOutputFile;
 function getIndexInputFile(index) {
     if (typeof index === 'string') {
         return index;
@@ -148,4 +148,3 @@ function getIndexInputFile(index) {
         return index.input;
     }
 }
-exports.getIndexInputFile = getIndexInputFile;

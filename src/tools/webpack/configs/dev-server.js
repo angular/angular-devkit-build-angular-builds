@@ -30,7 +30,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildServePath = exports.getDevServerConfig = void 0;
+exports.getDevServerConfig = getDevServerConfig;
+exports.buildServePath = buildServePath;
 const core_1 = require("@angular-devkit/core");
 const fs_1 = require("fs");
 const path_1 = require("path");
@@ -105,7 +106,6 @@ async function getDevServerConfig(wco) {
         },
     };
 }
-exports.getDevServerConfig = getDevServerConfig;
 /**
  * Resolve and build a URL _path_ that will be the root of the server. This resolved base href and
  * deploy URL from the browser options and returns a path from the root.
@@ -130,7 +130,6 @@ function buildServePath(options, logger) {
     }
     return servePath;
 }
-exports.buildServePath = buildServePath;
 /**
  * Private method to enhance a webpack config with SSL configuration.
  * @private

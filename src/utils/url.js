@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.urlJoin = void 0;
+exports.urlJoin = urlJoin;
 function urlJoin(...parts) {
     const [p, ...rest] = parts;
     // Remove trailing slash from first part
@@ -15,4 +15,3 @@ function urlJoin(...parts) {
     // Dedupe double slashes from path names
     return p.replace(/\/$/, '') + ('/' + rest.join('/')).replace(/\/\/+/g, '/');
 }
-exports.urlJoin = urlJoin;

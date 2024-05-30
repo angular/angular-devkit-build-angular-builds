@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildEsbuildBrowser = void 0;
+exports.buildEsbuildBrowser = buildEsbuildBrowser;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const promises_1 = __importDefault(require("node:fs/promises"));
@@ -50,7 +50,6 @@ async function* buildEsbuildBrowser(userOptions, context, infrastructureSettings
         yield builderResult;
     }
 }
-exports.buildEsbuildBrowser = buildEsbuildBrowser;
 function normalizeOptions(options) {
     const { main: browser, outputPath, ngswConfigPath, serviceWorker, polyfills, ...otherOptions } = options;
     return {

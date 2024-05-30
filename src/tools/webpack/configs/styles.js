@@ -33,7 +33,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStylesConfig = void 0;
+exports.getStylesConfig = getStylesConfig;
 const private_1 = require("@angular/build/private");
 const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
 const path = __importStar(require("node:path"));
@@ -278,7 +278,6 @@ async function getStylesConfig(wco) {
         plugins: extraPlugins,
     };
 }
-exports.getStylesConfig = getStylesConfig;
 function getSassLoaderOptions(root, implementation, includePaths, indentedSyntax, verbose, preserveSymlinks) {
     return {
         sourceMap: true,

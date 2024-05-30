@@ -30,7 +30,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildWebpackBrowser = exports.BUILD_TIMEOUT = void 0;
+exports.BUILD_TIMEOUT = void 0;
+exports.buildWebpackBrowser = buildWebpackBrowser;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
@@ -311,7 +312,6 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         return undefined;
     }
 }
-exports.buildWebpackBrowser = buildWebpackBrowser;
 function assertNever(input) {
     throw new Error(`Unexpected call to assertNever() with input: ${JSON.stringify(input, null /* replacer */, 4 /* tabSize */)}`);
 }

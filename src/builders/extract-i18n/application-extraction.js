@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.extractMessages = void 0;
+exports.extractMessages = extractMessages;
 const private_1 = require("@angular/build/private");
 const node_assert_1 = __importDefault(require("node:assert"));
 const node_path_1 = __importDefault(require("node:path"));
@@ -83,7 +83,6 @@ async function extractMessages(options, builderName, context, extractorConstruct
         useLegacyIds: false,
     };
 }
-exports.extractMessages = extractMessages;
 function setupLocalizeExtractor(extractorConstructor, files, context) {
     // Setup a virtual file system instance for the extractor
     // * MessageExtractor itself uses readFile, relative and resolve

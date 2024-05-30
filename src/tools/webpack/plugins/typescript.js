@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createIvyPlugin = void 0;
+exports.createIvyPlugin = createIvyPlugin;
 const webpack_1 = require("@ngtools/webpack");
 const typescript_1 = require("typescript");
 function createIvyPlugin(wco, aot, tsconfig) {
@@ -47,4 +47,3 @@ function createIvyPlugin(wco, aot, tsconfig) {
         inlineStyleFileExtension: buildOptions.inlineStyleLanguage ?? 'css',
     });
 }
-exports.createIvyPlugin = createIvyPlugin;

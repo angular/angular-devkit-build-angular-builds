@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizePolyfills = void 0;
+exports.normalizePolyfills = normalizePolyfills;
 const fs_1 = require("fs");
 const path_1 = require("path");
 function normalizePolyfills(polyfills, root) {
@@ -21,4 +21,3 @@ function normalizePolyfills(polyfills, root) {
         return (0, fs_1.existsSync)(resolvedPath) ? resolvedPath : p;
     });
 }
-exports.normalizePolyfills = normalizePolyfills;

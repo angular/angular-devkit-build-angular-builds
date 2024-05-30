@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findTestFiles = void 0;
+exports.findTestFiles = findTestFiles;
 const fast_glob_1 = __importDefault(require("fast-glob"));
 /**
  * Finds all test files in the project.
@@ -32,4 +32,3 @@ async function findTestFiles(include, exclude, workspaceRoot, glob = fast_glob_1
     // Flatten and deduplicate any files found in multiple include patterns.
     return new Set(included.flat());
 }
-exports.findTestFiles = findTestFiles;

@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.i18nInlineEmittedFiles = void 0;
+exports.i18nInlineEmittedFiles = i18nInlineEmittedFiles;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const action_executor_1 = require("./action-executor");
@@ -118,4 +118,3 @@ async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPat
     }
     return !hasErrors;
 }
-exports.i18nInlineEmittedFiles = i18nInlineEmittedFiles;
