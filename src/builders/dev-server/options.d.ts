@@ -44,4 +44,8 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     sslKey: string | undefined;
     forceEsbuild: boolean | undefined;
     prebundle: import("./schema").PrebundleUnion;
+    inspect: boolean | {
+        host?: string;
+        port?: number;
+    };
 }>;

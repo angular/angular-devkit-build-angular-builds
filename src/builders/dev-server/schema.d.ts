@@ -45,6 +45,11 @@ export interface Schema {
      */
     host?: string;
     /**
+     * Activate debugging inspector. This option only has an effect when 'SSR' or 'SSG' are
+     * enabled.
+     */
+    inspect?: Inspect;
+    /**
      * Whether to reload the page on change, using live-reload.
      */
     liveReload?: boolean;
@@ -103,6 +108,11 @@ export interface Schema {
      */
     watch?: boolean;
 }
+/**
+ * Activate debugging inspector. This option only has an effect when 'SSR' or 'SSG' are
+ * enabled.
+ */
+export type Inspect = boolean | string;
 /**
  * Enable and control the Vite-based development server's prebundling capabilities. To
  * enable prebundling, the Angular CLI cache must also be enabled. This option has no effect
