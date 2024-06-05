@@ -9,14 +9,14 @@ import { InlineOptions } from './bundle-inline-options';
 export declare function inlineLocales(options: InlineOptions): Promise<{
     file: string;
     diagnostics: {
-        type: "error" | "warning";
+        type: "warning" | "error";
         message: string;
     }[];
     count: number;
 } | {
     file: string;
     diagnostics: {
-        type: "error" | "warning";
+        type: "warning" | "error";
         message: string;
     }[];
 }>;
