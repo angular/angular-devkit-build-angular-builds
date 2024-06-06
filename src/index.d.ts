@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 export * from './transforms';
 export { AssetPattern, AssetPatternClass as AssetPatternObject, Budget, CrossOrigin, FileReplacement, OptimizationClass as OptimizationObject, OptimizationUnion, OutputHashing, Schema as BrowserBuilderOptions, SourceMapClass as SourceMapObject, SourceMapUnion, StylePreprocessorOptions, Type, } from './builders/browser/schema';
