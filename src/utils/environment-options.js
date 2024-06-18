@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useJSONBuildLogs = exports.useTypeChecking = exports.shouldWatchRoot = exports.debugPerformance = exports.useParallelTs = exports.maxWorkers = exports.allowMinify = exports.shouldBeautify = exports.allowMangle = void 0;
+const node_os_1 = require("node:os");
 function isDisabled(variable) {
     return variable === '0' || variable.toLowerCase() === 'false';
 }
@@ -66,7 +67,9 @@ exports.allowMinify = debugOptimize.minify;
  *
  */
 const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
-exports.maxWorkers = isPresent(maxWorkersVariable) ? +maxWorkersVariable : 4;
+exports.maxWorkers = isPresent(maxWorkersVariable)
+    ? +maxWorkersVariable
+    : Math.min(4, (0, node_os_1.availableParallelism)());
 const parallelTsVariable = process.env['NG_BUILD_PARALLEL_TS'];
 exports.useParallelTs = !isPresent(parallelTsVariable) || !isDisabled(parallelTsVariable);
 const debugPerfVariable = process.env['NG_BUILD_DEBUG_PERF'];
