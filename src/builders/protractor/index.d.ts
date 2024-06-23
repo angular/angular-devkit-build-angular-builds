@@ -8,7 +8,7 @@
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
 import { Schema as ProtractorBuilderOptions } from './schema';
-export { ProtractorBuilderOptions };
+export type { ProtractorBuilderOptions };
 /**
  * @experimental Direct usage of this function is considered experimental.
  */

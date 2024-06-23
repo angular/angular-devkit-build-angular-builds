@@ -21,7 +21,7 @@ export type ServerBuilderOutput = BuilderOutput & {
         path: string;
     }[];
 };
-export { ServerBuilderOptions };
+export type { ServerBuilderOptions };
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
