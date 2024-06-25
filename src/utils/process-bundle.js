@@ -145,7 +145,7 @@ async function inlineLocales(options) {
             }
         }
         const { diagnostics: localeDiagnostics, plugins } = await createI18nPlugins(locale, translations, isSourceLocale ? 'ignore' : options.missingTranslation || 'warning', true, localeDataContent);
-        const transformResult = await (0, core_1.transformFromAstSync)(ast, options.code, {
+        const transformResult = (0, core_1.transformFromAstSync)(ast, options.code, {
             filename: options.filename,
             // using false ensures that babel will NOT search and process sourcemap comments (large memory usage)
             // The types do not include the false option even though it is valid

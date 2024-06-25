@@ -6,12 +6,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.runModuleAsObservableFork = runModuleAsObservableFork;
 const child_process_1 = require("child_process");
 const path_1 = require("path");
 const rxjs_1 = require("rxjs");
-const treeKill = require('tree-kill');
+const tree_kill_1 = __importDefault(require("tree-kill"));
 function runModuleAsObservableFork(cwd, modulePath, exportName, 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 args) {
@@ -39,7 +42,7 @@ args) {
         // Cleanup.
         const killForkedProcess = () => {
             if (forkedProcess && forkedProcess.pid) {
-                treeKill(forkedProcess.pid, 'SIGTERM');
+                (0, tree_kill_1.default)(forkedProcess.pid, 'SIGTERM');
             }
         };
         // Handle child process exit.
