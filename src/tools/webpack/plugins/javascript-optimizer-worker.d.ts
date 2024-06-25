@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+import { SourceMapInput } from '@ampproject/remapping';
 /**
  * The options to use when optimizing.
  */
@@ -70,7 +71,7 @@ interface OptimizeRequest {
          * The source map of the JavaScript asset, if available.
          * This map is merged with all intermediate source maps during optimization.
          */
-        map: object;
+        map: SourceMapInput;
     };
 }
 /**
