@@ -69,7 +69,7 @@ exports.allowMinify = debugOptimize.minify;
 const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
 exports.maxWorkers = isPresent(maxWorkersVariable)
     ? +maxWorkersVariable
-    : Math.min(4, (0, node_os_1.availableParallelism)());
+    : Math.min(4, Math.max((0, node_os_1.availableParallelism)() - 1, 1));
 const parallelTsVariable = process.env['NG_BUILD_PARALLEL_TS'];
 exports.useParallelTs = !isPresent(parallelTsVariable) || !isDisabled(parallelTsVariable);
 const debugPerfVariable = process.env['NG_BUILD_DEBUG_PERF'];
