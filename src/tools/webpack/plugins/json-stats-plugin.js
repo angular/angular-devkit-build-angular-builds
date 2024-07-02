@@ -31,8 +31,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JsonStatsPlugin = void 0;
-const fs_1 = require("fs");
-const path_1 = require("path");
+const node_fs_1 = require("node:fs");
+const promises_1 = require("node:fs/promises");
+const node_path_1 = require("node:path");
+const promises_2 = require("node:stream/promises");
 const error_1 = require("../../../utils/error");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
 class JsonStatsPlugin {
@@ -42,14 +44,11 @@ class JsonStatsPlugin {
     }
     apply(compiler) {
         compiler.hooks.done.tapPromise('angular-json-stats', async (stats) => {
-            const { stringifyStream } = await Promise.resolve().then(() => __importStar(require('@discoveryjs/json-ext')));
+            const { stringifyChunked } = await Promise.resolve().then(() => __importStar(require('@discoveryjs/json-ext')));
             const data = stats.toJson('verbose');
             try {
-                await fs_1.promises.mkdir((0, path_1.dirname)(this.statsOutputPath), { recursive: true });
-                await new Promise((resolve, reject) => stringifyStream(data)
-                    .pipe((0, fs_1.createWriteStream)(this.statsOutputPath))
-                    .on('close', resolve)
-                    .on('error', reject));
+                await (0, promises_1.mkdir)((0, node_path_1.dirname)(this.statsOutputPath), { recursive: true });
+                await (0, promises_2.pipeline)(stringifyChunked(data), (0, node_fs_1.createWriteStream)(this.statsOutputPath));
             }
             catch (error) {
                 (0, error_1.assertIsError)(error);
