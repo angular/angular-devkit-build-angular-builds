@@ -37,8 +37,8 @@ async function normalizeOptions(context, projectName, options) {
     // Normalize xliff format extensions
     let format = options.format;
     switch (format) {
-        case undefined:
         // Default format is xliff1
+        case undefined:
         case schema_1.Format.Xlf:
         case schema_1.Format.Xlif:
         case schema_1.Format.Xliff:

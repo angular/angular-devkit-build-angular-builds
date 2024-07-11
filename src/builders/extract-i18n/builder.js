@@ -139,12 +139,13 @@ async function createSerializer(localizeToolsModule, format, sourceLocale, baseP
         case schema_1.Format.LegacyMigrate:
             return new LegacyMessageIdMigrationSerializer(diagnostics);
         case schema_1.Format.Arb:
-            const fileSystem = {
+            return new ArbTranslationSerializer(sourceLocale, 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            basePath, {
                 relative(from, to) {
                     return node_path_1.default.relative(from, to);
                 },
-            };
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return new ArbTranslationSerializer(sourceLocale, basePath, fileSystem);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            });
     }
 }
