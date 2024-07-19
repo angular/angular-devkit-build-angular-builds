@@ -11,6 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildEsbuildBrowser = buildEsbuildBrowser;
+exports.buildEsbuildBrowserArchitect = buildEsbuildBrowserArchitect;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const promises_1 = __importDefault(require("node:fs/promises"));
@@ -35,19 +36,30 @@ async function* buildEsbuildBrowser(userOptions, context, infrastructureSettings
     for await (const result of (0, private_1.buildApplicationInternal)(normalizedOptions, context, {
         write: false,
     }, plugins && { codePlugins: plugins })) {
-        if (infrastructureSettings?.write !== false && result.outputFiles) {
-            // Write output files
-            await writeResultFiles(result.outputFiles, result.assetFiles, fullOutputPath);
+        // Write the file directly from this builder to maintain webpack output compatibility
+        // and not output browser files into '/browser'.
+        if (infrastructureSettings?.write !== false &&
+            (result.kind === private_1.ResultKind.Full || result.kind === private_1.ResultKind.Incremental)) {
+            const directoryExists = new Set();
+            // Writes the output file to disk and ensures the containing directories are present
+            await (0, private_1.emitFilesToDisk)(Object.entries(result.files), async ([filePath, file]) => {
+                // Ensure output subdirectories exist
+                const basePath = node_path_1.default.dirname(filePath);
+                if (basePath && !directoryExists.has(basePath)) {
+                    await promises_1.default.mkdir(node_path_1.default.join(fullOutputPath, basePath), { recursive: true });
+                    directoryExists.add(basePath);
+                }
+                if (file.origin === 'memory') {
+                    // Write file contents
+                    await promises_1.default.writeFile(node_path_1.default.join(fullOutputPath, filePath), file.contents);
+                }
+                else {
+                    // Copy file contents
+                    await promises_1.default.copyFile(file.inputPath, node_path_1.default.join(fullOutputPath, filePath), promises_1.default.constants.COPYFILE_FICLONE);
+                }
+            });
         }
-        // The builder system (architect) currently attempts to treat all results as JSON and
-        // attempts to validate the object with a JSON schema validator. This can lead to slow
-        // build completion (even after the actual build is fully complete) or crashes if the
-        // size and/or quantity of output files is large. Architect only requires a `success`
-        // property so that is all that will be passed here if the infrastructure settings have
-        // not been explicitly set to avoid writes. Writing is only disabled when used directly
-        // by the dev server which bypasses the architect behavior.
-        const builderResult = infrastructureSettings?.write === false ? result : { success: result.success };
-        yield builderResult;
+        yield result;
     }
 }
 function normalizeOptions(options) {
@@ -63,32 +75,9 @@ function normalizeOptions(options) {
         ...otherOptions,
     };
 }
-// We write the file directly from this builder to maintain webpack output compatibility
-// and not output browser files into '/browser'.
-async function writeResultFiles(outputFiles, assetFiles, outputPath) {
-    const directoryExists = new Set();
-    const ensureDirectoryExists = async (basePath) => {
-        if (basePath && !directoryExists.has(basePath)) {
-            await promises_1.default.mkdir(node_path_1.default.join(outputPath, basePath), { recursive: true });
-            directoryExists.add(basePath);
-        }
-    };
-    // Writes the output file to disk and ensures the containing directories are present
-    await (0, private_1.emitFilesToDisk)(outputFiles, async (file) => {
-        // Ensure output subdirectories exist
-        const basePath = node_path_1.default.dirname(file.path);
-        await ensureDirectoryExists(basePath);
-        // Write file contents
-        await promises_1.default.writeFile(node_path_1.default.join(outputPath, file.path), file.contents);
-    });
-    if (assetFiles?.length) {
-        await (0, private_1.emitFilesToDisk)(assetFiles, async ({ source, destination }) => {
-            const basePath = node_path_1.default.dirname(destination);
-            // Ensure output subdirectories exist
-            await ensureDirectoryExists(basePath);
-            // Copy file contents
-            await promises_1.default.copyFile(source, node_path_1.default.join(outputPath, destination), promises_1.default.constants.COPYFILE_FICLONE);
-        });
+async function* buildEsbuildBrowserArchitect(options, context) {
+    for await (const result of buildEsbuildBrowser(options, context)) {
+        yield { success: result.kind !== private_1.ResultKind.Failure };
     }
 }
-exports.default = (0, architect_1.createBuilder)(buildEsbuildBrowser);
+exports.default = (0, architect_1.createBuilder)(buildEsbuildBrowserArchitect);

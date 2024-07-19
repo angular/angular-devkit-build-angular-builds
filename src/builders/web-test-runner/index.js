@@ -47,8 +47,8 @@ exports.default = (0, architect_1.createBuilder)(async (schema, ctx) => {
     ]);
     // Build the tests and abort on any build failure.
     const buildOutput = await buildTests(testFiles, testDir, options, ctx);
-    if (!buildOutput.success) {
-        return buildOutput;
+    if (buildOutput.kind === private_1.ResultKind.Failure) {
+        return { success: false };
     }
     // Run the built tests.
     return await runTests(wtr, `${testDir}/browser`, options);

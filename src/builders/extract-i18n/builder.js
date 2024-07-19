@@ -75,6 +75,9 @@ async function execute(options, context, transforms) {
         builderName === '@angular-devkit/build-angular:browser-esbuild') {
         const { extractMessages } = await Promise.resolve().then(() => __importStar(require('./application-extraction')));
         extractionResult = await extractMessages(normalizedOptions, builderName, context, localizeToolsModule.MessageExtractor);
+        if (!extractionResult.success) {
+            return { success: false };
+        }
     }
     else {
         // Purge old build disk cache.
@@ -82,10 +85,10 @@ async function execute(options, context, transforms) {
         await (0, private_1.purgeStaleBuildCache)(context);
         const { extractMessages } = await Promise.resolve().then(() => __importStar(require('./webpack-extraction')));
         extractionResult = await extractMessages(normalizedOptions, builderName, context, transforms);
-    }
-    // Return the builder result if it failed
-    if (!extractionResult.builderResult.success) {
-        return extractionResult.builderResult;
+        // Return the builder result if it failed
+        if (!extractionResult.builderResult.success) {
+            return extractionResult.builderResult;
+        }
     }
     // Perform duplicate message checks
     const { checkDuplicateMessages } = localizeToolsModule;

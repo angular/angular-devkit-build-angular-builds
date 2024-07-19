@@ -7,10 +7,10 @@
  */
 import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
 import type { MessageExtractor } from '@angular/localize/tools';
-import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import type { BuilderContext } from '@angular-devkit/architect';
 import type { NormalizedExtractI18nOptions } from './options';
 export declare function extractMessages(options: NormalizedExtractI18nOptions, builderName: string, context: BuilderContext, extractorConstructor: typeof MessageExtractor): Promise<{
-    builderResult: BuilderOutput;
+    success: boolean;
     basePath: string;
     messages: LocalizeMessage[];
     useLegacyIds: boolean;

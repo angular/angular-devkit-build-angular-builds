@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import type { BuildOutputFile } from '@angular/build';
-import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import { Result } from '@angular/build/private';
+import { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import type { Schema as BrowserBuilderOptions } from './schema';
 /**
@@ -18,12 +18,9 @@ import type { Schema as BrowserBuilderOptions } from './schema';
  */
 export declare function buildEsbuildBrowser(userOptions: BrowserBuilderOptions, context: BuilderContext, infrastructureSettings?: {
     write?: boolean;
-}, plugins?: Plugin[]): AsyncIterable<BuilderOutput & {
-    outputFiles?: BuildOutputFile[];
-    assetFiles?: {
-        source: string;
-        destination: string;
-    }[];
-}>;
+}, plugins?: Plugin[]): AsyncIterable<Result>;
+export declare function buildEsbuildBrowserArchitect(options: BrowserBuilderOptions, context: BuilderContext): AsyncGenerator<{
+    success: boolean;
+}, void, unknown>;
 declare const _default: import("../../../../architect/src/internal").Builder<BrowserBuilderOptions & import("../../../../core/src").JsonObject>;
 export default _default;
