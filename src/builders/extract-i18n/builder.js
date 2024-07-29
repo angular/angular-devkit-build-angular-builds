@@ -50,6 +50,12 @@ async function execute(options, context, transforms) {
         context.logger.error(`The 'extract-i18n' builder requires a target to be specified.`);
         return { success: false };
     }
+    const { projectType } = (await context.getProjectMetadata(projectName));
+    if (projectType !== 'application') {
+        context.logger.error(`Tried to extract from ${projectName} with 'projectType' ${projectType}, which is not supported.` +
+            ` The 'extract-i18n' builder can only extract from applications.`);
+        return { success: false };
+    }
     // Check Angular version.
     (0, private_1.assertCompatibleAngularVersion)(context.workspaceRoot);
     // Load the Angular localize package.
