@@ -33,19 +33,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const node_child_process_1 = require("node:child_process");
+const node_crypto_1 = require("node:crypto");
 const fs = __importStar(require("node:fs/promises"));
 const path = __importStar(require("node:path"));
 const node_util_1 = require("node:util");
 const color_1 = require("../../utils/color");
 const test_files_1 = require("../../utils/test-files");
 const schema_1 = require("../browser-esbuild/schema");
+const write_test_files_1 = require("../web-test-runner/write-test-files");
 const options_1 = require("./options");
 const execFile = (0, node_util_1.promisify)(node_child_process_1.execFile);
 /** Main execution function for the Jest builder. */
 exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
     context.logger.warn('NOTE: The Jest builder is currently EXPERIMENTAL and not ready for production use.');
     const options = (0, options_1.normalizeOptions)(schema);
-    const testOut = 'dist/test-out'; // TODO(dgp1130): Hide in temp directory.
+    const testOut = path.join(context.workspaceRoot, 'dist/test-out', (0, node_crypto_1.randomUUID)()); // TODO(dgp1130): Hide in temp directory.
     // Verify Jest installation and get the path to it's binary.
     // We need to `node_modules/.bin/jest`, but there is no means to resolve that directly. Fortunately Jest's `package.json` exports the
     // same file at `bin/jest`, so we can just resolve that instead.
@@ -83,7 +85,7 @@ exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
     // Build all the test files.
     const jestGlobal = path.join(__dirname, 'jest-global.mjs');
     const initTestBed = path.join(__dirname, 'init-test-bed.mjs');
-    const buildResult = await build(context, {
+    const buildResult = await first((0, private_1.buildApplicationInternal)({
         // Build all the test files and also the `jest-global` and `init-test-bed` scripts.
         entryPoints: new Set([...testFiles, jestGlobal, initTestBed]),
         tsConfig: options.tsConfig,
@@ -99,15 +101,23 @@ exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
             styles: false,
             vendor: false,
         },
-    });
-    if (!buildResult.success) {
-        return buildResult;
+    }, context, { write: false }));
+    if (buildResult.kind === private_1.ResultKind.Failure) {
+        return { success: false };
     }
+    else if (buildResult.kind !== private_1.ResultKind.Full) {
+        return {
+            success: false,
+            error: 'A full build result is required from the application builder.',
+        };
+    }
+    // Write test files
+    await (0, write_test_files_1.writeTestFiles)(buildResult.files, testOut);
     // Execute Jest on the built output directory.
     const jestProc = execFile(process.execPath, [
         '--experimental-vm-modules',
         jest,
-        `--rootDir="${path.join(testOut, 'browser')}"`,
+        `--rootDir="${testOut}"`,
         `--config=${path.join(__dirname, 'jest.config.mjs')}`,
         '--testEnvironment=jsdom',
         // TODO(dgp1130): Enable cache once we have a mechanism for properly clearing / disabling it.
@@ -150,19 +160,12 @@ exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
     }
     return { success: true };
 });
-async function build(context, options) {
-    try {
-        for await (const _ of (0, private_1.buildApplicationInternal)(options, context)) {
-            // Nothing to do for each event, just wait for the whole build.
-        }
-        return { success: true };
+/** Returns the first item yielded by the given generator and cancels the execution. */
+async function first(generator) {
+    for await (const value of generator) {
+        return value;
     }
-    catch (err) {
-        return {
-            success: false,
-            error: err.message,
-        };
-    }
+    throw new Error('Expected generator to emit at least once.');
 }
 /** Safely resolves the given Node module string. */
 function resolveModule(module) {

@@ -12,13 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
-const node_fs_1 = require("node:fs");
+const node_crypto_1 = require("node:crypto");
+const promises_1 = __importDefault(require("node:fs/promises"));
 const node_module_1 = require("node:module");
 const node_path_1 = __importDefault(require("node:path"));
 const test_files_1 = require("../../utils/test-files");
 const schema_1 = require("../browser-esbuild/schema");
 const builder_status_warnings_1 = require("./builder-status-warnings");
 const options_1 = require("./options");
+const write_test_files_1 = require("./write-test-files");
 exports.default = (0, architect_1.createBuilder)(async (schema, ctx) => {
     ctx.logger.warn('NOTE: The Web Test Runner builder is currently EXPERIMENTAL and not ready for production use.');
     (0, builder_status_warnings_1.logBuilderStatusWarnings)(schema, ctx);
@@ -37,21 +39,29 @@ exports.default = (0, architect_1.createBuilder)(async (schema, ctx) => {
         };
     }
     const options = (0, options_1.normalizeOptions)(schema);
-    const testDir = 'dist/test-out';
+    const testDir = node_path_1.default.join(ctx.workspaceRoot, 'dist/test-out', (0, node_crypto_1.randomUUID)());
     // Parallelize startup work.
     const [testFiles] = await Promise.all([
         // Glob for files to test.
         (0, test_files_1.findTestFiles)(options.include, options.exclude, ctx.workspaceRoot),
         // Clean build output path.
-        node_fs_1.promises.rm(testDir, { recursive: true, force: true }),
+        promises_1.default.rm(testDir, { recursive: true, force: true }),
     ]);
     // Build the tests and abort on any build failure.
     const buildOutput = await buildTests(testFiles, testDir, options, ctx);
     if (buildOutput.kind === private_1.ResultKind.Failure) {
         return { success: false };
     }
+    else if (buildOutput.kind !== private_1.ResultKind.Full) {
+        return {
+            success: false,
+            error: 'A full build result is required from the application builder.',
+        };
+    }
+    // Write test files
+    await (0, write_test_files_1.writeTestFiles)(buildOutput.files, testDir);
     // Run the built tests.
-    return await runTests(wtr, `${testDir}/browser`, options);
+    return await runTests(wtr, testDir, options);
 });
 /** Build all the given test files and write the result to the given output path. */
 async function buildTests(testFiles, outputPath, options, ctx) {
@@ -85,7 +95,7 @@ async function buildTests(testFiles, outputPath, options, ctx) {
             vendor: true,
         },
         polyfills,
-    }, ctx));
+    }, ctx, { write: false }));
     return buildOutput;
 }
 function extractZoneTesting(polyfills) {
@@ -96,7 +106,7 @@ function extractZoneTesting(polyfills) {
 /** Run Web Test Runner on the given directory of bundled JavaScript tests. */
 async function runTests(wtr, testDir, options) {
     const testPagePath = node_path_1.default.resolve(__dirname, 'test_page.html');
-    const testPage = await node_fs_1.promises.readFile(testPagePath, 'utf8');
+    const testPage = await promises_1.default.readFile(testPagePath, 'utf8');
     const runner = await wtr.startTestRunner({
         config: {
             rootDir: testDir,
