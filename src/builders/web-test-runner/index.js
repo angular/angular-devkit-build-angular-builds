@@ -95,7 +95,7 @@ async function buildTests(testFiles, outputPath, options, ctx) {
             vendor: true,
         },
         polyfills,
-    }, ctx, { write: false }));
+    }, ctx));
     return buildOutput;
 }
 function extractZoneTesting(polyfills) {

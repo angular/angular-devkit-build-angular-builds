@@ -76,7 +76,7 @@ function execute(options, context, transforms = {}, extensions) {
                 return builderName === '@angular-devkit/build-angular:browser-esbuild'
                     ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         buildEsbuildBrowser(options, context, { write: false }, codePlugins)
-                    : buildApplicationInternal(options, context, { write: false }, { codePlugins });
+                    : buildApplicationInternal(options, context, { codePlugins });
             }, context, transforms, extensions)));
         }
         // Warn if the initial options provided by the user enable prebundling with Webpack-based builders

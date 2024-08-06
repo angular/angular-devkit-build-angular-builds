@@ -33,9 +33,7 @@ async function* buildEsbuildBrowser(userOptions, context, infrastructureSettings
     if (deleteOutputPath && infrastructureSettings?.write !== false) {
         await (0, private_1.deleteOutputDir)(context.workspaceRoot, outputPath.base);
     }
-    for await (const result of (0, private_1.buildApplicationInternal)(normalizedOptions, context, {
-        write: false,
-    }, plugins && { codePlugins: plugins })) {
+    for await (const result of (0, private_1.buildApplicationInternal)(normalizedOptions, context, plugins && { codePlugins: plugins })) {
         // Write the file directly from this builder to maintain webpack output compatibility
         // and not output browser files into '/browser'.
         if (infrastructureSettings?.write !== false &&

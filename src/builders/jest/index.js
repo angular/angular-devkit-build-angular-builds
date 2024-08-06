@@ -101,7 +101,7 @@ exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
             styles: false,
             vendor: false,
         },
-    }, context, { write: false }));
+    }, context));
     if (buildResult.kind === private_1.ResultKind.Failure) {
         return { success: false };
     }
