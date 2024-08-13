@@ -17,25 +17,23 @@ const browser_esbuild_1 = require("../browser-esbuild");
 async function extractMessages(options, builderName, context, extractorConstructor) {
     const messages = [];
     // Setup the build options for the application based on the buildTarget option
-    const buildOptions = (await context.validateOptions(await context.getTargetOptions(options.buildTarget), builderName));
+    let buildOptions;
+    if (builderName === '@angular-devkit/build-angular:application') {
+        buildOptions = (await context.validateOptions(await context.getTargetOptions(options.buildTarget), builderName));
+    }
+    else {
+        buildOptions = (0, browser_esbuild_1.convertBrowserOptions)((await context.validateOptions(await context.getTargetOptions(options.buildTarget), builderName)));
+    }
     buildOptions.optimization = false;
     buildOptions.sourceMap = { scripts: true, vendor: true, styles: false };
     buildOptions.localize = false;
     buildOptions.budgets = undefined;
     buildOptions.index = false;
     buildOptions.serviceWorker = false;
-    let build;
-    if (builderName === '@angular-devkit/build-angular:application') {
-        build = private_1.buildApplicationInternal;
-        buildOptions.ssr = false;
-        buildOptions.appShell = false;
-        buildOptions.prerender = false;
-    }
-    else {
-        build = browser_esbuild_1.buildEsbuildBrowser;
-    }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const builderResult = await first(build(buildOptions, context, { write: false }));
+    buildOptions.ssr = false;
+    buildOptions.appShell = false;
+    buildOptions.prerender = false;
+    const builderResult = await first((0, private_1.buildApplicationInternal)(buildOptions, context));
     let success = false;
     if (!builderResult || builderResult.kind === private_1.ResultKind.Failure) {
         context.logger.error('Application build failed.');

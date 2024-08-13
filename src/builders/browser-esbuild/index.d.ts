@@ -5,10 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { Result } from '@angular/build/private';
-import { BuilderContext } from '@angular-devkit/architect';
+import { type ApplicationBuilderOptions } from '@angular/build';
+import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import type { Schema as BrowserBuilderOptions } from './schema';
+export type { BrowserBuilderOptions };
+type OutputPathClass = Exclude<ApplicationBuilderOptions['outputPath'], string | undefined>;
 /**
  * Main execution function for the esbuild-based application builder.
  * The options are compatible with the Webpack-based builder.
@@ -18,9 +20,9 @@ import type { Schema as BrowserBuilderOptions } from './schema';
  */
 export declare function buildEsbuildBrowser(userOptions: BrowserBuilderOptions, context: BuilderContext, infrastructureSettings?: {
     write?: boolean;
-}, plugins?: Plugin[]): AsyncIterable<Result>;
-export declare function buildEsbuildBrowserArchitect(options: BrowserBuilderOptions, context: BuilderContext): AsyncGenerator<{
-    success: boolean;
-}, void, unknown>;
+}, plugins?: Plugin[]): AsyncIterable<BuilderOutput>;
+export declare function convertBrowserOptions(options: BrowserBuilderOptions): Omit<ApplicationBuilderOptions, 'outputPath'> & {
+    outputPath: OutputPathClass;
+};
 declare const _default: import("../../../../architect/src/internal").Builder<BrowserBuilderOptions & import("../../../../core/src").JsonObject>;
 export default _default;

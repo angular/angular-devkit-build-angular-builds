@@ -72,10 +72,12 @@ function execute(options, context, transforms = {}, extensions) {
             if (options.disableHostCheck) {
                 context.logger.warn(`The "disableHostCheck" option will not be used because it is not supported by the "${builderName}" builder.`);
             }
-            return (0, rxjs_1.defer)(() => Promise.all([Promise.resolve().then(() => __importStar(require('@angular/build/private'))), Promise.resolve().then(() => __importStar(require('../browser-esbuild')))])).pipe((0, rxjs_1.switchMap)(([{ serveWithVite, buildApplicationInternal }, { buildEsbuildBrowser }]) => serveWithVite(normalizedOptions, builderName, (options, context, codePlugins) => {
+            return (0, rxjs_1.defer)(() => Promise.all([Promise.resolve().then(() => __importStar(require('@angular/build/private'))), Promise.resolve().then(() => __importStar(require('../browser-esbuild')))])).pipe((0, rxjs_1.switchMap)(([{ serveWithVite, buildApplicationInternal }, { convertBrowserOptions }]) => serveWithVite(normalizedOptions, builderName, (options, context, codePlugins) => {
                 return builderName === '@angular-devkit/build-angular:browser-esbuild'
                     ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        buildEsbuildBrowser(options, context, { write: false }, codePlugins)
+                        buildApplicationInternal(convertBrowserOptions(options), context, {
+                            codePlugins,
+                        })
                     : buildApplicationInternal(options, context, { codePlugins });
             }, context, transforms, extensions)));
         }
