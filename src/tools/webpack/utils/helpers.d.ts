@@ -34,7 +34,10 @@ export declare function globalScriptsByBundleName(scripts: ScriptElement[]): {
 export declare function assetPatterns(root: string, assets: AssetPatternClass[]): ObjectPattern[];
 export declare function getStatsOptions(verbose?: boolean): WebpackStatsOptions;
 /**
- * @param root the workspace root
- * @returns `true` when `@angular/platform-server` is installed.
+ * Checks if a specified package is installed in the given workspace.
+ *
+ * @param root - The root directory of the workspace.
+ * @param name - The name of the package to check for.
+ * @returns `true` if the package is installed, `false` otherwise.
  */
-export declare function isPlatformServerInstalled(root: string): boolean;
+export declare function isPackageInstalled(root: string, name: string): boolean;

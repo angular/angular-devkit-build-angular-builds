@@ -42,7 +42,7 @@ exports.getCacheSettings = getCacheSettings;
 exports.globalScriptsByBundleName = globalScriptsByBundleName;
 exports.assetPatterns = assetPatterns;
 exports.getStatsOptions = getStatsOptions;
-exports.isPlatformServerInstalled = isPlatformServerInstalled;
+exports.isPackageInstalled = isPackageInstalled;
 const crypto_1 = require("crypto");
 const fast_glob_1 = __importDefault(require("fast-glob"));
 const path = __importStar(require("path"));
@@ -276,12 +276,15 @@ function getStatsOptions(verbose = false) {
         : webpackOutputOptions;
 }
 /**
- * @param root the workspace root
- * @returns `true` when `@angular/platform-server` is installed.
+ * Checks if a specified package is installed in the given workspace.
+ *
+ * @param root - The root directory of the workspace.
+ * @param name - The name of the package to check for.
+ * @returns `true` if the package is installed, `false` otherwise.
  */
-function isPlatformServerInstalled(root) {
+function isPackageInstalled(root, name) {
     try {
-        require.resolve('@angular/platform-server', { paths: [root] });
+        require.resolve(name, { paths: [root] });
         return true;
     }
     catch {

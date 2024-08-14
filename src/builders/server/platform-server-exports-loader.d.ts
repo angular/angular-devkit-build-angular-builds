@@ -10,4 +10,6 @@
  * allow exports from multiple files in the same entry.
  * @see https://github.com/webpack/webpack/issues/15936.
  */
-export default function (this: import('webpack').LoaderContext<{}>, content: string, map: Parameters<import('webpack').LoaderDefinitionFunction>[1]): void;
+export default function (this: import('webpack').LoaderContext<{
+    angularSSRInstalled: boolean;
+}>, content: string, map: Parameters<import('webpack').LoaderDefinitionFunction>[1]): void;

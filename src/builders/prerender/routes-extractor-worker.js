@@ -39,14 +39,15 @@ const path = __importStar(require("node:path"));
 const node_worker_threads_1 = require("node:worker_threads");
 const { zonePackage, serverBundlePath, outputPath, indexFile } = node_worker_threads_1.workerData;
 async function extract() {
-    const { AppServerModule, extractRoutes, default: bootstrapAppFn, } = (await Promise.resolve(`${serverBundlePath}`).then(s => __importStar(require(s))));
+    const { AppServerModule, ɵgetRoutesFromAngularRouterConfig: getRoutesFromAngularRouterConfig, default: bootstrapAppFn, } = (await Promise.resolve(`${serverBundlePath}`).then(s => __importStar(require(s))));
     const browserIndexInputPath = path.join(outputPath, indexFile);
     const document = await fs.promises.readFile(browserIndexInputPath, 'utf8');
     const bootstrapAppFnOrModule = bootstrapAppFn || AppServerModule;
     (0, node_assert_1.default)(bootstrapAppFnOrModule, `The file "${serverBundlePath}" does not have a default export for an AppServerModule or a bootstrapping function.`);
     const routes = [];
-    for await (const { route, success } of extractRoutes(bootstrapAppFnOrModule, document)) {
-        if (success) {
+    const { routes: extractRoutes } = await getRoutesFromAngularRouterConfig(bootstrapAppFnOrModule, document, new URL('http://localhost'));
+    for (const { route, redirectTo } of extractRoutes) {
+        if (redirectTo === undefined && !/[:*]/.test(route)) {
             routes.push(route);
         }
     }

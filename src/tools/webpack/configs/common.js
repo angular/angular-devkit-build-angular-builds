@@ -85,7 +85,8 @@ async function getCommonConfig(wco) {
     if (isPlatformServer) {
         // Fixes Critical dependency: the request of a dependency is an expression
         extraPlugins.push(new webpack_2.ContextReplacementPlugin(/@?hapi|express[\\/]/));
-        if ((0, helpers_1.isPlatformServerInstalled)(wco.root) && Array.isArray(entryPoints['main'])) {
+        if ((0, helpers_1.isPackageInstalled)(wco.root, '@angular/platform-server') &&
+            Array.isArray(entryPoints['main'])) {
             // This import must come before any imports (direct or transitive) that rely on DOM built-ins being
             // available, such as `@angular/elements`.
             entryPoints['main'].unshift('@angular/platform-server/init');

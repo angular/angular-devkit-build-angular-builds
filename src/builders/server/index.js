@@ -183,13 +183,16 @@ function getPlatformServerExportsConfig(wco) {
     // Only add `@angular/platform-server` exports when it is installed.
     // In some cases this builder is used when `@angular/platform-server` is not installed.
     // Example: when using `@nguniversal/common/clover` which does not need `@angular/platform-server`.
-    return (0, helpers_1.isPlatformServerInstalled)(wco.root)
+    return (0, helpers_1.isPackageInstalled)(wco.root, '@angular/platform-server')
         ? {
             module: {
                 rules: [
                     {
                         loader: require.resolve('./platform-server-exports-loader'),
                         include: [path.resolve(wco.root, wco.buildOptions.main)],
+                        options: {
+                            angularSSRInstalled: (0, helpers_1.isPackageInstalled)(wco.root, '@angular/ssr'),
+                        },
                     },
                 ],
             },
