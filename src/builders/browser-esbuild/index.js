@@ -11,7 +11,6 @@ exports.buildEsbuildBrowser = buildEsbuildBrowser;
 exports.convertBrowserOptions = convertBrowserOptions;
 const build_1 = require("@angular/build");
 const architect_1 = require("@angular-devkit/architect");
-const builder_status_warnings_1 = require("./builder-status-warnings");
 /**
  * Main execution function for the esbuild-based application builder.
  * The options are compatible with the Webpack-based builder.
@@ -20,9 +19,19 @@ const builder_status_warnings_1 = require("./builder-status-warnings");
  * @returns An async iterable with the builder result output
  */
 async function* buildEsbuildBrowser(userOptions, context, infrastructureSettings, plugins) {
-    // Inform user of status of builder and options
-    (0, builder_status_warnings_1.logBuilderStatusWarnings)(userOptions, context);
+    // Warn about any unsupported options
+    if (userOptions['vendorChunk']) {
+        context.logger.warn(`The 'vendorChunk' option is not used by this builder and will be ignored.`);
+    }
+    if (userOptions['commonChunk'] === false) {
+        context.logger.warn(`The 'commonChunk' option is always enabled by this builder and will be ignored.`);
+    }
+    if (userOptions['webWorkerTsConfig']) {
+        context.logger.warn(`The 'webWorkerTsConfig' option is not yet supported by this builder.`);
+    }
+    // Convert browser builder options to application builder options
     const normalizedOptions = convertBrowserOptions(userOptions);
+    // Execute the application builder
     yield* (0, build_1.buildApplication)(normalizedOptions, context, { codePlugins: plugins });
 }
 function convertBrowserOptions(options) {
