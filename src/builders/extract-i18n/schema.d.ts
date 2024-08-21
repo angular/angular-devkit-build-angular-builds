@@ -3,13 +3,6 @@
  */
 export interface Schema {
     /**
-     * A browser builder target to extract i18n messages in the format of
-     * `project:target[:configuration]`. You can also pass in more than one configuration name
-     * as a comma-separated list. Example: `project:target:production,staging`.
-     * @deprecated Use 'buildTarget' instead.
-     */
-    browserTarget?: string;
-    /**
      * A builder target to extract i18n messages in the format of
      * `project:target[:configuration]`. You can also pass in more than one configuration name
      * as a comma-separated list. Example: `project:target:production,staging`.

@@ -32,7 +32,7 @@ async function normalizeOptions(context, projectName, options) {
     const projectRoot = node_path_1.default.join(workspaceRoot, projectMetadata.root ?? '');
     const cacheOptions = (0, normalize_cache_1.normalizeCacheOptions)(projectMetadata, workspaceRoot);
     // Target specifier defaults to the current project's build target using a development configuration
-    const buildTargetSpecifier = options.buildTarget ?? options.browserTarget ?? `::development`;
+    const buildTargetSpecifier = options.buildTarget ?? `::development`;
     const buildTarget = (0, architect_1.targetFromTargetString)(buildTargetSpecifier, projectName, 'build');
     // Get the application builder options.
     const browserBuilderName = await context.getBuilderNameForTarget(buildTarget);

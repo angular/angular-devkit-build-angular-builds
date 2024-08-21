@@ -8,18 +8,11 @@ export interface Schema {
      */
     allowedHosts?: string[];
     /**
-     * A browser builder target to serve in the format of `project:target[:configuration]`. You
-     * can also pass in more than one configuration name as a comma-separated list. Example:
-     * `project:target:production,staging`.
-     * @deprecated Use 'buildTarget' instead.
-     */
-    browserTarget?: string;
-    /**
      * A build builder target to serve in the format of `project:target[:configuration]`. You
      * can also pass in more than one configuration name as a comma-separated list. Example:
      * `project:target:production,staging`.
      */
-    buildTarget?: string;
+    buildTarget: string;
     /**
      * Don't verify connected clients are part of allowed hosts. This option has no effect when
      * using the 'application' or other esbuild-based builders.

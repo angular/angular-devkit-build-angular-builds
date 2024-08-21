@@ -31,7 +31,7 @@ async function normalizeOptions(context, projectName, options) {
     const projectMetadata = await context.getProjectMetadata(projectName);
     const projectRoot = node_path_1.default.join(workspaceRoot, projectMetadata.root ?? '');
     // Target specifier defaults to the current project's build target with no specified configuration
-    const buildTargetSpecifier = options.buildTarget ?? options.browserTarget ?? ':';
+    const buildTargetSpecifier = options.buildTarget ?? ':';
     const buildTarget = (0, architect_1.targetFromTargetString)(buildTargetSpecifier, projectName, 'build');
     const i18nOptions = (0, private_1.createI18nOptions)(projectMetadata);
     // Normalize xliff format extensions
