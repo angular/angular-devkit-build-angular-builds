@@ -51,7 +51,7 @@ class BuilderWatchFileSystem {
                 const directoryChanges = new Set();
                 const missingChanges = new Set();
                 for (const event of events) {
-                    this.inputFileSystem.purge?.(event.path);
+                    this.inputFileSystem?.purge?.(event.path);
                     if (event.type === 'deleted') {
                         timeInfo.delete(event.path);
                         removals.add(event.path);
@@ -70,7 +70,7 @@ class BuilderWatchFileSystem {
                     }
                 }
                 const timeInfoMap = new Map(timeInfo);
-                callback(undefined, timeInfoMap, timeInfoMap, new Set([...fileChanges, ...directoryChanges, ...missingChanges]), removals);
+                callback(null, timeInfoMap, timeInfoMap, new Set([...fileChanges, ...directoryChanges, ...missingChanges]), removals);
             });
         });
         return {
