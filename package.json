@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "19.0.0-next.7+sha-b65ef44",
+  "version": "19.0.0-next.7+sha-26962e4",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#b65ef44",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#b65ef44",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#b65ef44",
-    "@angular/build": "github:angular/angular-build-builds#b65ef44",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#26962e4",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#26962e4",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#26962e4",
+    "@angular/build": "github:angular/angular-build-builds#26962e4",
     "@babel/core": "7.25.2",
     "@babel/generator": "7.25.6",
     "@babel/helper-annotate-as-pure": "7.24.7",
@@ -21,7 +21,7 @@
     "@babel/preset-env": "7.25.4",
     "@babel/runtime": "7.25.6",
     "@discoveryjs/json-ext": "0.6.1",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#b65ef44",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#26962e4",
     "@vitejs/plugin-basic-ssl": "1.1.0",
     "ansi-colors": "4.1.3",
     "autoprefixer": "10.4.20",
@@ -30,7 +30,7 @@
     "copy-webpack-plugin": "12.0.2",
     "critters": "0.0.24",
     "css-loader": "7.1.2",
-    "esbuild-wasm": "0.23.1",
+    "esbuild-wasm": "0.24.0",
     "fast-glob": "3.3.2",
     "http-proxy-middleware": "3.0.2",
     "https-proxy-agent": "7.0.5",
@@ -70,14 +70,14 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.23.1"
+    "esbuild": "0.24.0"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^19.0.0-next.0",
     "@angular/localize": "^19.0.0-next.0",
     "@angular/platform-server": "^19.0.0-next.0",
     "@angular/service-worker": "^19.0.0-next.0",
-    "@angular/ssr": "github:angular/angular-ssr-builds#b65ef44",
+    "@angular/ssr": "github:angular/angular-ssr-builds#26962e4",
     "@web/test-runner": "^0.19.0",
     "browser-sync": "^3.0.2",
     "jest": "^29.5.0",
@@ -98,7 +98,7 @@
     "@angular/service-worker": {
       "optional": true
     },
-    "@angular/ssr": "github:angular/angular-ssr-builds#b65ef44",
+    "@angular/ssr": "github:angular/angular-ssr-builds#26962e4",
     "@web/test-runner": {
       "optional": true
     },
