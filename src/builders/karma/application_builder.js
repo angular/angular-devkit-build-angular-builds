@@ -38,7 +38,6 @@ const crypto_1 = require("crypto");
 const fs = __importStar(require("fs/promises"));
 const path = __importStar(require("path"));
 const rxjs_1 = require("rxjs");
-const read_tsconfig_1 = require("../../utils/read-tsconfig");
 const schema_1 = require("../browser-esbuild/schema");
 const find_tests_1 = require("./find-tests");
 class ApplicationBuildError extends Error {
@@ -88,13 +87,6 @@ async function collectEntrypoints(options, context) {
     const [polyfills, hasZoneTesting] = extractZoneTesting(options.polyfills);
     if (hasZoneTesting) {
         entryPoints.add('zone.js/testing');
-    }
-    const tsConfigPath = path.resolve(context.workspaceRoot, options.tsConfig);
-    const tsConfig = await (0, read_tsconfig_1.readTsconfig)(tsConfigPath);
-    const localizePackageInitEntryPoint = '@angular/localize/init';
-    const hasLocalizeType = tsConfig.options.types?.some((t) => t === '@angular/localize' || t === localizePackageInitEntryPoint);
-    if (hasLocalizeType) {
-        polyfills.push(localizePackageInitEntryPoint);
     }
     return [entryPoints, polyfills];
 }
