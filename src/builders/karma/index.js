@@ -37,127 +37,56 @@ const core_1 = require("@angular-devkit/core");
 const module_1 = require("module");
 const path = __importStar(require("path"));
 const rxjs_1 = require("rxjs");
-const configs_1 = require("../../tools/webpack/configs");
-const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
-const schema_1 = require("../browser/schema");
-const find_tests_plugin_1 = require("./find-tests-plugin");
-async function initialize(options, context, webpackConfigurationTransformer) {
-    // Purge old build disk cache.
-    await (0, private_1.purgeStaleBuildCache)(context);
-    const { config } = await (0, webpack_browser_config_1.generateBrowserWebpackConfigFromContext)(
-    // only two properties are missing:
-    // * `outputPath` which is fixed for tests
-    // * `budgets` which might be incorrect due to extra dev libs
-    {
-        ...options,
-        outputPath: '',
-        budgets: undefined,
-        optimization: false,
-        buildOptimizer: false,
-        aot: false,
-        vendorChunk: true,
-        namedChunks: true,
-        extractLicenses: false,
-        outputHashing: schema_1.OutputHashing.None,
-        // The webpack tier owns the watch behavior so we want to force it in the config.
-        // When not in watch mode, webpack-dev-middleware will call `compiler.watch` anyway.
-        // https://github.com/webpack/webpack-dev-middleware/blob/698c9ae5e9bb9a013985add6189ff21c1a1ec185/src/index.js#L65
-        // https://github.com/webpack/webpack/blob/cde1b73e12eb8a77eb9ba42e7920c9ec5d29c2c9/lib/Compiler.js#L379-L388
-        watch: true,
-    }, context, (wco) => [(0, configs_1.getCommonConfig)(wco), (0, configs_1.getStylesConfig)(wco)]);
-    const karma = await Promise.resolve().then(() => __importStar(require('karma')));
-    return [karma, (await webpackConfigurationTransformer?.(config)) ?? config];
-}
+const schema_1 = require("./schema");
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
 function execute(options, context, transforms = {}) {
     // Check Angular version.
     (0, private_1.assertCompatibleAngularVersion)(context.workspaceRoot);
+    return (0, rxjs_1.from)(getExecuteWithBuilder(options, context)).pipe((0, rxjs_1.mergeMap)(([useEsbuild, executeWithBuilder]) => {
+        const karmaOptions = getBaseKarmaOptions(options, context, useEsbuild);
+        return executeWithBuilder.execute(options, context, karmaOptions, transforms);
+    }));
+}
+function getBaseKarmaOptions(options, context, useEsbuild) {
     let singleRun;
     if (options.watch !== undefined) {
         singleRun = !options.watch;
     }
-    return (0, rxjs_1.from)(initialize(options, context, transforms.webpackConfiguration)).pipe((0, rxjs_1.switchMap)(async ([karma, webpackConfig]) => {
-        // Determine project name from builder context target
-        const projectName = context.target?.project;
-        if (!projectName) {
-            throw new Error(`The 'karma' builder requires a target to be specified.`);
+    // Determine project name from builder context target
+    const projectName = context.target?.project;
+    if (!projectName) {
+        throw new Error(`The 'karma' builder requires a target to be specified.`);
+    }
+    const karmaOptions = options.karmaConfig
+        ? {}
+        : getBuiltInKarmaConfig(context.workspaceRoot, projectName, useEsbuild);
+    karmaOptions.singleRun = singleRun;
+    // Workaround https://github.com/angular/angular-cli/issues/28271, by clearing context by default
+    // for single run executions. Not clearing context for multi-run (watched) builds allows the
+    // Jasmine Spec Runner to be visible in the browser after test execution.
+    karmaOptions.client ??= {};
+    karmaOptions.client.clearContext ??= singleRun ?? false; // `singleRun` defaults to `false` per Karma docs.
+    // Convert browsers from a string to an array
+    if (typeof options.browsers === 'string' && options.browsers) {
+        karmaOptions.browsers = options.browsers.split(',');
+    }
+    else if (options.browsers === false) {
+        karmaOptions.browsers = [];
+    }
+    if (options.reporters) {
+        // Split along commas to make it more natural, and remove empty strings.
+        const reporters = options.reporters
+            .reduce((acc, curr) => acc.concat(curr.split(',')), [])
+            .filter((x) => !!x);
+        if (reporters.length > 0) {
+            karmaOptions.reporters = reporters;
         }
-        const karmaOptions = options.karmaConfig
-            ? {}
-            : getBuiltInKarmaConfig(context.workspaceRoot, projectName);
-        karmaOptions.singleRun = singleRun;
-        // Workaround https://github.com/angular/angular-cli/issues/28271, by clearing context by default
-        // for single run executions. Not clearing context for multi-run (watched) builds allows the
-        // Jasmine Spec Runner to be visible in the browser after test execution.
-        karmaOptions.client ??= {};
-        karmaOptions.client.clearContext ??= singleRun ?? false; // `singleRun` defaults to `false` per Karma docs.
-        // Convert browsers from a string to an array
-        if (typeof options.browsers === 'string' && options.browsers) {
-            karmaOptions.browsers = options.browsers.split(',');
-        }
-        else if (options.browsers === false) {
-            karmaOptions.browsers = [];
-        }
-        if (options.reporters) {
-            // Split along commas to make it more natural, and remove empty strings.
-            const reporters = options.reporters
-                .reduce((acc, curr) => acc.concat(curr.split(',')), [])
-                .filter((x) => !!x);
-            if (reporters.length > 0) {
-                karmaOptions.reporters = reporters;
-            }
-        }
-        if (!options.main) {
-            webpackConfig.entry ??= {};
-            if (typeof webpackConfig.entry === 'object' && !Array.isArray(webpackConfig.entry)) {
-                if (Array.isArray(webpackConfig.entry['main'])) {
-                    webpackConfig.entry['main'].push(getBuiltInMainFile());
-                }
-                else {
-                    webpackConfig.entry['main'] = [getBuiltInMainFile()];
-                }
-            }
-        }
-        const projectMetadata = await context.getProjectMetadata(projectName);
-        const sourceRoot = (projectMetadata.sourceRoot ?? projectMetadata.root ?? '');
-        webpackConfig.plugins ??= [];
-        webpackConfig.plugins.push(new find_tests_plugin_1.FindTestsPlugin({
-            include: options.include,
-            exclude: options.exclude,
-            workspaceRoot: context.workspaceRoot,
-            projectSourceRoot: path.join(context.workspaceRoot, sourceRoot),
-        }));
-        karmaOptions.buildWebpack = {
-            options,
-            webpackConfig,
-            logger: context.logger,
-        };
-        const parsedKarmaConfig = await karma.config.parseConfig(options.karmaConfig && path.resolve(context.workspaceRoot, options.karmaConfig), transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, { promiseConfig: true, throwErrors: true });
-        return [karma, parsedKarmaConfig];
-    }), (0, rxjs_1.switchMap)(([karma, karmaConfig]) => new rxjs_1.Observable((subscriber) => {
-        // Pass onto Karma to emit BuildEvents.
-        karmaConfig.buildWebpack ??= {};
-        if (typeof karmaConfig.buildWebpack === 'object') {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            karmaConfig.buildWebpack.failureCb ??= () => subscriber.next({ success: false });
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            karmaConfig.buildWebpack.successCb ??= () => subscriber.next({ success: true });
-        }
-        // Complete the observable once the Karma server returns.
-        const karmaServer = new karma.Server(karmaConfig, (exitCode) => {
-            subscriber.next({ success: exitCode === 0 });
-            subscriber.complete();
-        });
-        const karmaStart = karmaServer.start();
-        // Cleanup, signal Karma to exit.
-        return () => {
-            void karmaStart.then(() => karmaServer.stop());
-        };
-    })), (0, rxjs_1.defaultIfEmpty)({ success: false }));
+    }
+    return karmaOptions;
 }
-function getBuiltInKarmaConfig(workspaceRoot, projectName) {
+function getBuiltInKarmaConfig(workspaceRoot, projectName, useEsbuild) {
     let coverageFolderName = projectName.charAt(0) === '@' ? projectName.slice(1) : projectName;
     if (/[A-Z]/.test(coverageFolderName)) {
         coverageFolderName = core_1.strings.dasherize(coverageFolderName);
@@ -166,13 +95,13 @@ function getBuiltInKarmaConfig(workspaceRoot, projectName) {
     // Any changes to the config here need to be synced to: packages/schematics/angular/config/files/karma.conf.js.template
     return {
         basePath: '',
-        frameworks: ['jasmine', '@angular-devkit/build-angular'],
+        frameworks: ['jasmine', ...(useEsbuild ? [] : ['@angular-devkit/build-angular'])],
         plugins: [
             'karma-jasmine',
             'karma-chrome-launcher',
             'karma-jasmine-html-reporter',
             'karma-coverage',
-            '@angular-devkit/build-angular/plugins/karma',
+            ...(useEsbuild ? [] : ['@angular-devkit/build-angular/plugins/karma']),
         ].map((p) => workspaceRootRequire(p)),
         jasmineHtmlReporter: {
             suppressAll: true, // removes the duplicated traces
@@ -200,19 +129,36 @@ function getBuiltInKarmaConfig(workspaceRoot, projectName) {
     };
 }
 exports.default = (0, architect_1.createBuilder)(execute);
-function getBuiltInMainFile() {
-    const content = Buffer.from(`
-  import { getTestBed } from '@angular/core/testing';
-  import {
-    BrowserDynamicTestingModule,
-    platformBrowserDynamicTesting,
-   } from '@angular/platform-browser-dynamic/testing';
-
-  // Initialize the Angular testing environment.
-  getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
-    errorOnUnknownElements: true,
-    errorOnUnknownProperties: true
-  });
-`).toString('base64');
-    return `ng-virtual-main.js!=!data:text/javascript;base64,${content}`;
+async function getExecuteWithBuilder(options, context) {
+    const useEsbuild = await checkForEsbuild(options, context);
+    const executeWithBuilderModule = useEsbuild
+        ? Promise.resolve().then(() => __importStar(require('./application_builder'))) : Promise.resolve().then(() => __importStar(require('./browser_builder')));
+    return [useEsbuild, await executeWithBuilderModule];
+}
+async function checkForEsbuild(options, context) {
+    if (options.builderMode !== schema_1.BuilderMode.Detect) {
+        return options.builderMode === schema_1.BuilderMode.Application;
+    }
+    // Look up the current project's build target using a development configuration.
+    const buildTargetSpecifier = `::development`;
+    const buildTarget = (0, architect_1.targetFromTargetString)(buildTargetSpecifier, context.target?.project, 'build');
+    try {
+        const developmentBuilderName = await context.getBuilderNameForTarget(buildTarget);
+        return isEsbuildBased(developmentBuilderName);
+    }
+    catch (e) {
+        if (!(e instanceof Error) || e.message !== 'Project target does not exist.') {
+            throw e;
+        }
+        // If we can't find a development builder, we can't use 'detect'.
+        throw new Error('Failed to detect the builder used by the application. Please set builderMode explicitly.');
+    }
+}
+function isEsbuildBased(builderName) {
+    if (builderName === '@angular/build:application' ||
+        builderName === '@angular-devkit/build-angular:application' ||
+        builderName === '@angular-devkit/build-angular:browser-esbuild') {
+        return true;
+    }
+    return false;
 }

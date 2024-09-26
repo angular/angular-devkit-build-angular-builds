@@ -11,6 +11,11 @@ export interface Schema {
      */
     browsers?: Browsers;
     /**
+     * Determines how to build the code under test. If set to 'detect', attempts to follow the
+     * development builder.
+     */
+    builderMode?: BuilderMode;
+    /**
      * Output a code coverage report.
      */
     codeCoverage?: boolean;
@@ -121,6 +126,15 @@ export interface AssetPatternClass {
  * Override which browsers tests are run against. Set to `false` to not use any browser.
  */
 export type Browsers = boolean | string;
+/**
+ * Determines how to build the code under test. If set to 'detect', attempts to follow the
+ * development builder.
+ */
+export declare enum BuilderMode {
+    Application = "application",
+    Browser = "browser",
+    Detect = "detect"
+}
 export interface FileReplacement {
     replace?: string;
     replaceWith?: string;
