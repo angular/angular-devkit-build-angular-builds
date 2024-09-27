@@ -29,12 +29,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = execute;
 exports.writeTestFiles = writeTestFiles;
 const build_1 = require("@angular/build");
 const private_1 = require("@angular/build/private");
 const crypto_1 = require("crypto");
+const fast_glob_1 = __importDefault(require("fast-glob"));
 const fs = __importStar(require("fs/promises"));
 const path = __importStar(require("path"));
 const rxjs_1 = require("rxjs");
@@ -75,8 +79,7 @@ async function getProjectSourceRoot(context) {
     const sourceRoot = (projectMetadata.sourceRoot ?? projectMetadata.root ?? '');
     return path.join(context.workspaceRoot, sourceRoot);
 }
-async function collectEntrypoints(options, context) {
-    const projectSourceRoot = await getProjectSourceRoot(context);
+async function collectEntrypoints(options, context, projectSourceRoot) {
     // Glob for files to test.
     const testFiles = await (0, find_tests_1.findTests)(options.include ?? [], options.exclude ?? [], context.workspaceRoot, projectSourceRoot);
     const entryPoints = new Set([
@@ -95,12 +98,16 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         context.logger.warn(`This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`);
     }
     const testDir = path.join(context.workspaceRoot, 'dist/test-out', (0, crypto_1.randomUUID)());
+    const projectSourceRoot = await getProjectSourceRoot(context);
     const [karma, [entryPoints, polyfills]] = await Promise.all([
         Promise.resolve().then(() => __importStar(require('karma'))),
-        collectEntrypoints(options, context),
+        collectEntrypoints(options, context, projectSourceRoot),
         fs.rm(testDir, { recursive: true, force: true }),
     ]);
     const outputPath = testDir;
+    const instrumentForCoverage = options.codeCoverage
+        ? createInstrumentationFilter(projectSourceRoot, getInstrumentationExcludedPaths(context.workspaceRoot, options.codeCoverageExclude ?? []))
+        : undefined;
     // Build tests with `application` builder, using test files as entry points.
     const buildOutput = await first((0, private_1.buildApplicationInternal)({
         entryPoints,
@@ -115,6 +122,7 @@ async function initializeApplication(options, context, karmaOptions, transforms 
             styles: true,
             vendor: true,
         },
+        instrumentForCoverage,
         styles: options.styles,
         polyfills,
         webWorkerTsConfig: options.webWorkerTsConfig,
@@ -206,4 +214,19 @@ async function first(generator) {
         return value;
     }
     throw new Error('Expected generator to emit at least once.');
+}
+function createInstrumentationFilter(includedBasePath, excludedPaths) {
+    return (request) => {
+        return (!excludedPaths.has(request) &&
+            !/\.(e2e|spec)\.tsx?$|[\\/]node_modules[\\/]/.test(request) &&
+            request.startsWith(includedBasePath));
+    };
+}
+function getInstrumentationExcludedPaths(root, excludedPaths) {
+    const excluded = new Set();
+    for (const excludeGlob of excludedPaths) {
+        const excludePath = excludeGlob[0] === '/' ? excludeGlob.slice(1) : excludeGlob;
+        fast_glob_1.default.sync(excludePath, { cwd: root }).forEach((p) => excluded.add(path.join(root, p)));
+    }
+    return excluded;
 }
