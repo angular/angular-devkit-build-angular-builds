@@ -50,8 +50,56 @@ class ApplicationBuildError extends Error {
         this.name = 'ApplicationBuildError';
     }
 }
+function injectKarmaReporter(context, buildOptions, karmaConfig, subscriber) {
+    const reporterName = 'angular-progress-notifier';
+    class ProgressNotifierReporter {
+        emitter;
+        static $inject = ['emitter'];
+        constructor(emitter) {
+            this.emitter = emitter;
+            this.startWatchingBuild();
+        }
+        startWatchingBuild() {
+            void (async () => {
+                for await (const buildOutput of (0, private_1.buildApplicationInternal)({
+                    ...buildOptions,
+                    watch: true,
+                }, context)) {
+                    if (buildOutput.kind === private_1.ResultKind.Failure) {
+                        subscriber.next({ success: false, message: 'Build failed' });
+                    }
+                    else if (buildOutput.kind === private_1.ResultKind.Incremental ||
+                        buildOutput.kind === private_1.ResultKind.Full) {
+                        await writeTestFiles(buildOutput.files, buildOptions.outputPath);
+                        this.emitter.refreshFiles();
+                    }
+                }
+            })();
+        }
+        onRunComplete = function (_browsers, results) {
+            if (results.exitCode === 0) {
+                subscriber.next({ success: true });
+            }
+            else {
+                subscriber.next({ success: false });
+            }
+        };
+    }
+    karmaConfig.reporters ??= [];
+    karmaConfig.reporters.push(reporterName);
+    karmaConfig.plugins ??= [];
+    karmaConfig.plugins.push({
+        [`reporter:${reporterName}`]: [
+            'factory',
+            Object.assign((...args) => new ProgressNotifierReporter(...args), ProgressNotifierReporter),
+        ],
+    });
+}
 function execute(options, context, karmaOptions, transforms = {}) {
-    return (0, rxjs_1.from)(initializeApplication(options, context, karmaOptions, transforms)).pipe((0, rxjs_1.switchMap)(([karma, karmaConfig]) => new rxjs_1.Observable((subscriber) => {
+    return (0, rxjs_1.from)(initializeApplication(options, context, karmaOptions, transforms)).pipe((0, rxjs_1.switchMap)(([karma, karmaConfig, buildOptions]) => new rxjs_1.Observable((subscriber) => {
+        if (options.watch) {
+            injectKarmaReporter(context, buildOptions, karmaConfig, subscriber);
+        }
         // Complete the observable once the Karma server returns.
         const karmaServer = new karma.Server(karmaConfig, (exitCode) => {
             subscriber.next({ success: exitCode === 0 });
@@ -98,19 +146,17 @@ async function initializeApplication(options, context, karmaOptions, transforms 
     if (transforms.webpackConfiguration) {
         context.logger.warn(`This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`);
     }
-    const testDir = path.join(context.workspaceRoot, 'dist/test-out', (0, crypto_1.randomUUID)());
+    const outputPath = path.join(context.workspaceRoot, 'dist/test-out', (0, crypto_1.randomUUID)());
     const projectSourceRoot = await getProjectSourceRoot(context);
     const [karma, entryPoints] = await Promise.all([
         Promise.resolve().then(() => __importStar(require('karma'))),
         collectEntrypoints(options, context, projectSourceRoot),
-        fs.rm(testDir, { recursive: true, force: true }),
+        fs.rm(outputPath, { recursive: true, force: true }),
     ]);
-    const outputPath = testDir;
     const instrumentForCoverage = options.codeCoverage
         ? createInstrumentationFilter(projectSourceRoot, getInstrumentationExcludedPaths(context.workspaceRoot, options.codeCoverageExclude ?? []))
         : undefined;
-    // Build tests with `application` builder, using test files as entry points.
-    const buildOutput = await first((0, private_1.buildApplicationInternal)({
+    const buildOptions = {
         entryPoints,
         tsConfig: options.tsConfig,
         outputPath,
@@ -127,7 +173,9 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         styles: options.styles,
         polyfills: normalizePolyfills(options.polyfills),
         webWorkerTsConfig: options.webWorkerTsConfig,
-    }, context));
+    };
+    // Build tests with `application` builder, using test files as entry points.
+    const buildOutput = await first((0, private_1.buildApplicationInternal)(buildOptions, context));
     if (buildOutput.kind === private_1.ResultKind.Failure) {
         throw new ApplicationBuildError('Build failed');
     }
@@ -135,19 +183,19 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         throw new ApplicationBuildError('A full build result is required from the application builder.');
     }
     // Write test files
-    await writeTestFiles(buildOutput.files, testDir);
+    await writeTestFiles(buildOutput.files, buildOptions.outputPath);
     karmaOptions.files ??= [];
     karmaOptions.files.push(
     // Serve polyfills first.
-    { pattern: `${testDir}/polyfills.js`, type: 'module' }, 
+    { pattern: `${outputPath}/polyfills.js`, type: 'module' }, 
     // Allow loading of chunk-* files but don't include them all on load.
-    { pattern: `${testDir}/{chunk,worker}-*.js`, type: 'module', included: false });
+    { pattern: `${outputPath}/{chunk,worker}-*.js`, type: 'module', included: false });
     karmaOptions.files.push(
     // Serve remaining JS on page load, these are the test entrypoints.
-    { pattern: `${testDir}/*.js`, type: 'module' });
+    { pattern: `${outputPath}/*.js`, type: 'module' });
     if (options.styles?.length) {
         // Serve CSS outputs on page load, these are the global styles.
-        karmaOptions.files.push({ pattern: `${testDir}/*.css`, type: 'css' });
+        karmaOptions.files.push({ pattern: `${outputPath}/*.css`, type: 'css' });
     }
     const parsedKarmaConfig = await karma.config.parseConfig(options.karmaConfig && path.resolve(context.workspaceRoot, options.karmaConfig), transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, { promiseConfig: true, throwErrors: true });
     // Remove the webpack plugin/framework:
@@ -171,7 +219,7 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         !parsedKarmaConfig.reporters?.some((r) => r === 'coverage' || r === 'coverage-istanbul')) {
         parsedKarmaConfig.reporters = (parsedKarmaConfig.reporters ?? []).concat(['coverage']);
     }
-    return [karma, parsedKarmaConfig];
+    return [karma, parsedKarmaConfig, buildOptions];
 }
 async function writeTestFiles(files, testDir) {
     const directoryExists = new Set();
