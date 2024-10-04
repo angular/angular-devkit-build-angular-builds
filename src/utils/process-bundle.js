@@ -273,11 +273,6 @@ function unwrapTemplateLiteral(path, utils) {
     const [expressions] = utils.unwrapExpressionsFromTemplateLiteral(path.get('quasi'));
     return [messageParts, expressions];
 }
-function unwrapLocalizeCall(path, utils) {
-    const [messageParts] = utils.unwrapMessagePartsFromLocalizeCall(path);
-    const [expressions] = utils.unwrapSubstitutionsFromLocalizeCall(path);
-    return [messageParts, expressions];
-}
 async function loadLocaleData(path, optimize) {
     // The path is validated during option processing before the build starts
     const content = await fs.readFile(path, 'utf8');
