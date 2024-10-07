@@ -136,11 +136,7 @@ function normalizePolyfills(polyfills) {
 async function collectEntrypoints(options, context, projectSourceRoot) {
     // Glob for files to test.
     const testFiles = await (0, find_tests_1.findTests)(options.include ?? [], options.exclude ?? [], context.workspaceRoot, projectSourceRoot);
-    const entryPoints = new Set([
-        ...testFiles,
-        '@angular-devkit/build-angular/src/builders/karma/init_test_bed.js',
-    ]);
-    return entryPoints;
+    return new Set(testFiles);
 }
 async function initializeApplication(options, context, karmaOptions, transforms = {}) {
     if (transforms.webpackConfiguration) {
@@ -153,6 +149,14 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         collectEntrypoints(options, context, projectSourceRoot),
         fs.rm(outputPath, { recursive: true, force: true }),
     ]);
+    let mainName = 'init_test_bed';
+    if (options.main) {
+        entryPoints.add(options.main);
+        mainName = path.basename(options.main, path.extname(options.main));
+    }
+    else {
+        entryPoints.add('@angular-devkit/build-angular/src/builders/karma/init_test_bed.js');
+    }
     const instrumentForCoverage = options.codeCoverage
         ? createInstrumentationFilter(projectSourceRoot, getInstrumentationExcludedPaths(context.workspaceRoot, options.codeCoverageExclude ?? []))
         : undefined;
@@ -188,8 +192,15 @@ async function initializeApplication(options, context, karmaOptions, transforms 
     karmaOptions.files.push(
     // Serve polyfills first.
     { pattern: `${outputPath}/polyfills.js`, type: 'module' }, 
-    // Allow loading of chunk-* files but don't include them all on load.
-    { pattern: `${outputPath}/{chunk,worker}-*.js`, type: 'module', included: false });
+    // Serve global setup script.
+    { pattern: `${outputPath}/${mainName}.js`, type: 'module' }, 
+    // Serve all source maps.
+    { pattern: `${outputPath}/*.map`, included: false });
+    if (hasChunkOrWorkerFiles(buildOutput.files)) {
+        karmaOptions.files.push(
+        // Allow loading of chunk-* files but don't include them all on load.
+        { pattern: `${outputPath}/{chunk,worker}-*.js`, type: 'module', included: false });
+    }
     karmaOptions.files.push(
     // Serve remaining JS on page load, these are the test entrypoints.
     { pattern: `${outputPath}/*.js`, type: 'module' });
@@ -220,6 +231,11 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         parsedKarmaConfig.reporters = (parsedKarmaConfig.reporters ?? []).concat(['coverage']);
     }
     return [karma, parsedKarmaConfig, buildOptions];
+}
+function hasChunkOrWorkerFiles(files) {
+    return Object.keys(files).some((filename) => {
+        return /(?:^|\/)(?:worker|chunk)[^/]+\.js$/.test(filename);
+    });
 }
 async function writeTestFiles(files, testDir) {
     const directoryExists = new Set();
