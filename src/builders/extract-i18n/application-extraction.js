@@ -31,6 +31,7 @@ async function extractMessages(options, builderName, context, extractorConstruct
     buildOptions.budgets = undefined;
     buildOptions.index = false;
     buildOptions.serviceWorker = false;
+    buildOptions.server = undefined;
     buildOptions.ssr = false;
     buildOptions.appShell = false;
     buildOptions.prerender = false;
