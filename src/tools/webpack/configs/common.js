@@ -231,7 +231,10 @@ async function getCommonConfig(wco) {
     const extraMinimizers = [];
     if (scriptsOptimization) {
         extraMinimizers.push(new plugins_1.JavaScriptOptimizerPlugin({
-            define: buildOptions.aot ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT : GLOBAL_DEFS_FOR_TERSER,
+            define: {
+                ...(buildOptions.aot ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT : GLOBAL_DEFS_FOR_TERSER),
+                'ngServerMode': isPlatformServer,
+            },
             sourcemap: scriptsSourceMap,
             supportedBrowsers: buildOptions.supportedBrowsers,
             keepIdentifierNames: !environment_options_1.allowMangle || isPlatformServer,
