@@ -97,7 +97,9 @@ function injectKarmaReporter(context, buildOptions, karmaConfig, subscriber) {
 }
 function execute(options, context, karmaOptions, transforms = {}) {
     return (0, rxjs_1.from)(initializeApplication(options, context, karmaOptions, transforms)).pipe((0, rxjs_1.switchMap)(([karma, karmaConfig, buildOptions]) => new rxjs_1.Observable((subscriber) => {
-        if (options.watch) {
+        // If `--watch` is explicitly enabled or if we are keeping the Karma
+        // process running, we should hook Karma into the build.
+        if (options.watch ?? !karmaConfig.singleRun) {
             injectKarmaReporter(context, buildOptions, karmaConfig, subscriber);
         }
         // Complete the observable once the Karma server returns.
