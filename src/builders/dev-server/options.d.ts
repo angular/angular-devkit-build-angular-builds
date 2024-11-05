@@ -26,7 +26,7 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     open: boolean | undefined;
     verbose: boolean | undefined;
     watch: boolean | undefined;
-    liveReload: boolean | undefined;
+    liveReload: boolean;
     hmr: boolean | undefined;
     headers: {
         [key: string]: string;

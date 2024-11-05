@@ -85,7 +85,7 @@ async function normalizeOptions(context, projectName, options) {
         open,
         verbose,
         watch,
-        liveReload,
+        liveReload: !!liveReload,
         hmr,
         headers,
         workspaceRoot,
