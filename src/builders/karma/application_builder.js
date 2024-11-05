@@ -50,7 +50,7 @@ class ApplicationBuildError extends Error {
         this.name = 'ApplicationBuildError';
     }
 }
-function injectKarmaReporter(context, buildOptions, karmaConfig, subscriber) {
+function injectKarmaReporter(context, buildOptions, buildIterator, karmaConfig, subscriber) {
     const reporterName = 'angular-progress-notifier';
     class ProgressNotifierReporter {
         emitter;
@@ -61,10 +61,14 @@ function injectKarmaReporter(context, buildOptions, karmaConfig, subscriber) {
         }
         startWatchingBuild() {
             void (async () => {
-                for await (const buildOutput of (0, private_1.buildApplicationInternal)({
-                    ...buildOptions,
-                    watch: true,
-                }, context)) {
+                // This is effectively "for await of but skip what's already consumed".
+                let isDone = false; // to mark the loop condition as "not constant".
+                while (!isDone) {
+                    const { done, value: buildOutput } = await buildIterator.next();
+                    if (done) {
+                        isDone = true;
+                        break;
+                    }
                     if (buildOutput.kind === private_1.ResultKind.Failure) {
                         subscriber.next({ success: false, message: 'Build failed' });
                     }
@@ -96,11 +100,11 @@ function injectKarmaReporter(context, buildOptions, karmaConfig, subscriber) {
     });
 }
 function execute(options, context, karmaOptions, transforms = {}) {
-    return (0, rxjs_1.from)(initializeApplication(options, context, karmaOptions, transforms)).pipe((0, rxjs_1.switchMap)(([karma, karmaConfig, buildOptions]) => new rxjs_1.Observable((subscriber) => {
+    return (0, rxjs_1.from)(initializeApplication(options, context, karmaOptions, transforms)).pipe((0, rxjs_1.switchMap)(([karma, karmaConfig, buildOptions, buildIterator]) => new rxjs_1.Observable((subscriber) => {
         // If `--watch` is explicitly enabled or if we are keeping the Karma
         // process running, we should hook Karma into the build.
-        if (options.watch ?? !karmaConfig.singleRun) {
-            injectKarmaReporter(context, buildOptions, karmaConfig, subscriber);
+        if (buildIterator) {
+            injectKarmaReporter(context, buildOptions, buildIterator, karmaConfig, subscriber);
         }
         // Complete the observable once the Karma server returns.
         const karmaServer = new karma.Server(karmaConfig, (exitCode) => {
@@ -179,9 +183,10 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         styles: options.styles,
         polyfills: normalizePolyfills(options.polyfills),
         webWorkerTsConfig: options.webWorkerTsConfig,
+        watch: options.watch ?? !karmaOptions.singleRun,
     };
     // Build tests with `application` builder, using test files as entry points.
-    const buildOutput = await first((0, private_1.buildApplicationInternal)(buildOptions, context));
+    const [buildOutput, buildIterator] = await first((0, private_1.buildApplicationInternal)(buildOptions, context), { cancel: !buildOptions.watch });
     if (buildOutput.kind === private_1.ResultKind.Failure) {
         throw new ApplicationBuildError('Build failed');
     }
@@ -193,22 +198,27 @@ async function initializeApplication(options, context, karmaOptions, transforms 
     karmaOptions.files ??= [];
     karmaOptions.files.push(
     // Serve polyfills first.
-    { pattern: `${outputPath}/polyfills.js`, type: 'module' }, 
+    { pattern: `${outputPath}/polyfills.js`, type: 'module', watched: false }, 
     // Serve global setup script.
-    { pattern: `${outputPath}/${mainName}.js`, type: 'module' }, 
+    { pattern: `${outputPath}/${mainName}.js`, type: 'module', watched: false }, 
     // Serve all source maps.
-    { pattern: `${outputPath}/*.map`, included: false });
+    { pattern: `${outputPath}/*.map`, included: false, watched: false });
     if (hasChunkOrWorkerFiles(buildOutput.files)) {
         karmaOptions.files.push(
         // Allow loading of chunk-* files but don't include them all on load.
-        { pattern: `${outputPath}/{chunk,worker}-*.js`, type: 'module', included: false });
+        {
+            pattern: `${outputPath}/{chunk,worker}-*.js`,
+            type: 'module',
+            included: false,
+            watched: false,
+        });
     }
     karmaOptions.files.push(
     // Serve remaining JS on page load, these are the test entrypoints.
-    { pattern: `${outputPath}/*.js`, type: 'module' });
+    { pattern: `${outputPath}/*.js`, type: 'module', watched: false });
     if (options.styles?.length) {
         // Serve CSS outputs on page load, these are the global styles.
-        karmaOptions.files.push({ pattern: `${outputPath}/*.css`, type: 'css' });
+        karmaOptions.files.push({ pattern: `${outputPath}/*.css`, type: 'css', watched: false });
     }
     const parsedKarmaConfig = await karma.config.parseConfig(options.karmaConfig && path.resolve(context.workspaceRoot, options.karmaConfig), transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, { promiseConfig: true, throwErrors: true });
     // Remove the webpack plugin/framework:
@@ -232,7 +242,7 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         !parsedKarmaConfig.reporters?.some((r) => r === 'coverage' || r === 'coverage-istanbul')) {
         parsedKarmaConfig.reporters = (parsedKarmaConfig.reporters ?? []).concat(['coverage']);
     }
-    return [karma, parsedKarmaConfig, buildOptions];
+    return [karma, parsedKarmaConfig, buildOptions, buildIterator];
 }
 function hasChunkOrWorkerFiles(files) {
     return Object.keys(files).some((filename) => {
@@ -264,9 +274,17 @@ async function writeTestFiles(files, testDir) {
     });
 }
 /** Returns the first item yielded by the given generator and cancels the execution. */
-async function first(generator) {
+async function first(generator, { cancel }) {
+    if (!cancel) {
+        const iterator = generator[Symbol.asyncIterator]();
+        const firstValue = await iterator.next();
+        if (firstValue.done) {
+            throw new Error('Expected generator to emit at least once.');
+        }
+        return [firstValue.value, iterator];
+    }
     for await (const value of generator) {
-        return value;
+        return [value, null];
     }
     throw new Error('Expected generator to emit at least once.');
 }
