@@ -196,7 +196,21 @@ function normalizePolyfills(polyfills) {
 async function collectEntrypoints(options, context, projectSourceRoot) {
     // Glob for files to test.
     const testFiles = await (0, find_tests_1.findTests)(options.include ?? [], options.exclude ?? [], context.workspaceRoot, projectSourceRoot);
-    return new Set(testFiles);
+    const seen = new Set();
+    return new Map(Array.from(testFiles, (testFile) => {
+        const relativePath = path
+            .relative(testFile.startsWith(projectSourceRoot) ? projectSourceRoot : context.workspaceRoot, testFile)
+            .replace(/^[./]+/, '_')
+            .replace(/\//g, '-');
+        let uniqueName = `spec-${path.basename(relativePath, path.extname(relativePath))}`;
+        let suffix = 2;
+        while (seen.has(uniqueName)) {
+            uniqueName = `${relativePath}-${suffix}`;
+            ++suffix;
+        }
+        seen.add(uniqueName);
+        return [uniqueName, testFile];
+    }));
 }
 async function initializeApplication(options, context, karmaOptions, transforms = {}) {
     if (transforms.webpackConfiguration) {
@@ -209,13 +223,12 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         collectEntrypoints(options, context, projectSourceRoot),
         fs.rm(outputPath, { recursive: true, force: true }),
     ]);
-    let mainName = 'init_test_bed';
+    const mainName = 'test_main';
     if (options.main) {
-        entryPoints.add(options.main);
-        mainName = path.basename(options.main, path.extname(options.main));
+        entryPoints.set(mainName, options.main);
     }
     else {
-        entryPoints.add('@angular-devkit/build-angular/src/builders/karma/init_test_bed.js');
+        entryPoints.set(mainName, '@angular-devkit/build-angular/src/builders/karma/init_test_bed.js');
     }
     const instrumentForCoverage = options.codeCoverage
         ? createInstrumentationFilter(projectSourceRoot, getInstrumentationExcludedPaths(context.workspaceRoot, options.codeCoverageExclude ?? []))
@@ -257,7 +270,9 @@ async function initializeApplication(options, context, karmaOptions, transforms 
     // Serve global setup script.
     { pattern: `${outputPath}/${mainName}.js`, type: 'module', watched: false }, 
     // Serve all source maps.
-    { pattern: `${outputPath}/*.map`, included: false, watched: false });
+    { pattern: `${outputPath}/*.map`, included: false, watched: false }, 
+    // These are the test entrypoints.
+    { pattern: `${outputPath}/spec-*.js`, type: 'module', watched: false });
     if (hasChunkOrWorkerFiles(buildOutput.files)) {
         karmaOptions.files.push(
         // Allow loading of chunk-* files but don't include them all on load.
@@ -268,9 +283,6 @@ async function initializeApplication(options, context, karmaOptions, transforms 
             watched: false,
         });
     }
-    karmaOptions.files.push(
-    // Serve remaining JS on page load, these are the test entrypoints.
-    { pattern: `${outputPath}/*.js`, type: 'module', watched: false });
     if (options.styles?.length) {
         // Serve CSS outputs on page load, these are the global styles.
         karmaOptions.files.push({ pattern: `${outputPath}/*.css`, type: 'css', watched: false });
