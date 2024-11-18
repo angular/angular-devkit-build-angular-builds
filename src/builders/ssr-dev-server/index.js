@@ -45,6 +45,19 @@ const IGNORED_STDOUT_MESSAGES = [
     'Angular is running in development mode. Call enableProdMode() to enable production mode.',
 ];
 function execute(options, context) {
+    let browserSync;
+    try {
+        browserSync = require('browser-sync');
+    }
+    catch {
+        return (0, rxjs_1.of)({
+            success: false,
+            error: 
+            // eslint-disable-next-line max-len
+            'Required dependency `browser-sync` is not installed, most likely you need to run `npm install browser-sync --save-dev` in your project.',
+        });
+    }
+    const bsInstance = browserSync.create();
     const browserTarget = (0, architect_1.targetFromTargetString)(options.browserTarget);
     const serverTarget = (0, architect_1.targetFromTargetString)(options.serverTarget);
     const getBaseUrl = (bs) => `${bs.getOption('scheme')}://${bs.getOption('host')}:${bs.getOption('port')}`;
@@ -60,17 +73,6 @@ function execute(options, context) {
         progress: options.progress,
         verbose: options.verbose,
     });
-    let browserSync;
-    try {
-        browserSync = require('browser-sync');
-    }
-    catch {
-        return (0, rxjs_1.of)({
-            success: false,
-            error: '"browser-sync" is not installed, most likely you need to run `npm install browser-sync --save-dev` in your project.',
-        });
-    }
-    const bsInstance = browserSync.create();
     context.logger.error(core_1.tags.stripIndents `
   ****************************************************************************************
   This is a simple server for use in testing or debugging Angular applications locally.
