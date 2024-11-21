@@ -93,7 +93,7 @@ class AngularAssetsMiddleware {
         };
     }
 }
-function injectKarmaReporter(context, buildOptions, buildIterator, karmaConfig, subscriber) {
+function injectKarmaReporter(buildOptions, buildIterator, karmaConfig, subscriber) {
     const reporterName = 'angular-progress-notifier';
     class ProgressNotifierReporter {
         emitter;
@@ -158,7 +158,7 @@ function execute(options, context, karmaOptions, transforms = {}) {
         // If `--watch` is explicitly enabled or if we are keeping the Karma
         // process running, we should hook Karma into the build.
         if (buildIterator) {
-            injectKarmaReporter(context, buildOptions, buildIterator, karmaConfig, subscriber);
+            injectKarmaReporter(buildOptions, buildIterator, karmaConfig, subscriber);
         }
         // Complete the observable once the Karma server returns.
         const karmaServer = new karma.Server(karmaConfig, (exitCode) => {
@@ -252,6 +252,7 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         polyfills: normalizePolyfills(options.polyfills),
         webWorkerTsConfig: options.webWorkerTsConfig,
         watch: options.watch ?? !karmaOptions.singleRun,
+        stylePreprocessorOptions: options.stylePreprocessorOptions,
     };
     // Build tests with `application` builder, using test files as entry points.
     const [buildOutput, buildIterator] = await first((0, private_1.buildApplicationInternal)(buildOptions, context), { cancel: !buildOptions.watch });
