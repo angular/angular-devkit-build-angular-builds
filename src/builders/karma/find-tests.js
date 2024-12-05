@@ -31,6 +31,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findTests = findTests;
+exports.getTestEntrypoints = getTestEntrypoints;
 const fast_glob_1 = __importStar(require("fast-glob"));
 const fs_1 = require("fs");
 const path_1 = require("path");
@@ -40,6 +41,26 @@ async function findTests(include, exclude, workspaceRoot, projectSourceRoot) {
     const files = await Promise.all(matchingTestsPromises);
     // Unique file names
     return [...new Set(files.flat())];
+}
+/** Generate unique bundle names for a set of test files. */
+function getTestEntrypoints(testFiles, { projectSourceRoot, workspaceRoot }) {
+    const seen = new Set();
+    return new Map(Array.from(testFiles, (testFile) => {
+        const relativePath = removeRoots(testFile, [projectSourceRoot, workspaceRoot])
+            // Strip leading dots and path separators.
+            .replace(/^[./\\]+/, '')
+            // Replace any path separators with dashes.
+            .replace(/[/\\]/g, '-');
+        const baseName = `spec-${(0, path_1.basename)(relativePath, (0, path_1.extname)(relativePath))}`;
+        let uniqueName = baseName;
+        let suffix = 2;
+        while (seen.has(uniqueName)) {
+            uniqueName = `${baseName}-${suffix}`.replace(/([^\w](?:spec|test))-([\d]+)$/, '-$2$1');
+            ++suffix;
+        }
+        seen.add(uniqueName);
+        return [uniqueName, testFile];
+    }));
 }
 const normalizePath = (path) => path.replace(/\\/g, '/');
 const removeLeadingSlash = (pattern) => {
@@ -54,6 +75,14 @@ const removeRelativeRoot = (path, root) => {
     }
     return path;
 };
+function removeRoots(path, roots) {
+    for (const root of roots) {
+        if (path.startsWith(root)) {
+            return path.substring(root.length);
+        }
+    }
+    return (0, path_1.basename)(path);
+}
 async function findMatchingTests(pattern, ignore, workspaceRoot, projectSourceRoot) {
     // normalize pattern, glob lib only accepts forward slashes
     let normalizedPattern = normalizePath(pattern);

@@ -196,21 +196,7 @@ function normalizePolyfills(polyfills) {
 async function collectEntrypoints(options, context, projectSourceRoot) {
     // Glob for files to test.
     const testFiles = await (0, find_tests_1.findTests)(options.include ?? [], options.exclude ?? [], context.workspaceRoot, projectSourceRoot);
-    const seen = new Set();
-    return new Map(Array.from(testFiles, (testFile) => {
-        const relativePath = path
-            .relative(testFile.startsWith(projectSourceRoot) ? projectSourceRoot : context.workspaceRoot, testFile)
-            .replace(/^[./]+/, '_')
-            .replace(/\//g, '-');
-        let uniqueName = `spec-${path.basename(relativePath, path.extname(relativePath))}`;
-        let suffix = 2;
-        while (seen.has(uniqueName)) {
-            uniqueName = `${relativePath}-${suffix}`;
-            ++suffix;
-        }
-        seen.add(uniqueName);
-        return [uniqueName, testFile];
-    }));
+    return (0, find_tests_1.getTestEntrypoints)(testFiles, { projectSourceRoot, workspaceRoot: context.workspaceRoot });
 }
 async function initializeApplication(options, context, karmaOptions, transforms = {}) {
     if (transforms.webpackConfiguration) {
