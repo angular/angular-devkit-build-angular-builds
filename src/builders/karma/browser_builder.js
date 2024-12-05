@@ -39,7 +39,7 @@ const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const schema_1 = require("../browser/schema");
 const find_tests_plugin_1 = require("./find-tests-plugin");
 function execute(options, context, karmaOptions, transforms = {}) {
-    return (0, rxjs_1.from)(initializeBrowser(options, context)).pipe((0, rxjs_1.switchMap)(async ([karma, webpackConfig]) => {
+    return (0, rxjs_1.from)(initializeBrowser(options, context, transforms.webpackConfiguration)).pipe((0, rxjs_1.switchMap)(async ([karma, webpackConfig]) => {
         const projectName = context.target?.project;
         if (!projectName) {
             throw new Error(`The 'karma' builder requires a target to be specified.`);
