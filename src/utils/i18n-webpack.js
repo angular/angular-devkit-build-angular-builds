@@ -30,7 +30,7 @@ async function configureI18nBuild(context, options) {
     const buildOptions = { ...options };
     const tsConfig = await (0, read_tsconfig_1.readTsconfig)(buildOptions.tsConfig, context.workspaceRoot);
     const metadata = await context.getProjectMetadata(context.target);
-    const i18n = (0, private_1.createI18nOptions)(metadata, buildOptions.localize);
+    const i18n = (0, private_1.createI18nOptions)(metadata, buildOptions.localize, context.logger);
     // No additional processing needed if no inlining requested and no source locale defined.
     if (!i18n.shouldInline && !i18n.hasDefinedSourceLocale) {
         return { buildOptions, i18n };

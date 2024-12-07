@@ -316,10 +316,15 @@ function buildWebpackBrowser(options, context, transforms = {}) {
         })));
     }));
     function getLocaleBaseHref(i18n, locale) {
-        if (i18n.locales[locale] && i18n.locales[locale]?.baseHref !== '') {
-            return (0, utils_1.urlJoin)(options.baseHref || '', i18n.locales[locale].baseHref ?? `/${locale}/`);
+        if (i18n.flatOutput) {
+            return undefined;
         }
-        return undefined;
+        const localeData = i18n.locales[locale];
+        if (!localeData) {
+            return undefined;
+        }
+        const baseHrefSuffix = localeData.baseHref ?? localeData.subPath + '/';
+        return baseHrefSuffix !== '' ? (0, utils_1.urlJoin)(options.baseHref || '', baseHrefSuffix) : undefined;
     }
 }
 function assertNever(input) {

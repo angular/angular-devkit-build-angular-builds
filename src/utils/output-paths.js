@@ -14,7 +14,7 @@ function ensureOutputPaths(baseOutputPath, i18n) {
     const outputPaths = i18n.shouldInline
         ? [...i18n.inlineLocales].map((l) => [
             l,
-            i18n.flatOutput ? baseOutputPath : (0, path_1.join)(baseOutputPath, l),
+            i18n.flatOutput ? baseOutputPath : (0, path_1.join)(baseOutputPath, i18n.locales[l].subPath),
         ])
         : [['', baseOutputPath]];
     for (const [, outputPath] of outputPaths) {
