@@ -99,7 +99,10 @@ function default_1(options) {
                     reject(err);
                     return;
                 }
-                let outputPath = (0, loader_utils_1.interpolateName)({ resourcePath: result }, filename(result), {
+                let outputPath = (0, loader_utils_1.interpolateName)(
+                // TODO: Revisit. Previously due to lack of type safety, this object
+                // was fine, but in practice it doesn't match the type of the loader context.
+                { resourcePath: result }, filename(result), {
                     content,
                     context: loader.context || loader.rootContext,
                 }).replace(/\\|\//g, '-');

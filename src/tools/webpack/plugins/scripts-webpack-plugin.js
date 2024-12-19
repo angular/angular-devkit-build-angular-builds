@@ -170,7 +170,10 @@ class ScriptsWebpackPlugin {
                 const assetName = this.options.filename;
                 const asset = compilation.getAsset(assetName);
                 if (asset) {
-                    const interpolatedFilename = (0, loader_utils_1.interpolateName)({ resourcePath: 'scripts.js' }, assetName, { content: asset.source.source() });
+                    const interpolatedFilename = (0, loader_utils_1.interpolateName)(
+                    // TODO: Revisit. Previously due to lack of type safety, this object
+                    // was fine, but in practice it doesn't match the type of the loader context.
+                    { resourcePath: 'scripts.js' }, assetName, { content: asset.source.source() });
                     if (assetName !== interpolatedFilename) {
                         compilation.renameAsset(assetName, interpolatedFilename);
                     }
