@@ -24,5 +24,5 @@ export declare function buildEsbuildBrowser(userOptions: BrowserBuilderOptions, 
 export declare function convertBrowserOptions(options: BrowserBuilderOptions): Omit<ApplicationBuilderOptions, 'outputPath'> & {
     outputPath: OutputPathClass;
 };
-declare const _default: import("../../../../architect/src/internal").Builder<BrowserBuilderOptions & import("../../../../core/src").JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<BrowserBuilderOptions & import("../../../../core").JsonObject>;
 export default _default;

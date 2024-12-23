@@ -28,5 +28,5 @@ export type { ServerBuilderOptions };
 export declare function execute(options: ServerBuilderOptions, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
 }): Observable<ServerBuilderOutput>;
-declare const _default: import("../../../../architect/src/internal").Builder<ServerBuilderOptions & import("../../../../core/src").JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<ServerBuilderOptions & import("../../../../core").JsonObject>;
 export default _default;
