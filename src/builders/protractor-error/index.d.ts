@@ -6,5 +6,5 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { Schema as ProtractorBuilderOptions } from '../protractor/schema';
-declare const _default: import("../../../../architect/src/internal").Builder<ProtractorBuilderOptions & import("../../../../core/src").JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<ProtractorBuilderOptions & import("../../../../core").JsonObject>;
 export default _default;

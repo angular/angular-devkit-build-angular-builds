@@ -7,5 +7,5 @@
  */
 import { Schema as JestBuilderSchema } from './schema';
 /** Main execution function for the Jest builder. */
-declare const _default: import("../../../../architect/src/internal").Builder<JestBuilderSchema & import("../../../../core/src").JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<JestBuilderSchema & import("../../../../core").JsonObject>;
 export default _default;

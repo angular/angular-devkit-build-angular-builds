@@ -9,6 +9,6 @@ import { DevServerBuilderOutput } from '@angular/build';
 import { execute } from './builder';
 import { Schema as DevServerBuilderOptions } from './schema';
 export { type DevServerBuilderOptions, type DevServerBuilderOutput, execute as executeDevServerBuilder, };
-declare const _default: import("../../../../architect/src/internal").Builder<DevServerBuilderOptions & import("../../../../core/src").JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<DevServerBuilderOptions & import("../../../../core").JsonObject>;
 export default _default;
 export { execute as executeDevServer };

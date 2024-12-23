@@ -15,5 +15,5 @@ type PrerenderBuilderOutput = BuilderOutput;
  * the browser result.
  */
 export declare function execute(options: PrerenderBuilderOptions, context: BuilderContext): Promise<PrerenderBuilderOutput>;
-declare const _default: import("../../../../architect/src/internal").Builder<Schema & import("../../../../core/src").JsonObject>;
+declare const _default: import("../../../../architect/src/internal").Builder<Schema & import("../../../../core").JsonObject>;
 export default _default;
