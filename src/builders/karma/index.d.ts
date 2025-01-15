@@ -23,5 +23,5 @@ export declare function execute(options: KarmaBuilderOptions, context: BuilderCo
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
 }): Observable<BuilderOutput>;
 export type { KarmaBuilderOptions };
-declare const _default: import("../../../../architect/src/internal").Builder<Record<string, string> & KarmaBuilderOptions & import("@angular-devkit/core").JsonObject>;
+declare const _default: import("@angular-devkit/architect").Builder<Record<string, string> & KarmaBuilderOptions & import("@angular-devkit/core").JsonObject>;
 export default _default;

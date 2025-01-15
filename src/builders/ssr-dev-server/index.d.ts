@@ -19,5 +19,5 @@ export declare function log({ stderr, stdout }: {
     stderr: string | undefined;
     stdout: string | undefined;
 }, logger: logging.LoggerApi): void;
-declare const _default: import("../../../../architect/src/internal").Builder<Schema & json.JsonObject>;
+declare const _default: import("@angular-devkit/architect").Builder<Schema & json.JsonObject>;
 export default _default;
