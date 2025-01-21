@@ -1,4 +1,4 @@
-export interface Schema {
+export type Schema = {
     /**
      * List of static application assets.
      */
@@ -116,9 +116,9 @@ export interface Schema {
      * Run build when files change.
      */
     watch?: boolean;
-}
+};
 export type AssetPattern = AssetPatternClass | string;
-export interface AssetPatternClass {
+export type AssetPatternClass = {
     /**
      * Allow glob patterns to follow symlink directories. This allows subdirectories of the
      * symlink to be searched.
@@ -140,13 +140,13 @@ export interface AssetPatternClass {
      * Absolute path within the output.
      */
     output?: string;
-}
-export interface FileReplacement {
+};
+export type FileReplacement = {
     replace?: string;
     replaceWith?: string;
     src?: string;
     with?: string;
-}
+};
 /**
  * How to handle duplicate translations for i18n.
  *
@@ -176,7 +176,7 @@ export type Localize = string[] | boolean;
  * https://angular.dev/reference/configs/workspace-config#optimization-configuration.
  */
 export type OptimizationUnion = boolean | OptimizationClass;
-export interface OptimizationClass {
+export type OptimizationClass = {
     /**
      * Enables optimization of the scripts output.
      */
@@ -185,7 +185,7 @@ export interface OptimizationClass {
      * Enables optimization of the styles output.
      */
     styles?: boolean;
-}
+};
 /**
  * Define the output filename cache-busting hashing mode.
  */
@@ -200,7 +200,7 @@ export declare enum OutputHashing {
  * https://angular.dev/reference/configs/workspace-config#source-map-configuration.
  */
 export type SourceMapUnion = boolean | SourceMapClass;
-export interface SourceMapClass {
+export type SourceMapClass = {
     /**
      * Output source maps used for error reporting tools.
      */
@@ -217,13 +217,13 @@ export interface SourceMapClass {
      * Resolve vendor packages source maps.
      */
     vendor?: boolean;
-}
+};
 /**
  * Options to pass to style preprocessors
  */
-export interface StylePreprocessorOptions {
+export type StylePreprocessorOptions = {
     /**
      * Paths to include. Paths will be resolved to workspace root.
      */
     includePaths?: string[];
-}
+};

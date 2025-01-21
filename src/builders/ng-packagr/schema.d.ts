@@ -1,7 +1,7 @@
 /**
  * ng-packagr target options for Build Architect. Use to build library projects.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Enable and define the file watching poll time period in milliseconds.
      */
@@ -18,4 +18,4 @@ export interface Schema {
      * Run build when files change.
      */
     watch?: boolean;
-}
+};
