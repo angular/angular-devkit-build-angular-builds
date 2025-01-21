@@ -1,7 +1,7 @@
 /**
  * SSR Dev Server target options for Build Facade.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Browser target to build.
      */
@@ -61,4 +61,4 @@ export interface Schema {
      * Rebuild on change.
      */
     watch?: boolean;
-}
+};

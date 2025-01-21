@@ -1,7 +1,7 @@
 /**
  * Extract i18n target options for Build Facade.
  */
-export interface Schema {
+export type Schema = {
     /**
      * A builder target to extract i18n messages in the format of
      * `project:target[:configuration]`. You can also pass in more than one configuration name
@@ -24,7 +24,7 @@ export interface Schema {
      * Log progress to the console.
      */
     progress?: boolean;
-}
+};
 /**
  * Output format for the generated file.
  */

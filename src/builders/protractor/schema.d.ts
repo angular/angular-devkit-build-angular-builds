@@ -1,7 +1,7 @@
 /**
  * Protractor target options for Build Facade.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Base URL for protractor to connect to.
      */
@@ -44,4 +44,4 @@ export interface Schema {
      * Try to update webdriver.
      */
     webdriverUpdate?: boolean;
-}
+};

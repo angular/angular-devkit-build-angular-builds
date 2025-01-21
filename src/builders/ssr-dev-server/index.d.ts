@@ -9,7 +9,7 @@ import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { json, logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { Schema } from './schema';
-export type SSRDevServerBuilderOptions = Schema & json.JsonObject;
+export type SSRDevServerBuilderOptions = Schema;
 export type SSRDevServerBuilderOutput = BuilderOutput & {
     baseUrl?: string;
     port?: string;

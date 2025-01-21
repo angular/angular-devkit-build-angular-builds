@@ -1,7 +1,7 @@
 /**
  * App Shell target options for Build Facade.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Script that exports the Server AppModule to render. This should be the main JavaScript
      * outputted by the server target. By default we will resolve the outputPath of the
@@ -33,4 +33,4 @@ export interface Schema {
      * as a comma-separated list. Example: `project:target:production,staging`.
      */
     serverTarget: string;
-}
+};

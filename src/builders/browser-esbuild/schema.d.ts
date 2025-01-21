@@ -1,7 +1,7 @@
 /**
  * Browser target options
  */
-export interface Schema {
+export type Schema = {
     /**
      * A list of CommonJS or AMD packages that are allowed to be used without a build time
      * warning. Use `'*'` to allow all.
@@ -178,9 +178,9 @@ export interface Schema {
      * TypeScript configuration for Web Worker modules.
      */
     webWorkerTsConfig?: string;
-}
+};
 export type AssetPattern = AssetPatternClass | string;
-export interface AssetPatternClass {
+export type AssetPatternClass = {
     /**
      * Allow glob patterns to follow symlink directories. This allows subdirectories of the
      * symlink to be searched.
@@ -202,8 +202,8 @@ export interface AssetPatternClass {
      * Absolute path within the output.
      */
     output?: string;
-}
-export interface Budget {
+};
+export type Budget = {
     /**
      * The baseline size for comparison.
      */
@@ -240,7 +240,7 @@ export interface Budget {
      * The threshold for warning relative to the baseline (min & max).
      */
     warning?: string;
-}
+};
 /**
  * The type of budget.
  */
@@ -261,10 +261,10 @@ export declare enum CrossOrigin {
     None = "none",
     UseCredentials = "use-credentials"
 }
-export interface FileReplacement {
+export type FileReplacement = {
     replace: string;
     with: string;
-}
+};
 /**
  * How to handle duplicate translations for i18n.
  *
@@ -279,7 +279,7 @@ export declare enum I18NTranslation {
  * Configures the generation of the application's HTML index.
  */
 export type IndexUnion = boolean | IndexObject | string;
-export interface IndexObject {
+export type IndexObject = {
     /**
      * The path of a file to use for the application's generated HTML index.
      */
@@ -290,7 +290,7 @@ export interface IndexObject {
      */
     output?: string;
     [property: string]: any;
-}
+};
 /**
  * The stylesheet language to use for the application's inline component styles.
  */
@@ -311,7 +311,7 @@ export type Localize = string[] | boolean;
  * https://angular.dev/reference/configs/workspace-config#optimization-configuration.
  */
 export type OptimizationUnion = boolean | OptimizationClass;
-export interface OptimizationClass {
+export type OptimizationClass = {
     /**
      * Enables optimization for fonts. This option requires internet access. `HTTPS_PROXY`
      * environment variable can be used to specify a proxy server.
@@ -325,25 +325,25 @@ export interface OptimizationClass {
      * Enables optimization of the styles output.
      */
     styles?: StylesUnion;
-}
+};
 /**
  * Enables optimization for fonts. This option requires internet access. `HTTPS_PROXY`
  * environment variable can be used to specify a proxy server.
  */
 export type FontsUnion = boolean | FontsClass;
-export interface FontsClass {
+export type FontsClass = {
     /**
      * Reduce render blocking requests by inlining external Google Fonts and Adobe Fonts CSS
      * definitions in the application's HTML index file. This option requires internet access.
      * `HTTPS_PROXY` environment variable can be used to specify a proxy server.
      */
     inline?: boolean;
-}
+};
 /**
  * Enables optimization of the styles output.
  */
 export type StylesUnion = boolean | StylesClass;
-export interface StylesClass {
+export type StylesClass = {
     /**
      * Extract and inline critical CSS definitions to improve first paint time.
      */
@@ -353,7 +353,7 @@ export interface StylesClass {
      * identifiers and minimizing values.
      */
     minify?: boolean;
-}
+};
 /**
  * Define the output filename cache-busting hashing mode.
  */
@@ -368,7 +368,7 @@ export declare enum OutputHashing {
  */
 export type Polyfills = string[] | string;
 export type ScriptElement = ScriptClass | string;
-export interface ScriptClass {
+export type ScriptClass = {
     /**
      * The bundle name for this extra entry point.
      */
@@ -381,13 +381,13 @@ export interface ScriptClass {
      * The file to include.
      */
     input: string;
-}
+};
 /**
  * Output source maps for scripts and styles. For more information, see
  * https://angular.dev/reference/configs/workspace-config#source-map-configuration.
  */
 export type SourceMapUnion = boolean | SourceMapClass;
-export interface SourceMapClass {
+export type SourceMapClass = {
     /**
      * Output source maps used for error reporting tools.
      */
@@ -404,18 +404,18 @@ export interface SourceMapClass {
      * Resolve vendor packages source maps.
      */
     vendor?: boolean;
-}
+};
 /**
  * Options to pass to style preprocessors.
  */
-export interface StylePreprocessorOptions {
+export type StylePreprocessorOptions = {
     /**
      * Paths to include. Paths will be resolved to workspace root.
      */
     includePaths?: string[];
-}
+};
 export type StyleElement = StyleClass | string;
-export interface StyleClass {
+export type StyleClass = {
     /**
      * The bundle name for this extra entry point.
      */
@@ -428,4 +428,4 @@ export interface StyleClass {
      * The file to include.
      */
     input: string;
-}
+};

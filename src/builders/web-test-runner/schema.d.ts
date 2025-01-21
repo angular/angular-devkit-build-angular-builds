@@ -1,7 +1,7 @@
 /**
  * Web Test Runner target options for Build Facade.
  */
-export interface Schema {
+export type Schema = {
     /**
      * List of static application assets.
      */
@@ -89,9 +89,9 @@ export interface Schema {
      * TypeScript configuration for Web Worker modules.
      */
     webWorkerTsConfig?: string;
-}
+};
 export type AssetPattern = AssetPatternClass | string;
-export interface AssetPatternClass {
+export type AssetPatternClass = {
     /**
      * The pattern to match.
      */
@@ -108,13 +108,13 @@ export interface AssetPatternClass {
      * Absolute path within the output.
      */
     output?: string;
-}
-export interface FileReplacement {
+};
+export type FileReplacement = {
     replace?: string;
     replaceWith?: string;
     src?: string;
     with?: string;
-}
+};
 /**
  * The stylesheet language to use for the application's inline component styles.
  */
@@ -129,7 +129,7 @@ export declare enum InlineStyleLanguage {
  */
 export type Polyfills = string[] | string;
 export type ScriptElement = ScriptClass | string;
-export interface ScriptClass {
+export type ScriptClass = {
     /**
      * The bundle name for this extra entry point.
      */
@@ -142,13 +142,13 @@ export interface ScriptClass {
      * The file to include.
      */
     input: string;
-}
+};
 /**
  * Output source maps for scripts and styles. For more information, see
  * https://angular.dev/reference/configs/workspace-config#source-map-configuration.
  */
 export type SourceMapUnion = boolean | SourceMapClass;
-export interface SourceMapClass {
+export type SourceMapClass = {
     /**
      * Output source maps for all scripts.
      */
@@ -161,18 +161,18 @@ export interface SourceMapClass {
      * Resolve vendor packages source maps.
      */
     vendor?: boolean;
-}
+};
 /**
  * Options to pass to style preprocessors
  */
-export interface StylePreprocessorOptions {
+export type StylePreprocessorOptions = {
     /**
      * Paths to include. Paths will be resolved to workspace root.
      */
     includePaths?: string[];
-}
+};
 export type StyleElement = StyleClass | string;
-export interface StyleClass {
+export type StyleClass = {
     /**
      * The bundle name for this extra entry point.
      */
@@ -185,4 +185,4 @@ export interface StyleClass {
      * The file to include.
      */
     input: string;
-}
+};

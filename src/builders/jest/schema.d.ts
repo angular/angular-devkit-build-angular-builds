@@ -1,7 +1,7 @@
 /**
  * Jest target options
  */
-export interface Schema {
+export type Schema = {
     /**
      * Globs of files to exclude, relative to the project root.
      */
@@ -19,4 +19,4 @@ export interface Schema {
      * The name of the TypeScript configuration file.
      */
     tsConfig: string;
-}
+};

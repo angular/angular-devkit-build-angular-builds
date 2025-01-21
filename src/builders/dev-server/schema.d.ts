@@ -1,7 +1,7 @@
 /**
  * Dev Server target options for Build Facade.
  */
-export interface Schema {
+export type Schema = {
     /**
      * List of hosts that are allowed to access the dev server. This option has no effect when
      * using the 'application' or other esbuild-based builders.
@@ -100,7 +100,7 @@ export interface Schema {
      * Rebuild on change.
      */
     watch?: boolean;
-}
+};
 /**
  * Activate debugging inspector. This option only has an effect when 'SSR' or 'SSG' are
  * enabled.
@@ -112,10 +112,10 @@ export type Inspect = boolean | string;
  * when using the 'browser' or other Webpack-based builders.
  */
 export type PrebundleUnion = boolean | PrebundleClass;
-export interface PrebundleClass {
+export type PrebundleClass = {
     /**
      * List of package imports that should not be prebundled by the development server. The
      * packages will be bundled into the application code itself.
      */
     exclude: string[];
-}
+};

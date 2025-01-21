@@ -1,4 +1,4 @@
-export interface Schema {
+export type Schema = {
     /**
      * Target to build.
      */
@@ -21,4 +21,4 @@ export interface Schema {
      * Server target to use for prerendering the app.
      */
     serverTarget: string;
-}
+};
