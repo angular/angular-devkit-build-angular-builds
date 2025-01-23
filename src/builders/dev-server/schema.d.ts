@@ -3,8 +3,7 @@
  */
 export type Schema = {
     /**
-     * List of hosts that are allowed to access the dev server. This option has no effect when
-     * using the 'application' or other esbuild-based builders.
+     * List of hosts that are allowed to access the dev server.
      */
     allowedHosts?: string[];
     /**
@@ -14,8 +13,7 @@ export type Schema = {
      */
     buildTarget: string;
     /**
-     * Don't verify connected clients are part of allowed hosts. This option has no effect when
-     * using the 'application' or other esbuild-based builders.
+     * Don't verify connected clients are part of allowed hosts.
      */
     disableHostCheck?: boolean;
     /**
