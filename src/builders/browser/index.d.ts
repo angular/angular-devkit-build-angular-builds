@@ -38,5 +38,5 @@ export declare function buildWebpackBrowser(options: BrowserBuilderSchema, conte
     logging?: WebpackLoggingCallback;
     indexHtml?: IndexHtmlTransform;
 }): Observable<BrowserBuilderOutput>;
-declare const _default: import("@angular-devkit/architect").Builder<BrowserBuilderSchema & import("../../../../core").JsonObject>;
+declare const _default: import("@angular-devkit/architect").Builder<BrowserBuilderSchema & import("@angular-devkit/core").JsonObject>;
 export default _default;
