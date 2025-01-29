@@ -6,5 +6,5 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { Schema } from './schema';
-declare const _default: import("@angular-devkit/architect").Builder<Schema & import("../../../../core").JsonObject>;
+declare const _default: import("@angular-devkit/architect").Builder<Schema & import("@angular-devkit/core").JsonObject>;
 export default _default;

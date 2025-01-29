@@ -24,5 +24,5 @@ export declare function buildEsbuildBrowser(userOptions: BrowserBuilderOptions, 
 export declare function convertBrowserOptions(options: BrowserBuilderOptions): Omit<ApplicationBuilderOptions, 'outputPath'> & {
     outputPath: OutputPathClass;
 };
-declare const _default: import("@angular-devkit/architect").Builder<BrowserBuilderOptions & import("../../../../core").JsonObject>;
+declare const _default: import("@angular-devkit/architect").Builder<BrowserBuilderOptions & import("@angular-devkit/core").JsonObject>;
 export default _default;
