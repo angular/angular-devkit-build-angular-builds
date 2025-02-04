@@ -3,6 +3,10 @@
  */
 export type Schema = {
     /**
+     * Run tests using Ahead of Time compilation.
+     */
+    aot?: boolean;
+    /**
      * Globs of files to exclude, relative to the project root.
      */
     exclude?: string[];

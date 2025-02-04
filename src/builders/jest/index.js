@@ -101,7 +101,7 @@ exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
         tsConfig: options.tsConfig,
         polyfills: options.polyfills ?? ['zone.js', 'zone.js/testing'],
         outputPath: testOut,
-        aot: false,
+        aot: options.aot,
         index: false,
         outputHashing: schema_1.OutputHashing.None,
         outExtension: 'mjs', // Force native ESM.
