@@ -73,9 +73,6 @@ function execute(options, context, transforms = {}, extensions) {
             if (transforms?.logging || transforms?.webpackConfiguration) {
                 throw new Error(`The "application" and "browser-esbuild" builders do not support Webpack transforms.`);
             }
-            if (options.allowedHosts?.length) {
-                context.logger.warn(`The "allowedHosts" option will not be used because it is not supported by the "${builderName}" builder.`);
-            }
             if (options.publicHost) {
                 context.logger.warn(`The "publicHost" option will not be used because it is not supported by the "${builderName}" builder.`);
             }
