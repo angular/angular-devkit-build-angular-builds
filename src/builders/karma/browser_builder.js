@@ -116,7 +116,7 @@ async function initializeBrowser(options, context, webpackConfigurationTransform
         budgets: undefined,
         optimization: false,
         buildOptimizer: false,
-        aot: false,
+        aot: options.aot,
         vendorChunk: true,
         namedChunks: true,
         extractLicenses: false,
