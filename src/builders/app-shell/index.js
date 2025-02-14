@@ -45,8 +45,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
-const fs = __importStar(require("fs"));
-const path = __importStar(require("path"));
+const fs = __importStar(require("node:fs"));
+const path = __importStar(require("node:path"));
 const piscina_1 = __importDefault(require("piscina"));
 const utils_1 = require("../../utils");
 const error_1 = require("../../utils/error");

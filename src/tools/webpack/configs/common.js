@@ -46,7 +46,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCommonConfig = getCommonConfig;
 const webpack_1 = require("@ngtools/webpack");
 const copy_webpack_plugin_1 = __importDefault(require("copy-webpack-plugin"));
-const path = __importStar(require("path"));
+const path = __importStar(require("node:path"));
 const webpack_2 = require("webpack");
 const webpack_subresource_integrity_1 = require("webpack-subresource-integrity");
 const environment_options_1 = require("../../../utils/environment-options");

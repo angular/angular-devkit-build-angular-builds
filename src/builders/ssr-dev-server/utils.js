@@ -13,13 +13,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAvailablePort = getAvailablePort;
 exports.spawnAsObservable = spawnAsObservable;
 exports.waitUntilServerIsListening = waitUntilServerIsListening;
-const child_process_1 = require("child_process");
-const net_1 = require("net");
+const node_child_process_1 = require("node:child_process");
+const node_net_1 = require("node:net");
 const rxjs_1 = require("rxjs");
 const tree_kill_1 = __importDefault(require("tree-kill"));
 function getAvailablePort() {
     return new Promise((resolve, reject) => {
-        const server = (0, net_1.createServer)();
+        const server = (0, node_net_1.createServer)();
         server
             .unref()
             .on('error', reject)
@@ -31,7 +31,7 @@ function getAvailablePort() {
 }
 function spawnAsObservable(command, args = [], options = {}) {
     return new rxjs_1.Observable((obs) => {
-        const proc = (0, child_process_1.spawn)(command, args, options);
+        const proc = (0, node_child_process_1.spawn)(command, args, options);
         if (proc.stdout) {
             proc.stdout.on('data', (data) => obs.next({ stdout: data.toString() }));
         }
@@ -56,7 +56,7 @@ function spawnAsObservable(command, args = [], options = {}) {
 function waitUntilServerIsListening(port, host) {
     const allowedErrorCodes = ['ECONNREFUSED', 'ECONNRESET'];
     return new rxjs_1.Observable((obs) => {
-        const client = (0, net_1.createConnection)({ host, port }, () => {
+        const client = (0, node_net_1.createConnection)({ host, port }, () => {
             obs.next(undefined);
             obs.complete();
         }).on('error', (err) => obs.error(err));

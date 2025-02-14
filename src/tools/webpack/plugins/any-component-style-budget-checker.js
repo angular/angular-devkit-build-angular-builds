@@ -42,7 +42,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AnyComponentStyleBudgetChecker = void 0;
 const private_1 = require("@angular/build/private");
-const path = __importStar(require("path"));
+const path = __importStar(require("node:path"));
 const webpack_1 = require("webpack");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
 const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';

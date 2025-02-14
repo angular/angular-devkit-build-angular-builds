@@ -43,8 +43,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.findTests = findTests;
 exports.getTestEntrypoints = getTestEntrypoints;
 const fast_glob_1 = __importStar(require("fast-glob"));
-const fs_1 = require("fs");
-const path_1 = require("path");
+const node_fs_1 = require("node:fs");
+const node_path_1 = require("node:path");
 /* Go through all patterns and find unique list of files */
 async function findTests(include, exclude, workspaceRoot, projectSourceRoot) {
     const matchingTestsPromises = include.map((pattern) => findMatchingTests(pattern, exclude, workspaceRoot, projectSourceRoot));
@@ -61,7 +61,7 @@ function getTestEntrypoints(testFiles, { projectSourceRoot, workspaceRoot }) {
             .replace(/^[./\\]+/, '')
             // Replace any path separators with dashes.
             .replace(/[/\\]/g, '-');
-        const baseName = `spec-${(0, path_1.basename)(relativePath, (0, path_1.extname)(relativePath))}`;
+        const baseName = `spec-${(0, node_path_1.basename)(relativePath, (0, node_path_1.extname)(relativePath))}`;
         let uniqueName = baseName;
         let suffix = 2;
         while (seen.has(uniqueName)) {
@@ -91,26 +91,26 @@ function removeRoots(path, roots) {
             return path.substring(root.length);
         }
     }
-    return (0, path_1.basename)(path);
+    return (0, node_path_1.basename)(path);
 }
 async function findMatchingTests(pattern, ignore, workspaceRoot, projectSourceRoot) {
     // normalize pattern, glob lib only accepts forward slashes
     let normalizedPattern = normalizePath(pattern);
     normalizedPattern = removeLeadingSlash(normalizedPattern);
-    const relativeProjectRoot = normalizePath((0, path_1.relative)(workspaceRoot, projectSourceRoot) + '/');
+    const relativeProjectRoot = normalizePath((0, node_path_1.relative)(workspaceRoot, projectSourceRoot) + '/');
     // remove relativeProjectRoot to support relative paths from root
     // such paths are easy to get when running scripts via IDEs
     normalizedPattern = removeRelativeRoot(normalizedPattern, relativeProjectRoot);
     // special logic when pattern does not look like a glob
     if (!(0, fast_glob_1.isDynamicPattern)(normalizedPattern)) {
-        if (await isDirectory((0, path_1.join)(projectSourceRoot, normalizedPattern))) {
+        if (await isDirectory((0, node_path_1.join)(projectSourceRoot, normalizedPattern))) {
             normalizedPattern = `${normalizedPattern}/**/*.spec.@(ts|tsx)`;
         }
         else {
             // see if matching spec file exists
-            const fileExt = (0, path_1.extname)(normalizedPattern);
+            const fileExt = (0, node_path_1.extname)(normalizedPattern);
             // Replace extension to `.spec.ext`. Example: `src/app/app.component.ts`-> `src/app/app.component.spec.ts`
-            const potentialSpec = (0, path_1.join)(projectSourceRoot, (0, path_1.dirname)(normalizedPattern), `${(0, path_1.basename)(normalizedPattern, fileExt)}.spec${fileExt}`);
+            const potentialSpec = (0, node_path_1.join)(projectSourceRoot, (0, node_path_1.dirname)(normalizedPattern), `${(0, node_path_1.basename)(normalizedPattern, fileExt)}.spec${fileExt}`);
             if (await exists(potentialSpec)) {
                 return [potentialSpec];
             }
@@ -126,7 +126,7 @@ async function findMatchingTests(pattern, ignore, workspaceRoot, projectSourceRo
 }
 async function isDirectory(path) {
     try {
-        const stats = await fs_1.promises.stat(path);
+        const stats = await node_fs_1.promises.stat(path);
         return stats.isDirectory();
     }
     catch {
@@ -135,7 +135,7 @@ async function isDirectory(path) {
 }
 async function exists(path) {
     try {
-        await fs_1.promises.access(path, fs_1.constants.F_OK);
+        await node_fs_1.promises.access(path, node_fs_1.constants.F_OK);
         return true;
     }
     catch {

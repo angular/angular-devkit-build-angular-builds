@@ -41,7 +41,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readTsconfig = readTsconfig;
-const path = __importStar(require("path"));
+const path = __importStar(require("node:path"));
 const load_esm_1 = require("./load-esm");
 /**
  * Reads and parses a given TsConfig file.

@@ -53,9 +53,9 @@ exports.globalScriptsByBundleName = globalScriptsByBundleName;
 exports.assetPatterns = assetPatterns;
 exports.getStatsOptions = getStatsOptions;
 exports.isPackageInstalled = isPackageInstalled;
-const crypto_1 = require("crypto");
 const fast_glob_1 = __importDefault(require("fast-glob"));
-const path = __importStar(require("path"));
+const node_crypto_1 = require("node:crypto");
+const path = __importStar(require("node:path"));
 const schema_1 = require("../../../builders/browser/schema");
 const package_version_1 = require("../../../utils/package-version");
 function getOutputHashFormat(outputHashing = schema_1.OutputHashing.None, length = 20) {
@@ -171,7 +171,7 @@ function getCacheSettings(wco, angularVersion) {
             // We use the versions and build options as the cache name. The Webpack configurations are too
             // dynamic and shared among different build types: test, build and serve.
             // None of which are "named".
-            name: (0, crypto_1.createHash)('sha1')
+            name: (0, node_crypto_1.createHash)('sha1')
                 .update(angularVersion)
                 .update(package_version_1.VERSION)
                 .update(wco.projectRoot)

@@ -44,8 +44,8 @@ exports.execute = execute;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
-const module_1 = require("module");
-const path = __importStar(require("path"));
+const node_module_1 = require("node:module");
+const path = __importStar(require("node:path"));
 const rxjs_1 = require("rxjs");
 const schema_1 = require("./schema");
 /**
@@ -101,7 +101,7 @@ function getBuiltInKarmaConfig(workspaceRoot, projectName, useEsbuild) {
     if (/[A-Z]/.test(coverageFolderName)) {
         coverageFolderName = core_1.strings.dasherize(coverageFolderName);
     }
-    const workspaceRootRequire = (0, module_1.createRequire)(workspaceRoot + '/');
+    const workspaceRootRequire = (0, node_module_1.createRequire)(workspaceRoot + '/');
     // Any changes to the config here need to be synced to: packages/schematics/angular/config/files/karma.conf.js.template
     return {
         basePath: '',

@@ -47,10 +47,10 @@ exports.execute = execute;
 exports.writeTestFiles = writeTestFiles;
 const build_1 = require("@angular/build");
 const private_1 = require("@angular/build/private");
-const crypto_1 = require("crypto");
 const fast_glob_1 = __importDefault(require("fast-glob"));
-const fs = __importStar(require("fs/promises"));
-const path = __importStar(require("path"));
+const node_crypto_1 = require("node:crypto");
+const fs = __importStar(require("node:fs/promises"));
+const path = __importStar(require("node:path"));
 const rxjs_1 = require("rxjs");
 const utils_1 = require("../../utils");
 const schema_1 = require("../browser-esbuild/schema");
@@ -276,7 +276,7 @@ async function initializeApplication(options, context, karmaOptions, transforms 
     if (transforms.webpackConfiguration) {
         context.logger.warn(`This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`);
     }
-    const outputPath = path.join(context.workspaceRoot, 'dist/test-out', (0, crypto_1.randomUUID)());
+    const outputPath = path.join(context.workspaceRoot, 'dist/test-out', (0, node_crypto_1.randomUUID)());
     const projectSourceRoot = await getProjectSourceRoot(context);
     const [karma, entryPoints] = await Promise.all([
         Promise.resolve().then(() => __importStar(require('karma'))),

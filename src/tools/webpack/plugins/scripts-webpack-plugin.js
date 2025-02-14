@@ -42,7 +42,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ScriptsWebpackPlugin = void 0;
 const loader_utils_1 = require("loader-utils");
-const path = __importStar(require("path"));
+const path = __importStar(require("node:path"));
 const webpack_1 = require("webpack");
 const error_1 = require("../../../utils/error");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");

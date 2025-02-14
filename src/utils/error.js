@@ -11,10 +11,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assertIsError = assertIsError;
-const assert_1 = __importDefault(require("assert"));
+const node_assert_1 = __importDefault(require("node:assert"));
 function assertIsError(value) {
     const isError = value instanceof Error ||
         // The following is needing to identify errors coming from RxJs.
         (typeof value === 'object' && value && 'name' in value && 'message' in value);
-    (0, assert_1.default)(isError, 'catch clause variable is not an Error instance');
+    (0, node_assert_1.default)(isError, 'catch clause variable is not an Error instance');
 }

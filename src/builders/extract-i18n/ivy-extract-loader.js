@@ -41,7 +41,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = localizeExtractLoader;
-const nodePath = __importStar(require("path"));
+const nodePath = __importStar(require("node:path"));
 const load_esm_1 = require("../../utils/load-esm");
 function localizeExtractLoader(content, map) {
     // This loader is not cacheable due to how message extraction works.
