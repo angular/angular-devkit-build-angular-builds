@@ -52,6 +52,7 @@ const fast_glob_1 = __importDefault(require("fast-glob"));
 const fs = __importStar(require("fs/promises"));
 const path = __importStar(require("path"));
 const rxjs_1 = require("rxjs");
+const utils_1 = require("../../utils");
 const schema_1 = require("../browser-esbuild/schema");
 const find_tests_1 = require("./find-tests");
 class ApplicationBuildError extends Error {
@@ -305,17 +306,24 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         index: false,
         outputHashing: schema_1.OutputHashing.None,
         optimization: false,
-        sourceMap: {
-            scripts: true,
-            styles: true,
-            vendor: true,
-        },
+        sourceMap: options.codeCoverage
+            ? {
+                scripts: true,
+                styles: true,
+                vendor: true,
+            }
+            : options.sourceMap,
         instrumentForCoverage,
         styles: options.styles,
+        scripts: options.scripts,
         polyfills,
         webWorkerTsConfig: options.webWorkerTsConfig,
         watch: options.watch ?? !karmaOptions.singleRun,
         stylePreprocessorOptions: options.stylePreprocessorOptions,
+        inlineStyleLanguage: options.inlineStyleLanguage,
+        fileReplacements: options.fileReplacements
+            ? (0, utils_1.normalizeFileReplacements)(options.fileReplacements, './')
+            : undefined,
     };
     // Build tests with `application` builder, using test files as entry points.
     const [buildOutput, buildIterator] = await first((0, private_1.buildApplicationInternal)(buildOptions, context), { cancel: !buildOptions.watch });
@@ -344,6 +352,15 @@ async function initializeApplication(options, context, karmaOptions, transforms 
         watched: false,
     };
     karmaOptions.files ??= [];
+    if (options.scripts?.length) {
+        // This should be more granular to support named bundles.
+        // However, it replicates the behavior of the Karma Webpack-based builder.
+        karmaOptions.files.push({
+            pattern: `${outputPath}/scripts.js`,
+            watched: false,
+            type: 'js',
+        });
+    }
     karmaOptions.files.push(
     // Serve global setup script.
     { pattern: `${outputPath}/${mainName}.js`, type: 'module', watched: false }, 
