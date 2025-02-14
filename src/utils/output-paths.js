@@ -8,18 +8,18 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ensureOutputPaths = ensureOutputPaths;
-const fs_1 = require("fs");
-const path_1 = require("path");
+const node_fs_1 = require("node:fs");
+const node_path_1 = require("node:path");
 function ensureOutputPaths(baseOutputPath, i18n) {
     const outputPaths = i18n.shouldInline
         ? [...i18n.inlineLocales].map((l) => [
             l,
-            i18n.flatOutput ? baseOutputPath : (0, path_1.join)(baseOutputPath, i18n.locales[l].subPath),
+            i18n.flatOutput ? baseOutputPath : (0, node_path_1.join)(baseOutputPath, i18n.locales[l].subPath),
         ])
         : [['', baseOutputPath]];
     for (const [, outputPath] of outputPaths) {
-        if (!(0, fs_1.existsSync)(outputPath)) {
-            (0, fs_1.mkdirSync)(outputPath, { recursive: true });
+        if (!(0, node_fs_1.existsSync)(outputPath)) {
+            (0, node_fs_1.mkdirSync)(outputPath, { recursive: true });
         }
     }
     return new Map(outputPaths);

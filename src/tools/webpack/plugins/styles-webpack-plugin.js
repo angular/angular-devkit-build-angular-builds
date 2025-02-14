@@ -11,7 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StylesWebpackPlugin = void 0;
-const assert_1 = __importDefault(require("assert"));
+const node_assert_1 = __importDefault(require("node:assert"));
 const error_1 = require("../../../utils/error");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
 /**
@@ -51,12 +51,12 @@ class StylesWebpackPlugin {
                                 entryImport.push(`${resolvedPath}?ngGlobalStyle`);
                             }
                             else {
-                                (0, assert_1.default)(this.compilation, 'Compilation cannot be undefined.');
+                                (0, node_assert_1.default)(this.compilation, 'Compilation cannot be undefined.');
                                 (0, webpack_diagnostics_1.addError)(this.compilation, `Cannot resolve '${path}'.`);
                             }
                         }
                         catch (error) {
-                            (0, assert_1.default)(this.compilation, 'Compilation cannot be undefined.');
+                            (0, node_assert_1.default)(this.compilation, 'Compilation cannot be undefined.');
                             (0, error_1.assertIsError)(error);
                             (0, webpack_diagnostics_1.addError)(this.compilation, error.message);
                         }

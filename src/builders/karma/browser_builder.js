@@ -42,7 +42,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = execute;
 const private_1 = require("@angular/build/private");
-const path = __importStar(require("path"));
+const path = __importStar(require("node:path"));
 const rxjs_1 = require("rxjs");
 const configs_1 = require("../../tools/webpack/configs");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");

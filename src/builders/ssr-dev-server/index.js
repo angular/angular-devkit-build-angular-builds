@@ -45,9 +45,9 @@ exports.log = log;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
-const path_1 = require("path");
+const node_path_1 = require("node:path");
+const url = __importStar(require("node:url"));
 const rxjs_1 = require("rxjs");
-const url = __importStar(require("url"));
 const utils_1 = require("./utils");
 /** Log messages to ignore and not rely to the logger */
 const IGNORED_STDOUT_MESSAGES = [
@@ -166,7 +166,7 @@ function log({ stderr, stdout }, logger) {
 }
 function startNodeServer(serverOutput, port, logger, inspectMode = false) {
     const outputPath = serverOutput.outputPath;
-    const path = (0, path_1.join)(outputPath, 'main.js');
+    const path = (0, node_path_1.join)(outputPath, 'main.js');
     const env = { ...process.env, PORT: '' + port };
     const args = ['--enable-source-maps', `"${path}"`];
     if (inspectMode) {
@@ -290,8 +290,8 @@ function getSslConfig(root, options) {
     const { ssl, sslCert, sslKey } = options;
     if (ssl && sslCert && sslKey) {
         return {
-            key: (0, path_1.resolve)(root, sslKey),
-            cert: (0, path_1.resolve)(root, sslCert),
+            key: (0, node_path_1.resolve)(root, sslKey),
+            cert: (0, node_path_1.resolve)(root, sslCert),
         };
     }
     return ssl;

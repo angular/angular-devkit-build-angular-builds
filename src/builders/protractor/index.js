@@ -43,8 +43,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = execute;
 const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
-const path_1 = require("path");
-const url = __importStar(require("url"));
+const node_path_1 = require("node:path");
+const url = __importStar(require("node:url"));
 const utils_1 = require("../../utils");
 const error_1 = require("../../utils/error");
 function runProtractor(root, options) {
@@ -61,7 +61,7 @@ function runProtractor(root, options) {
     // process. To work around this we run it in a subprocess.
     // https://github.com/angular/protractor/issues/4160
     return (0, utils_1.runModuleAsObservableFork)(root, 'protractor/built/launcher', 'init', [
-        (0, path_1.resolve)(root, options.protractorConfig),
+        (0, node_path_1.resolve)(root, options.protractorConfig),
         additionalProtractorConfig,
     ]).toPromise();
 }

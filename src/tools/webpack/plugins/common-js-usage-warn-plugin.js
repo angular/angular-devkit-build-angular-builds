@@ -8,7 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommonJsUsageWarnPlugin = void 0;
-const path_1 = require("path");
+const node_path_1 = require("node:path");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
 // Webpack doesn't export these so the deep imports can potentially break.
 const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
@@ -38,7 +38,7 @@ class CommonJsUsageWarnPlugin {
                     const { dependencies, rawRequest } = module;
                     if (!rawRequest ||
                         rawRequest.startsWith('.') ||
-                        (0, path_1.isAbsolute)(rawRequest) ||
+                        (0, node_path_1.isAbsolute)(rawRequest) ||
                         this.allowedDependencies.has(rawRequest) ||
                         this.allowedDependencies.has(this.rawRequestToPackageName(rawRequest)) ||
                         rawRequest.startsWith('@angular/common/locales/')) {

@@ -43,9 +43,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDevServerConfig = getDevServerConfig;
 exports.buildServePath = buildServePath;
 const core_1 = require("@angular-devkit/core");
-const fs_1 = require("fs");
-const path_1 = require("path");
-const url_1 = require("url");
+const node_fs_1 = require("node:fs");
+const node_path_1 = require("node:path");
+const node_url_1 = require("node:url");
 const error_1 = require("../../../utils/error");
 const load_esm_1 = require("../../../utils/load-esm");
 const webpack_browser_config_1 = require("../../../utils/webpack-browser-config");
@@ -57,7 +57,7 @@ async function getDevServerConfig(wco) {
     if (hmr) {
         extraRules.push({
             loader: hmr_loader_1.HmrLoader,
-            include: [(0, path_1.resolve)(wco.root, main)],
+            include: [(0, node_path_1.resolve)(wco.root, main)],
         });
     }
     const extraPlugins = [];
@@ -87,7 +87,7 @@ async function getDevServerConfig(wco) {
                 ...headers,
             },
             historyApiFallback: !!index && {
-                index: path_1.posix.join(servePath, (0, webpack_browser_config_1.getIndexOutputFile)(index)),
+                index: node_path_1.posix.join(servePath, (0, webpack_browser_config_1.getIndexOutputFile)(index)),
                 disableDotRule: true,
                 htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
                 rewrites: [
@@ -153,8 +153,8 @@ function getServerConfig(root, options) {
         type: 'https',
         options: sslCert && sslKey
             ? {
-                key: (0, path_1.resolve)(root, sslKey),
-                cert: (0, path_1.resolve)(root, sslCert),
+                key: (0, node_path_1.resolve)(root, sslKey),
+                cert: (0, node_path_1.resolve)(root, sslCert),
             }
             : undefined,
     };
@@ -167,14 +167,14 @@ async function addProxyConfig(root, proxyConfig) {
     if (!proxyConfig) {
         return undefined;
     }
-    const proxyPath = (0, path_1.resolve)(root, proxyConfig);
-    if (!(0, fs_1.existsSync)(proxyPath)) {
+    const proxyPath = (0, node_path_1.resolve)(root, proxyConfig);
+    if (!(0, node_fs_1.existsSync)(proxyPath)) {
         throw new Error(`Proxy configuration file ${proxyPath} does not exist.`);
     }
     let proxyConfiguration;
-    switch ((0, path_1.extname)(proxyPath)) {
+    switch ((0, node_path_1.extname)(proxyPath)) {
         case '.json': {
-            const content = await fs_1.promises.readFile(proxyPath, 'utf-8');
+            const content = await node_fs_1.promises.readFile(proxyPath, 'utf-8');
             const { parse, printParseErrorCode } = await Promise.resolve().then(() => __importStar(require('jsonc-parser')));
             const parseErrors = [];
             proxyConfiguration = parse(content, parseErrors, { allowTrailingComma: true });
@@ -192,7 +192,7 @@ async function addProxyConfig(root, proxyConfig) {
             // Load the ESM configuration file using the TypeScript dynamic import workaround.
             // Once TypeScript provides support for keeping the dynamic import this workaround can be
             // changed to a direct dynamic import.
-            proxyConfiguration = (await (0, load_esm_1.loadEsmModule)((0, url_1.pathToFileURL)(proxyPath))).default;
+            proxyConfiguration = (await (0, load_esm_1.loadEsmModule)((0, node_url_1.pathToFileURL)(proxyPath))).default;
             break;
         case '.cjs':
             proxyConfiguration = require(proxyPath);
@@ -211,7 +211,7 @@ async function addProxyConfig(root, proxyConfig) {
                 // Load the ESM configuration file using the TypeScript dynamic import workaround.
                 // Once TypeScript provides support for keeping the dynamic import this workaround can be
                 // changed to a direct dynamic import.
-                proxyConfiguration = (await (0, load_esm_1.loadEsmModule)((0, url_1.pathToFileURL)(proxyPath))).default;
+                proxyConfiguration = (await (0, load_esm_1.loadEsmModule)((0, node_url_1.pathToFileURL)(proxyPath))).default;
             }
     }
     return normalizeProxyConfiguration(proxyConfiguration);
@@ -288,7 +288,7 @@ function getWebSocketSettings(options, servePath) {
             client: undefined,
         };
     }
-    const webSocketPath = path_1.posix.join(servePath, 'ng-cli-ws');
+    const webSocketPath = node_path_1.posix.join(servePath, 'ng-cli-ws');
     return {
         webSocketServer: {
             options: {
@@ -310,7 +310,7 @@ function getPublicHostOptions(options, webSocketPath) {
     let publicHost = options.publicHost;
     if (publicHost) {
         const hostWithProtocol = !/^\w+:\/\//.test(publicHost) ? `https://${publicHost}` : publicHost;
-        publicHost = new url_1.URL(hostWithProtocol).host;
+        publicHost = new node_url_1.URL(hostWithProtocol).host;
     }
     return `auto://${publicHost || '0.0.0.0:0'}${webSocketPath}`;
 }

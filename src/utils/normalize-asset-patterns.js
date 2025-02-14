@@ -45,9 +45,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MissingAssetSourceRootException = void 0;
 exports.normalizeAssetPatterns = normalizeAssetPatterns;
-const fs_1 = require("fs");
 const node_assert_1 = __importDefault(require("node:assert"));
-const path = __importStar(require("path"));
+const node_fs_1 = require("node:fs");
+const path = __importStar(require("node:path"));
 class MissingAssetSourceRootException extends Error {
     constructor(path) {
         super(`The ${path} asset path must start with the project source root.`);
@@ -73,7 +73,7 @@ function normalizeAssetPatterns(assetPatterns, workspaceRoot, projectRoot, proje
             let glob, input;
             let isDirectory = false;
             try {
-                isDirectory = (0, fs_1.statSync)(resolvedAssetPath).isDirectory();
+                isDirectory = (0, node_fs_1.statSync)(resolvedAssetPath).isDirectory();
             }
             catch {
                 isDirectory = true;

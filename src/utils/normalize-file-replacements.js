@@ -42,8 +42,8 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MissingFileReplacementException = void 0;
 exports.normalizeFileReplacements = normalizeFileReplacements;
-const fs_1 = require("fs");
-const path = __importStar(require("path"));
+const node_fs_1 = require("node:fs");
+const path = __importStar(require("node:path"));
 class MissingFileReplacementException extends Error {
     constructor(path) {
         super(`The ${path} path in file replacements does not exist.`);
@@ -56,10 +56,10 @@ function normalizeFileReplacements(fileReplacements, workspaceRoot) {
     }
     const normalizedReplacement = fileReplacements.map((replacement) => normalizeFileReplacement(replacement, workspaceRoot));
     for (const { replace, with: replacementWith } of normalizedReplacement) {
-        if (!(0, fs_1.existsSync)(replacementWith)) {
+        if (!(0, node_fs_1.existsSync)(replacementWith)) {
             throw new MissingFileReplacementException(replacementWith);
         }
-        if (!(0, fs_1.existsSync)(replace)) {
+        if (!(0, node_fs_1.existsSync)(replace)) {
             throw new MissingFileReplacementException(replace);
         }
     }

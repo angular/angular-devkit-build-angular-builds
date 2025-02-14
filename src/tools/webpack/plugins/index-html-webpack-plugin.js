@@ -9,7 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IndexHtmlWebpackPlugin = void 0;
 const private_1 = require("@angular/build/private");
-const path_1 = require("path");
+const node_path_1 = require("node:path");
 const webpack_1 = require("webpack");
 const error_1 = require("../../../utils/error");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
@@ -47,13 +47,13 @@ class IndexHtmlWebpackPlugin extends private_1.IndexHtmlGenerator {
                         files.push({
                             name: chunk.name,
                             file,
-                            extension: (0, path_1.extname)(file),
+                            extension: (0, node_path_1.extname)(file),
                         });
                     }
                 }
                 const { csrContent: content, warnings, errors, } = await this.process({
                     files,
-                    outputPath: (0, path_1.dirname)(this.options.outputPath),
+                    outputPath: (0, node_path_1.dirname)(this.options.outputPath),
                     baseHref: this.options.baseHref,
                     lang: this.options.lang,
                 });
@@ -68,7 +68,7 @@ class IndexHtmlWebpackPlugin extends private_1.IndexHtmlGenerator {
         };
     }
     async readAsset(path) {
-        const data = this.compilation.assets[(0, path_1.basename)(path)].source();
+        const data = this.compilation.assets[(0, node_path_1.basename)(path)].source();
         return typeof data === 'string' ? data : data.toString();
     }
     async readIndex(path) {

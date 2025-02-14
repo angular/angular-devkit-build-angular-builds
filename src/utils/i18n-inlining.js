@@ -41,8 +41,8 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.i18nInlineEmittedFiles = i18nInlineEmittedFiles;
-const fs = __importStar(require("fs"));
-const path = __importStar(require("path"));
+const fs = __importStar(require("node:fs"));
+const path = __importStar(require("node:path"));
 const action_executor_1 = require("./action-executor");
 const copy_assets_1 = require("./copy-assets");
 const error_1 = require("./error");

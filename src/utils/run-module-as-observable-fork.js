@@ -11,15 +11,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.runModuleAsObservableFork = runModuleAsObservableFork;
-const child_process_1 = require("child_process");
-const path_1 = require("path");
+const node_child_process_1 = require("node:child_process");
+const node_path_1 = require("node:path");
 const rxjs_1 = require("rxjs");
 const tree_kill_1 = __importDefault(require("tree-kill"));
 function runModuleAsObservableFork(cwd, modulePath, exportName, 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 args) {
     return new rxjs_1.Observable((obs) => {
-        const workerPath = (0, path_1.resolve)(__dirname, './run-module-worker.js');
+        const workerPath = (0, node_path_1.resolve)(__dirname, './run-module-worker.js');
         const debugArgRegex = /--inspect(?:-brk|-port)?|--debug(?:-brk|-port)/;
         const execArgv = process.execArgv.filter((arg) => {
             // Remove debug args.
@@ -38,7 +38,7 @@ args) {
         //     logger.error, // make it a stream
         //   ];
         // }
-        const forkedProcess = (0, child_process_1.fork)(workerPath, undefined, forkOptions);
+        const forkedProcess = (0, node_child_process_1.fork)(workerPath, undefined, forkOptions);
         // Cleanup.
         const killForkedProcess = () => {
             if (forkedProcess && forkedProcess.pid) {

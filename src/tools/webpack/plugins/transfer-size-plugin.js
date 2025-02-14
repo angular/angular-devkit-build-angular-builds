@@ -8,10 +8,10 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TransferSizePlugin = void 0;
-const util_1 = require("util");
-const zlib_1 = require("zlib");
+const node_util_1 = require("node:util");
+const node_zlib_1 = require("node:zlib");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
-const brotliCompressAsync = (0, util_1.promisify)(zlib_1.brotliCompress);
+const brotliCompressAsync = (0, node_util_1.promisify)(node_zlib_1.brotliCompress);
 const PLUGIN_NAME = 'angular-transfer-size-estimator';
 class TransferSizePlugin {
     constructor() { }

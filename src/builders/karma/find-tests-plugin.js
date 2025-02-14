@@ -11,8 +11,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FindTestsPlugin = void 0;
-const assert_1 = __importDefault(require("assert"));
 const mini_css_extract_plugin_1 = require("mini-css-extract-plugin");
+const node_assert_1 = __importDefault(require("node:assert"));
 const find_tests_1 = require("./find-tests");
 /**
  * The name of the plugin provided to Webpack when tapping Webpack compiler hooks.
@@ -42,7 +42,7 @@ class FindTestsPlugin {
                 entrypoint.import = [...originalImport, ...specFiles];
             }
             else {
-                (0, assert_1.default)(this.compilation, 'Compilation cannot be undefined.');
+                (0, node_assert_1.default)(this.compilation, 'Compilation cannot be undefined.');
                 this.compilation
                     .getLogger(mini_css_extract_plugin_1.pluginName)
                     .error(`Specified patterns: "${include.join(', ')}" did not match any spec files.`);

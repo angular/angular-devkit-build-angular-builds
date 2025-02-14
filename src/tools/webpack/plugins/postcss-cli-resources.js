@@ -43,8 +43,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postcss = void 0;
 exports.default = default_1;
 const loader_utils_1 = require("loader-utils");
-const path = __importStar(require("path"));
-const url = __importStar(require("url"));
+const path = __importStar(require("node:path"));
+const url = __importStar(require("node:url"));
 const error_1 = require("../../../utils/error");
 function wrapUrl(url) {
     let wrappedUrl;
