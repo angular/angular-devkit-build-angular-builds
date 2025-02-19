@@ -3,6 +3,10 @@
  */
 export type Schema = {
     /**
+     * Run tests using Ahead of Time compilation.
+     */
+    aot?: boolean;
+    /**
      * List of static application assets.
      */
     assets?: AssetPattern[];

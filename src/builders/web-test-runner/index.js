@@ -81,7 +81,7 @@ async function buildTests(testFiles, outputPath, options, ctx) {
         entryPoints,
         tsConfig: options.tsConfig,
         outputPath,
-        aot: false,
+        aot: options.aot,
         index: false,
         outputHashing: schema_1.OutputHashing.None,
         optimization: false,
