@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "19.2.1+sha-e6e8ce9",
+  "version": "19.2.1+sha-177f356",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#e6e8ce9",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#e6e8ce9",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#e6e8ce9",
-    "@angular/build": "github:angular/angular-build-builds#e6e8ce9",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#177f356",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#177f356",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#177f356",
+    "@angular/build": "github:angular/angular-build-builds#177f356",
     "@babel/core": "7.26.9",
     "@babel/generator": "7.26.9",
     "@babel/helper-annotate-as-pure": "7.25.9",
@@ -21,7 +21,7 @@
     "@babel/preset-env": "7.26.9",
     "@babel/runtime": "7.26.9",
     "@discoveryjs/json-ext": "0.6.3",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#e6e8ce9",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#177f356",
     "@vitejs/plugin-basic-ssl": "1.2.0",
     "ansi-colors": "4.1.3",
     "autoprefixer": "10.4.20",
@@ -70,7 +70,7 @@
     "@angular/localize": "^19.0.0 || ^19.2.0-next.0",
     "@angular/platform-server": "^19.0.0 || ^19.2.0-next.0",
     "@angular/service-worker": "^19.0.0 || ^19.2.0-next.0",
-    "@angular/ssr": "github:angular/angular-ssr-builds#e6e8ce9",
+    "@angular/ssr": "github:angular/angular-ssr-builds#177f356",
     "@web/test-runner": "^0.20.0",
     "browser-sync": "^3.0.2",
     "jest": "^29.5.0",
@@ -91,7 +91,7 @@
     "@angular/service-worker": {
       "optional": true
     },
-    "@angular/ssr": "github:angular/angular-ssr-builds#e6e8ce9",
+    "@angular/ssr": "github:angular/angular-ssr-builds#177f356",
     "@web/test-runner": {
       "optional": true
     },
@@ -128,6 +128,7 @@
     "type": "git",
     "url": "https://github.com/angular/angular-cli.git"
   },
+  "packageManager": "pnpm@9.15.6",
   "engines": {
     "node": "^18.19.1 || ^20.11.1 || >=22.0.0",
     "npm": "^6.11.0 || ^7.5.6 || >=8.0.0",
