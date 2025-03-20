@@ -10,12 +10,11 @@
 // `@angular-devkit/build-angular` rather than the user's workspace. Should look into virtual modules to support those use cases.
 
 import { getTestBed } from '@angular/core/testing';
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting,
-} from '@angular/platform-browser-dynamic/testing';
+import { platformBrowser } from '@angular/platform-browser';
+import { BrowserTestingModule } from '@angular/platform-browser/testing';
 
-getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
+// TODO(alanagius): replace with `platformBrowserTesting` once https://github.com/angular/angular/pull/60480 is released.
+getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowser(), {
   errorOnUnknownElements: true,
   errorOnUnknownProperties: true,
 });

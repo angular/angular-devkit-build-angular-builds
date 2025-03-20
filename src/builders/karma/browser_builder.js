@@ -132,13 +132,12 @@ async function initializeBrowser(options, context, webpackConfigurationTransform
 function getBuiltInMainFile() {
     const content = Buffer.from(`
   import { getTestBed } from '@angular/core/testing';
-  import {
-    BrowserDynamicTestingModule,
-    platformBrowserDynamicTesting,
-   } from '@angular/platform-browser-dynamic/testing';
+  import { platformBrowser } from '@angular/platform-browser';
+  import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 
+  // TODO(alanagius): replace with \`platformBrowserTesting\` once https://github.com/angular/angular/pull/60480 is released.
   // Initialize the Angular testing environment.
-  getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
+  getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowser(), {
     errorOnUnknownElements: true,
     errorOnUnknownProperties: true
   });
