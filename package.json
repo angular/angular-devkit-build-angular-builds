@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "20.0.0-next.3+sha-f4061ef",
+  "version": "20.0.0-next.3+sha-a5ace27",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#f4061ef",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#f4061ef",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#f4061ef",
-    "@angular/build": "github:angular/angular-build-builds#f4061ef",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#a5ace27",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#a5ace27",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#a5ace27",
+    "@angular/build": "github:angular/angular-build-builds#a5ace27",
     "@babel/core": "7.26.10",
     "@babel/generator": "7.27.0",
     "@babel/helper-annotate-as-pure": "7.25.9",
@@ -21,7 +21,7 @@
     "@babel/preset-env": "7.26.9",
     "@babel/runtime": "7.27.0",
     "@discoveryjs/json-ext": "0.6.3",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#f4061ef",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#a5ace27",
     "@vitejs/plugin-basic-ssl": "2.0.0",
     "ansi-colors": "4.1.3",
     "autoprefixer": "10.4.21",
@@ -71,7 +71,7 @@
     "@angular/platform-browser": "^20.0.0 || ^20.0.0-next.0",
     "@angular/platform-server": "^20.0.0 || ^20.0.0-next.0",
     "@angular/service-worker": "^20.0.0 || ^20.0.0-next.0",
-    "@angular/ssr": "github:angular/angular-ssr-builds#f4061ef",
+    "@angular/ssr": "github:angular/angular-ssr-builds#a5ace27",
     "@web/test-runner": "^0.20.0",
     "browser-sync": "^3.0.2",
     "jest": "^29.5.0",
@@ -95,7 +95,7 @@
     "@angular/service-worker": {
       "optional": true
     },
-    "@angular/ssr": "github:angular/angular-ssr-builds#f4061ef",
+    "@angular/ssr": "github:angular/angular-ssr-builds#a5ace27",
     "@web/test-runner": {
       "optional": true
     },
