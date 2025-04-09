@@ -12,7 +12,6 @@ const mrmime_1 = require("mrmime");
 const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
 const node_worker_threads_1 = require("node:worker_threads");
-const undici_1 = require("undici");
 /**
  * This is passed as workerData when setting up the worker via the `piscina` package.
  */
@@ -45,7 +44,7 @@ function patchFetchToLoadInMemoryAssets() {
         const cachedAsset = assetsCache.get(pathname);
         if (cachedAsset) {
             const { content, headers } = cachedAsset;
-            return new undici_1.Response(content, {
+            return new Response(content, {
                 headers,
             });
         }
@@ -58,7 +57,7 @@ function patchFetchToLoadInMemoryAssets() {
             }
             : undefined;
         assetsCache.set(pathname, { headers, content });
-        return new undici_1.Response(content, {
+        return new Response(content, {
             headers,
         });
     };
