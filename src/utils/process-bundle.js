@@ -171,7 +171,8 @@ async function inlineLocales(options) {
         if (!transformResult || !transformResult.code) {
             throw new Error(`Unknown error occurred processing bundle for "${options.filename}".`);
         }
-        const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
+        const subPath = i18n.locales[locale].subPath;
+        const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : subPath, options.filename);
         await fs.writeFile(outputPath, transformResult.code);
         if (options.map && transformResult.map) {
             const outputMap = (0, remapping_1.default)([transformResult.map, options.map], () => null);
@@ -231,7 +232,8 @@ async function inlineLocalesDirect(ast, options) {
                 : new ConcatSource(setLocaleText, content);
         }
         const { source: outputCode, map: outputMap } = outputSource.sourceAndMap();
-        const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
+        const subPath = i18n.locales[locale].subPath;
+        const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : subPath, options.filename);
         await fs.writeFile(outputPath, outputCode);
         if (inputMap && outputMap) {
             outputMap.file = options.filename;
@@ -248,7 +250,8 @@ async function inlineCopyOnly(options) {
         throw new Error('i18n options are missing');
     }
     for (const locale of i18n.inlineLocales) {
-        const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : locale, options.filename);
+        const subPath = i18n.locales[locale].subPath;
+        const outputPath = path.join(options.outputPath, i18n.flatOutput ? '' : subPath, options.filename);
         await fs.writeFile(outputPath, options.code);
         if (options.map) {
             await fs.writeFile(outputPath + '.map', options.map);
