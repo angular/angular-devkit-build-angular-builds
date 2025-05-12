@@ -1,6 +1,6 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "20.0.0-rc.0+sha-0f8594f",
+  "version": "20.0.0-rc.0+sha-a01dc23",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
@@ -48,7 +48,7 @@
     "postcss-loader": "8.1.1",
     "resolve-url-loader": "5.0.0",
     "rxjs": "7.8.2",
-    "sass": "1.87.0",
+    "sass": "1.88.0",
     "sass-loader": "16.0.5",
     "semver": "7.7.1",
     "source-map-loader": "5.0.0",
