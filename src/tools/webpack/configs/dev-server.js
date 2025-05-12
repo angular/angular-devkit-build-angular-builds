@@ -205,7 +205,7 @@ async function addProxyConfig(root, proxyConfig) {
             }
             catch (e) {
                 (0, error_1.assertIsError)(e);
-                if (e.code !== 'ERR_REQUIRE_ESM') {
+                if (e.code !== 'ERR_REQUIRE_ESM' && e.code !== 'ERR_REQUIRE_ASYNC_MODULE') {
                     throw e;
                 }
                 // Load the ESM configuration file using the TypeScript dynamic import workaround.
