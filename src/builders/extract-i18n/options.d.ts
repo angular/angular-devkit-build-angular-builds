@@ -5,6 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+import { type I18nOptions } from '@angular/build/private';
+import { type DiagnosticHandlingStrategy } from '@angular/localize/tools';
 import { BuilderContext } from '@angular-devkit/architect';
 import { Schema as ExtractI18nOptions, Format } from './schema';
 export type NormalizedExtractI18nOptions = Awaited<ReturnType<typeof normalizeOptions>>;
@@ -22,7 +24,9 @@ export declare function normalizeOptions(context: BuilderContext, projectName: s
     workspaceRoot: string;
     projectRoot: string;
     buildTarget: import("@angular-devkit/architect").Target;
-    i18nOptions: import("@angular/build/private").I18nOptions;
+    i18nOptions: I18nOptions & {
+        duplicateTranslationBehavior: DiagnosticHandlingStrategy;
+    };
     format: Format.Arb | Format.Json | Format.LegacyMigrate | Format.Xliff | Format.Xliff2 | Format.Xmb;
     outFile: string;
     progress: boolean;
