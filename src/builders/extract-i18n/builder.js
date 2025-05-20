@@ -115,13 +115,20 @@ async function execute(options, context, transforms) {
             return node_path_1.default.relative(from, to);
         },
     };
+    const duplicateTranslationBehavior = normalizedOptions.i18nOptions.duplicateTranslationBehavior;
     const diagnostics = checkDuplicateMessages(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    checkFileSystem, extractionResult.messages, 'warning', 
+    checkFileSystem, extractionResult.messages, duplicateTranslationBehavior, 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     extractionResult.basePath);
-    if (diagnostics.messages.length > 0) {
-        context.logger.warn(diagnostics.formatDiagnostics(''));
+    if (diagnostics.messages.length > 0 && duplicateTranslationBehavior !== 'ignore') {
+        if (duplicateTranslationBehavior === 'error') {
+            context.logger.error(`Extraction Failed: ${diagnostics.formatDiagnostics('')}`);
+            return { success: false };
+        }
+        else {
+            context.logger.warn(diagnostics.formatDiagnostics(''));
+        }
     }
     // Serialize all extracted messages
     const serializer = await createSerializer(localizeToolsModule, normalizedOptions.format, normalizedOptions.i18nOptions.sourceLocale, extractionResult.basePath, extractionResult.useLegacyIds, diagnostics);

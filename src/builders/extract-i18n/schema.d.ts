@@ -13,6 +13,10 @@ export type Schema = {
      */
     format?: Format;
     /**
+     * How to handle duplicate translations.
+     */
+    i18nDuplicateTranslation?: I18NDuplicateTranslation;
+    /**
      * Name of the file to output.
      */
     outFile?: string;
@@ -38,4 +42,12 @@ export declare enum Format {
     Xliff = "xliff",
     Xliff2 = "xliff2",
     Xmb = "xmb"
+}
+/**
+ * How to handle duplicate translations.
+ */
+export declare enum I18NDuplicateTranslation {
+    Error = "error",
+    Ignore = "ignore",
+    Warning = "warning"
 }
