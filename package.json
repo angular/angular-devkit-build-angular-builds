@@ -1,6 +1,6 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "20.1.0-next.0+sha-7e69aa0",
+  "version": "20.1.0-next.0+sha-2a23579",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
@@ -41,7 +41,7 @@
     "loader-utils": "3.3.1",
     "mini-css-extract-plugin": "2.9.2",
     "open": "10.1.2",
-    "ora": "5.4.1",
+    "ora": "8.2.0",
     "picomatch": "4.0.2",
     "piscina": "5.0.0",
     "postcss": "8.5.3",
