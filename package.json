@@ -1,6 +1,6 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "20.0.0-rc.2+sha-a42e045",
+  "version": "20.0.0-rc.2+sha-7877d9a",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
