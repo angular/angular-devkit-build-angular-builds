@@ -56,18 +56,27 @@ function execute(options, context, transforms = {}) {
     // Check Angular version.
     (0, private_1.assertCompatibleAngularVersion)(context.workspaceRoot);
     return (0, rxjs_1.from)(getExecuteWithBuilder(options, context)).pipe((0, rxjs_1.mergeMap)(([useEsbuild, executeWithBuilder]) => {
-        const karmaOptions = getBaseKarmaOptions(options, context, useEsbuild);
-        if (useEsbuild && transforms.webpackConfiguration) {
-            context.logger.warn(`This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`);
+        if (useEsbuild) {
+            if (transforms.webpackConfiguration) {
+                context.logger.warn(`This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`);
+            }
+            if (options.fileReplacements) {
+                options.fileReplacements = (0, utils_1.normalizeFileReplacements)(options.fileReplacements, './');
+            }
+            if (typeof options.polyfills === 'string') {
+                options.polyfills = [options.polyfills];
+            }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return executeWithBuilder(options, context, transforms);
         }
-        if (useEsbuild && options.fileReplacements) {
-            options.fileReplacements = (0, utils_1.normalizeFileReplacements)(options.fileReplacements, './');
+        else {
+            const karmaOptions = getBaseKarmaOptions(options, context);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return executeWithBuilder(options, context, karmaOptions, transforms);
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return executeWithBuilder(options, context, karmaOptions, transforms);
     }));
 }
-function getBaseKarmaOptions(options, context, useEsbuild) {
+function getBaseKarmaOptions(options, context) {
     let singleRun;
     if (options.watch !== undefined) {
         singleRun = !options.watch;
@@ -79,7 +88,7 @@ function getBaseKarmaOptions(options, context, useEsbuild) {
     }
     const karmaOptions = options.karmaConfig
         ? {}
-        : getBuiltInKarmaConfig(context.workspaceRoot, projectName, useEsbuild);
+        : getBuiltInKarmaConfig(context.workspaceRoot, projectName);
     karmaOptions.singleRun = singleRun;
     // Workaround https://github.com/angular/angular-cli/issues/28271, by clearing context by default
     // for single run executions. Not clearing context for multi-run (watched) builds allows the
@@ -104,7 +113,7 @@ function getBaseKarmaOptions(options, context, useEsbuild) {
     }
     return karmaOptions;
 }
-function getBuiltInKarmaConfig(workspaceRoot, projectName, useEsbuild) {
+function getBuiltInKarmaConfig(workspaceRoot, projectName) {
     let coverageFolderName = projectName.charAt(0) === '@' ? projectName.slice(1) : projectName;
     if (/[A-Z]/.test(coverageFolderName)) {
         coverageFolderName = core_1.strings.dasherize(coverageFolderName);
@@ -113,13 +122,13 @@ function getBuiltInKarmaConfig(workspaceRoot, projectName, useEsbuild) {
     // Any changes to the config here need to be synced to: packages/schematics/angular/config/files/karma.conf.js.template
     return {
         basePath: '',
-        frameworks: ['jasmine', ...(useEsbuild ? [] : ['@angular-devkit/build-angular'])],
+        frameworks: ['jasmine', '@angular-devkit/build-angular'],
         plugins: [
             'karma-jasmine',
             'karma-chrome-launcher',
             'karma-jasmine-html-reporter',
             'karma-coverage',
-            ...(useEsbuild ? [] : ['@angular-devkit/build-angular/plugins/karma']),
+            '@angular-devkit/build-angular/plugins/karma',
         ].map((p) => workspaceRootRequire(p)),
         jasmineHtmlReporter: {
             suppressAll: true, // removes the duplicated traces
@@ -151,8 +160,8 @@ async function getExecuteWithBuilder(options, context) {
     const useEsbuild = await checkForEsbuild(options, context);
     let execute;
     if (useEsbuild) {
-        const { executeKarmaInternal } = await Promise.resolve().then(() => __importStar(require('@angular/build/private')));
-        execute = executeKarmaInternal;
+        const { executeKarmaBuilder } = await Promise.resolve().then(() => __importStar(require('@angular/build')));
+        execute = executeKarmaBuilder;
     }
     else {
         const browserBuilderModule = await Promise.resolve().then(() => __importStar(require('./browser_builder')));
