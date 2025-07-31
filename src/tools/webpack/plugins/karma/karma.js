@@ -49,6 +49,7 @@ const webpack_dev_middleware_1 = __importDefault(require("webpack-dev-middleware
 const stats_1 = require("../../utils/stats");
 const node_1 = require("@angular-devkit/core/node");
 const index_1 = require("../../../../utils/index");
+const node_assert_1 = __importDefault(require("node:assert"));
 const KARMA_APPLICATION_PATH = '_karma_webpack_';
 let blocked = [];
 let isBlocked = false;
@@ -145,6 +146,7 @@ const init = (config, emitter) => {
         isBlocked = true;
         callback?.();
     }
+    (0, node_assert_1.default)(compiler, 'Webpack compiler factory did not return a compiler instance.');
     compiler.hooks.invalid.tap('karma', () => handler());
     compiler.hooks.watchRun.tapAsync('karma', (_, callback) => handler(callback));
     compiler.hooks.run.tapAsync('karma', (_, callback) => handler(callback));
