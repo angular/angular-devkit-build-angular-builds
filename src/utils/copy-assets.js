@@ -11,15 +11,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.copyAssets = copyAssets;
-const fast_glob_1 = __importDefault(require("fast-glob"));
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
+const tinyglobby_1 = require("tinyglobby");
 async function copyAssets(entries, basePaths, root, changed) {
     const defaultIgnore = ['.gitkeep', '**/.DS_Store', '**/Thumbs.db'];
     const outputFiles = [];
     for (const entry of entries) {
         const cwd = node_path_1.default.resolve(root, entry.input);
-        const files = await (0, fast_glob_1.default)(entry.glob, {
+        const files = await (0, tinyglobby_1.glob)(entry.glob, {
             cwd,
             dot: true,
             ignore: entry.ignore ? defaultIgnore.concat(entry.ignore) : defaultIgnore,
