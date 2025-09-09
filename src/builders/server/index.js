@@ -167,6 +167,7 @@ async function initialize(options, context, webpackConfigurationTransform) {
             {
                 plugins: [
                     new webpack_1.default.DefinePlugin({
+                        'ngJitMode': false,
                         'ngServerMode': true,
                     }),
                 ],
