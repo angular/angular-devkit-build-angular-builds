@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { glob as globFn } from 'tinyglobby';
+import fastGlob from 'fast-glob';
 /**
  * Finds all test files in the project.
  *
@@ -15,4 +15,4 @@ import { glob as globFn } from 'tinyglobby';
  *     testing purposes.
  * @returns A set of all test files in the project.
  */
-export declare function findTestFiles(include: string[], exclude: string[], workspaceRoot: string, glob?: typeof globFn): Promise<Set<string>>;
+export declare function findTestFiles(include: string[], exclude: string[], workspaceRoot: string, glob?: typeof fastGlob): Promise<Set<string>>;

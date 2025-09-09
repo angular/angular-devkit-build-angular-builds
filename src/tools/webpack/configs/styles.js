@@ -46,7 +46,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStylesConfig = getStylesConfig;
 const private_1 = require("@angular/build/private");
 const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
-const node_module_1 = require("node:module");
 const path = __importStar(require("node:path"));
 const node_url_1 = require("node:url");
 const plugins_1 = require("../plugins");
@@ -89,9 +88,9 @@ async function getStylesConfig(wco) {
     const searchDirectories = await (0, private_1.generateSearchDirectories)([projectRoot, root]);
     const postcssConfig = await (0, private_1.loadPostcssConfiguration)(searchDirectories);
     if (postcssConfig) {
-        const postCssPluginRequire = (0, node_module_1.createRequire)(path.dirname(postcssConfig.configPath) + '/');
-        for (const [pluginName, pluginOptions] of postcssConfig.config.plugins) {
-            const plugin = postCssPluginRequire(pluginName);
+        for (const [pluginName, pluginOptions] of postcssConfig.plugins) {
+            const resolvedPlugin = require.resolve(pluginName, { paths: [root] });
+            const { default: plugin } = await Promise.resolve(`${resolvedPlugin}`).then(s => __importStar(require(s)));
             if (typeof plugin !== 'function' || plugin.postcss !== true) {
                 throw new Error(`Attempted to load invalid Postcss plugin: "${pluginName}"`);
             }

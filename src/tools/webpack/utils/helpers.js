@@ -39,6 +39,9 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getOutputHashFormat = getOutputHashFormat;
 exports.normalizeExtraEntryPoints = normalizeExtraEntryPoints;
@@ -50,9 +53,9 @@ exports.globalScriptsByBundleName = globalScriptsByBundleName;
 exports.assetPatterns = assetPatterns;
 exports.getStatsOptions = getStatsOptions;
 exports.isPackageInstalled = isPackageInstalled;
+const fast_glob_1 = __importDefault(require("fast-glob"));
 const node_crypto_1 = require("node:crypto");
 const path = __importStar(require("node:path"));
-const tinyglobby_1 = require("tinyglobby");
 const schema_1 = require("../../../builders/browser/schema");
 const package_version_1 = require("../../../utils/package-version");
 function getOutputHashFormat(outputHashing = schema_1.OutputHashing.None, length = 20) {
@@ -136,7 +139,7 @@ function getInstrumentationExcludedPaths(root, excludedPaths) {
     const excluded = new Set();
     for (const excludeGlob of excludedPaths) {
         const excludePath = excludeGlob[0] === '/' ? excludeGlob.slice(1) : excludeGlob;
-        (0, tinyglobby_1.globSync)(excludePath, { cwd: root }).forEach((p) => excluded.add(path.join(root, p)));
+        fast_glob_1.default.sync(excludePath, { cwd: root }).forEach((p) => excluded.add(path.join(root, p)));
     }
     return excluded;
 }
