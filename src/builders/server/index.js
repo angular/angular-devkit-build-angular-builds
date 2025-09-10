@@ -29,6 +29,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = execute;
 const private_1 = require("@angular/build/private");
@@ -37,6 +40,7 @@ const build_webpack_1 = require("@angular-devkit/build-webpack");
 const promises_1 = require("node:fs/promises");
 const path = __importStar(require("node:path"));
 const rxjs_1 = require("rxjs");
+const webpack_1 = __importDefault(require("webpack"));
 const configs_1 = require("../../tools/webpack/configs");
 const helpers_1 = require("../../tools/webpack/utils/helpers");
 const stats_1 = require("../../tools/webpack/utils/stats");
@@ -146,7 +150,18 @@ async function initialize(options, context, webpackConfigurationTransform) {
         // We use the platform to determine the JavaScript syntax output.
         wco.buildOptions.supportedBrowsers ??= [];
         wco.buildOptions.supportedBrowsers.push(...browserslist('maintained node versions'));
-        return [getPlatformServerExportsConfig(wco), (0, configs_1.getCommonConfig)(wco), (0, configs_1.getStylesConfig)(wco)];
+        return [
+            getPlatformServerExportsConfig(wco),
+            (0, configs_1.getCommonConfig)(wco),
+            (0, configs_1.getStylesConfig)(wco),
+            {
+                plugins: [
+                    new webpack_1.default.DefinePlugin({
+                        'ngJitMode': false,
+                    }),
+                ],
+            },
+        ];
     });
     if (options.deleteOutputPath) {
         await (0, utils_1.deleteOutputDir)(context.workspaceRoot, originalOutputPath);
