@@ -91,7 +91,8 @@ async function getStylesConfig(wco) {
     if (postcssConfig) {
         const postCssPluginRequire = (0, node_module_1.createRequire)(path.dirname(postcssConfig.configPath) + '/');
         for (const [pluginName, pluginOptions] of postcssConfig.config.plugins) {
-            const plugin = postCssPluginRequire(pluginName);
+            const pluginMod = postCssPluginRequire(pluginName);
+            const plugin = pluginMod.__esModule ? pluginMod['default'] : pluginMod;
             if (typeof plugin !== 'function' || plugin.postcss !== true) {
                 throw new Error(`Attempted to load invalid Postcss plugin: "${pluginName}"`);
             }
