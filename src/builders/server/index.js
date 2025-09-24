@@ -206,22 +206,18 @@ async function checkTsConfigForPreserveWhitespacesSetting(context, tsConfigPath)
 function getPlatformServerExportsConfig(wco) {
     // Add `@angular/platform-server` exports.
     // This is needed so that DI tokens can be referenced and set at runtime outside of the bundle.
-    // Only add `@angular/platform-server` exports when it is installed.
-    // In some cases this builder is used when `@angular/platform-server` is not installed.
-    // Example: when using `@nguniversal/common/clover` which does not need `@angular/platform-server`.
-    return (0, helpers_1.isPackageInstalled)(wco.root, '@angular/platform-server')
-        ? {
-            module: {
-                rules: [
-                    {
-                        loader: require.resolve('./platform-server-exports-loader'),
-                        include: [path.resolve(wco.root, wco.buildOptions.main)],
-                        options: {
-                            angularSSRInstalled: (0, helpers_1.isPackageInstalled)(wco.root, '@angular/ssr'),
-                        },
+    return {
+        module: {
+            rules: [
+                {
+                    loader: require.resolve('./platform-server-exports-loader'),
+                    include: [path.resolve(wco.root, wco.buildOptions.main)],
+                    options: {
+                        angularSSRInstalled: (0, helpers_1.isPackageInstalled)(wco.root, '@angular/ssr'),
+                        isZoneJsInstalled: (0, helpers_1.isPackageInstalled)(wco.root, 'zone.js'),
                     },
-                ],
-            },
-        }
-        : {};
+                },
+            ],
+        },
+    };
 }

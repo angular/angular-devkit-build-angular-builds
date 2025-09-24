@@ -14,7 +14,7 @@ exports.default = default_1;
  * @see https://github.com/webpack/webpack/issues/15936.
  */
 function default_1(content, map) {
-    const { angularSSRInstalled } = this.getOptions();
+    const { angularSSRInstalled, isZoneJsInstalled } = this.getOptions();
     let source = `${content}
 
   // EXPORTS added by @angular-devkit/build-angular
@@ -24,6 +24,10 @@ function default_1(content, map) {
         source += `
       export { ɵgetRoutesFromAngularRouterConfig } from '@angular/ssr';
     `;
+    }
+    if (isZoneJsInstalled) {
+        source = `import 'zone.js/node';
+    ${source}`;
     }
     this.callback(null, source, map);
     return;

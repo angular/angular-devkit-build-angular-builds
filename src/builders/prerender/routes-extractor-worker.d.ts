@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 export interface RoutesExtractorWorkerData {
-    zonePackage: string;
+    zonePackage: string | undefined;
     indexFile: string;
     outputPath: string;
     serverBundlePath: string;

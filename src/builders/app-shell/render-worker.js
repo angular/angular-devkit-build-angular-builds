@@ -101,8 +101,9 @@ function isBootstrapFn(value) {
  * @returns A promise resolving to the render function of the worker.
  */
 async function initialize() {
-    // Setup Zone.js
-    await Promise.resolve(`${zonePackage}`).then(s => __importStar(require(s)));
+    if (zonePackage) {
+        await Promise.resolve(`${zonePackage}`).then(s => __importStar(require(s)));
+    }
     // Return the render function for use
     return render;
 }

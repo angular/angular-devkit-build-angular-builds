@@ -69,6 +69,11 @@ async function getRoutes(indexFile, outputPath, serverBundlePath, options, works
             routes.add(route);
         }
     }
+    let zonePackage;
+    try {
+        zonePackage = require.resolve('zone.js/node', { paths: [workspaceRoot] });
+    }
+    catch { }
     if (discoverRoutes) {
         const renderWorker = new piscina_1.default({
             filename: require.resolve('./routes-extractor-worker'),
@@ -77,7 +82,7 @@ async function getRoutes(indexFile, outputPath, serverBundlePath, options, works
                 indexFile,
                 outputPath,
                 serverBundlePath,
-                zonePackage: require.resolve('zone.js', { paths: [workspaceRoot] }),
+                zonePackage,
             },
             recordTiming: false,
         });
@@ -145,7 +150,11 @@ async function _renderUniversal(options, context, browserResult, serverResult, b
     // Users can specify a different base html file e.g. "src/home.html"
     const indexFile = (0, webpack_browser_config_1.getIndexOutputFile)(browserOptions.index);
     const { styles: normalizedStylesOptimization } = (0, utils_1.normalizeOptimization)(browserOptions.optimization);
-    const zonePackage = require.resolve('zone.js', { paths: [context.workspaceRoot] });
+    let zonePackage;
+    try {
+        zonePackage = require.resolve('zone.js/node', { paths: [context.workspaceRoot] });
+    }
+    catch { }
     const { baseOutputPath = '' } = serverResult;
     const worker = new piscina_1.default({
         filename: path.join(__dirname, 'render-worker.js'),

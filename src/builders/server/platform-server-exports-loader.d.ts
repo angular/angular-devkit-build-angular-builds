@@ -12,4 +12,5 @@
  */
 export default function (this: import('webpack').LoaderContext<{
     angularSSRInstalled: boolean;
+    isZoneJsInstalled: boolean;
 }>, content: string, map: Parameters<import('webpack').LoaderDefinitionFunction>[1]): void;

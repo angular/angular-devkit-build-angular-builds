@@ -59,7 +59,11 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
     const browserOptions = await context.validateOptions(rawBrowserOptions, browserBuilderName);
     // Locate zone.js to load in the render worker
     const root = context.workspaceRoot;
-    const zonePackage = require.resolve('zone.js', { paths: [root] });
+    let zonePackage;
+    try {
+        zonePackage = require.resolve('zone.js', { paths: [root] });
+    }
+    catch { }
     const projectName = context.target && context.target.project;
     if (!projectName) {
         throw new Error('The builder requires a target.');

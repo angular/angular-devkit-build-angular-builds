@@ -70,8 +70,10 @@ async function extract() {
  * @returns A promise resolving to the extract function of the worker.
  */
 async function initialize() {
-    // Setup Zone.js
-    await Promise.resolve(`${zonePackage}`).then(s => __importStar(require(s)));
+    if (zonePackage) {
+        // Setup Zone.js
+        await Promise.resolve(`${zonePackage}`).then(s => __importStar(require(s)));
+    }
     return extract;
 }
 /**
