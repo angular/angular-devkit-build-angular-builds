@@ -37,7 +37,7 @@ export interface ApplicationPresetOptions {
         inputSourceMap: unknown;
     };
     optimize?: {
-        pureTopLevel: boolean;
+        topLevelSafeMode: boolean;
         wrapDecorators: boolean;
     };
     supportedBrowsers?: string[];

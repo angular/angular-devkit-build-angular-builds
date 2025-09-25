@@ -124,13 +124,7 @@ function default_1(api, options) {
     }
     if (options.optimize) {
         const { adjustStaticMembers, adjustTypeScriptEnums, elideAngularMetadata, markTopLevelPure, } = require('@angular/build/private');
-        if (options.optimize.pureTopLevel) {
-            plugins.push(markTopLevelPure);
-        }
-        plugins.push(elideAngularMetadata, adjustTypeScriptEnums, [
-            adjustStaticMembers,
-            { wrapDecorators: options.optimize.wrapDecorators },
-        ]);
+        plugins.push([markTopLevelPure, { topLevelSafeMode: options.optimize.topLevelSafeMode }], elideAngularMetadata, adjustTypeScriptEnums, [adjustStaticMembers, { wrapDecorators: options.optimize.wrapDecorators }]);
     }
     if (options.instrumentCode) {
         plugins.push(require('../plugins/add-code-coverage').default);
