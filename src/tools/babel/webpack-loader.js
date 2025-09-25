@@ -99,7 +99,7 @@ exports.default = (0, babel_loader_1.custom)(() => {
                 customOptions.optimize = {
                     // Angular packages provide additional tested side effects guarantees and can use
                     // otherwise unsafe optimizations. (@angular/platform-server/init) however has side-effects.
-                    pureTopLevel: AngularPackage && sideEffectFree,
+                    topLevelSafeMode: !(AngularPackage && sideEffectFree),
                     // JavaScript modules that are marked as side effect free are considered to have
                     // no decorators that contain non-local effects.
                     wrapDecorators: sideEffectFree,
