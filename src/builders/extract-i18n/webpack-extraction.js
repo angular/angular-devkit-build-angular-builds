@@ -96,3 +96,4 @@ async function extractMessages(options, builderName, context, transforms = {}) {
         useLegacyIds,
     };
 }
+//# sourceMappingURL=webpack-extraction.js.map

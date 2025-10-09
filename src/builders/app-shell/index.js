@@ -190,3 +190,4 @@ async function _appShellBuilder(options, context) {
     }
 }
 exports.default = (0, architect_1.createBuilder)(_appShellBuilder);
+//# sourceMappingURL=index.js.map

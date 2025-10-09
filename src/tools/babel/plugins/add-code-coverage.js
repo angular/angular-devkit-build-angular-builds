@@ -42,3 +42,4 @@ function default_1() {
         },
     };
 }
+//# sourceMappingURL=add-code-coverage.js.map

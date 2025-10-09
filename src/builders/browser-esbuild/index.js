@@ -50,3 +50,4 @@ function convertBrowserOptions(options) {
     };
 }
 exports.default = (0, architect_1.createBuilder)(buildEsbuildBrowser);
+//# sourceMappingURL=index.js.map

@@ -174,3 +174,4 @@ async function execute(options, context) {
     }
 }
 exports.default = (0, architect_1.createBuilder)(execute);
+//# sourceMappingURL=index.js.map

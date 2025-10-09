@@ -322,3 +322,4 @@ function normalizeProxyConfiguration(proxy) {
         ? proxy
         : Object.entries(proxy).map(([context, value]) => ({ context: [context], ...value }));
 }
+//# sourceMappingURL=dev-server.js.map

@@ -186,3 +186,4 @@ function default_1(options) {
         },
     };
 }
+//# sourceMappingURL=postcss-cli-resources.js.map

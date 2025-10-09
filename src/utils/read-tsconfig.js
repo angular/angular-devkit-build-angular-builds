@@ -62,3 +62,4 @@ async function readTsconfig(tsconfigPath, workspaceRoot) {
     }
     return configResult;
 }
+//# sourceMappingURL=read-tsconfig.js.map

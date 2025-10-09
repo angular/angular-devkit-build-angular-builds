@@ -99,3 +99,4 @@ class BuilderWatchPlugin {
     }
 }
 exports.BuilderWatchPlugin = BuilderWatchPlugin;
+//# sourceMappingURL=builder-watch-plugin.js.map

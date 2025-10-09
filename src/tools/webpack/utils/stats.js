@@ -298,3 +298,4 @@ function webpackStatsLogger(logger, json, config, budgetFailures) {
         logger.error(statsErrorsToString(json, config.stats));
     }
 }
+//# sourceMappingURL=stats.js.map

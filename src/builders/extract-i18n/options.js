@@ -83,3 +83,4 @@ function getDefaultOutFile(format) {
             (0, node_assert_1.fail)(`Invalid Format enum value: ${format}`);
     }
 }
+//# sourceMappingURL=options.js.map

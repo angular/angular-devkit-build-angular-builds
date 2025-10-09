@@ -316,3 +316,4 @@ async function loadLocaleData(path, optimize) {
     }
     return transformResult.code;
 }
+//# sourceMappingURL=process-bundle.js.map

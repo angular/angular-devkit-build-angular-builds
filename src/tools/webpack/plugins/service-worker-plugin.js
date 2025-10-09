@@ -44,3 +44,4 @@ class ServiceWorkerPlugin {
     }
 }
 exports.ServiceWorkerPlugin = ServiceWorkerPlugin;
+//# sourceMappingURL=service-worker-plugin.js.map

@@ -37,3 +37,4 @@ function normalizeOptimization(optimization = true) {
         },
     };
 }
+//# sourceMappingURL=normalize-optimization.js.map

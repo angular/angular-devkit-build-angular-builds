@@ -30,3 +30,4 @@ var javascript_optimizer_plugin_1 = require("./javascript-optimizer-plugin");
 Object.defineProperty(exports, "JavaScriptOptimizerPlugin", { enumerable: true, get: function () { return javascript_optimizer_plugin_1.JavaScriptOptimizerPlugin; } });
 var postcss_cli_resources_1 = require("./postcss-cli-resources");
 Object.defineProperty(exports, "PostcssCliResources", { enumerable: true, get: function () { return __importDefault(postcss_cli_resources_1).default; } });
+//# sourceMappingURL=index.js.map

@@ -80,3 +80,4 @@ const typeCheckingVariable = process.env['NG_BUILD_TYPE_CHECK'];
 exports.useTypeChecking = !isPresent(typeCheckingVariable) || !isDisabled(typeCheckingVariable);
 const buildLogsJsonVariable = process.env['NG_BUILD_LOGS_JSON'];
 exports.useJSONBuildLogs = isPresent(buildLogsJsonVariable) && isEnabled(buildLogsJsonVariable);
+//# sourceMappingURL=environment-options.js.map

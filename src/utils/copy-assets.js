@@ -48,3 +48,4 @@ async function copyAssets(entries, basePaths, root, changed) {
     }
     return outputFiles;
 }
+//# sourceMappingURL=copy-assets.js.map

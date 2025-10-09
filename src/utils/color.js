@@ -71,3 +71,4 @@ function supportColor() {
 const colors = ansiColors.create();
 exports.colors = colors;
 colors.enabled = supportColor();
+//# sourceMappingURL=color.js.map

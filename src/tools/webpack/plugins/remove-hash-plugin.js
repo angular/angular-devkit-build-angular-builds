@@ -29,3 +29,4 @@ class RemoveHashPlugin {
     }
 }
 exports.RemoveHashPlugin = RemoveHashPlugin;
+//# sourceMappingURL=remove-hash-plugin.js.map

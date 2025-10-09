@@ -56,3 +56,4 @@ class FindTestsPlugin {
     }
 }
 exports.FindTestsPlugin = FindTestsPlugin;
+//# sourceMappingURL=find-tests-plugin.js.map

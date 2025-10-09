@@ -14,3 +14,4 @@ function defaultProgress(progress) {
     }
     return progress;
 }
+//# sourceMappingURL=default-progress.js.map

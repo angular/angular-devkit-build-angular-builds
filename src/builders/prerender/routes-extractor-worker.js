@@ -81,3 +81,4 @@ async function initialize() {
  * This is awaited by piscina prior to using the Worker.
  */
 exports.default = initialize();
+//# sourceMappingURL=routes-extractor-worker.js.map

@@ -298,3 +298,4 @@ function isPackageInstalled(root, name) {
         return false;
     }
 }
+//# sourceMappingURL=helpers.js.map

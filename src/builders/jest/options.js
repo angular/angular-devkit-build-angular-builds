@@ -22,3 +22,4 @@ function normalizeOptions(schema) {
         ...schema,
     };
 }
+//# sourceMappingURL=options.js.map

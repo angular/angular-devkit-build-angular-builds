@@ -22,3 +22,4 @@ function localizeExtractLoader(content, map) {
     this.callback(null, source, map);
     return;
 }
+//# sourceMappingURL=hmr-loader.js.map

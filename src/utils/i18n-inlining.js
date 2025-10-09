@@ -128,3 +128,4 @@ async function i18nInlineEmittedFiles(context, emittedFiles, i18n, baseOutputPat
     }
     return !hasErrors;
 }
+//# sourceMappingURL=i18n-inlining.js.map

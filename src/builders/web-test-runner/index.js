@@ -159,3 +159,4 @@ function once(emitter, event) {
         emitter.on(event, onEmit);
     });
 }
+//# sourceMappingURL=index.js.map

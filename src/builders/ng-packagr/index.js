@@ -74,3 +74,4 @@ function execute(options, context) {
     })()).pipe((0, rxjs_1.switchMap)(({ packager, ngPackagrOptions }) => options.watch ? packager.watch(ngPackagrOptions) : packager.build(ngPackagrOptions)), (0, rxjs_1.map)(() => ({ success: true })), (0, rxjs_1.catchError)((err) => (0, rxjs_1.of)({ success: false, error: err.message })));
 }
 exports.default = (0, architect_1.createBuilder)(execute);
+//# sourceMappingURL=index.js.map

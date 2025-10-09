@@ -11,3 +11,4 @@ exports.default = default_1;
 function default_1() {
     return `export default '';`;
 }
+//# sourceMappingURL=empty-loader.js.map

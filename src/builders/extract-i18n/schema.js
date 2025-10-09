@@ -27,3 +27,4 @@ var I18NDuplicateTranslation;
     I18NDuplicateTranslation["Ignore"] = "ignore";
     I18NDuplicateTranslation["Warning"] = "warning";
 })(I18NDuplicateTranslation || (exports.I18NDuplicateTranslation = I18NDuplicateTranslation = {}));
+//# sourceMappingURL=schema.js.map

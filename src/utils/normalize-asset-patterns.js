@@ -104,3 +104,4 @@ function normalizeAssetPatterns(assetPatterns, workspaceRoot, projectRoot, proje
         return assetPattern;
     });
 }
+//# sourceMappingURL=normalize-asset-patterns.js.map

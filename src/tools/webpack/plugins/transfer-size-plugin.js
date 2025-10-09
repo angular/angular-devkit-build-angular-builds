@@ -47,3 +47,4 @@ class TransferSizePlugin {
     }
 }
 exports.TransferSizePlugin = TransferSizePlugin;
+//# sourceMappingURL=transfer-size-plugin.js.map

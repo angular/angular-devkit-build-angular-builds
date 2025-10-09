@@ -41,3 +41,4 @@ function normalizeBrowserSchema(workspaceRoot, projectRoot, projectSourceRoot, o
         supportedBrowsers: (0, private_1.getSupportedBrowsers)(projectRoot, logger),
     };
 }
+//# sourceMappingURL=normalize-builder-schema.js.map

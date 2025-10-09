@@ -132,3 +132,4 @@ async function optimizeWithTerser(name, code, sourcemaps, advanced) {
 function isEsBuildFailure(value) {
     return !!value && typeof value === 'object' && 'errors' in value && 'warnings' in value;
 }
+//# sourceMappingURL=javascript-optimizer-worker.js.map

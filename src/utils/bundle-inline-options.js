@@ -7,3 +7,4 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=bundle-inline-options.js.map

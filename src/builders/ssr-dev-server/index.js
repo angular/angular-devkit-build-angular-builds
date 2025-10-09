@@ -312,3 +312,4 @@ async function getProxyConfig(root, proxyConfig) {
     });
 }
 exports.default = (0, architect_1.createBuilder)(execute);
+//# sourceMappingURL=index.js.map

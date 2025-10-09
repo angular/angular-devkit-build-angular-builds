@@ -25,3 +25,4 @@ class WatchFilesLogsPlugin {
     }
 }
 exports.WatchFilesLogsPlugin = WatchFilesLogsPlugin;
+//# sourceMappingURL=watch-files-logs-plugin.js.map

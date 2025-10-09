@@ -50,3 +50,4 @@ function createIvyPlugin(wco, aot, tsconfig) {
         inlineStyleFileExtension: buildOptions.inlineStyleLanguage ?? 'css',
     });
 }
+//# sourceMappingURL=typescript.js.map

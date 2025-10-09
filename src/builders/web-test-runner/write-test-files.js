@@ -39,3 +39,4 @@ async function writeTestFiles(files, testDir) {
         }
     });
 }
+//# sourceMappingURL=write-test-files.js.map

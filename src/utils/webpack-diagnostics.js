@@ -15,3 +15,4 @@ function addWarning(compilation, message) {
 function addError(compilation, message) {
     compilation.errors.push(new compilation.compiler.webpack.WebpackError(message));
 }
+//# sourceMappingURL=webpack-diagnostics.js.map

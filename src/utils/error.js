@@ -18,3 +18,4 @@ function assertIsError(value) {
         (typeof value === 'object' && value && 'name' in value && 'message' in value);
     (0, node_assert_1.default)(isError, 'catch clause variable is not an Error instance');
 }
+//# sourceMappingURL=error.js.map

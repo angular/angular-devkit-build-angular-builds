@@ -28,3 +28,4 @@ function loadEsmModule(modulePath) {
     load ??= new Function('modulePath', `return import(modulePath);`);
     return load(modulePath);
 }
+//# sourceMappingURL=load-esm.js.map

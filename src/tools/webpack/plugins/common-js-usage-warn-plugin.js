@@ -123,3 +123,4 @@ function getWebpackModule(compilation, dependency) {
     }
     return compilation.moduleGraph.getModule(dependency);
 }
+//# sourceMappingURL=common-js-usage-warn-plugin.js.map

@@ -12,3 +12,4 @@ exports.default = (0, architect_1.createBuilder)((_options, context) => {
     context.logger.error('Protractor has reached end-of-life and is no longer supported. For additional information and alternatives, please see https://blog.angular.dev/protractor-deprecation-update-august-2023-2beac7402ce0.');
     return { success: false };
 });
+//# sourceMappingURL=index.js.map

@@ -15,3 +15,4 @@ function urlJoin(...parts) {
     // Dedupe double slashes from path names
     return p.replace(/\/$/, '') + ('/' + rest.join('/')).replace(/\/\/+/g, '/');
 }
+//# sourceMappingURL=url.js.map

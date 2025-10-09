@@ -239,3 +239,4 @@ async function execute(options, context) {
     return _renderUniversal(options, context, browserResult, serverResult, browserOptions);
 }
 exports.default = (0, architect_1.createBuilder)(execute);
+//# sourceMappingURL=index.js.map

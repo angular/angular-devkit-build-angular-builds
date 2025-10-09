@@ -7,3 +7,4 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 module.exports = require('../src/tools/webpack/plugins/karma/karma');
+//# sourceMappingURL=karma.js.map

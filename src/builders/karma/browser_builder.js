@@ -146,3 +146,4 @@ function getBuiltInMainFile(includeZoneProvider = false) {
 `).toString('base64');
     return `ng-virtual-main.js!=!data:text/javascript;base64,${content}`;
 }
+//# sourceMappingURL=browser_builder.js.map

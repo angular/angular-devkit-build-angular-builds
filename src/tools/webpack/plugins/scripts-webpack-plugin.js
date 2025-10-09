@@ -193,3 +193,4 @@ class ScriptsWebpackPlugin {
     }
 }
 exports.ScriptsWebpackPlugin = ScriptsWebpackPlugin;
+//# sourceMappingURL=scripts-webpack-plugin.js.map

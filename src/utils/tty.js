@@ -20,3 +20,4 @@ function isTTY() {
     }
     return !!process.stdout.isTTY && !_isTruthy(process.env['CI']);
 }
+//# sourceMappingURL=tty.js.map

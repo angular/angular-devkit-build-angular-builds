@@ -121,3 +121,4 @@ class CssOptimizerPlugin {
     }
 }
 exports.CssOptimizerPlugin = CssOptimizerPlugin;
+//# sourceMappingURL=css-optimizer-plugin.js.map

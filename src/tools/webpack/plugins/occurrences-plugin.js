@@ -78,3 +78,4 @@ class OccurrencesPlugin {
     }
 }
 exports.OccurrencesPlugin = OccurrencesPlugin;
+//# sourceMappingURL=occurrences-plugin.js.map

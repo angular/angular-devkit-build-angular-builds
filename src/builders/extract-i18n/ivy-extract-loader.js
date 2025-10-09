@@ -135,3 +135,4 @@ async function extract(loaderContext, content, map, options) {
         options?.messageHandler(messages);
     }
 }
+//# sourceMappingURL=ivy-extract-loader.js.map

@@ -68,3 +68,4 @@ class JsonStatsPlugin {
     }
 }
 exports.JsonStatsPlugin = JsonStatsPlugin;
+//# sourceMappingURL=json-stats-plugin.js.map

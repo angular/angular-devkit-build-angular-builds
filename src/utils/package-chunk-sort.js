@@ -32,3 +32,4 @@ function generateEntryPoints(options) {
     }
     return entryPoints;
 }
+//# sourceMappingURL=package-chunk-sort.js.map

@@ -53,3 +53,4 @@ class Spinner {
     }
 }
 exports.Spinner = Spinner;
+//# sourceMappingURL=spinner.js.map

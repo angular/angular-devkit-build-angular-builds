@@ -23,3 +23,4 @@ function normalizeOptions(schema) {
         polyfills: typeof schema.polyfills === 'string' ? [schema.polyfills] : schema.polyfills ?? [],
     };
 }
+//# sourceMappingURL=options.js.map

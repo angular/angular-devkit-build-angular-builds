@@ -36,3 +36,4 @@ class ProgressPlugin extends webpack_1.ProgressPlugin {
     }
 }
 exports.ProgressPlugin = ProgressPlugin;
+//# sourceMappingURL=progress-plugin.js.map

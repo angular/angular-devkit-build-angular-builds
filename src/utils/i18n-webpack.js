@@ -105,3 +105,4 @@ function findLocaleDataPath(locale, resolver) {
         return scrubbedLocale === 'en-US' ? findLocaleDataPath('en', resolver) : null;
     }
 }
+//# sourceMappingURL=i18n-webpack.js.map

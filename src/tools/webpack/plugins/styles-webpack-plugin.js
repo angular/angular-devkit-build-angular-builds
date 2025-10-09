@@ -71,3 +71,4 @@ class StylesWebpackPlugin {
     }
 }
 exports.StylesWebpackPlugin = StylesWebpackPlugin;
+//# sourceMappingURL=styles-webpack-plugin.js.map

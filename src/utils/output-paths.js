@@ -24,3 +24,4 @@ function ensureOutputPaths(baseOutputPath, i18n) {
     }
     return new Map(outputPaths);
 }
+//# sourceMappingURL=output-paths.js.map

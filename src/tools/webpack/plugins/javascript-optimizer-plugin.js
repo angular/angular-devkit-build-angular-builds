@@ -165,3 +165,4 @@ class JavaScriptOptimizerPlugin {
     }
 }
 exports.JavaScriptOptimizerPlugin = JavaScriptOptimizerPlugin;
+//# sourceMappingURL=javascript-optimizer-plugin.js.map

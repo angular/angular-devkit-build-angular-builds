@@ -84,3 +84,4 @@ function normalizeFileReplacement(fileReplacement, root) {
         with: path.join(root, withPath),
     };
 }
+//# sourceMappingURL=normalize-file-replacements.js.map

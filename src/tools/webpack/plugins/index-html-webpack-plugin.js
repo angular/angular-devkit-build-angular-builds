@@ -85,3 +85,4 @@ class IndexHtmlWebpackPlugin extends private_1.IndexHtmlGenerator {
     }
 }
 exports.IndexHtmlWebpackPlugin = IndexHtmlWebpackPlugin;
+//# sourceMappingURL=index-html-webpack-plugin.js.map

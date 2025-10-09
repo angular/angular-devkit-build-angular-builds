@@ -56,3 +56,4 @@ class NamedChunksPlugin {
     }
 }
 exports.NamedChunksPlugin = NamedChunksPlugin;
+//# sourceMappingURL=named-chunks-plugin.js.map

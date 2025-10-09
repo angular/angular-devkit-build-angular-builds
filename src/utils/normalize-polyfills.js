@@ -21,3 +21,4 @@ function normalizePolyfills(polyfills, root) {
         return (0, node_fs_1.existsSync)(resolvedPath) ? resolvedPath : p;
     });
 }
+//# sourceMappingURL=normalize-polyfills.js.map
