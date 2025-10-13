@@ -127,7 +127,7 @@ exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
     const jestProc = execFile(process.execPath, [
         '--experimental-vm-modules',
         jest,
-        `--rootDir="${testOut}"`,
+        `--rootDir=${testOut}`,
         `--config=${path.join(__dirname, 'jest.config.mjs')}`,
         '--testEnvironment=jsdom',
         // TODO(dgp1130): Enable cache once we have a mechanism for properly clearing / disabling it.
