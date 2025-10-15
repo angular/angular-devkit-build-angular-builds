@@ -48,6 +48,12 @@ var InlineStyleLanguage;
 })(InlineStyleLanguage || (exports.InlineStyleLanguage = InlineStyleLanguage = {}));
 /**
  * Define the output filename cache-busting hashing mode.
+ *
+ * - `none`: No hashing.
+ * - `all`: Hash for all output bundles.
+ * - `media`: Hash for all output media (e.g., images, fonts, etc. that are referenced in
+ * CSS files).
+ * - `bundles`: Hash for output of lazy and main bundles.
  */
 var OutputHashing;
 (function (OutputHashing) {
