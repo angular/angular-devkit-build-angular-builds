@@ -42,7 +42,6 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readTsconfig = readTsconfig;
 const path = __importStar(require("node:path"));
-const load_esm_1 = require("./load-esm");
 /**
  * Reads and parses a given TsConfig file.
  *
@@ -52,10 +51,7 @@ const load_esm_1 = require("./load-esm");
  */
 async function readTsconfig(tsconfigPath, workspaceRoot) {
     const tsConfigFullPath = workspaceRoot ? path.resolve(workspaceRoot, tsconfigPath) : tsconfigPath;
-    // Load ESM `@angular/compiler-cli` using the TypeScript dynamic import workaround.
-    // Once TypeScript provides support for keeping the dynamic import this workaround can be
-    // changed to a direct dynamic import.
-    const { formatDiagnostics, readConfiguration } = await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli');
+    const { formatDiagnostics, readConfiguration } = await Promise.resolve().then(() => __importStar(require('@angular/compiler-cli')));
     const configResult = readConfiguration(tsConfigFullPath);
     if (configResult.errors && configResult.errors.length) {
         throw new Error(formatDiagnostics(configResult.errors));

@@ -50,7 +50,6 @@ const path = __importStar(require("node:path"));
 const webpack_2 = require("webpack");
 const webpack_subresource_integrity_1 = require("webpack-subresource-integrity");
 const environment_options_1 = require("../../../utils/environment-options");
-const load_esm_1 = require("../../../utils/load-esm");
 const plugins_1 = require("../plugins");
 const devtools_ignore_plugin_1 = require("../plugins/devtools-ignore-plugin");
 const named_chunks_plugin_1 = require("../plugins/named-chunks-plugin");
@@ -72,8 +71,8 @@ async function getCommonConfig(wco) {
     // Load ESM `@angular/compiler-cli` using the TypeScript dynamic import workaround.
     // Once TypeScript provides support for keeping the dynamic import this workaround can be
     // changed to a direct dynamic import.
-    const { VERSION: NG_VERSION } = await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli');
-    const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT } = await (0, load_esm_1.loadEsmModule)('@angular/compiler-cli/private/tooling');
+    const { VERSION: NG_VERSION } = await Promise.resolve().then(() => __importStar(require('@angular/compiler-cli')));
+    const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT } = await Promise.resolve().then(() => __importStar(require('@angular/compiler-cli/private/tooling')));
     // determine hashing format
     const hashFormat = (0, helpers_1.getOutputHashFormat)(buildOptions.outputHashing);
     if (buildOptions.progress) {

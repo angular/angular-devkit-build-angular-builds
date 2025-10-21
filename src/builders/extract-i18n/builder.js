@@ -45,9 +45,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = execute;
 const private_1 = require("@angular/build/private");
+const node_assert_1 = __importDefault(require("node:assert"));
 const node_fs_1 = __importDefault(require("node:fs"));
 const node_path_1 = __importDefault(require("node:path"));
-const load_esm_1 = require("../../utils/load-esm");
 const options_1 = require("./options");
 const schema_1 = require("./schema");
 /**
@@ -72,8 +72,7 @@ async function execute(options, context, transforms) {
     // The package is a peer dependency and might not be present
     let localizeToolsModule;
     try {
-        localizeToolsModule =
-            await (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
+        localizeToolsModule = await Promise.resolve().then(() => __importStar(require('@angular/localize/tools')));
     }
     catch {
         return {
@@ -132,6 +131,7 @@ async function execute(options, context, transforms) {
     }
     // Serialize all extracted messages
     const serializer = await createSerializer(localizeToolsModule, normalizedOptions.format, normalizedOptions.i18nOptions.sourceLocale, extractionResult.basePath, extractionResult.useLegacyIds, diagnostics);
+    (0, node_assert_1.default)(serializer);
     const content = serializer.serialize(extractionResult.messages);
     // Ensure directory exists
     const outputPath = node_path_1.default.dirname(normalizedOptions.outFile);

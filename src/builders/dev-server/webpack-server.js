@@ -54,7 +54,6 @@ const stats_1 = require("../../tools/webpack/utils/stats");
 const utils_1 = require("../../utils");
 const color_1 = require("../../utils/color");
 const i18n_webpack_1 = require("../../utils/i18n-webpack");
-const load_esm_1 = require("../../utils/load-esm");
 const package_chunk_sort_1 = require("../../utils/package-chunk-sort");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const webpack_diagnostics_1 = require("../../utils/webpack-diagnostics");
@@ -194,7 +193,7 @@ function serveWebpackBrowser(options, builderName, context, transforms = {}) {
             ` +
                     '\n');
                 if (options.open) {
-                    const open = (await (0, load_esm_1.loadEsmModule)('open')).default;
+                    const open = (await Promise.resolve().then(() => __importStar(require('open')))).default;
                     await open(serverAddress);
                 }
             }

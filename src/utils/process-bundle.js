@@ -51,7 +51,6 @@ const path = __importStar(require("node:path"));
 const node_worker_threads_1 = require("node:worker_threads");
 const environment_options_1 = require("./environment-options");
 const error_1 = require("./error");
-const load_esm_1 = require("./load-esm");
 // Lazy loaded webpack-sources object
 // Webpack is only imported if needed during the processing
 let webpackSources;
@@ -76,10 +75,7 @@ async function loadLocalizeTools() {
     if (localizeToolsModule !== undefined) {
         return localizeToolsModule;
     }
-    // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
-    // Once TypeScript provides support for keeping the dynamic import this workaround can be
-    // changed to a direct dynamic import.
-    return (0, load_esm_1.loadEsmModule)('@angular/localize/tools');
+    return Promise.resolve().then(() => __importStar(require('@angular/localize/tools')));
 }
 async function createI18nPlugins(locale, translation, missingTranslation, shouldInline, localeDataContent) {
     const { Diagnostics, makeEs2015TranslatePlugin, makeLocalePlugin } = await loadLocalizeTools();
