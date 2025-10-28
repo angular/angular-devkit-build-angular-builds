@@ -22,7 +22,7 @@ const builder_status_warnings_1 = require("./builder-status-warnings");
 const options_1 = require("./options");
 const write_test_files_1 = require("./write-test-files");
 exports.default = (0, architect_1.createBuilder)(async (schema, ctx) => {
-    ctx.logger.warn('NOTE: The Web Test Runner builder is currently EXPERIMENTAL and not ready for production use.');
+    ctx.logger.warn('NOTE: The Web Test Runner builder is currently EXPERIMENTAL and will be removed in version 22.');
     (0, builder_status_warnings_1.logBuilderStatusWarnings)(schema, ctx);
     // Dynamic import `@web/test-runner` from the user's workspace. As an optional peer dep, it may not be installed
     // and may not be resolvable from `@angular-devkit/build-angular`.
