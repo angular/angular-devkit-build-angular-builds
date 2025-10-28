@@ -55,7 +55,7 @@ const options_1 = require("./options");
 const execFile = (0, node_util_1.promisify)(node_child_process_1.execFile);
 /** Main execution function for the Jest builder. */
 exports.default = (0, architect_1.createBuilder)(async (schema, context) => {
-    context.logger.warn('NOTE: The Jest builder is currently EXPERIMENTAL and not ready for production use.');
+    context.logger.warn('NOTE: The Jest builder is currently EXPERIMENTAL and will be removed in version 22.');
     const options = (0, options_1.normalizeOptions)(schema);
     const testOut = path.join(context.workspaceRoot, 'dist/test-out', (0, node_crypto_1.randomUUID)()); // TODO(dgp1130): Hide in temp directory.
     // Verify Jest installation and get the path to it's binary.
