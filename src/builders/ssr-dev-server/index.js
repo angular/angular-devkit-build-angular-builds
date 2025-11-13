@@ -45,6 +45,7 @@ exports.log = log;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
+const node_module_1 = require("node:module");
 const node_path_1 = require("node:path");
 const url = __importStar(require("node:url"));
 const rxjs_1 = require("rxjs");
@@ -57,7 +58,7 @@ const IGNORED_STDOUT_MESSAGES = [
 function execute(options, context) {
     let browserSync;
     try {
-        browserSync = require('browser-sync');
+        browserSync = (0, node_module_1.createRequire)(context.workspaceRoot + '/')('browser-sync');
     }
     catch {
         return (0, rxjs_1.of)({
