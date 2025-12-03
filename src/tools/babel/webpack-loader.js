@@ -51,7 +51,6 @@ let linkerPluginCreator;
  * Cached instance of the localize Babel plugins factory functions.
  */
 let i18nPluginCreators;
-// eslint-disable-next-line max-lines-per-function
 exports.default = (0, babel_loader_1.custom)(() => {
     const baseOptions = Object.freeze({
         babelrc: false,
