@@ -129,14 +129,19 @@ async function initializeBrowser(options, context, webpackConfigurationTransform
     }, context, (wco) => [(0, configs_1.getCommonConfig)(wco), (0, configs_1.getStylesConfig)(wco)]);
     return [karma, (await webpackConfigurationTransformer?.(config)) ?? config];
 }
-function getBuiltInMainFile(includeZoneProvider = false) {
+function getBuiltInMainFile() {
     const content = Buffer.from(`
   import { provideZoneChangeDetection, ɵcompileNgModuleDefs as compileNgModuleDefs } from '@angular/core';
   import { getTestBed } from '@angular/core/testing';
   import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 
+  const providers = [];
+  if (typeof window.Zone !== 'undefined') {
+    providers.push(provideZoneChangeDetection());
+  }
+
   export class TestModule {}
-  compileNgModuleDefs(TestModule, {providers: [${includeZoneProvider ? 'provideZoneChangeDetection()' : ''}]});
+  compileNgModuleDefs(TestModule, {providers});
 
   // Initialize the Angular testing environment.
   getTestBed().initTestEnvironment([BrowserTestingModule, TestModule], platformBrowserTesting(), {
