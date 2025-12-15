@@ -54,7 +54,6 @@ const async_chunks_1 = require("../../tools/webpack/utils/async-chunks");
 const helpers_1 = require("../../tools/webpack/utils/helpers");
 const stats_1 = require("../../tools/webpack/utils/stats");
 const utils_1 = require("../../utils");
-const color_1 = require("../../utils/color");
 const copy_assets_1 = require("../../utils/copy-assets");
 const error_1 = require("../../utils/error");
 const i18n_inlining_1 = require("../../utils/i18n-inlining");
@@ -205,7 +204,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             spinner.succeed('Copying assets complete.');
                         }
                         catch (err) {
-                            spinner.fail(color_1.colors.redBright('Copying of assets failed.'));
+                            spinner.fail('Copying of assets failed.');
                             (0, error_1.assertIsError)(err);
                             return {
                                 output: {
