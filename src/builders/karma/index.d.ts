@@ -7,7 +7,6 @@
  */
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { ConfigOptions } from 'karma';
-import { Observable } from 'rxjs';
 import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { Schema as KarmaBuilderOptions } from './schema';
@@ -21,7 +20,7 @@ export type KarmaConfigOptions = ConfigOptions & {
 export declare function execute(options: KarmaBuilderOptions, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<Configuration>;
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
-}): Observable<BuilderOutput>;
+}): AsyncIterable<BuilderOutput>;
 export type { KarmaBuilderOptions };
-declare const _default: import("@angular-devkit/architect").Builder<Record<string, string> & KarmaBuilderOptions & import("@angular-devkit/core").JsonObject>;
+declare const _default: import("@angular-devkit/architect").Builder<KarmaBuilderOptions & import("@angular-devkit/core").JsonObject>;
 export default _default;

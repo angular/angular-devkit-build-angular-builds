@@ -46,35 +46,32 @@ const architect_1 = require("@angular-devkit/architect");
 const core_1 = require("@angular-devkit/core");
 const node_module_1 = require("node:module");
 const path = __importStar(require("node:path"));
-const rxjs_1 = require("rxjs");
 const utils_1 = require("../../utils");
 const schema_1 = require("./schema");
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
-function execute(options, context, transforms = {}) {
+async function* execute(options, context, transforms = {}) {
     // Check Angular version.
     (0, private_1.assertCompatibleAngularVersion)(context.workspaceRoot);
-    return (0, rxjs_1.from)(getExecuteWithBuilder(options, context)).pipe((0, rxjs_1.mergeMap)(([useEsbuild, executeWithBuilder]) => {
-        if (useEsbuild) {
-            if (transforms.webpackConfiguration) {
-                context.logger.warn(`This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`);
-            }
-            if (options.fileReplacements) {
-                options.fileReplacements = (0, utils_1.normalizeFileReplacements)(options.fileReplacements, './');
-            }
-            if (typeof options.polyfills === 'string') {
-                options.polyfills = [options.polyfills];
-            }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return executeWithBuilder(options, context, transforms);
+    if (await checkForEsbuild(options, context)) {
+        if (transforms.webpackConfiguration) {
+            context.logger.warn(`This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`);
         }
-        else {
-            const karmaOptions = getBaseKarmaOptions(options, context);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return executeWithBuilder(options, context, karmaOptions, transforms);
+        if (options.fileReplacements) {
+            options.fileReplacements = (0, utils_1.normalizeFileReplacements)(options.fileReplacements, './');
         }
-    }));
+        if (typeof options.polyfills === 'string') {
+            options.polyfills = [options.polyfills];
+        }
+        const { executeKarmaBuilder } = await Promise.resolve().then(() => __importStar(require('@angular/build')));
+        yield* executeKarmaBuilder(options, context, transforms);
+    }
+    else {
+        const karmaOptions = getBaseKarmaOptions(options, context);
+        const { execute } = await Promise.resolve().then(() => __importStar(require('./browser_builder')));
+        yield* execute(options, context, karmaOptions, transforms);
+    }
 }
 function getBaseKarmaOptions(options, context) {
     let singleRun;
@@ -156,19 +153,6 @@ function getBuiltInKarmaConfig(workspaceRoot, projectName) {
     };
 }
 exports.default = (0, architect_1.createBuilder)(execute);
-async function getExecuteWithBuilder(options, context) {
-    const useEsbuild = await checkForEsbuild(options, context);
-    let execute;
-    if (useEsbuild) {
-        const { executeKarmaBuilder } = await Promise.resolve().then(() => __importStar(require('@angular/build')));
-        execute = executeKarmaBuilder;
-    }
-    else {
-        const browserBuilderModule = await Promise.resolve().then(() => __importStar(require('./browser_builder')));
-        execute = browserBuilderModule.execute;
-    }
-    return [useEsbuild, execute];
-}
 async function checkForEsbuild(options, context) {
     if (options.builderMode !== schema_1.BuilderMode.Detect) {
         return options.builderMode === schema_1.BuilderMode.Application;

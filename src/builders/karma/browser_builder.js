@@ -39,68 +39,109 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = execute;
 const private_1 = require("@angular/build/private");
 const path = __importStar(require("node:path"));
-const rxjs_1 = require("rxjs");
+const webpack_1 = __importDefault(require("webpack"));
 const configs_1 = require("../../tools/webpack/configs");
 const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
 const schema_1 = require("../browser/schema");
 const find_tests_plugin_1 = require("./find-tests-plugin");
 function execute(options, context, karmaOptions, transforms = {}) {
-    return (0, rxjs_1.from)(initializeBrowser(options, context, transforms.webpackConfiguration)).pipe((0, rxjs_1.switchMap)(async ([karma, webpackConfig]) => {
-        const projectName = context.target?.project;
-        if (!projectName) {
-            throw new Error(`The 'karma' builder requires a target to be specified.`);
-        }
-        const projectMetadata = await context.getProjectMetadata(projectName);
-        const sourceRoot = (projectMetadata.sourceRoot ?? projectMetadata.root ?? '');
-        if (!options.main) {
-            webpackConfig.entry ??= {};
-            if (typeof webpackConfig.entry === 'object' && !Array.isArray(webpackConfig.entry)) {
-                if (Array.isArray(webpackConfig.entry['main'])) {
-                    webpackConfig.entry['main'].push(getBuiltInMainFile());
-                }
-                else {
-                    webpackConfig.entry['main'] = [getBuiltInMainFile()];
+    let karmaServer;
+    let isCancelled = false;
+    return new ReadableStream({
+        async start(controller) {
+            const [karma, webpackConfig] = await initializeBrowser(options, context, transforms.webpackConfiguration);
+            if (isCancelled) {
+                return;
+            }
+            const projectName = context.target?.project;
+            if (!projectName) {
+                throw new Error(`The 'karma' builder requires a target to be specified.`);
+            }
+            const projectMetadata = await context.getProjectMetadata(projectName);
+            const sourceRoot = (projectMetadata.sourceRoot ?? projectMetadata.root ?? '');
+            if (!options.main) {
+                webpackConfig.entry ??= {};
+                if (typeof webpackConfig.entry === 'object' && !Array.isArray(webpackConfig.entry)) {
+                    if (Array.isArray(webpackConfig.entry['main'])) {
+                        webpackConfig.entry['main'].push(getBuiltInMainFile());
+                    }
+                    else {
+                        webpackConfig.entry['main'] = [getBuiltInMainFile()];
+                    }
                 }
             }
-        }
-        webpackConfig.plugins ??= [];
-        webpackConfig.plugins.push(new find_tests_plugin_1.FindTestsPlugin({
-            include: options.include,
-            exclude: options.exclude,
-            workspaceRoot: context.workspaceRoot,
-            projectSourceRoot: path.join(context.workspaceRoot, sourceRoot),
-        }));
-        karmaOptions.buildWebpack = {
-            options,
-            webpackConfig,
-            logger: context.logger,
-        };
-        const parsedKarmaConfig = await karma.config.parseConfig(options.karmaConfig && path.resolve(context.workspaceRoot, options.karmaConfig), transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, { promiseConfig: true, throwErrors: true });
-        return [karma, parsedKarmaConfig];
-    }), (0, rxjs_1.switchMap)(([karma, karmaConfig]) => new rxjs_1.Observable((subscriber) => {
-        // Pass onto Karma to emit BuildEvents.
-        karmaConfig.buildWebpack ??= {};
-        if (typeof karmaConfig.buildWebpack === 'object') {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            karmaConfig.buildWebpack.failureCb ??= () => subscriber.next({ success: false });
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            karmaConfig.buildWebpack.successCb ??= () => subscriber.next({ success: true });
-        }
-        // Complete the observable once the Karma server returns.
-        const karmaServer = new karma.Server(karmaConfig, (exitCode) => {
-            subscriber.next({ success: exitCode === 0 });
-            subscriber.complete();
-        });
-        const karmaStart = karmaServer.start();
-        // Cleanup, signal Karma to exit.
-        return () => {
-            void karmaStart.then(() => karmaServer.stop());
-        };
-    })), (0, rxjs_1.defaultIfEmpty)({ success: false }));
+            webpackConfig.plugins ??= [];
+            webpackConfig.plugins.push(new find_tests_plugin_1.FindTestsPlugin({
+                include: options.include,
+                exclude: options.exclude,
+                workspaceRoot: context.workspaceRoot,
+                projectSourceRoot: path.join(context.workspaceRoot, sourceRoot),
+            }));
+            const KARMA_APPLICATION_PATH = '_karma_webpack_';
+            webpackConfig.output ??= {};
+            webpackConfig.output.path = `/${KARMA_APPLICATION_PATH}/`;
+            webpackConfig.output.publicPath = `/${KARMA_APPLICATION_PATH}/`;
+            if (karmaOptions.singleRun) {
+                webpackConfig.plugins.unshift({
+                    apply: (compiler) => {
+                        compiler.hooks.afterEnvironment.tap('karma', () => {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            compiler.watchFileSystem = { watch: () => { } };
+                        });
+                    },
+                });
+            }
+            // Remove the watch option to avoid the [DEP_WEBPACK_WATCH_WITHOUT_CALLBACK] warning.
+            // The compiler is initialized in watch mode by webpack-dev-middleware.
+            delete webpackConfig.watch;
+            const compiler = (0, webpack_1.default)(webpackConfig);
+            karmaOptions.buildWebpack = {
+                options,
+                compiler,
+                logger: context.logger,
+            };
+            const parsedKarmaConfig = await karma.config.parseConfig(options.karmaConfig && path.resolve(context.workspaceRoot, options.karmaConfig), transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions, { promiseConfig: true, throwErrors: true });
+            if (isCancelled) {
+                return;
+            }
+            const enqueue = (value) => {
+                try {
+                    controller.enqueue(value);
+                }
+                catch {
+                    // Controller is already closed
+                }
+            };
+            const close = () => {
+                try {
+                    controller.close();
+                }
+                catch {
+                    // Controller is already closed
+                }
+            };
+            // Close the stream once the Karma server returns.
+            karmaServer = new karma.Server(parsedKarmaConfig, (exitCode) => {
+                enqueue({ success: exitCode === 0 });
+                close();
+            });
+            karmaServer.on('run_complete', (_, results) => {
+                enqueue({ success: results.exitCode === 0 });
+            });
+            await karmaServer.start();
+        },
+        async cancel() {
+            isCancelled = true;
+            await karmaServer?.stop();
+        },
+    });
 }
 async function initializeBrowser(options, context, webpackConfigurationTransformer) {
     // Purge old build disk cache.
