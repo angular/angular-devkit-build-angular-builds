@@ -37,7 +37,6 @@ export declare function execute(options: DevServerBuilderOptions, context: Build
     middleware?: ((req: http.IncomingMessage, res: http.ServerResponse, next: (err?: unknown) => void) => void)[];
     builderSelector?: (info: BuilderSelectorInfo, logger: BuilderContext['logger']) => string;
 }): Observable<DevServerBuilderOutput>;
-export declare function isEsbuildBased(builderName: string): builderName is '@angular/build:application' | '@angular-devkit/build-angular:application' | '@angular-devkit/build-angular:browser-esbuild';
 interface BuilderSelectorInfo {
     builderName: string;
     forceEsbuild: boolean;

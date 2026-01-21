@@ -41,7 +41,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = execute;
-exports.isEsbuildBased = isEsbuildBased;
 const private_1 = require("@angular/build/private");
 const rxjs_1 = require("rxjs");
 const options_1 = require("./options");
@@ -69,7 +68,7 @@ function execute(options, context, transforms = {}, extensions) {
     }
     return (0, rxjs_1.defer)(() => initialize(options, projectName, context, extensions?.builderSelector)).pipe((0, rxjs_1.switchMap)(({ builderName, normalizedOptions }) => {
         // Use vite-based development server for esbuild-based builds
-        if (isEsbuildBased(builderName)) {
+        if ((0, options_1.isEsbuildBased)(builderName)) {
             if (transforms?.logging || transforms?.webpackConfiguration) {
                 throw new Error(`The "application" and "browser-esbuild" builders do not support Webpack transforms.`);
             }
@@ -144,16 +143,8 @@ case.
         normalizedOptions,
     };
 }
-function isEsbuildBased(builderName) {
-    if (builderName === '@angular/build:application' ||
-        builderName === '@angular-devkit/build-angular:application' ||
-        builderName === '@angular-devkit/build-angular:browser-esbuild') {
-        return true;
-    }
-    return false;
-}
 function defaultBuilderSelector(info, logger) {
-    if (isEsbuildBased(info.builderName)) {
+    if ((0, options_1.isEsbuildBased)(info.builderName)) {
         return info.builderName;
     }
     if (info.forceEsbuild) {

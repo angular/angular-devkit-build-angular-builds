@@ -10,12 +10,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isEsbuildBased = isEsbuildBased;
 exports.normalizeOptions = normalizeOptions;
 const architect_1 = require("@angular-devkit/architect");
 const node_path_1 = __importDefault(require("node:path"));
 const normalize_cache_1 = require("../../utils/normalize-cache");
 const normalize_optimization_1 = require("../../utils/normalize-optimization");
-const builder_1 = require("./builder");
+function isEsbuildBased(builderName) {
+    if (builderName === '@angular/build:application' ||
+        builderName === '@angular-devkit/build-angular:application' ||
+        builderName === '@angular-devkit/build-angular:browser-esbuild') {
+        return true;
+    }
+    return false;
+}
 /**
  * Normalize the user provided options by creating full paths for all path based options
  * and converting multi-form options into a single form that can be directly used
@@ -40,7 +48,7 @@ async function normalizeOptions(context, projectName, options) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const buildOptions = (await context.validateOptions(rawBuildOptions, browserBuilderName));
     const optimization = (0, normalize_optimization_1.normalizeOptimization)(buildOptions.optimization);
-    if (options.prebundle !== false && (0, builder_1.isEsbuildBased)(browserBuilderName)) {
+    if (options.prebundle !== false && isEsbuildBased(browserBuilderName)) {
         if (!cacheOptions.enabled) {
             // Warn if the initial options provided by the user enable prebundling but caching is disabled
             logger.warn('Prebundling has been configured but will not be used because caching has been disabled.');

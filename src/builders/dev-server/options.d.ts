@@ -8,6 +8,7 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { Schema as DevServerOptions } from './schema';
 export type NormalizedDevServerOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+export declare function isEsbuildBased(builderName: string): builderName is '@angular/build:application' | '@angular-devkit/build-angular:application' | '@angular-devkit/build-angular:browser-esbuild';
 /**
  * Normalize the user provided options by creating full paths for all path based options
  * and converting multi-form options into a single form that can be directly used
