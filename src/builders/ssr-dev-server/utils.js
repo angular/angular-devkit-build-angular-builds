@@ -31,7 +31,7 @@ function getAvailablePort() {
 }
 function spawnAsObservable(command, args = [], options = {}) {
     return new rxjs_1.Observable((obs) => {
-        const proc = (0, node_child_process_1.spawn)(command, args, options);
+        const proc = (0, node_child_process_1.spawn)(`${command} ${args.join(' ')}`, options);
         if (proc.stdout) {
             proc.stdout.on('data', (data) => obs.next({ stdout: data.toString() }));
         }
