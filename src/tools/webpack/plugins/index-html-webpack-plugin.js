@@ -45,7 +45,7 @@ class IndexHtmlWebpackPlugin extends private_1.IndexHtmlGenerator {
                             continue;
                         }
                         files.push({
-                            name: chunk.name,
+                            name: chunk.name ?? undefined,
                             file,
                             extension: (0, node_path_1.extname)(file),
                         });

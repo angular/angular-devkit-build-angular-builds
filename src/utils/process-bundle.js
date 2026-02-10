@@ -205,7 +205,8 @@ async function inlineLocalesDirect(ast, options) {
     const { ConcatSource, OriginalSource, ReplaceSource, SourceMapSource } = webpackSources;
     for (const locale of i18n.inlineLocales) {
         const content = new ReplaceSource(inputMap
-            ? new SourceMapSource(options.code, options.filename, inputMap)
+            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                new SourceMapSource(options.code, options.filename, inputMap)
             : new OriginalSource(options.code, options.filename));
         const isSourceLocale = locale === i18n.sourceLocale;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

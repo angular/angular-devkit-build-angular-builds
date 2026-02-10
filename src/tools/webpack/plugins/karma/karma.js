@@ -44,6 +44,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = __importStar(require("path"));
+const node_assert_1 = __importDefault(require("node:assert"));
 const webpack_1 = __importDefault(require("webpack"));
 const webpack_dev_middleware_1 = __importDefault(require("webpack-dev-middleware"));
 const stats_1 = require("../../utils/stats");
@@ -145,6 +146,7 @@ const init = (config, emitter) => {
         isBlocked = true;
         callback?.();
     }
+    (0, node_assert_1.default)(compiler, 'Compiler cannot be undefined.');
     compiler.hooks.invalid.tap('karma', () => handler());
     compiler.hooks.watchRun.tapAsync('karma', (_, callback) => handler(callback));
     compiler.hooks.run.tapAsync('karma', (_, callback) => handler(callback));
