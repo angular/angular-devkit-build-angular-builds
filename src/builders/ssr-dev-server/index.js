@@ -99,7 +99,7 @@ function execute(options, context) {
             if (!s.success || !b.success) {
                 return (0, rxjs_1.of)([b, s]);
             }
-            return startNodeServer(s, nodeServerPort, context.logger, !!options.inspect).pipe((0, rxjs_1.map)(() => [b, s]), (0, rxjs_1.catchError)((err) => {
+            return startNodeServer(s, nodeServerPort, options.host, context.logger, !!options.inspect).pipe((0, rxjs_1.map)(() => [b, s]), (0, rxjs_1.catchError)((err) => {
                 context.logger.error(`A server error has occurred.\n${mapErrorToMessage(err)}`);
                 return rxjs_1.EMPTY;
             }));
@@ -164,10 +164,10 @@ function log({ stderr, stdout }, logger) {
         logger.info(stdout.replace(/\n?$/, ''));
     }
 }
-function startNodeServer(serverOutput, port, logger, inspectMode = false) {
+function startNodeServer(serverOutput, port, host, logger, inspectMode = false) {
     const outputPath = serverOutput.outputPath;
     const path = (0, node_path_1.join)(outputPath, 'main.js');
-    const env = { ...process.env, PORT: '' + port };
+    const env = { ...process.env, PORT: '' + port, NG_ALLOWED_HOSTS: host ?? 'localhost' };
     const args = ['--enable-source-maps', `"${path}"`];
     if (inspectMode) {
         args.unshift('--inspect-brk');
