@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "22.0.0-next.0+sha-bfdc7b0",
+  "version": "22.0.0-next.0+sha-b4885b8",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#bfdc7b0",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#bfdc7b0",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#bfdc7b0",
-    "@angular/build": "github:angular/angular-build-builds#bfdc7b0",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#b4885b8",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#b4885b8",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#b4885b8",
+    "@angular/build": "github:angular/angular-build-builds#b4885b8",
     "@babel/core": "7.29.0",
     "@babel/generator": "7.29.1",
     "@babel/helper-annotate-as-pure": "7.27.3",
@@ -21,7 +21,7 @@
     "@babel/preset-env": "7.29.0",
     "@babel/runtime": "7.28.6",
     "@discoveryjs/json-ext": "0.6.3",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#bfdc7b0",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#b4885b8",
     "ansi-colors": "4.1.3",
     "autoprefixer": "10.4.24",
     "babel-loader": "10.0.0",
@@ -71,11 +71,8 @@
     "@angular/platform-browser": "^21.0.0 || ^21.2.0-next.0",
     "@angular/platform-server": "^21.0.0 || ^21.2.0-next.0",
     "@angular/service-worker": "^21.0.0 || ^21.2.0-next.0",
-    "@angular/ssr": "github:angular/angular-ssr-builds#bfdc7b0",
-    "@web/test-runner": "^0.20.0",
+    "@angular/ssr": "github:angular/angular-ssr-builds#b4885b8",
     "browser-sync": "^3.0.2",
-    "jest": "^30.2.0",
-    "jest-environment-jsdom": "^30.2.0",
     "karma": "^6.3.0",
     "ng-packagr": "^21.0.0 || ^21.2.0-next.0",
     "protractor": "^7.0.0",
@@ -101,16 +98,7 @@
     "@angular/ssr": {
       "optional": true
     },
-    "@web/test-runner": {
-      "optional": true
-    },
     "browser-sync": {
-      "optional": true
-    },
-    "jest": {
-      "optional": true
-    },
-    "jest-environment-jsdom": {
       "optional": true
     },
     "karma": {
