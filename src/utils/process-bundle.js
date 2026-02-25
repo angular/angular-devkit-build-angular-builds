@@ -72,10 +72,8 @@ let localizeToolsModule;
  * This module must be dynamically loaded as it is an ESM module and this file is CommonJS.
  */
 async function loadLocalizeTools() {
-    if (localizeToolsModule !== undefined) {
-        return localizeToolsModule;
-    }
-    return Promise.resolve().then(() => __importStar(require('@angular/localize/tools')));
+    localizeToolsModule ??= await Promise.resolve().then(() => __importStar(require('@angular/localize/tools')));
+    return localizeToolsModule;
 }
 async function createI18nPlugins(locale, translation, missingTranslation, shouldInline, localeDataContent) {
     const { Diagnostics, makeEs2015TranslatePlugin, makeLocalePlugin } = await loadLocalizeTools();
@@ -129,7 +127,9 @@ async function inlineLocales(options) {
         // Which makes it hard to find the actual error message.
         const index = error.message.indexOf(')\n');
         const msg = index !== -1 ? error.message.slice(0, index + 1) : error.message;
-        throw new Error(`${msg}\nAn error occurred inlining file "${options.filename}"`);
+        throw new Error(`${msg}\nAn error occurred inlining file "${options.filename}"`, {
+            cause: error,
+        });
     }
     if (!ast) {
         throw new Error(`Unknown error occurred inlining file "${options.filename}"`);

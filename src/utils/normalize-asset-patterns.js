@@ -71,7 +71,7 @@ function normalizeAssetPatterns(assetPatterns, workspaceRoot, projectRoot, proje
                 throw new MissingAssetSourceRootException(assetPattern);
             }
             let glob, input;
-            let isDirectory = false;
+            let isDirectory;
             try {
                 isDirectory = (0, node_fs_1.statSync)(resolvedAssetPath).isDirectory();
             }

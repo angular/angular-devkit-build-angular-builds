@@ -90,7 +90,6 @@ statsConfig, budgetFailures) {
     const rs = (x) => (colors ? color_1.colors.reset(x) : x);
     const w = (x) => (colors ? color_1.colors.bold.white(x) : x);
     const changedChunksStats = [];
-    let unchangedChunkNumber = 0;
     let hasEstimatedTransferSizes = false;
     const isFirstRun = !runsCache.has(json.outputPath || '');
     for (const chunk of json.chunks) {
@@ -119,7 +118,7 @@ statsConfig, budgetFailures) {
         }
         changedChunksStats.push(generateBundleStats({ ...chunk, rawSize, estimatedTransferSize }));
     }
-    unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
+    const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
     runsCache.add(json.outputPath || '');
     const statsTable = (0, private_1.generateBuildStatsTable)(changedChunksStats, colors, unchangedChunkNumber === 0, hasEstimatedTransferSizes, budgetFailures);
     // In some cases we do things outside of webpack context
