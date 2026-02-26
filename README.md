@@ -33,7 +33,6 @@ This package contains [Architect builders](/packages/angular_devkit/architect/RE
 | prerender       | [Prerender](https://angular.dev/guide/prerendering) pages of your application. Prerendering is the process where a dynamic page is processed at build time generating static HTML.                      |
 | server          | Build an Angular application targeting a [Node.js](https://nodejs.org) environment.                                                                                                                     |
 | ssr-dev-server  | A development server which offers live reload during development, but uses server-side rendering.                                                                                                       |
-| protractor      | **Deprecated** - Run end-to-end tests using [Protractor](https://www.protractortest.org/) framework.                                                                                                    |
 
 ## Disclaimer
 

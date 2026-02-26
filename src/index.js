@@ -21,7 +21,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.executeNgPackagrBuilder = exports.executeSSRDevServerBuilder = exports.executeServerBuilder = exports.executeProtractorBuilder = exports.executeExtractI18nBuilder = exports.executeDevServerBuilder = exports.buildApplication = exports.executeBrowserBuilder = exports.Type = exports.OutputHashing = exports.CrossOrigin = void 0;
+exports.executeNgPackagrBuilder = exports.executeSSRDevServerBuilder = exports.executeServerBuilder = exports.executeExtractI18nBuilder = exports.executeDevServerBuilder = exports.buildApplication = exports.executeBrowserBuilder = exports.Type = exports.OutputHashing = exports.CrossOrigin = void 0;
 exports.executeKarmaBuilder = executeKarmaBuilder;
 const rxjs_1 = require("rxjs");
 const karma_1 = require("./builders/karma");
@@ -44,8 +44,6 @@ Object.defineProperty(exports, "executeExtractI18nBuilder", { enumerable: true, 
 function executeKarmaBuilder(options, context, transforms) {
     return (0, rxjs_1.from)((0, karma_1.execute)(options, context, transforms));
 }
-var protractor_1 = require("./builders/protractor");
-Object.defineProperty(exports, "executeProtractorBuilder", { enumerable: true, get: function () { return protractor_1.execute; } });
 var server_1 = require("./builders/server");
 Object.defineProperty(exports, "executeServerBuilder", { enumerable: true, get: function () { return server_1.execute; } });
 var ssr_dev_server_1 = require("./builders/ssr-dev-server");

@@ -24,7 +24,6 @@ export declare function executeKarmaBuilder(options: KarmaBuilderOptions, contex
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
 }): Observable<BuilderOutput>;
 export { type KarmaBuilderOptions, type KarmaConfigOptions };
-export { execute as executeProtractorBuilder, type ProtractorBuilderOptions, } from './builders/protractor';
 export { execute as executeServerBuilder, type ServerBuilderOptions, type ServerBuilderOutput, } from './builders/server';
 export { execute as executeSSRDevServerBuilder, type SSRDevServerBuilderOptions, type SSRDevServerBuilderOutput, } from './builders/ssr-dev-server';
 export { execute as executeNgPackagrBuilder, type NgPackagrBuilderOptions, } from './builders/ng-packagr';

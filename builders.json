@@ -32,16 +32,6 @@
       "schema": "./src/builders/karma/schema.json",
       "description": "Run Karma unit tests."
     },
-    "protractor": {
-      "implementation": "./src/builders/protractor-error",
-      "schema": "./src/builders/protractor/schema.json",
-      "description": "Throw an error that Protractor is end-of-life and no longer supported."
-    },
-    "private-protractor": {
-      "implementation": "./src/builders/protractor",
-      "schema": "./src/builders/protractor/schema.json",
-      "description": "PRIVATE API - Do not use."
-    },
     "server": {
       "implementation": "./src/builders/server",
       "schema": "./src/builders/server/schema.json",
