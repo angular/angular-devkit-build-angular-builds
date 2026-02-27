@@ -6,9 +6,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAvailablePort = getAvailablePort;
 exports.spawnAsObservable = spawnAsObservable;
@@ -16,7 +13,6 @@ exports.waitUntilServerIsListening = waitUntilServerIsListening;
 const node_child_process_1 = require("node:child_process");
 const node_net_1 = require("node:net");
 const rxjs_1 = require("rxjs");
-const tree_kill_1 = __importDefault(require("tree-kill"));
 function getAvailablePort() {
     return new Promise((resolve, reject) => {
         const server = (0, node_net_1.createServer)();
@@ -47,8 +43,8 @@ function spawnAsObservable(command, args = [], options = {}) {
             obs.complete();
         });
         return () => {
-            if (!proc.killed && proc.pid) {
-                (0, tree_kill_1.default)(proc.pid, 'SIGTERM');
+            if (!proc.killed) {
+                proc.kill();
             }
         };
     });
