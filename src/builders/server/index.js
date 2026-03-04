@@ -127,6 +127,7 @@ function execute(options, context, transforms = {}) {
         }));
     }), (0, rxjs_1.concatMap)(async (output) => {
         if (!output.success) {
+            // The `as unknown` is here primarily for the linter.
             return output;
         }
         return {

@@ -164,10 +164,10 @@ async function _appShellBuilder(options, context) {
     });
     let spinner;
     try {
-        const [browserResult, serverResult] = await Promise.all([
+        const [browserResult, serverResult] = (await Promise.all([
             browserTargetRun.result,
             serverTargetRun.result,
-        ]);
+        ]));
         if (browserResult.success === false || browserResult.baseOutputPath === undefined) {
             return browserResult;
         }
