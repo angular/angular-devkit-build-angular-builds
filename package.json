@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "21.2.1+sha-add72f7",
+  "version": "21.2.1+sha-0601029",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#add72f7",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#add72f7",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#add72f7",
-    "@angular/build": "github:angular/angular-build-builds#add72f7",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#0601029",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#0601029",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#0601029",
+    "@angular/build": "github:angular/angular-build-builds#0601029",
     "@babel/core": "7.29.0",
     "@babel/generator": "7.29.1",
     "@babel/helper-annotate-as-pure": "7.27.3",
@@ -21,7 +21,7 @@
     "@babel/preset-env": "7.29.0",
     "@babel/runtime": "7.28.6",
     "@discoveryjs/json-ext": "0.6.3",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#add72f7",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#0601029",
     "ansi-colors": "4.1.3",
     "autoprefixer": "10.4.27",
     "babel-loader": "10.0.0",
@@ -71,7 +71,7 @@
     "@angular/platform-browser": "^21.0.0",
     "@angular/platform-server": "^21.0.0",
     "@angular/service-worker": "^21.0.0",
-    "@angular/ssr": "github:angular/angular-ssr-builds#add72f7",
+    "@angular/ssr": "github:angular/angular-ssr-builds#0601029",
     "@web/test-runner": "^0.20.0",
     "browser-sync": "^3.0.2",
     "jest": "^30.2.0",
@@ -135,7 +135,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/angular/angular-cli.git"
+    "url": "git+https://github.com/angular/angular-cli.git"
   },
   "packageManager": "pnpm@10.30.3",
   "engines": {
