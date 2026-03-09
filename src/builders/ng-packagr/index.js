@@ -43,6 +43,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = execute;
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
+const node_module_1 = require("node:module");
 const node_path_1 = require("node:path");
 const rxjs_1 = require("rxjs");
 const normalize_cache_1 = require("../../utils/normalize-cache");
@@ -54,7 +55,9 @@ function execute(options, context) {
         // Purge old build disk cache.
         await (0, private_1.purgeStaleBuildCache)(context);
         const root = context.workspaceRoot;
-        const packager = (await Promise.resolve().then(() => __importStar(require('ng-packagr')))).ngPackagr();
+        const workspaceRequire = (0, node_module_1.createRequire)(root + '/');
+        const ngPackagePath = workspaceRequire.resolve('ng-packagr');
+        const packager = (await Promise.resolve(`${ngPackagePath}`).then(s => __importStar(require(s)))).ngPackagr();
         packager.forProject((0, node_path_1.resolve)(root, options.project));
         if (options.tsConfig) {
             packager.withTsConfig((0, node_path_1.resolve)(root, options.tsConfig));
