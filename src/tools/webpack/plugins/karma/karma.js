@@ -47,7 +47,6 @@ const path = __importStar(require("node:path"));
 const webpack_dev_middleware_1 = __importDefault(require("webpack-dev-middleware"));
 const stats_1 = require("../../utils/stats");
 const index_1 = require("../../../../utils/index");
-const KARMA_APPLICATION_PATH = '_karma_webpack_';
 let webpackMiddleware;
 const init = (config, emitter) => {
     if (!config.buildWebpack) {
@@ -80,7 +79,6 @@ const init = (config, emitter) => {
     const webpackMiddlewareConfig = {
         // Hide webpack output because its noisy.
         stats: false,
-        publicPath: `/${KARMA_APPLICATION_PATH}/`,
     };
     config.webpackMiddleware = { ...webpackMiddlewareConfig, ...config.webpackMiddleware };
     // Our custom context and debug files list the webpack bundles directly instead of using
@@ -147,7 +145,7 @@ function muteDuplicateReporterLogging(context, config) {
 const sourceMapReporter = function (baseReporterDecorator, config) {
     baseReporterDecorator(this);
     muteDuplicateReporterLogging(this, config);
-    const urlRegexp = /http:\/\/localhost:\d+\/_karma_webpack_\/(webpack:\/)?/gi;
+    const urlRegexp = /http:\/\/localhost:\d+\/(webpack:\/)?/gi;
     this.onSpecComplete = function (_browser, result) {
         if (!result.success) {
             result.log = result.log.map((l) => l.replace(urlRegexp, ''));
@@ -159,33 +157,32 @@ const sourceMapReporter = function (baseReporterDecorator, config) {
     this.specFailure = () => { };
 };
 sourceMapReporter.$inject = ['baseReporterDecorator', 'config'];
+/**
+ * List of files that are always served by the webpack server.
+ */
+const alwaysServe = new Set([
+    '/runtime.js',
+    '/polyfills.js',
+    '/scripts.js',
+    '/styles.css',
+    '/vendor.js',
+]);
 // When a request is not found in the karma server, try looking for it from the webpack server root.
 function fallbackMiddleware() {
     return function (request, response, next) {
-        if (webpackMiddleware) {
-            if (request.url && !new RegExp(`\\/${KARMA_APPLICATION_PATH}\\/.*`).test(request.url)) {
-                request.url = '/' + KARMA_APPLICATION_PATH + request.url;
-            }
-            webpackMiddleware(request, response, () => {
-                const alwaysServe = [
-                    `/${KARMA_APPLICATION_PATH}/runtime.js`,
-                    `/${KARMA_APPLICATION_PATH}/polyfills.js`,
-                    `/${KARMA_APPLICATION_PATH}/scripts.js`,
-                    `/${KARMA_APPLICATION_PATH}/styles.css`,
-                    `/${KARMA_APPLICATION_PATH}/vendor.js`,
-                ];
-                if (request.url && alwaysServe.includes(request.url)) {
-                    response.statusCode = 200;
-                    response.end();
-                }
-                else {
-                    next();
-                }
-            });
-        }
-        else {
+        if (!webpackMiddleware) {
             next();
+            return;
         }
+        webpackMiddleware(request, response, () => {
+            if (request.url && alwaysServe.has(request.url)) {
+                response.statusCode = 200;
+                response.end();
+            }
+            else {
+                next();
+            }
+        });
     };
 }
 module.exports = {
