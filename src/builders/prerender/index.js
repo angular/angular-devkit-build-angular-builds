@@ -181,7 +181,7 @@ async function _renderUniversal(options, context, browserResult, serverResult, b
                         inlineCriticalCss: !!normalizedStylesOptimization.inlineCritical,
                         minifyCss: !!normalizedStylesOptimization.minify,
                         outputPath,
-                        route,
+                        route: route[0] === '/' ? route : '/' + route,
                         serverBundlePath,
                     };
                     return worker.run(options);
