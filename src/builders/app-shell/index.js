@@ -91,10 +91,11 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
             const browserIndexOutputPath = path.join(outputPath, 'index.html');
             const indexHtml = await fs.promises.readFile(browserIndexOutputPath, 'utf8');
             const serverBundlePath = await _getServerModuleBundlePath(options, context, serverResult, localeDirectory);
+            const route = options.route;
             let html = await renderWorker.run({
                 serverBundlePath,
                 document: indexHtml,
-                url: options.route,
+                url: route?.[0] === '/' ? route : '/' + route,
             });
             // Overwrite the client index file.
             const outputIndexPath = options.outputIndexPath

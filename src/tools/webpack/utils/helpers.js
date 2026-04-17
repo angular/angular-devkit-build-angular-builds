@@ -51,6 +51,7 @@ exports.assetPatterns = assetPatterns;
 exports.getStatsOptions = getStatsOptions;
 exports.isPackageInstalled = isPackageInstalled;
 const node_crypto_1 = require("node:crypto");
+const node_module_1 = require("node:module");
 const path = __importStar(require("node:path"));
 const tinyglobby_1 = require("tinyglobby");
 const schema_1 = require("../../../builders/browser/schema");
@@ -291,7 +292,8 @@ function getStatsOptions(verbose = false) {
  */
 function isPackageInstalled(root, name) {
     try {
-        require.resolve(name, { paths: [root] });
+        const resolve = (0, node_module_1.createRequire)(root + '/').resolve;
+        resolve(name);
         return true;
     }
     catch {
