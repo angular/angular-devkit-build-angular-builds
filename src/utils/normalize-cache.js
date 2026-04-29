@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalizeCacheOptions = normalizeCacheOptions;
 const node_path_1 = require("node:path");
 /** Version placeholder is replaced during the build process with actual package version */
-const VERSION = '22.0.0-next.6+sha-b287640';
+const VERSION = '22.0.0-next.6+sha-dc1238e';
 function hasCacheMetadata(value) {
     return (!!value &&
         typeof value === 'object' &&
