@@ -229,6 +229,8 @@ async function _renderUniversal(options, context, browserResult, serverResult, b
  * the browser result.
  */
 async function execute(options, context) {
+    context.logger.warn('The "@angular-devkit/build-angular:prerender" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+        'Use "@angular/build:application" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.');
     const browserTarget = (0, architect_1.targetFromTargetString)(options.browserTarget);
     const browserOptions = (await context.getTargetOptions(browserTarget));
     const result = await _scheduleBuilds(options, context);

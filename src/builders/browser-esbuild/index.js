@@ -19,6 +19,8 @@ const architect_1 = require("@angular-devkit/architect");
  * @returns An async iterable with the builder result output
  */
 async function* buildEsbuildBrowser(userOptions, context, infrastructureSettings, plugins) {
+    context.logger.warn('The "@angular-devkit/build-angular:browser-esbuild" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+        'Use "@angular/build:application" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.');
     // Warn about any unsupported options
     if (userOptions['vendorChunk']) {
         context.logger.warn(`The 'vendorChunk' option is not used by this builder and will be ignored.`);

@@ -52,6 +52,8 @@ const schema_1 = require("./schema");
  * @experimental Direct usage of this function is considered experimental.
  */
 async function* execute(options, context, transforms = {}) {
+    context.logger.warn('The "@angular-devkit/build-angular:karma" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+        'Use "@angular/build:karma" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.');
     // Check Angular version.
     (0, private_1.assertCompatibleAngularVersion)(context.workspaceRoot);
     if (await checkForEsbuild(options, context)) {

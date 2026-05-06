@@ -60,6 +60,8 @@ async function execute(options, context, transforms) {
         context.logger.error(`The 'extract-i18n' builder requires a target to be specified.`);
         return { success: false };
     }
+    context.logger.warn('The "@angular-devkit/build-angular:extract-i18n" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+        'Use "@angular/build:extract-i18n" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.');
     const { projectType } = (await context.getProjectMetadata(projectName));
     if (projectType !== 'application') {
         context.logger.error(`Tried to extract from ${projectName} with 'projectType' ${projectType}, which is not supported.` +

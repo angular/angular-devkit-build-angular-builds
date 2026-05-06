@@ -141,6 +141,8 @@ async function _getServerModuleBundlePath(options, context, serverResult, browse
     return path.join(outputPath, maybeMain);
 }
 async function _appShellBuilder(options, context) {
+    context.logger.warn('The "@angular-devkit/build-angular:app-shell" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+        'Use "@angular/build:application" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.');
     const browserTarget = (0, architect_1.targetFromTargetString)(options.browserTarget);
     const serverTarget = (0, architect_1.targetFromTargetString)(options.serverTarget);
     // Never run the browser target in watch mode.

@@ -56,6 +56,8 @@ const IGNORED_STDOUT_MESSAGES = [
     'Angular is running in development mode. Call enableProdMode() to enable production mode.',
 ];
 function execute(options, context) {
+    context.logger.warn('The "@angular-devkit/build-angular:ssr-dev-server" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+        'Use "@angular/build:ssr-dev-server" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.');
     let browserSync;
     try {
         browserSync = (0, node_module_1.createRequire)(context.workspaceRoot + '/')('browser-sync');

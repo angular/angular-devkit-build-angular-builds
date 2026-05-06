@@ -93,6 +93,8 @@ function buildWebpackBrowser(options, context, transforms = {}) {
     if (!projectName) {
         throw new Error('The builder requires a target.');
     }
+    context.logger.warn('The "@angular-devkit/build-angular:browser" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+        'Use "@angular/build:application" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.');
     const baseOutputPath = path.resolve(context.workspaceRoot, options.outputPath);
     let outputPaths;
     // Check Angular version.

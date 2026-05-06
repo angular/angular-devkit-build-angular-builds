@@ -66,6 +66,8 @@ const webpack_browser_config_1 = require("../../utils/webpack-browser-config");
  */
 function execute(options, context, transforms = {}) {
     const root = context.workspaceRoot;
+    context.logger.warn('The "@angular-devkit/build-angular:server" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+        'Use "@angular/build:application" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.');
     // Check Angular version.
     (0, private_1.assertCompatibleAngularVersion)(root);
     const baseOutputPath = path.resolve(root, options.outputPath);
