@@ -1,16 +1,16 @@
 {
   "name": "@angular-devkit/build-angular",
-  "version": "22.0.0-rc.0+sha-327cc24",
+  "version": "22.0.0-rc.0+sha-f32c36c",
   "description": "Angular Webpack Build Facade",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
-    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#327cc24",
-    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#327cc24",
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#327cc24",
-    "@angular/build": "github:angular/angular-build-builds#327cc24",
+    "@angular-devkit/architect": "github:angular/angular-devkit-architect-builds#f32c36c",
+    "@angular-devkit/build-webpack": "github:angular/angular-devkit-build-webpack-builds#f32c36c",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#f32c36c",
+    "@angular/build": "github:angular/angular-build-builds#f32c36c",
     "@babel/core": "7.29.0",
     "@babel/generator": "7.29.1",
     "@babel/helper-annotate-as-pure": "7.27.3",
@@ -21,7 +21,7 @@
     "@babel/preset-env": "7.29.3",
     "@babel/runtime": "7.29.2",
     "@discoveryjs/json-ext": "1.1.0",
-    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#327cc24",
+    "@ngtools/webpack": "github:angular/ngtools-webpack-builds#f32c36c",
     "ansi-colors": "4.1.3",
     "autoprefixer": "10.5.0",
     "babel-loader": "10.1.1",
@@ -70,7 +70,7 @@
     "@angular/platform-browser": "^22.0.0-next.0",
     "@angular/platform-server": "^22.0.0-next.0",
     "@angular/service-worker": "^22.0.0-next.0",
-    "@angular/ssr": "github:angular/angular-ssr-builds#327cc24",
+    "@angular/ssr": "github:angular/angular-ssr-builds#f32c36c",
     "browser-sync": "^3.0.2",
     "karma": "^6.3.0",
     "ng-packagr": "^22.0.0-next.0",
@@ -121,7 +121,7 @@
     "url": "git+https://github.com/angular/angular-cli.git"
   },
   "engines": {
-    "node": "^22.22.0 || ^24.13.1 || >=26.0.0",
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0",
     "npm": "^6.11.0 || ^7.5.6 || >=8.0.0",
     "yarn": ">= 1.13.0"
   },
