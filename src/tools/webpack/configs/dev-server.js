@@ -82,10 +82,7 @@ async function getDevServerConfig(wco) {
         devServer: {
             host,
             port,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                ...headers,
-            },
+            headers,
             historyApiFallback: !!index && {
                 index: node_path_1.posix.join(servePath, (0, webpack_browser_config_1.getIndexOutputFile)(index)),
                 disableDotRule: true,
