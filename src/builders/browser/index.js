@@ -42,6 +42,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BUILD_TIMEOUT = void 0;
 exports.buildWebpackBrowser = buildWebpackBrowser;
+/* eslint-disable max-lines-per-function */
 const private_1 = require("@angular/build/private");
 const architect_1 = require("@angular-devkit/architect");
 const build_webpack_1 = require("@angular-devkit/build-webpack");
@@ -87,7 +88,6 @@ async function initialize(options, context, webpackConfigurationTransform) {
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
-// eslint-disable-next-line max-lines-per-function
 function buildWebpackBrowser(options, context, transforms = {}) {
     const projectName = context.target?.project;
     if (!projectName) {
@@ -120,9 +120,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
             ...initialization,
             cacheOptions: (0, normalize_cache_1.normalizeCacheOptions)(projectMetadata, context.workspaceRoot),
         };
-    }), (0, rxjs_1.switchMap)(
-    // eslint-disable-next-line max-lines-per-function
-    ({ config, projectRoot, projectSourceRoot, i18n, cacheOptions }) => {
+    }), (0, rxjs_1.switchMap)(({ config, projectRoot, projectSourceRoot, i18n, cacheOptions }) => {
         const normalizedOptimization = (0, utils_1.normalizeOptimization)(options.optimization);
         return (0, build_webpack_1.runWebpack)(config, context, {
             webpackFactory: require('webpack'),
@@ -133,9 +131,7 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                         context.logger.info(stats.toString(statsOptions));
                     }
                 }),
-        }).pipe((0, rxjs_1.concatMap)(
-        // eslint-disable-next-line max-lines-per-function
-        async (buildEvent) => {
+        }).pipe((0, rxjs_1.concatMap)(async (buildEvent) => {
             const spinner = new spinner_1.Spinner();
             spinner.enabled = options.progress !== false;
             const { success, emittedFiles = [], outputPath: webpackOutputPath } = buildEvent;
