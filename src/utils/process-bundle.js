@@ -80,21 +80,19 @@ async function createI18nPlugins(locale, translation, missingTranslation, should
     const plugins = [];
     const diagnostics = new Diagnostics();
     if (shouldInline) {
-        plugins.push(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        makeEs2015TranslatePlugin(diagnostics, (translation || {}), {
+        plugins.push(makeEs2015TranslatePlugin(diagnostics, translation || {}, {
             missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
         }));
     }
     plugins.push(makeLocalePlugin(locale));
     if (localeDataContent) {
-        plugins.push({
+        plugins.push(() => ({
             visitor: {
                 Program(path) {
                     path.unshiftContainer('body', core_1.template.ast(localeDataContent));
                 },
             },
-        });
+        }));
     }
     return { diagnostics, plugins };
 }
@@ -210,6 +208,7 @@ async function inlineLocalesDirect(ast, options) {
         for (const position of positions) {
             const translated = localizeDiag.translate(diagnostics, translations, position.messageParts, position.expressions, isSourceLocale ? 'ignore' : options.missingTranslation || 'warning');
             const expression = localizeDiag.buildLocalizeReplacement(translated[0], translated[1]);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { code } = generate(expression);
             content.replace(position.start, position.end - 1, code);
         }
@@ -279,8 +278,12 @@ function findLocalizePositions(ast, options, utils) {
     return positions;
 }
 function unwrapTemplateLiteral(path, utils) {
-    const [messageParts] = utils.unwrapMessagePartsFromTemplateLiteral(path.get('quasi').get('quasis'));
-    const [expressions] = utils.unwrapExpressionsFromTemplateLiteral(path.get('quasi'));
+    const [messageParts] = utils.unwrapMessagePartsFromTemplateLiteral(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    path.get('quasi').get('quasis'));
+    const [expressions] = utils.unwrapExpressionsFromTemplateLiteral(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    path.get('quasi'));
     return [messageParts, expressions];
 }
 async function loadLocaleData(path, optimize) {
@@ -298,7 +301,6 @@ async function loadLocaleData(path, optimize) {
             [
                 require.resolve('@babel/preset-env'),
                 {
-                    bugfixes: true,
                     targets: { esmodules: true },
                 },
             ],

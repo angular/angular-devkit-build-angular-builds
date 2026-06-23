@@ -136,7 +136,6 @@ function default_1(api, options) {
         presets.push([
             require('@babel/preset-env').default,
             {
-                bugfixes: true,
                 modules: false,
                 targets: options.supportedBrowsers,
                 exclude: ['transform-typeof-symbol'],
@@ -166,7 +165,6 @@ function default_1(api, options) {
         plugins.push([
             require('@babel/plugin-transform-runtime').default,
             {
-                useESModules: true,
                 version: require('@babel/runtime/package.json').version,
                 absoluteRuntime: node_path_1.default.dirname(require.resolve('@babel/runtime/package.json')),
             },
