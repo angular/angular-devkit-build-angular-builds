@@ -171,12 +171,12 @@ function startNodeServer(serverOutput, port, host, logger, inspectMode = false) 
     const outputPath = serverOutput.outputPath;
     const path = (0, node_path_1.join)(outputPath, 'main.js');
     const env = { ...process.env, PORT: '' + port, NG_ALLOWED_HOSTS: host ?? 'localhost' };
-    const args = ['--enable-source-maps', `"${path}"`];
+    const args = ['--enable-source-maps', path];
     if (inspectMode) {
         args.unshift('--inspect-brk');
     }
     return (0, rxjs_1.of)(null).pipe((0, rxjs_1.delay)(0), // Avoid EADDRINUSE error since it will cause the kill event to be finish.
-    (0, rxjs_1.switchMap)(() => (0, utils_1.spawnAsObservable)('node', args, { env, shell: true })), (0, rxjs_1.tap)((res) => log({ stderr: res.stderr, stdout: res.stdout }, logger)), (0, rxjs_1.ignoreElements)(), 
+    (0, rxjs_1.switchMap)(() => (0, utils_1.spawnAsObservable)(process.execPath, args, { env })), (0, rxjs_1.tap)((res) => log({ stderr: res.stderr, stdout: res.stdout }, logger)), (0, rxjs_1.ignoreElements)(), 
     // Emit a signal after the process has been started
     (0, rxjs_1.startWith)(undefined));
 }
