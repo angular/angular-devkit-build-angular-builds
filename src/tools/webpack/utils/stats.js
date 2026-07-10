@@ -205,7 +205,13 @@ function statsErrorsToString(json, statsConfig) {
             // This below cleans up the error from stacks.
             // See: https://github.com/webpack/webpack/issues/15980
             const index = error.message.search(/[\n\s]+at /);
-            const message = statsConfig.errorStack || index === -1 ? error.message : error.message.substring(0, index);
+            let message = statsConfig.errorStack || index === -1 ? error.message : error.message.substring(0, index);
+            // Clean up error message paths when not verbose
+            // Ex: Execution of module code from module graph (./src/styles.scss.webpack[javascript/auto]!=!...) failed
+            // to Execution of module code from module graph (./src/styles.scss) failed
+            if (message && !statsConfig.errorDetails) {
+                message = message.replace(/([^(\s]+)\.webpack\[[^\]]+\]!=![^\s)]+/g, '$1');
+            }
             if (!/^error/i.test(message)) {
                 output += r('Error: ');
             }
