@@ -307,7 +307,7 @@ export declare enum InlineStyleLanguage {
 /**
  * Translate the bundles in one or more locales.
  */
-export type Localize = string[] | boolean;
+export type Localize = [string, ...string[]] | boolean;
 /**
  * Enables optimization of the build output. Including minification of scripts and styles,
  * tree-shaking, dead-code elimination, inlining of critical CSS and fonts inlining. For
