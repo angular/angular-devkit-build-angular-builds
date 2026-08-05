@@ -154,8 +154,13 @@ function default_1(api, options) {
         needRuntimeTransform = true;
     }
     if (options.optimize) {
-        const { adjustStaticMembers, adjustTypeScriptEnums, elideAngularMetadata, markTopLevelPure, } = require('@angular/build/private');
-        plugins.push([markTopLevelPure, { topLevelSafeMode: options.optimize.topLevelSafeMode }], elideAngularMetadata, adjustTypeScriptEnums, [adjustStaticMembers, { wrapDecorators: options.optimize.wrapDecorators }]);
+        plugins.push([
+            require('../plugins/pure-toplevel-functions').default,
+            { topLevelSafeMode: options.optimize.topLevelSafeMode },
+        ], require('../plugins/elide-angular-metadata').default, require('../plugins/adjust-typescript-enums').default, [
+            require('../plugins/adjust-static-class-members').default,
+            { wrapDecorators: options.optimize.wrapDecorators },
+        ]);
     }
     if (options.instrumentCode) {
         plugins.push(require('../plugins/add-code-coverage').default);
