@@ -49,11 +49,11 @@ async function extractMessages(options, builderName, context, extractorConstruct
         const extractor = setupLocalizeExtractor(extractorConstructor, builderResult.files, context);
         // Extract messages from each output JavaScript file.
         // Output files are only present on a successful build.
-        for (const filePath of Object.keys(builderResult.files)) {
-            if (!filePath.endsWith('.js')) {
+        for (const file of builderResult.files) {
+            if (!file.path.endsWith('.js')) {
                 continue;
             }
-            const fileMessages = extractor.extractMessages(filePath);
+            const fileMessages = extractor.extractMessages(file.path);
             messages.push(...fileMessages);
         }
         success = true;
@@ -67,6 +67,7 @@ async function extractMessages(options, builderName, context, extractorConstruct
     };
 }
 function setupLocalizeExtractor(extractorConstructor, files, context) {
+    const fileMap = new Map(files.map((file) => [file.path, file]));
     const textDecoder = new TextDecoder();
     // Setup a virtual file system instance for the extractor
     // * MessageExtractor itself uses readFile, relative and resolve
@@ -75,7 +76,7 @@ function setupLocalizeExtractor(extractorConstructor, files, context) {
         readFile(path) {
             // Output files are stored as relative to the workspace root
             const requestedPath = node_path_1.default.relative(context.workspaceRoot, path);
-            const file = files[requestedPath];
+            const file = fileMap.get(requestedPath);
             let content;
             if (file?.origin === 'memory') {
                 content = textDecoder.decode(file.contents);
@@ -97,7 +98,7 @@ function setupLocalizeExtractor(extractorConstructor, files, context) {
         exists(path) {
             // Output files are stored as relative to the workspace root
             const requestedPath = node_path_1.default.relative(context.workspaceRoot, path);
-            return files[requestedPath] !== undefined;
+            return fileMap.has(requestedPath);
         },
         dirname(path) {
             return node_path_1.default.dirname(path);
