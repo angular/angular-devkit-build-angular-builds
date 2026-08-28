@@ -76,10 +76,10 @@ async function getStylesConfig(wco) {
             extraPlugins.push(new plugins_1.RemoveHashPlugin({ chunkNames: noInjectNames, hashFormat }));
         }
     }
-    const sassImplementation = new private_1.SassWorkerImplementation();
+    const sassImplementation = new private_1.SassCompiler(false);
     extraPlugins.push({
         apply(compiler) {
-            compiler.hooks.shutdown.tap('sass-worker', () => {
+            compiler.hooks.shutdown.tap('sass-service', () => {
                 void sassImplementation.close();
             });
         },
