@@ -50,6 +50,7 @@ const path = __importStar(require("node:path"));
 const piscina_1 = __importDefault(require("piscina"));
 const utils_1 = require("../../utils");
 const error_1 = require("../../utils/error");
+const inline_critical_css_1 = require("../../utils/inline-critical-css");
 const spinner_1 = require("../../utils/spinner");
 async function _renderUniversal(options, context, browserResult, serverResult, spinner) {
     // Get browser target options.
@@ -71,14 +72,6 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
     const projectMetadata = await context.getProjectMetadata(projectName);
     const projectRoot = path.join(root, projectMetadata.root ?? '');
     const { styles } = (0, utils_1.normalizeOptimization)(browserOptions.optimization);
-    let inlineCriticalCssProcessor;
-    if (styles.inlineCritical) {
-        const { InlineCriticalCssProcessor } = await Promise.resolve().then(() => __importStar(require('@angular/build/private')));
-        inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-            minify: styles.minify,
-            deployUrl: browserOptions.deployUrl,
-        });
-    }
     const renderWorker = new piscina_1.default({
         filename: require.resolve('./render-worker'),
         maxThreads: 1,
@@ -101,10 +94,13 @@ async function _renderUniversal(options, context, browserResult, serverResult, s
             const outputIndexPath = options.outputIndexPath
                 ? path.join(root, options.outputIndexPath)
                 : browserIndexOutputPath;
-            if (inlineCriticalCssProcessor) {
-                const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, {
+            if (styles.inlineCritical) {
+                const inlineCriticalCssProcessor = new inline_critical_css_1.InlineCriticalCssProcessor({
+                    minify: styles.minify,
                     outputPath,
+                    deployUrl: browserOptions.deployUrl,
                 });
+                const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html);
                 html = content;
                 if (warnings.length || errors.length) {
                     spinner.stop();

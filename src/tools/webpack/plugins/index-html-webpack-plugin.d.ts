@@ -10,10 +10,10 @@ import { Compilation, Compiler } from 'webpack';
 export interface IndexHtmlWebpackPluginOptions extends IndexHtmlGeneratorOptions, Omit<IndexHtmlGeneratorProcessOptions, 'files'> {
 }
 export declare class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
-    readonly options: IndexHtmlWebpackPluginOptions;
+    readonly pluginOptions: IndexHtmlWebpackPluginOptions;
     private _compilation;
     get compilation(): Compilation;
-    constructor(options: IndexHtmlWebpackPluginOptions);
+    constructor(pluginOptions: IndexHtmlWebpackPluginOptions);
     apply(compiler: Compiler): void;
     readAsset(path: string): Promise<string>;
     protected readIndex(path: string): Promise<string>;

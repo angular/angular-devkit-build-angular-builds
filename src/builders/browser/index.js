@@ -219,25 +219,25 @@ function buildWebpackBrowser(options, context, transforms = {}) {
                             scripts: options.scripts ?? [],
                             styles: options.styles ?? [],
                         });
-                        const indexHtmlGenerator = new private_1.IndexHtmlGenerator({
-                            cache: cacheOptions,
-                            indexPath: path.join(context.workspaceRoot, (0, webpack_browser_config_1.getIndexInputFile)(options.index)),
-                            entrypoints,
-                            deployUrl: options.deployUrl,
-                            sri: options.subresourceIntegrity,
-                            optimization: normalizedOptimization,
-                            crossOrigin: options.crossOrigin,
-                            postTransform: transforms.indexHtml,
-                            imageDomains: Array.from(webpack_1.imageDomains),
-                        });
                         let hasErrors = false;
                         for (const [locale, outputPath] of outputPaths.entries()) {
                             try {
+                                const indexHtmlGenerator = new private_1.IndexHtmlGenerator({
+                                    cache: cacheOptions,
+                                    indexPath: path.join(context.workspaceRoot, (0, webpack_browser_config_1.getIndexInputFile)(options.index)),
+                                    entrypoints,
+                                    outputPath,
+                                    deployUrl: options.deployUrl,
+                                    sri: options.subresourceIntegrity,
+                                    optimization: normalizedOptimization,
+                                    crossOrigin: options.crossOrigin,
+                                    postTransform: transforms.indexHtml,
+                                    imageDomains: Array.from(webpack_1.imageDomains),
+                                });
                                 const { csrContent: content, warnings, errors, } = await indexHtmlGenerator.process({
                                     baseHref: getLocaleBaseHref(i18n, locale) ?? options.baseHref,
                                     // i18nLocale is used when Ivy is disabled
                                     lang: locale || undefined,
-                                    outputPath,
                                     files: mapEmittedFilesToFileInfo(emittedFiles),
                                 });
                                 if (warnings.length || errors.length) {

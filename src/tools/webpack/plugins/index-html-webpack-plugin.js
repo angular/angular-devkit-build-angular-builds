@@ -15,7 +15,7 @@ const error_1 = require("../../../utils/error");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
 const PLUGIN_NAME = 'index-html-webpack-plugin';
 class IndexHtmlWebpackPlugin extends private_1.IndexHtmlGenerator {
-    options;
+    pluginOptions;
     _compilation;
     get compilation() {
         if (this._compilation) {
@@ -23,9 +23,12 @@ class IndexHtmlWebpackPlugin extends private_1.IndexHtmlGenerator {
         }
         throw new Error('compilation is undefined.');
     }
-    constructor(options) {
-        super(options);
-        this.options = options;
+    constructor(pluginOptions) {
+        super({
+            ...pluginOptions,
+            outputPath: (0, node_path_1.dirname)(pluginOptions.outputPath),
+        });
+        this.pluginOptions = pluginOptions;
     }
     apply(compiler) {
         compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
@@ -53,11 +56,10 @@ class IndexHtmlWebpackPlugin extends private_1.IndexHtmlGenerator {
                 }
                 const { csrContent: content, warnings, errors, } = await this.process({
                     files,
-                    outputPath: (0, node_path_1.dirname)(this.options.outputPath),
-                    baseHref: this.options.baseHref,
-                    lang: this.options.lang,
+                    baseHref: this.pluginOptions.baseHref,
+                    lang: this.pluginOptions.lang,
                 });
-                assets[this.options.outputPath] = new webpack_1.sources.RawSource(content);
+                assets[this.pluginOptions.outputPath] = new webpack_1.sources.RawSource(content);
                 warnings.forEach((msg) => (0, webpack_diagnostics_1.addWarning)(this.compilation, msg));
                 errors.forEach((msg) => (0, webpack_diagnostics_1.addError)(this.compilation, msg));
             }

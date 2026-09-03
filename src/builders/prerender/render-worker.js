@@ -47,6 +47,7 @@ const node_assert_1 = __importDefault(require("node:assert"));
 const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const node_worker_threads_1 = require("node:worker_threads");
+const inline_critical_css_1 = require("../../utils/inline-critical-css");
 /**
  * The fully resolved path to the zone.js package that will be loaded during worker initialization.
  * This is passed as workerData when setting up the worker via the `piscina` package.
@@ -94,14 +95,12 @@ async function render({ indexFile, deployUrl, minifyCss, outputPath, serverBundl
         });
     }
     if (inlineCriticalCss) {
-        const { InlineCriticalCssProcessor } = await Promise.resolve().then(() => __importStar(require('@angular/build/private')));
-        const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-            deployUrl: deployUrl,
+        const inlineCriticalCssProcessor = new inline_critical_css_1.InlineCriticalCssProcessor({
+            deployUrl,
+            outputPath,
             minify: minifyCss,
         });
-        const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, {
-            outputPath,
-        });
+        const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html);
         result.errors = errors;
         result.warnings = warnings;
         html = content;
