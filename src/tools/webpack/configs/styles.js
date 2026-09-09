@@ -79,6 +79,9 @@ async function getStylesConfig(wco) {
     const sassImplementation = new private_1.SassCompiler(false);
     extraPlugins.push({
         apply(compiler) {
+            compiler.hooks.thisCompilation.tap('sass-service', () => {
+                sassImplementation.clearCache();
+            });
             compiler.hooks.shutdown.tap('sass-service', () => {
                 void sassImplementation.close();
             });
