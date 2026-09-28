@@ -23,7 +23,7 @@ async function copyAssets(entries, basePaths, root, changed) {
             cwd,
             dot: true,
             ignore: entry.ignore ? defaultIgnore.concat(entry.ignore) : defaultIgnore,
-            followSymbolicLinks: entry.followSymlinks,
+            followSymbolicLinks: entry.followSymlinks ?? false,
         });
         const directoryExists = new Set();
         for (const file of files) {
