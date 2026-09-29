@@ -28,7 +28,7 @@ export type Schema = {
      */
     codeCoverageExclude?: string[];
     /**
-     * Globs of files to exclude, relative to the project root.
+     * Globs of files to exclude, relative to the project source root.
      */
     exclude?: string[];
     /**
@@ -36,11 +36,11 @@ export type Schema = {
      */
     fileReplacements?: FileReplacement[];
     /**
-     * Globs of files to include, relative to project root.
+     * Globs of files to include, relative to the project source root.
      * There are 2 special cases:
-     * - when a path to directory is provided, all spec files ending ".spec.@(ts|tsx)" will be
+     * - when a path to a directory is provided, all spec files ending ".spec.@(ts|tsx)" will be
      * included
-     * - when a path to a file is provided, and a matching spec file exists it will be included
+     * - when a path to a file is provided, and a matching spec file exists, it will be included
      * instead.
      */
     include?: string[];
