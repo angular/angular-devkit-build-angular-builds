@@ -94,6 +94,12 @@ function default_1() {
                 if (path.getFunctionParent()) {
                     return;
                 }
+                // Do not annotate standalone expression statements.
+                // Standalone expression statements are executed solely for their side effects;
+                // marking them pure causes minifiers to drop them as dead code.
+                if (path.parentPath.isExpressionStatement()) {
+                    return;
+                }
                 const callee = path.get('callee');
                 if ((callee.isFunctionExpression() || callee.isArrowFunctionExpression()) &&
                     path.node.arguments.length !== 0) {
@@ -110,6 +116,12 @@ function default_1() {
             NewExpression(path, state) {
                 // If the expression has a function parent, it is not top-level
                 if (path.getFunctionParent()) {
+                    return;
+                }
+                // Do not annotate standalone expression statements.
+                // Standalone expression statements are executed solely for their side effects;
+                // marking them pure causes minifiers to drop them as dead code.
+                if (path.parentPath.isExpressionStatement()) {
                     return;
                 }
                 const { topLevelSafeMode = false } = state.opts;
