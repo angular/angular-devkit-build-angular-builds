@@ -191,6 +191,7 @@ async function initBrowserSync(browserSyncInstance, nodeServerPort, options, con
             target: `localhost:${nodeServerPort}`,
             proxyOptions: {
                 xfwd: true,
+                changeOrigin: false,
             },
             proxyRes: [
                 (proxyRes) => {
