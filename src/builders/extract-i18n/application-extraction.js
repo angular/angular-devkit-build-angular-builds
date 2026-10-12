@@ -25,6 +25,7 @@ async function extractMessages(options, builderName, context, extractorConstruct
     else {
         buildOptions = (0, browser_esbuild_1.convertBrowserOptions)((await context.validateOptions(await context.getTargetOptions(options.buildTarget), builderName)));
     }
+    buildOptions.aot = true;
     buildOptions.optimization = false;
     buildOptions.sourceMap = { scripts: true, vendor: true, styles: false };
     buildOptions.localize = false;
