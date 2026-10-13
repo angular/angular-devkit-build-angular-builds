@@ -83,7 +83,7 @@ function setupLocalizeExtractor(extractorConstructor, files, context) {
                 content = textDecoder.decode(file.contents);
             }
             else if (file?.origin === 'disk') {
-                content = (0, node_fs_1.readFileSync)(file.inputPath, 'utf-8');
+                content = (0, node_fs_1.readFileSync)(file.source, 'utf-8');
             }
             if (content === undefined) {
                 throw new Error('Unknown file requested: ' + requestedPath);
