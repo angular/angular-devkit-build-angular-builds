@@ -11,10 +11,10 @@ exports.CommonJsUsageWarnPlugin = void 0;
 const node_path_1 = require("node:path");
 const webpack_diagnostics_1 = require("../../../utils/webpack-diagnostics");
 // Webpack doesn't export these so the deep imports can potentially break.
-const AMDDefineDependency = require('webpack/lib/dependencies/AMDDefineDependency');
-const CommonJsExportsDependency = require('webpack/lib/dependencies/CommonJsExportsDependency');
-const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequireDependency');
-const CommonJsSelfReferenceDependency = require('webpack/lib/dependencies/CommonJsSelfReferenceDependency');
+const AMDDefineDependency = require('webpack/lib/dependencies/amd/AMDDefineDependency');
+const CommonJsExportsDependency = require('webpack/lib/dependencies/commonjs/CommonJsExportsDependency');
+const CommonJsRequireDependency = require('webpack/lib/dependencies/commonjs/CommonJsRequireDependency');
+const CommonJsSelfReferenceDependency = require('webpack/lib/dependencies/commonjs/CommonJsSelfReferenceDependency');
 class CommonJsUsageWarnPlugin {
     options;
     shownWarnings = new Set();

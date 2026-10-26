@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NamedChunksPlugin = void 0;
 const webpack_1 = require("webpack");
 // `ImportDependency` is not part of Webpack's depenencies typings.
-const ImportDependency = require('webpack/lib/dependencies/ImportDependency');
+const ImportDependency = require('webpack/lib/dependencies/import/ImportDependency');
 const PLUGIN_NAME = 'named-chunks-plugin';
 /**
  * Webpack will not populate the chunk `name` property unless `webpackChunkName` magic comment is used.
