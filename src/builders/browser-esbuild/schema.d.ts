@@ -141,8 +141,8 @@ export type Schema = {
      */
     sourceMap?: SourceMapUnion;
     /**
-     * Generates a 'stats.json' file which can be analyzed using tools such as
-     * 'webpack-bundle-analyzer'.
+     * Generates a 'browser-stats.json' file which can be analyzed with
+     * https://esbuild.github.io/analyze/.
      */
     statsJson?: boolean;
     /**
