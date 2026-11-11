@@ -19,7 +19,7 @@ var Format;
     Format["Xmb"] = "xmb";
 })(Format || (exports.Format = Format = {}));
 /**
- * How to handle duplicate translations.
+ * How to handle duplicate messages found during extraction.
  */
 var I18NDuplicateTranslation;
 (function (I18NDuplicateTranslation) {
