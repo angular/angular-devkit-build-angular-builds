@@ -13,7 +13,7 @@ export type Schema = {
      */
     format?: Format;
     /**
-     * How to handle duplicate translations.
+     * How to handle duplicate messages found during extraction.
      */
     i18nDuplicateTranslation?: I18NDuplicateTranslation;
     /**
@@ -44,7 +44,7 @@ export declare enum Format {
     Xmb = "xmb"
 }
 /**
- * How to handle duplicate translations.
+ * How to handle duplicate messages found during extraction.
  */
 export declare enum I18NDuplicateTranslation {
     Error = "error",
