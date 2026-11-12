@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { Schema as NgPackagrBuilderOptions } from './schema';
 /**
  * @experimental Direct usage of this function is considered experimental.
+ * @deprecated Use the `@angular/build:library` builder instead.
  */
 export declare function execute(options: NgPackagrBuilderOptions, context: BuilderContext): Observable<BuilderOutput>;
 export type { NgPackagrBuilderOptions };

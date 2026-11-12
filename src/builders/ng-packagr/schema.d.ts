@@ -1,5 +1,6 @@
 /**
  * ng-packagr target options for Build Architect. Use to build library projects.
+ * @deprecated
  */
 export type Schema = {
     /**

@@ -49,10 +49,11 @@ const rxjs_1 = require("rxjs");
 const normalize_cache_1 = require("../../utils/normalize-cache");
 /**
  * @experimental Direct usage of this function is considered experimental.
+ * @deprecated Use the `@angular/build:library` builder instead.
  */
 function execute(options, context) {
     context.logger.warn('The "@angular-devkit/build-angular:ng-packagr" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
-        'Use "@angular/build:ng-packagr" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.');
+        'Use "@angular/build:library" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.');
     return (0, rxjs_1.from)((async () => {
         // Purge old build disk cache.
         await (0, private_1.purgeStaleBuildCache)(context);
